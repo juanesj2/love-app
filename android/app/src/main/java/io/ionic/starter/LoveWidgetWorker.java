@@ -17,6 +17,11 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class LoveWidgetWorker extends Worker {
 
@@ -55,6 +60,10 @@ public class LoveWidgetWorker extends Worker {
                      .putString("lastTime", timeText)
                      .apply();
                      
+                // Fetch the static map image centered on the partner's location
+                String mapUrl = String.format(Locale.US, "https://staticmap.openstreetmap.de/staticmap.php?center=%f,%f&zoom=14&size=600x400&maptype=mapnik", partnerLoc.getLatitude(), partnerLoc.getLongitude());
+                Bitmap mapBitmap = fetchBitmap(mapUrl);
+                     
                 AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
                 ComponentName thisWidget = new ComponentName(context, LoveWidgetProvider.class);
                 int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
@@ -63,6 +72,9 @@ public class LoveWidgetWorker extends Worker {
                     RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
                     views.setTextViewText(R.id.widget_distance, distanceText);
                     views.setTextViewText(R.id.widget_time, timeText);
+                    if (mapBitmap != null) {
+                        views.setImageViewBitmap(R.id.widget_map, mapBitmap);
+                    }
                     appWidgetManager.updateAppWidget(appWidgetId, views);
                 }
                 
@@ -100,5 +112,19 @@ public class LoveWidgetWorker extends Worker {
         loc.setLatitude(lat);
         loc.setLongitude(lng);
         return loc;
+    }
+    
+    private Bitmap fetchBitmap(String urlString) {
+        try {
+            URL url = new URL(urlString);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Android) LoveWidget");
+            conn.setDoInput(true);
+            conn.connect();
+            return BitmapFactory.decodeStream(conn.getInputStream());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

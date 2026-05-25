@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { IonContent, IonIcon, AlertController, ToastController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { person, heart } from 'ionicons/icons';
@@ -22,6 +22,8 @@ export class LoginPage implements OnInit {
   private router = inject(Router);
   private locationService = inject(LocationService);
   private loveApi = inject(LoveApiService);
+  private alertCtrl = inject(AlertController);
+  private toastCtrl = inject(ToastController);
 
   public juanAvatarUrl = '';
   public robertaAvatarUrl = '';
@@ -48,20 +50,50 @@ export class LoginPage implements OnInit {
   }
 
   async selectProfile(userId: 'juan' | 'roberta') {
-    // Autenticarnos en Laravel API usando las credenciales blindadas en environment
-    const email = userId === 'juan' ? environment.apiCredentials.juanEmail : environment.apiCredentials.robertaEmail;
-    const password = environment.apiCredentials.password; 
-    try {
-      await this.loveApi.login(email, password);
-    } catch (e) {
-      console.log('Error login API Laravel (¿El usuario no existe o mala contraseña?):', e);
-    }
-
-    // Guardar el usuario localmente
-    localStorage.setItem('love_widget_user', userId);
-    // Guardar nativamente para el Widget de Android
-    await Preferences.set({ key: 'myUserId', value: userId });
-    // Redirigir a home
-    this.router.navigate(['/home']);
+    const alert = await this.alertCtrl.create({
+      cssClass: 'premium-login-alert',
+      header: 'Contraseña',
+      message: `Ingresa la contraseña para ${userId}`,
+      inputs: [
+        {
+          name: 'password',
+          type: 'password',
+          placeholder: 'Contraseña'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Entrar',
+          handler: async (data) => {
+            const email = userId === 'juan' ? environment.apiCredentials.juanEmail : environment.apiCredentials.robertaEmail;
+            const password = data.password; 
+            try {
+              await this.loveApi.login(email, password);
+              // Guardar el usuario localmente
+              localStorage.setItem('love_widget_user', userId);
+              // Guardar nativamente para el Widget de Android
+              await Preferences.set({ key: 'myUserId', value: userId });
+              // Redirigir a home
+              this.router.navigate(['/home']);
+            } catch (e) {
+              console.log('Error login API Laravel (¿El usuario no existe o mala contraseña?):', e);
+              const toast = await this.toastCtrl.create({
+                message: 'Contraseña incorrecta. Por favor, inténtalo de nuevo.',
+                duration: 3000,
+                color: 'danger',
+                position: 'bottom'
+              });
+              await toast.present();
+            }
+          }
+        }
+      ]
+    });
+    
+    await alert.present();
   }
 }
