@@ -1,0 +1,32 @@
+<ion-content [fullscreen]="true">
+  <!-- El div donde Leaflet dibujará el mapa -->
+  <div id="map" class="map-container"></div>
+  
+  <!-- UI Superpuesta (Header flotante estilo glassmorphism) -->
+  <div class="glass-header">
+    <div class="user-info">
+      
+      <ng-container *ngIf="!areTogether">
+        <h3>Conectando con {{ partnerName }}</h3>
+        <p>{{ distanceText }}</p>
+      </ng-container>
+
+      <ng-container *ngIf="areTogether">
+        <h3 class="together-title">¡Estáis juntos! ❤️</h3>
+        <div class="avatars-together">
+          <div class="avatar-circle me" [style.backgroundImage]="myAvatarUrl ? 'url(' + myAvatarUrl + ')' : ''">
+            <ion-icon name="person" *ngIf="!myAvatarUrl"></ion-icon>
+          </div>
+          <div class="avatar-circle partner" [style.backgroundImage]="partnerAvatarUrl ? 'url(' + partnerAvatarUrl + ')' : ''">
+            <ion-icon name="heart" *ngIf="!partnerAvatarUrl"></ion-icon>
+          </div>
+        </div>
+      </ng-container>
+      
+      <button class="avatar-btn" (click)="changeMyAvatar()" [disabled]="uploadingAvatar">
+        <ion-icon name="camera"></ion-icon>
+        Cambiar mi foto
+      </button>
+    </div>
+  </div>
+</ion-content>

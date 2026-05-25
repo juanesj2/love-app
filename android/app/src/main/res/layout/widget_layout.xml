@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF0F3"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/widget_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Love Widget"
+        android:textColor="#FF4D6D"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/widget_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cargando..."
+        android:textColor="#590D22"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp" />
+        
+    <TextView
+        android:id="@+id/widget_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Actualizando..."
+        android:textColor="#E5989B"
+        android:textSize="10sp"
+        android:layout_marginTop="12dp" />
+
+</LinearLayout>

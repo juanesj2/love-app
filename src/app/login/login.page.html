@@ -1,0 +1,26 @@
+<ion-content [fullscreen]="true" class="login-content">
+  <div class="login-container">
+    <div class="header-text">
+      <h1>¿Quién eres hoy?</h1>
+      <p>Selecciona tu perfil para conectar</p>
+    </div>
+
+    <div class="cards-container">
+      <!-- Tarjeta Juan -->
+      <div class="profile-card" (click)="selectProfile('juan')">
+        <div class="avatar-container juan">
+          <img [src]="juanAvatarUrl || defaultAvatar" class="avatar-img" />
+        </div>
+        <h2>Juan</h2>
+      </div>
+
+      <!-- Tarjeta Roberta -->
+      <div class="profile-card" (click)="selectProfile('roberta')">
+        <div class="avatar-container roberta">
+          <img [src]="robertaAvatarUrl || defaultAvatar" class="avatar-img" />
+        </div>
+        <h2>Roberta</h2>
+      </div>
+    </div>
+  </div>
+</ion-content>
