@@ -7,7 +7,8 @@ import { Subscription, combineLatest } from 'rxjs';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Preferences } from '@capacitor/preferences';
 import { addIcons } from 'ionicons';
-import { locateOutline } from 'ionicons/icons';
+import { locateOutline, flagOutline } from 'ionicons/icons';
+import { LoveApiService } from '../../services/love-api.service';
 
 @Component({
   selector: 'app-location-widget',
@@ -18,6 +19,17 @@ import { locateOutline } from 'ionicons/icons';
         <button class="center-map-btn" *ngIf="myLastPos" (click)="centerMap()">
           <ion-icon name="locate-outline"></ion-icon>
         </button>
+      </div>
+      
+      <!-- Floating Next Milestone -->
+      <div class="next-milestone-card" *ngIf="nextMilestone" (click)="loadNextMilestone()">
+        <div class="nm-icon">
+          <ion-icon name="flag-outline"></ion-icon>
+        </div>
+        <div class="nm-info">
+          <span class="nm-title">{{ nextMilestone.name }}</span>
+          <span class="nm-days">Faltan {{ daysRemaining }} días</span>
+        </div>
       </div>
       
       <!-- Together Box -->
@@ -46,6 +58,13 @@ import { locateOutline } from 'ionicons/icons';
     .center-map-btn { position: absolute; top: 15px; right: 15px; z-index: 2000; width: 44px; height: 44px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.4); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-size: 1.5rem; transition: transform 0.2s; }
     .center-map-btn:active { transform: scale(0.9); }
     
+    .next-milestone-card { position: absolute; top: 15px; left: 15px; z-index: 2000; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border-radius: 20px; padding: 10px 18px 10px 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.6); max-width: 65%; cursor: pointer; transition: transform 0.2s; }
+    .next-milestone-card:active { transform: scale(0.95); }
+    .nm-icon { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; box-shadow: 0 4px 10px rgba(255,77,109,0.3); }
+    .nm-info { display: flex; flex-direction: column; overflow: hidden; }
+    .nm-title { font-weight: 800; color: #590D22; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+    .nm-days { font-weight: 700; color: #FF4D6D; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    
     .together-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 20px; padding: 20px 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); z-index: 1000; min-width: 250px; }
     
     .avatar-container { position: relative; width: 60px; height: 60px; border-radius: 50%; border: 3px solid #FF4D6D; }
@@ -65,6 +84,10 @@ import { locateOutline } from 'ionicons/icons';
 })
 export class LocationWidgetComponent implements OnInit, OnDestroy {
   private locationService = inject(LocationService);
+  private api = inject(LoveApiService);
+
+  public nextMilestone: any = null;
+  public daysRemaining: number = 0;
 
   private map!: L.Map;
   public myUserId!: 'juan' | 'roberta';
@@ -89,7 +112,7 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
   private hasCentered = false;
 
   constructor() {
-    addIcons({ locateOutline });
+    addIcons({ locateOutline, flagOutline });
     const storedUser = localStorage.getItem('love_widget_user') as 'juan' | 'roberta';
     if (storedUser) {
       this.myUserId = storedUser;
@@ -101,6 +124,7 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.initMap();
       this.startTracking();
+      this.loadNextMilestone();
     }, 100);
 
     const myName = this.myUserId === 'juan' ? 'Juan' : 'Roberta';
@@ -111,6 +135,36 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.locationsSub?.unsubscribe();
+  }
+
+  async loadNextMilestone() {
+    try {
+      const milestones = await this.api.getMilestones();
+      const now = new Date();
+      now.setHours(0,0,0,0);
+      
+      let closest = null;
+      let minDiff = Infinity;
+      
+      for (const m of milestones) {
+        const d = new Date(m.target_date);
+        d.setHours(0,0,0,0);
+        const diffTime = d.getTime() - now.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays >= 0 && diffDays < minDiff) {
+          minDiff = diffDays;
+          closest = m;
+        }
+      }
+      
+      if (closest) {
+        this.nextMilestone = closest;
+        this.daysRemaining = minDiff;
+      }
+    } catch (e) {
+      console.error('Error fetching milestones', e);
+    }
   }
 
   private initMap() {

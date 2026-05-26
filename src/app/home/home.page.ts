@@ -1,24 +1,54 @@
-import { Component, inject, ViewChild } from '@angular/core';
-import { IonContent, IonFooter } from '@ionic/angular/standalone';
+import { Component, inject, ViewChild, OnInit } from '@angular/core';
+import { IonContent, IonFooter, IonHeader, IonToolbar, ActionSheetController } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastController, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { imagesOutline, images, chatbubblesOutline, chatbubbles, add, hourglassOutline, mapOutline, map, personOutline } from 'ionicons/icons';
+import { imagesOutline, images, chatbubblesOutline, chatbubbles, add, hourglassOutline, mapOutline, map, ellipsisHorizontalOutline, ellipsisHorizontal, heart, happyOutline, sadOutline, flameOutline, bedOutline } from 'ionicons/icons';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 import { LocationWidgetComponent } from '../widgets/location-widget/location-widget.component';
 import { PhotoWidgetComponent } from '../widgets/photo-widget/photo-widget.component';
 import { ChatWidgetComponent } from '../widgets/chat-widget/chat-widget.component';
+import { MasWidgetComponent } from '../widgets/mas-widget/mas-widget.component';
+import { QuestionsWidgetComponent } from '../widgets/questions-widget/questions-widget.component';
 import { LoveApiService } from '../services/love-api.service';
+import { LocationService } from '../services/location.service';
+import { Camera, CameraResultType, CameraSource, CameraDirection } from '@capacitor/camera';
+import { Preferences } from '@capacitor/preferences';
 
 @Component({
   selector: 'app-home',
   template: `
+    <ion-header class="ion-no-border">
+      <ion-toolbar>
+        <div class="custom-header">
+          <div class="avatar-container" (click)="openMoodSelector()">
+            <img *ngIf="myAvatarUrl" [src]="myAvatarUrl" class="avatar" />
+            <div *ngIf="!myAvatarUrl" class="avatar my-avatar">TÚ</div>
+            <div class="mood-badge" *ngIf="myMood">{{ myMood }}</div>
+          </div>
+          
+          <div class="poke-btn" (click)="sendPoke()">
+            <ion-icon name="heart" [class.poking]="pokeAnimation"></ion-icon>
+          </div>
+
+          <div class="avatar-container">
+            <img *ngIf="partnerAvatarUrl" [src]="partnerAvatarUrl" class="avatar" />
+            <div *ngIf="!partnerAvatarUrl" class="avatar partner-avatar">{{ partnerInitial }}</div>
+            <div class="mood-badge" *ngIf="partnerMood">{{ partnerMood }}</div>
+          </div>
+        </div>
+      </ion-toolbar>
+    </ion-header>
+
     <ion-content>
       <app-photo-widget *ngIf="selectedWidget === 'photo'" #photoWidget></app-photo-widget>
       <app-chat-widget *ngIf="selectedWidget === 'chat'"></app-chat-widget>
       <app-location-widget *ngIf="selectedWidget === 'location'"></app-location-widget>
+      <app-mas-widget *ngIf="selectedWidget === 'mas'" (openGameEvent)="selectedWidget = 'game'"></app-mas-widget>
+      <app-questions-widget *ngIf="selectedWidget === 'game'"></app-questions-widget>
     </ion-content>
 
     <ion-footer class="custom-footer">
@@ -40,7 +70,7 @@ import { LoveApiService } from '../services/love-api.service';
         </div>
         
         <!-- Center Upload Button -->
-        <div class="tab-btn center-btn" (click)="fileInput.click()">
+        <div class="tab-btn center-btn" (click)="takePicture()">
           <div class="plus-circle" [class.uploading]="uploading">
             <ion-icon name="add" *ngIf="!uploading"></ion-icon>
             <ion-icon name="hourglass-outline" *ngIf="uploading"></ion-icon>
@@ -54,17 +84,29 @@ import { LoveApiService } from '../services/love-api.service';
           <span>Mapa</span>
         </div>
         
-        <!-- Profile / Logout -->
-        <div class="tab-btn" (click)="logout()">
-          <ion-icon name="person-outline"></ion-icon>
-          <span>Salir</span>
+        <!-- Más -->
+        <div class="tab-btn" (click)="selectedWidget = 'mas'" [class.active]="selectedWidget === 'mas'">
+          <ion-icon name="ellipsis-horizontal-outline" *ngIf="selectedWidget !== 'mas'"></ion-icon>
+          <ion-icon name="ellipsis-horizontal" *ngIf="selectedWidget === 'mas'"></ion-icon>
+          <span>Más</span>
         </div>
       </div>
-      
-      <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display:none" />
     </ion-footer>
   `,
   styles: [`
+    ion-toolbar { --background: white; }
+    .custom-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 25px; background: white; }
+    .avatar-container { position: relative; cursor: pointer; }
+    .avatar { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); object-fit: cover; }
+    .my-avatar { background: linear-gradient(135deg, #FF4D6D, #c9184a); }
+    .partner-avatar { background: linear-gradient(135deg, #ff8fa3, #ffb3c1); }
+    .mood-badge { position: absolute; bottom: -5px; right: -5px; background: white; border-radius: 50%; padding: 2px; font-size: 1.2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    
+    .poke-btn { width: 50px; height: 50px; border-radius: 50%; background: #fff0f3; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: #FF4D6D; cursor: pointer; box-shadow: inset 0 2px 5px rgba(255,77,109,0.1); transition: all 0.2s; }
+    .poke-btn:active { transform: scale(0.9); }
+    .poke-btn ion-icon.poking { animation: heartbeat 0.8s infinite; color: #c9184a; }
+    @keyframes heartbeat { 0% { transform: scale(1); } 25% { transform: scale(1.3); } 50% { transform: scale(1); } 75% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
     .custom-footer { background: white; border-top: 1px solid #eee; padding-bottom: env(safe-area-inset-bottom); }
     .custom-tab-bar { display: flex; justify-content: space-between; align-items: center; padding: 5px 15px; height: 65px; position: relative; }
     .tab-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #888; width: 55px; font-size: 0.75rem; gap: 4px; transition: color 0.2s; cursor: pointer; }
@@ -81,31 +123,144 @@ import { LoveApiService } from '../services/love-api.service';
     @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
   `],
   standalone: true,
-  imports: [IonContent, IonFooter, IonIcon, CommonModule, FormsModule, LocationWidgetComponent, PhotoWidgetComponent, ChatWidgetComponent],
+  imports: [IonHeader, IonToolbar, IonContent, IonFooter, IonIcon, CommonModule, FormsModule, LocationWidgetComponent, PhotoWidgetComponent, ChatWidgetComponent, MasWidgetComponent, QuestionsWidgetComponent],
 })
-export class HomePage {
-  selectedWidget: 'location' | 'photo' | 'chat' = 'location';
+export class HomePage implements OnInit {
+  selectedWidget: 'location' | 'photo' | 'chat' | 'mas' | 'game' = 'location';
   uploading = false;
+  pokeAnimation = false;
+
+  myMood = '';
+  partnerMood = '';
+  partnerInitial = 'P';
+  
+  myAvatarUrl = '';
+  partnerAvatarUrl = '';
 
   private api = inject(LoveApiService);
+  private locationService = inject(LocationService);
   private toastController = inject(ToastController);
-  private router = inject(Router);
+  private actionSheetCtrl = inject(ActionSheetController);
 
   @ViewChild('photoWidget') photoWidgetComp?: PhotoWidgetComponent;
 
   constructor() {
-    addIcons({ imagesOutline, images, chatbubblesOutline, chatbubbles, add, hourglassOutline, mapOutline, map, personOutline });
+    addIcons({ imagesOutline, images, chatbubblesOutline, chatbubbles, add, hourglassOutline, mapOutline, map, ellipsisHorizontalOutline, ellipsisHorizontal, heart, happyOutline, sadOutline, flameOutline, bedOutline });
   }
 
-  async onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.uploading = true;
-      try {
-        await this.api.uploadPhoto(file, '');
-        this.selectedWidget = 'photo'; // Switch to photo tab
+  async ngOnInit() {
+    this.loadHeaderData();
+    // Poll header data every 30 seconds
+    setInterval(() => this.loadHeaderData(), 30000);
+
+    // Load avatars from Firebase
+    const { value } = await Preferences.get({ key: 'firebase_user_id' });
+    const myId = value || 'juan';
+    const partnerId = myId === 'juan' ? 'roberta' : 'juan';
+
+    this.locationService.listenToUserLocation(myId as 'juan'|'roberta').subscribe((data: any) => {
+      if (data && data.avatar) this.myAvatarUrl = data.avatar;
+    });
+    this.locationService.listenToUserLocation(partnerId as 'juan'|'roberta').subscribe((data: any) => {
+      if (data && data.avatar) this.partnerAvatarUrl = data.avatar;
+    });
+  }
+
+  async loadHeaderData() {
+    try {
+      const data = await this.api.getCoupleInfo();
+      if (data.my_mood) this.myMood = data.my_mood;
+      if (data.partner_mood) this.partnerMood = data.partner_mood;
+      if (data.partner_name) this.partnerInitial = data.partner_name.charAt(0).toUpperCase();
+    } catch (e) {
+      console.log('No se pudo cargar la info de la cabecera');
+    }
+  }
+
+  async openMoodSelector() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: '¿Cómo te sientes hoy?',
+      buttons: [
+        { text: 'Feliz 😊', handler: () => this.setMood('😊') },
+        { text: 'Cansado/a 😴', handler: () => this.setMood('😴') },
+        { text: 'Estresado/a 🤯', handler: () => this.setMood('🤯') },
+        { text: 'Mimoso/a 🥰', handler: () => this.setMood('🥰') },
+        { text: 'Triste 🥺', handler: () => this.setMood('🥺') },
+        { text: 'Cancelar', role: 'cancel' }
+      ]
+    });
+    await actionSheet.present();
+  }
+
+  async setMood(mood: string) {
+    this.myMood = mood;
+    try {
+      await this.api.updateCoupleInfo({ current_mood: mood });
+      const toast = await this.toastController.create({
+        message: 'Estado de ánimo actualizado',
+        duration: 2000,
+        color: 'success',
+        position: 'top'
+      });
+      toast.present();
+    } catch (e) {
+      console.error(e);
+      const toast = await this.toastController.create({
+        message: 'Error al actualizar el estado',
+        duration: 3000,
+        color: 'danger',
+        position: 'top'
+      });
+      toast.present();
+    }
+  }
+
+  async sendPoke() {
+    this.pokeAnimation = true;
+    try {
+      await Haptics.impact({ style: ImpactStyle.Heavy });
+      await this.api.sendPoke();
+      const toast = await this.toastController.create({
+        message: '¡Zumbido enviado! 🐝',
+        duration: 2000,
+        color: 'danger',
+        position: 'top'
+      });
+      toast.present();
+    } catch (e) {
+      console.error(e);
+      const toast = await this.toastController.create({
+        message: 'Error al enviar el zumbido',
+        duration: 3000,
+        color: 'danger',
+        position: 'top'
+      });
+      toast.present();
+    }
+    setTimeout(() => { this.pokeAnimation = false; }, 1500);
+  }
+
+  async takePicture() {
+    try {
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Uri,
+        source: CameraSource.Camera,
+        direction: CameraDirection.Front // Usar la cámara delantera por defecto
+      });
+
+      if (image.webPath) {
+        this.uploading = true;
         
-        // Wait a tick for angular to render the component if it was hidden
+        // Convert webPath to File object
+        const response = await fetch(image.webPath);
+        const blob = await response.blob();
+        const file = new File([blob], "camera_photo.jpg", { type: blob.type });
+
+        await this.api.uploadPhoto(file, '');
+        this.selectedWidget = 'photo';
+        
         setTimeout(async () => {
           if (this.photoWidgetComp) {
             await this.photoWidgetComp.loadData();
@@ -119,24 +274,22 @@ export class HomePage {
           position: 'top',
         });
         await toast.present();
-      } catch (e: any) {
-        console.error('Error al subir', e);
-        const toast = await this.toastController.create({
-          message: 'Error al subir la foto.',
-          duration: 3000,
-          color: 'danger',
-          position: 'top'
-        });
-        await toast.present();
-      } finally {
-        this.uploading = false;
-        event.target.value = ''; // reset
       }
+    } catch (e: any) {
+      if (e.message && e.message.includes('User cancelled')) {
+        // User closed the camera, do nothing
+        return;
+      }
+      console.error('Error al subir', e);
+      const toast = await this.toastController.create({
+        message: 'Error al subir la foto.',
+        duration: 3000,
+        color: 'danger',
+        position: 'top'
+      });
+      await toast.present();
+    } finally {
+      this.uploading = false;
     }
-  }
-
-  logout() {
-    this.api.logout();
-    this.router.navigate(['/login']);
   }
 }

@@ -60,8 +60,10 @@ public class LoveWidgetWorker extends Worker {
                      .putString("lastTime", timeText)
                      .apply();
                      
-                // Fetch the static map image centered on the partner's location
-                String mapUrl = String.format(Locale.US, "https://staticmap.openstreetmap.de/staticmap.php?center=%f,%f&zoom=14&size=600x400&maptype=mapnik", partnerLoc.getLatitude(), partnerLoc.getLongitude());
+                // Fetch the static map image centered on the partner's location (using Yandex for reliability without key)
+                String mapUrl = String.format(Locale.US, "https://static-maps.yandex.ru/1.x/?ll=%f,%f&size=600,400&z=14&l=map&pt=%f,%f,pm2rdm", 
+                    partnerLoc.getLongitude(), partnerLoc.getLatitude(),
+                    partnerLoc.getLongitude(), partnerLoc.getLatitude());
                 Bitmap mapBitmap = fetchBitmap(mapUrl);
                      
                 AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);

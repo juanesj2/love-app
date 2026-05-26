@@ -1,0 +1,216 @@
+import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { LoveApiService } from '../../services/love-api.service';
+import { IonIcon, ToastController } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { helpCircleOutline, checkmarkCircleOutline, lockClosedOutline, alertCircleOutline, arrowBack } from 'ionicons/icons';
+import { Location } from '@angular/common';
+
+@Component({
+  selector: 'app-questions-widget',
+  template: `
+    <div class="questions-container">
+      <div class="q-header">
+        <button class="back-btn" (click)="goBack()"><ion-icon name="arrow-back"></ion-icon></button>
+        <h2>Jueguitos</h2>
+        <p>Responde a ciegas y descubre qué ha puesto tu pareja.</p>
+      </div>
+
+      <div class="custom-toggle-container">
+        <div class="toggle-pill" [class.active]="viewMode === 'pending'" (click)="viewMode = 'pending'">
+          <ion-icon name="help-circle-outline"></ion-icon> Por responder
+        </div>
+        <div class="toggle-pill" [class.active]="viewMode === 'waiting_you'" (click)="viewMode = 'waiting_you'">
+          <ion-icon name="alert-circle-outline"></ion-icon> Te toca
+        </div>
+        <div class="toggle-pill" [class.active]="viewMode === 'completed'" (click)="viewMode = 'completed'">
+          <ion-icon name="checkmark-circle-outline"></ion-icon> Completadas
+        </div>
+      </div>
+
+      <div class="category-filter-container" *ngIf="categories.length > 1">
+        <div class="category-pill" 
+             *ngFor="let cat of categories" 
+             [class.active]="selectedCategory === cat" 
+             (click)="selectedCategory = cat">
+          {{ cat }}
+        </div>
+      </div>
+
+      <div class="q-list">
+        
+        <ng-container *ngIf="viewMode === 'pending'">
+          <div class="q-card" *ngFor="let q of pendingQuestions">
+            <div class="q-category">{{ q.category }}</div>
+            <h3 class="q-text">{{ q.question_text }}</h3>
+            <div class="q-body">
+              <div class="q-answer-box">
+                <textarea placeholder="Escribe tu respuesta aquí..." [(ngModel)]="draftAnswers[q.id]"></textarea>
+                <button (click)="submitAnswer(q.id)">Responder</button>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="pendingQuestions.length === 0" class="empty-state">
+             ¡Al día! No tienes preguntas nuevas pendientes.
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="viewMode === 'waiting_you'">
+          <div class="q-card" *ngFor="let q of waitingYouQuestions">
+            <div class="q-category attention">¡Tu pareja está esperando!</div>
+            <h3 class="q-text">{{ q.question_text }}</h3>
+            <div class="q-body">
+              <div class="q-answer-box">
+                <textarea placeholder="Descubre su respuesta al responder tú..." [(ngModel)]="draftAnswers[q.id]"></textarea>
+                <button (click)="submitAnswer(q.id)">Responder y Descubrir</button>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="waitingYouQuestions.length === 0" class="empty-state">
+             Nadie te está esperando por ahora 😊
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="viewMode === 'completed'">
+          <div class="q-card" *ngFor="let q of completedQuestions">
+            <div class="q-category">{{ q.category }}</div>
+            <h3 class="q-text">{{ q.question_text }}</h3>
+            
+            <div class="q-body">
+              <div *ngIf="q.status === 'waiting_partner'" class="q-waiting">
+                <ion-icon name="lock-closed-outline"></ion-icon>
+                <span>Respuesta oculta hasta que tu pareja responda.</span>
+              </div>
+
+              <div *ngIf="q.status === 'answered'" class="q-results">
+                <div class="answer-row">
+                  <span class="a-label">Tú:</span>
+                  <span class="a-text">{{ q.my_answer }}</span>
+                </div>
+                <div class="answer-row partner">
+                  <span class="a-label">Pareja:</span>
+                  <span class="a-text">{{ q.partner_answer }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="completedQuestions.length === 0" class="empty-state">
+             Aún no has respondido ninguna pregunta.
+          </div>
+        </ng-container>
+
+      </div>
+    </div>
+  `,
+  styles: [`
+    .questions-container { padding: 20px; background: #fff0f3; min-height: 100vh; padding-bottom: 80px; }
+    .q-header { text-align: center; margin-bottom: 20px; position: relative; }
+    .back-btn { position: absolute; left: 0; top: 0; background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; }
+    .q-header h2 { color: #590D22; margin: 0 0 5px; font-weight: 800; font-size: 1.8rem; padding-top: 5px; }
+    .q-header p { color: #a4133c; margin: 0; font-size: 0.95rem; }
+
+    .q-list { display: flex; flex-direction: column; gap: 15px; }
+    .q-card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(255,77,109,0.1); }
+    .q-category { display: inline-block; background: #ffb3c1; color: #590D22; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
+    .q-category.attention { background: #FF4D6D; color: white; animation: bounce 1s infinite alternate; }
+    @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-3px); } }
+    .q-text { color: #590D22; font-size: 1.1rem; margin: 0 0 15px; font-weight: 700; line-height: 1.4; }
+
+    .q-answer-box { display: flex; flex-direction: column; gap: 10px; }
+    .q-answer-box textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ffb3c1; background: #fffcfd; color: #590D22; font-family: inherit; font-size: 1.05rem; min-height: 80px; resize: none; outline: none; }
+    .q-answer-box textarea::placeholder { color: #ffb3c1; }
+    .q-answer-box button { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+
+    .q-waiting { display: flex; align-items: center; gap: 10px; background: #f8f9fa; padding: 15px; border-radius: 10px; color: #6c757d; font-size: 0.9rem; }
+    .q-waiting ion-icon { font-size: 1.5rem; }
+
+    .q-results { display: flex; flex-direction: column; gap: 10px; }
+    .answer-row { background: #fff0f3; padding: 12px; border-radius: 10px; display: flex; flex-direction: column; gap: 5px; }
+    .answer-row.partner { background: #ffb3c1; }
+    .a-label { font-size: 0.75rem; font-weight: bold; color: #590D22; text-transform: uppercase; }
+    .a-text { font-size: 1.05rem; color: #590D22; line-height: 1.4; }
+
+    .custom-toggle-container { display: flex; background: rgba(255,255,255,0.6); padding: 5px; border-radius: 30px; margin: 0 0 15px 0; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+    .toggle-pill { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 0; border-radius: 25px; font-weight: 700; color: #888; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
+    .toggle-pill.active { background: white; color: #FF4D6D; box-shadow: 0 4px 10px rgba(255,77,109,0.15); transform: scale(1.02); }
+    .category-filter-container { display: flex; gap: 8px; overflow-x: auto; padding: 5px; margin-bottom: 15px; scrollbar-width: none; -ms-overflow-style: none; }
+    .category-filter-container::-webkit-scrollbar { display: none; }
+    .category-pill { padding: 6px 14px; background: rgba(255, 77, 109, 0.1); color: #590D22; border-radius: 20px; font-size: 0.85rem; font-weight: bold; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
+    .category-pill.active { background: #FF4D6D; color: white; box-shadow: 0 3px 8px rgba(255,77,109,0.3); }
+    .empty-state { text-align: center; color: #a4133c; padding: 30px; font-weight: bold; opacity: 0.8; }
+  `],
+  standalone: true,
+  imports: [CommonModule, FormsModule, IonIcon]
+})
+export class QuestionsWidgetComponent implements OnInit {
+  questions: any[] = [];
+  draftAnswers: { [key: number]: string } = {};
+  viewMode: 'pending' | 'waiting_you' | 'completed' = 'pending';
+  selectedCategory: string = 'Todas';
+
+  get categories() {
+    const cats = this.questions.map(q => q.category);
+    return ['Todas', ...new Set(cats)];
+  }
+
+  get pendingQuestions() {
+    return this.questions.filter(q => q.status === 'unanswered' && (this.selectedCategory === 'Todas' || q.category === this.selectedCategory));
+  }
+
+  get waitingYouQuestions() {
+    return this.questions.filter(q => q.status === 'waiting_you' && (this.selectedCategory === 'Todas' || q.category === this.selectedCategory));
+  }
+
+  get completedQuestions() {
+    return this.questions.filter(q => (q.status === 'waiting_partner' || q.status === 'answered') && (this.selectedCategory === 'Todas' || q.category === this.selectedCategory));
+  }
+
+  private api = inject(LoveApiService);
+  private toastCtrl = inject(ToastController);
+  private location = inject(Location);
+
+  constructor() {
+    addIcons({ helpCircleOutline, checkmarkCircleOutline, lockClosedOutline, alertCircleOutline, arrowBack });
+  }
+
+  ngOnInit() {
+    this.loadQuestions();
+  }
+
+  goBack() {
+    this.location.back();
+  }
+
+  async loadQuestions() {
+    try {
+      this.questions = await this.api.getQuestions();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async submitAnswer(id: number) {
+    if (!this.draftAnswers[id]) return;
+    try {
+      await this.api.answerQuestion(id, this.draftAnswers[id]);
+      this.loadQuestions();
+      const toast = await this.toastCtrl.create({
+        message: 'Respuesta guardada con éxito',
+        duration: 2000,
+        color: 'success',
+        position: 'top'
+      });
+      toast.present();
+    } catch (e) {
+      console.error(e);
+      const toast = await this.toastCtrl.create({
+        message: 'Error al guardar la respuesta',
+        duration: 3000,
+        color: 'danger',
+        position: 'top'
+      });
+      toast.present();
+    }
+  }
+}

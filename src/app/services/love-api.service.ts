@@ -4,7 +4,7 @@ import { Preferences } from '@capacitor/preferences';
 import { firstValueFrom, BehaviorSubject } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-const API_BASE_URL = environment.apiUrl;
+export const API_BASE_URL = environment.apiUrl;
 
 @Injectable({
   providedIn: 'root'
@@ -54,15 +54,64 @@ export class LoveApiService {
     this.token$.next(null);
   }
 
-  // --- LOVE ALBUM ---
+  // --- INFO Y POKE ---
   async getCoupleInfo(): Promise<any> {
     const headers = await this.getHeaders();
-    return firstValueFrom(this.http.get(`${API_BASE_URL}/love-album/info`, { headers }));
+    return firstValueFrom(this.http.get<any>(`${API_BASE_URL}/love-album/info`, { headers }));
   }
 
-  async getPhotos(): Promise<any[]> {
+  async updateCoupleInfo(data: any): Promise<any> {
     const headers = await this.getHeaders();
-    return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/photos`, { headers }));
+    return firstValueFrom(this.http.put<any>(`${API_BASE_URL}/love-album/info`, data, { headers }));
+  }
+
+  async sendPoke(): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/poke`, {}, { headers }));
+  }
+
+  // --- HITOS IMPORTANTES ---
+  async getMilestones(): Promise<any[]> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/milestones`, { headers }));
+  }
+
+  async addMilestone(title: string, date: string): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/milestones`, { title, date }, { headers }));
+  }
+
+  async deleteMilestone(id: number): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/love-album/milestones/${id}`, { headers }));
+  }
+
+  // --- PREGUNTAS MINIJUEGO ---
+  async getQuestions(): Promise<any[]> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/questions`, { headers }));
+  }
+
+  async saveFcmToken(token: string): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/save-fcm-token`, { token }, { headers }));
+  }
+
+  async answerQuestion(id: number, answer: string): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/questions/${id}/answer`, { answer }, { headers }));
+  }
+
+  // --- FOTOGRAFÍAS ---
+  async getPhotos(albumId?: number): Promise<any[]> {
+    const headers = await this.getHeaders();
+    const url = albumId ? `${API_BASE_URL}/love-album/photos?album_id=${albumId}` : `${API_BASE_URL}/love-album/photos`;
+    return firstValueFrom(this.http.get<any[]>(url, { headers }));
+  }
+
+  async downloadPhotoBlob(id: number): Promise<Blob> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.get(`${API_BASE_URL}/love-album/photos/${id}/download`, { headers, responseType: 'blob' }));
   }
 
   // --- ALBUMES PERSONALIZADOS ---
@@ -77,10 +126,17 @@ export class LoveApiService {
     return res.album;
   }
 
-  async uploadPhoto(file: File, description: string = ''): Promise<any> {
+  async uploadAlbumCover(albumId: number, base64Image: string): Promise<any> {
+    const headers = await this.getHeaders();
+    const res: any = await firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/albums/${albumId}/cover`, { image: base64Image }, { headers }));
+    return res.album;
+  }
+
+  async uploadPhoto(file: File, description: string = '', albumId?: number): Promise<any> {
     const formData = new FormData();
     formData.append('image', file);
     if (description) formData.append('description', description);
+    if (albumId) formData.append('album_id', albumId.toString());
     
     const headers = await this.getHeaders();
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/photos`, formData, { headers }));
@@ -103,5 +159,50 @@ export class LoveApiService {
     
     const headers = await this.getHeaders();
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/chat`, body, { headers }));
+  }
+
+  // --- GAMES ---
+  
+  async getSwipeCategories(): Promise<string[]> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.get<string[]>(`${API_BASE_URL}/love-album/games/swipe/categories`, { headers }));
+  }
+
+  async getSwipeCards(category?: string): Promise<any[]> {
+    const headers = await this.getHeaders();
+    const url = category ? `${API_BASE_URL}/love-album/games/swipe/cards?category=${encodeURIComponent(category)}` : `${API_BASE_URL}/love-album/games/swipe/cards`;
+    return firstValueFrom(this.http.get<any[]>(url, { headers }));
+  }
+
+  async answerSwipe(questionId: number, answer: boolean): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/games/swipe/answer`, { question_id: questionId, answer }, { headers }));
+  }
+
+  async getSwipeStats(category?: string): Promise<any> {
+    const headers = await this.getHeaders();
+    const url = category ? `${API_BASE_URL}/love-album/games/swipe/stats?category=${encodeURIComponent(category)}` : `${API_BASE_URL}/love-album/games/swipe/stats`;
+    return firstValueFrom(this.http.get(url, { headers }));
+  }
+
+  async getDrawingCategories(): Promise<string[]> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.get<string[]>(`${API_BASE_URL}/love-album/games/drawing/categories`, { headers }));
+  }
+
+  async getDrawingPrompt(category?: string): Promise<any> {
+    const headers = await this.getHeaders();
+    const url = category ? `${API_BASE_URL}/love-album/games/drawing/prompt?category=${encodeURIComponent(category)}` : `${API_BASE_URL}/love-album/games/drawing/prompt`;
+    return firstValueFrom(this.http.get(url, { headers }));
+  }
+
+  async uploadDrawing(promptId: number, base64Image: string): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/games/drawing/upload`, { prompt_id: promptId, image: base64Image }, { headers }));
+  }
+
+  async getDrawingResult(promptId: number): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.get(`${API_BASE_URL}/love-album/games/drawing/${promptId}/result`, { headers }));
   }
 }

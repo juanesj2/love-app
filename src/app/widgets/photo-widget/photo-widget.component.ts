@@ -1,9 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, ToastController, AlertController } from '@ionic/angular';
+import { IonicModule, ToastController, AlertController, ActionSheetController } from '@ionic/angular';
 import { LoveApiService } from '../../services/love-api.service';
 import { environment } from '../../../environments/environment';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { addIcons } from 'ionicons';
+import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline } from 'ionicons/icons';
 
 // ... (Resto del decorador y imports no cambian, los saltamos por ahora, inyectaremos el AlertController abajo)
 
@@ -12,23 +15,47 @@ import { environment } from '../../../environments/environment';
   template: `
     <div class="photo-widget-container">
       <div class="header">
-        <div class="streak-badge" *ngIf="coupleInfo">
+        <div class="streak-badge" *ngIf="coupleInfo && !currentAlbum">
           <span class="streak-icon">🔥</span>
           <span class="streak-text">{{ coupleInfo.current_streak }} días</span>
         </div>
-        <h2 class="title albums-btn" (click)="openAlbumsModal()">
-          Nuestro Álbum <ion-icon name="chevron-down-outline" style="font-size: 1.2rem;"></ion-icon>
-        </h2>
+        <div class="streak-badge back-badge" *ngIf="currentAlbum" (click)="clearAlbum()" style="background: rgba(0,0,0,0.05); color: #590D22; cursor: pointer;">
+          <ion-icon name="arrow-back"></ion-icon>
+          <span class="streak-text">Atrás</span>
+        </div>
+        <div class="header-actions">
+          <h2 class="title albums-btn" (click)="openAlbumsModal()">
+            {{ currentAlbum ? currentAlbum.name : 'Nuestros Álbums' }} <ion-icon name="chevron-down-outline" style="font-size: 1.2rem;"></ion-icon>
+          </h2>
+          <button class="header-icon-btn" (click)="activateSelectionMode()" *ngIf="currentAlbum && photos.length > 0">
+            <ion-icon name="checkmark-done-outline"></ion-icon>
+          </button>
+          <button *ngIf="currentAlbum" class="header-upload-btn" (click)="uploadNewPhoto()">
+            <ion-icon name="add"></ion-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="custom-toggle-container" *ngIf="!currentAlbum">
+        <div class="toggle-pill" [class.active]="viewMode === 'feed'" (click)="viewMode = 'feed'">
+          <ion-icon name="list"></ion-icon> Feed
+        </div>
+        <div class="toggle-pill" [class.active]="viewMode === 'grid'" (click)="viewMode = 'grid'">
+          <ion-icon name="grid"></ion-icon> Galería
+        </div>
       </div>
 
       <div class="photos-list" *ngIf="groupedPhotos.length > 0; else noPhotos">
-        <div *ngFor="let group of groupedPhotos" class="date-group">
-          
-          <div class="date-header">
-            <span class="date-line"></span>
-            <span class="date-text">{{ group.date }}</span>
-            <span class="date-line"></span>
-          </div>
+        
+        <!-- VISTA FEED -->
+        <ng-container *ngIf="viewMode === 'feed'">
+          <div *ngFor="let group of groupedPhotos" class="date-group">
+            
+            <div class="date-header">
+              <span class="date-line"></span>
+              <span class="date-text">{{ group.date }}</span>
+              <span class="date-line"></span>
+            </div>
 
           <div class="photo-card" *ngFor="let photo of group.photos">
             <div class="image-wrapper">
@@ -46,6 +73,8 @@ import { environment } from '../../../environments/environment';
                 <button class="reaction-btn" (click)="react(photo.id, '❤️')">❤️</button>
                 <button class="reaction-btn" (click)="react(photo.id, '😍')">😍</button>
                 <button class="reaction-btn" (click)="react(photo.id, '😂')">😂</button>
+                <button class="reaction-btn custom-reaction" (click)="reactCustom(photo.id)"><ion-icon name="add"></ion-icon></button>
+                <button class="reaction-btn download-btn" (click)="downloadPhoto(photo)"><ion-icon name="download-outline"></ion-icon></button>
               </div>
 
               <div class="reply-box">
@@ -56,17 +85,64 @@ import { environment } from '../../../environments/environment';
           </div>
 
         </div>
+        </ng-container>
+
+        <!-- VISTA GRID (GALERÍA) -->
+        <ng-container *ngIf="viewMode === 'grid'">
+          <div class="selection-top-bar" *ngIf="selectionMode">
+             <div class="select-all-wrapper" (click)="toggleSelectAll()">
+               <ion-icon name="checkmark-circle" *ngIf="isAllSelected()" color="primary"></ion-icon>
+               <ion-icon name="ellipse-outline" *ngIf="!isAllSelected()"></ion-icon>
+               <span>Seleccionar todo</span>
+             </div>
+          </div>
+
+          <div *ngFor="let group of galleryGroups" class="gallery-month-group">
+            <div class="month-header">
+              <h3 class="gallery-month-title">{{ group.monthYear }}</h3>
+              <div class="select-month-wrapper" *ngIf="selectionMode" (click)="toggleSelectMonth(group)">
+                <ion-icon name="checkmark-circle" *ngIf="isMonthSelected(group)" color="primary"></ion-icon>
+                <ion-icon name="ellipse-outline" *ngIf="!isMonthSelected(group)"></ion-icon>
+              </div>
+            </div>
+            <div class="grid-view">
+              <div class="grid-photo-container" *ngFor="let photo of group.photos" 
+                   (mousedown)="startPress(photo)" (mouseup)="endPress()" (mouseleave)="endPress()"
+                   (touchstart)="startPress(photo)" (touchend)="endPress()"
+                   (click)="onPhotoClick(photo)"
+                   [class.selected]="selectedPhotos.has(photo.id)">
+                <img [src]="environment.storageUrl + photo.image_path" class="grid-photo" />
+                <div class="selection-overlay" *ngIf="selectionMode">
+                  <ion-icon name="checkmark-circle" *ngIf="selectedPhotos.has(photo.id)"></ion-icon>
+                  <ion-icon name="ellipse-outline" *ngIf="!selectedPhotos.has(photo.id)"></ion-icon>
+                </div>
+                <div class="grid-overlay" *ngIf="photo.reactions?.length && !selectionMode">
+                  <span *ngFor="let r of (photo.reactions || []).slice(0, 1)">{{r.content}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
       </div>
 
       <ng-template #noPhotos>
         <div class="empty-state">
           <ion-icon name="images-outline" class="empty-icon"></ion-icon>
-          <p>No hay fotos aún.<br>¡Sube una para empezar la racha!</p>
+          <p>No hay fotos aún.</p>
+          <p *ngIf="!currentAlbum">¡Sube una para empezar la racha!</p>
+          <button *ngIf="currentAlbum" class="empty-upload-btn" (click)="uploadNewPhoto()"><ion-icon name="camera"></ion-icon> Añadir foto al álbum</button>
         </div>
       </ng-template>
 
+      <div class="selection-actions" *ngIf="selectionMode">
+        <button class="selection-btn cancel" (click)="cancelSelection()"><ion-icon name="close"></ion-icon></button>
+        <span class="selection-count">{{selectedPhotos.size}} seleccionadas</span>
+        <button class="selection-btn download" (click)="downloadSelected()" [disabled]="selectedPhotos.size === 0"><ion-icon name="download"></ion-icon></button>
+      </div>
+
       <!-- Pantalla superpuesta de Colecciones (Modal) -->
-      <ion-modal [isOpen]="isAlbumsModalOpen" (didDismiss)="closeAlbumsModal()" initialBreakpoint="0.75" [breakpoints]="[0, 0.75, 1]">
+      <ion-modal [isOpen]="isAlbumsModalOpen" (didDismiss)="closeAlbumsModal()" initialBreakpoint="0.75" [breakpoints]="[0, 0.75, 1]" style="--background: #fff;">
         <ng-template>
           <div class="albums-modal-content">
             <div class="modal-header">
@@ -82,9 +158,12 @@ import { environment } from '../../../environments/environment';
                 <span class="album-name">Crear Nuevo</span>
               </div>
               
-              <div class="album-item" *ngFor="let album of albums">
-                <div class="album-cover">
-                  <ion-icon name="heart" style="color: white; font-size: 2rem;"></ion-icon>
+              <div class="album-item" *ngFor="let album of albums" (click)="openAlbum(album)">
+                <div class="album-cover" [style.backgroundImage]="album.cover_image ? 'url(' + environment.storageUrl + album.cover_image + ')' : ''">
+                  <ion-icon name="heart" *ngIf="!album.cover_image" style="color: white; font-size: 2rem;"></ion-icon>
+                  <div class="change-cover-btn" (click)="changeAlbumCover(album.id, $event)">
+                    <ion-icon name="camera"></ion-icon>
+                  </div>
                 </div>
                 <span class="album-name">{{ album.name }}</span>
               </div>
@@ -97,10 +176,19 @@ import { environment } from '../../../environments/environment';
   `,
   styles: [`
     .photo-widget-container { padding: 15px; height: 100%; display: flex; flex-direction: column; background: linear-gradient(135deg, #fff5f8 0%, #ffe3e9 100%); font-family: 'Inter', sans-serif; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .header-actions { display: flex; align-items: center; gap: 10px; }
     .title { margin: 0; font-size: 1.4rem; font-weight: 800; color: #590D22; letter-spacing: -0.5px; }
+    .header-upload-btn { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; box-shadow: 0 4px 10px rgba(255, 77, 109, 0.4); transition: transform 0.2s; }
+    .header-upload-btn:active { transform: scale(0.9); }
+    .header-icon-btn { background: rgba(0,0,0,0.05); color: #590D22; border: none; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; transition: transform 0.2s; }
+    .header-icon-btn:active { transform: scale(0.9); }
     .albums-btn { display: flex; align-items: center; gap: 5px; cursor: pointer; background: rgba(255, 77, 109, 0.1); padding: 8px 14px; border-radius: 20px; transition: all 0.2s; }
     .albums-btn:active { transform: scale(0.95); background: rgba(255, 77, 109, 0.2); }
+    
+    .custom-toggle-container { display: flex; background: rgba(255,255,255,0.6); padding: 5px; border-radius: 30px; margin: 0 10px 15px 10px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+    .toggle-pill { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 0; border-radius: 25px; font-weight: 700; color: #888; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
+    .toggle-pill.active { background: white; color: #FF4D6D; box-shadow: 0 4px 10px rgba(255,77,109,0.15); transform: scale(1.02); }
     
     .streak-badge { background: linear-gradient(90deg, #FF4D6D, #ff758c); color: white; padding: 6px 14px; border-radius: 25px; font-weight: 700; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4); animation: pulse 2s infinite; }
     .streak-icon { font-size: 1.2rem; }
@@ -112,7 +200,23 @@ import { environment } from '../../../environments/environment';
     .date-header { display: flex; align-items: center; justify-content: center; margin: 15px 0 25px 0; }
     .date-text { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; color: #a4133c; margin: 0 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); text-transform: capitalize; }
     .date-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 77, 109, 0.3), transparent); }
+    
+    .gallery-month-group { margin-bottom: 25px; }
+    .month-header { display: flex; justify-content: space-between; align-items: center; margin: 0 10px 10px 10px; border-bottom: 2px solid rgba(255, 77, 109, 0.2); padding-bottom: 5px; }
+    .gallery-month-title { margin: 0; font-size: 1.1rem; font-weight: 800; color: #590D22; text-transform: capitalize; }
+    .select-month-wrapper { font-size: 1.5rem; color: #FF4D6D; cursor: pointer; display: flex; align-items: center; }
+    
+    .selection-top-bar { display: flex; justify-content: flex-end; padding: 0 10px 10px 10px; margin-bottom: 10px; }
+    .select-all-wrapper { display: flex; align-items: center; gap: 8px; font-weight: 600; color: #FF4D6D; cursor: pointer; font-size: 1.1rem; }
+    .select-all-wrapper ion-icon { font-size: 1.5rem; }
 
+    .grid-view { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 0 10px; }
+    .grid-photo-container { position: relative; width: 100%; aspect-ratio: 1; cursor: pointer; overflow: hidden; border-radius: 8px; transition: all 0.2s; }
+    .grid-photo { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+    .grid-photo-container:active .grid-photo { transform: scale(0.95); }
+    .grid-photo-container.selected { border: 3px solid #FF4D6D; transform: scale(0.95); }
+    .grid-overlay { position: absolute; bottom: 3px; right: 3px; background: rgba(255,255,255,0.85); border-radius: 12px; padding: 1px 4px; font-size: 0.7rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .selection-overlay { position: absolute; top: 5px; right: 5px; font-size: 1.5rem; color: #FF4D6D; background: rgba(255,255,255,0.8); border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
     
     .photo-card { max-width: 500px; margin: 0 auto 25px auto; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border-radius: 24px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.8); transition: transform 0.3s ease; }
     .photo-card:hover { transform: translateY(-5px); }
@@ -128,6 +232,8 @@ import { environment } from '../../../environments/environment';
     .actions { display: flex; justify-content: center; gap: 15px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 15px; margin-bottom: 15px; }
     .reaction-btn { background: #fff; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.06); transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     .reaction-btn:hover { transform: scale(1.2); box-shadow: 0 6px 15px rgba(255, 77, 109, 0.2); }
+    .reaction-btn.custom-reaction { font-size: 1.2rem; color: #ffb3c1; border: 1px dashed #ffb3c1; }
+    .reaction-btn.download-btn { font-size: 1.2rem; color: #590D22; border: 1px solid rgba(0,0,0,0.1); }
     
     .reply-box { display: flex; gap: 10px; align-items: center; background: rgba(255,255,255,0.8); padding: 8px; border-radius: 20px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.05); }
     .reply-box input { flex: 1; border: none; background: transparent; padding: 8px 12px; outline: none; font-size: 0.95rem; color: #444; }
@@ -137,18 +243,32 @@ import { environment } from '../../../environments/environment';
     
     .empty-state { text-align: center; color: #a08c92; padding: 40px 20px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     .empty-icon { font-size: 4rem; margin-bottom: 15px; color: #ffb3c1; opacity: 0.8; }
+    .empty-upload-btn { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none; padding: 12px 24px; border-radius: 20px; font-weight: bold; margin-top: 15px; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3); }
+
+    .selection-actions { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); display: flex; align-items: center; gap: 15px; padding: 10px 20px; border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000; border: 1px solid rgba(255,77,109,0.2); }
+    .selection-count { font-weight: 700; color: #590D22; font-size: 1rem; }
+    .selection-btn { background: none; border: none; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s; }
+    .selection-btn:active { transform: scale(0.9); }
+    .selection-btn.cancel { color: #888; }
+    .selection-btn.download { color: #FF4D6D; }
+    .selection-btn.download:disabled { opacity: 0.5; color: #ccc; }
     
     .albums-modal-content { padding: 20px; background: #fff5f8; height: 100%; border-radius: 25px 25px 0 0; }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
     .modal-header h2 { margin: 0; font-size: 1.6rem; font-weight: 800; color: #590D22; }
     .close-btn { background: rgba(0,0,0,0.05); border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; }
     
-    .albums-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; }
+    .albums-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
     .album-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: transform 0.2s; }
     .album-item:active { transform: scale(0.95); }
-    .album-cover { width: 100%; aspect-ratio: 1; border-radius: 20px; background: linear-gradient(135deg, #FF4D6D, #c9184a); box-shadow: 0 5px 15px rgba(255, 77, 109, 0.3); display: flex; align-items: center; justify-content: center; }
-    .album-cover.empty { background: white; border: 2px dashed #ffb3c1; box-shadow: none; color: #FF4D6D; font-size: 2.5rem; }
-    .album-name { font-size: 0.9rem; font-weight: 700; color: #590D22; text-align: center; }
+    .album-cover { width: 100%; aspect-ratio: 1; border-radius: 20px; background: linear-gradient(135deg, #FF4D6D, #c9184a); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(201,24,74,0.3); background-size: cover; background-position: center; position: relative; }
+    .album-cover.empty { background: rgba(255, 77, 109, 0.1); border: 2px dashed #FF4D6D; box-shadow: none; }
+    .album-cover.empty ion-icon { font-size: 2rem; color: #FF4D6D; }
+    .album-name { font-size: 0.85rem; font-weight: 600; color: #590D22; text-align: center; }
+    
+    .change-cover-btn { position: absolute; bottom: 5px; right: 5px; background: rgba(255,255,255,0.8); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .change-cover-btn ion-icon { font-size: 1.2rem; color: #FF4D6D; }
+    .upload-fab { --background: #FF4D6D; --color: white; }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
@@ -157,15 +277,29 @@ export class PhotoWidgetComponent implements OnInit {
   private api = inject(LoveApiService);
   private toastController = inject(ToastController);
   private alertController = inject(AlertController);
+  private actionSheetCtrl = inject(ActionSheetController);
   public environment = environment;
   
   photos: any[] = [];
-  groupedPhotos: { date: string, photos: any[] }[] = [];
+  groupedPhotos: any[] = [];
+  galleryGroups: any[] = [];
+  
+  viewMode: 'feed' | 'grid' = 'feed';
+  
   albums: any[] = [];
+  isAlbumsModalOpen = false;
+  currentAlbum: any = null;
+
+  selectionMode = false;
+  selectedPhotos = new Set<number>();
+  longPressTimeout: any;
+
   coupleInfo: any = null;
   uploading = false;
-  
-  isAlbumsModalOpen = false;
+
+  constructor() {
+    addIcons({ arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline });
+  }
 
   ngOnInit() {
     this.loadData();
@@ -173,13 +307,14 @@ export class PhotoWidgetComponent implements OnInit {
 
   async loadData() {
     try {
-      this.coupleInfo = await this.api.getCoupleInfo();
-      this.photos = await this.api.getPhotos();
+      this.coupleInfo = await this.api.getCoupleInfo().catch(() => null);
+      this.photos = await this.api.getPhotos(this.currentAlbum?.id).catch(() => []);
       this.groupPhotosByDate();
+      this.groupPhotosForGallery();
       this.albums = await this.api.getAlbums().catch(() => []); // Ignorar error si backend no está actualizado
     } catch (e) {
       console.error(e);
-      this.showError('Error al cargar las fotos o tu pareja. Comprueba la conexión.');
+      this.showError('Error inesperado al cargar datos.');
     }
   }
 
@@ -209,10 +344,28 @@ export class PhotoWidgetComponent implements OnInit {
     this.groupedPhotos = Object.keys(groups).map(k => ({ date: k, photos: groups[k] }));
   }
 
+  groupPhotosForGallery() {
+    const groups: { [key: string]: any[] } = {};
+    for (const p of this.photos) {
+      const dateObj = new Date(p.created_at);
+      let monthYear = dateObj.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+      monthYear = monthYear.charAt(0).toUpperCase() + monthYear.slice(1); // Capitalizar
+      
+      if (!groups[monthYear]) {
+        groups[monthYear] = [];
+      }
+      groups[monthYear].push(p);
+    }
+    
+    // Sort array descending if needed, currently API returns new to old
+    this.galleryGroups = Object.keys(groups).map(k => ({ monthYear: k, photos: groups[k] }));
+  }
+
   async createNewAlbum() {
     const alert = await this.alertController.create({
       header: 'Nueva Colección',
       message: 'Dale un nombre a este álbum especial (ej. "Viaje a París", "Nuestro Aniversario").',
+      cssClass: 'custom-love-alert',
       inputs: [
         {
           name: 'name',
@@ -245,6 +398,66 @@ export class PhotoWidgetComponent implements OnInit {
     await alert.present();
   }
 
+  async presentPhotoOptions(callback: (source: CameraSource) => void) {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Seleccionar Imagen',
+      buttons: [
+        {
+          text: 'Tomar Foto',
+          icon: 'camera',
+          handler: () => {
+            callback(CameraSource.Camera);
+          }
+        },
+        {
+          text: 'Elegir de la Galería',
+          icon: 'image',
+          handler: () => {
+            callback(CameraSource.Photos);
+          }
+        },
+        {
+          text: 'Cancelar',
+          icon: 'close',
+          role: 'cancel'
+        }
+      ]
+    });
+    await actionSheet.present();
+  }
+
+  async changeAlbumCover(albumId: number, event: Event) {
+    event.stopPropagation();
+    
+    this.presentPhotoOptions(async (source) => {
+      try {
+        const image = await Camera.getPhoto({
+          quality: 60, width: 600, height: 600, allowEditing: true, resultType: CameraResultType.DataUrl, source: source
+        });
+        
+        if (image.dataUrl) {
+          // @ts-ignore
+          await this.api.updateAlbumCover(albumId, image.dataUrl);
+          this.loadData();
+          this.showSuccess('Portada actualizada');
+        }
+      } catch (e) {
+        console.log('User cancelled or error', e);
+      }
+    });
+  }
+
+  openAlbum(album: any) {
+    this.currentAlbum = album;
+    this.closeAlbumsModal();
+    this.loadData();
+  }
+
+  clearAlbum() {
+    this.currentAlbum = null;
+    this.loadData();
+  }
+
   openAlbumsModal() {
     this.isAlbumsModalOpen = true;
   }
@@ -264,6 +477,29 @@ export class PhotoWidgetComponent implements OnInit {
     }
   }
 
+  async reactCustom(photoId: number) {
+    const alert = await this.alertController.create({
+      header: 'Reacción',
+      message: 'Pon el emoji o sticker con el que quieres reaccionar',
+      cssClass: 'custom-love-alert',
+      inputs: [
+        { name: 'emoji', type: 'text', placeholder: 'Escribe un emoji...' }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Enviar',
+          handler: (data) => {
+            if (data.emoji) {
+              this.react(photoId, data.emoji);
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
   replyTexts: { [key: number]: string } = {};
 
   async replyWithText(photoId: number) {
@@ -279,31 +515,145 @@ export class PhotoWidgetComponent implements OnInit {
     }
   }
 
-  async onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.uploading = true;
+  async uploadNewPhoto() {
+    this.presentPhotoOptions(async (source) => {
       try {
-        await this.api.uploadPhoto(file, '');
-        this.loadData();
-        this.showSuccess('¡Recuerdo subido con éxito!');
-      } catch (e: any) {
-        console.error('Error completo:', e);
-        let errorMsg = 'Ocurrió un problema al subir la foto.';
+        const image = await Camera.getPhoto({
+          quality: 80, allowEditing: false, resultType: CameraResultType.Uri, source: source
+        });
         
-        // Extraer los mensajes de validación (422) de Laravel si existen
-        if (e.error && e.error.errors) {
-          const firstErrorKey = Object.keys(e.error.errors)[0];
-          errorMsg = e.error.errors[firstErrorKey][0];
-        } else if (e.error && e.error.message) {
-          errorMsg = e.error.message;
+        if (image.webPath) {
+          const response = await fetch(image.webPath);
+          const blob = await response.blob();
+          const file = new File([blob], `photo_${new Date().getTime()}.jpg`, { type: blob.type });
+          
+          this.uploading = true;
+          try {
+            await this.api.uploadPhoto(file, '', this.currentAlbum?.id);
+            this.loadData();
+            this.showSuccess('¡Recuerdo subido con éxito!');
+          } catch (e: any) {
+            console.error('Error completo:', e);
+            let errorMsg = 'Ocurrió un problema al subir la foto.';
+            if (e.error && e.error.errors) {
+              const firstErrorKey = Object.keys(e.error.errors)[0];
+              errorMsg = e.error.errors[firstErrorKey][0];
+            } else if (e.error && e.error.message) {
+              errorMsg = e.error.message;
+            }
+            this.showError(errorMsg);
+          } finally {
+            this.uploading = false;
+          }
         }
-        
-        this.showError(errorMsg);
-      } finally {
-        this.uploading = false;
-        event.target.value = ''; // reset input
+      } catch (e) {
+        console.log('User cancelled or error', e);
       }
+    });
+  }
+
+  // --- Selección y Descarga ---
+  activateSelectionMode() {
+    this.viewMode = 'grid';
+    this.selectionMode = true;
+  }
+
+  startPress(photo: any) {
+    if (this.selectionMode) return;
+    this.longPressTimeout = setTimeout(() => {
+      this.selectionMode = true;
+      this.toggleSelection(photo);
+    }, 500); // 500ms para mantener pulsado
+  }
+
+  endPress() {
+    clearTimeout(this.longPressTimeout);
+  }
+
+  toggleSelection(photo: any) {
+    if (this.selectedPhotos.has(photo.id)) {
+      this.selectedPhotos.delete(photo.id);
+      if (this.selectedPhotos.size === 0) {
+        this.selectionMode = false;
+      }
+    } else {
+      this.selectedPhotos.add(photo.id);
+    }
+  }
+
+  isMonthSelected(group: any): boolean {
+    if (!group || !group.photos || group.photos.length === 0) return false;
+    return group.photos.every((p: any) => this.selectedPhotos.has(p.id));
+  }
+
+  toggleSelectMonth(group: any) {
+    const allSelected = this.isMonthSelected(group);
+    if (allSelected) {
+      group.photos.forEach((p: any) => this.selectedPhotos.delete(p.id));
+      if (this.selectedPhotos.size === 0) this.selectionMode = false;
+    } else {
+      group.photos.forEach((p: any) => this.selectedPhotos.add(p.id));
+    }
+  }
+
+  isAllSelected(): boolean {
+    if (this.photos.length === 0) return false;
+    return this.photos.every(p => this.selectedPhotos.has(p.id));
+  }
+
+  toggleSelectAll() {
+    if (this.isAllSelected()) {
+      this.selectedPhotos.clear();
+      this.selectionMode = false;
+    } else {
+      this.photos.forEach(p => this.selectedPhotos.add(p.id));
+    }
+  }
+  
+  onPhotoClick(photo: any) {
+    if (this.selectionMode) {
+      this.toggleSelection(photo);
+    } else {
+      this.viewMode = 'feed';
+      // Aquí se podría hacer scroll hacia la foto si quisieramos
+    }
+  }
+
+  cancelSelection() {
+    this.selectionMode = false;
+    this.selectedPhotos.clear();
+  }
+
+  async downloadSelected() {
+    const selectedIds = Array.from(this.selectedPhotos);
+    this.showSuccess(`Descargando ${selectedIds.length} foto(s)...`);
+    
+    for (const photoId of selectedIds) {
+      const photo = this.photos.find(p => p.id === photoId);
+      if (photo) {
+        await this.downloadPhoto(photo);
+      }
+    }
+    
+    this.cancelSelection();
+  }
+
+  async downloadPhoto(photo: any) {
+    try {
+      const blob = await this.api.downloadPhotoBlob(photo.id);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `love_photo_${photo.id}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      this.showSuccess('Imagen descargada');
+    } catch (e) {
+      console.error('Error al descargar:', e);
+      this.showError('Error al descargar la imagen');
     }
   }
 
