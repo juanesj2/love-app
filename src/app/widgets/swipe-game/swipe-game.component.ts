@@ -12,7 +12,12 @@ import { Location } from '@angular/common';
     <div class="swipe-container">
       <div class="header">
         <button class="back-btn" (click)="goBack()"><ion-icon name="arrow-back"></ion-icon></button>
-        <h2>Tinder de Pareja</h2>
+        <div class="header-titles">
+          <h2>Tinder de Pareja</h2>
+          <div class="progress-bar-small" *ngIf="progress">
+            <div class="progress-fill" [style.width.%]="progress.swipe?.percentage || 0"></div>
+          </div>
+        </div>
         <button class="stats-btn" *ngIf="viewMode !== 'categories'" (click)="viewMode = viewMode === 'play' ? 'stats' : 'play'; loadStats()">
           <ion-icon [name]="viewMode === 'play' ? 'stats-chart-outline' : 'heart-outline'"></ion-icon>
         </button>
@@ -21,7 +26,7 @@ import { Location } from '@angular/common';
       <!-- VISTA DE CATEGORIAS -->
       <ng-container *ngIf="viewMode === 'categories'">
         <div class="categories-area">
-          <p class="subtitle">Elige un tema para empezar a jugar</p>
+          <p class="subtitle">Elige un tema para empezar a deslizar y descubrir vuestra afinidad</p>
           
           <div class="category-grid">
             <div class="cat-card all-card" (click)="selectCategory('')">
@@ -69,7 +74,7 @@ import { Location } from '@angular/common';
       <ng-template #noCards>
         <div class="empty-state" *ngIf="viewMode === 'play'">
           <h3>¡No hay más cartas!</h3>
-          <p>Habéis respondido a todas las preguntas de este tema. Vuelve más tarde o elige otro.</p>
+          <p>Habéis respondido a todas las preguntas candentes de este tema. Vuelve más tarde o elige otro.</p>
           <button class="primary-btn" (click)="viewMode = 'stats'; loadStats()">Ver Estadísticas</button>
         </div>
       </ng-template>
@@ -107,10 +112,17 @@ import { Location } from '@angular/common';
     </div>
   `,
   styles: [`
+    :host {
+      display: block;
+      height: 100%;
+    }
     .swipe-container { padding: 20px; background: #fff0f3; min-height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .back-btn, .stats-btn { background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; }
-    .header h2 { color: #590D22; margin: 0; font-weight: 800; font-size: 1.5rem; }
+    .back-btn, .stats-btn { background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; flex-shrink: 0; }
+    .header-titles { flex: 1; text-align: center; display: flex; flex-direction: column; align-items: center; }
+    .header-titles h2 { color: #590D22; margin: 0 0 5px; font-weight: 800; font-size: 1.5rem; }
+    .progress-bar-small { width: 100px; height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden; }
+    .progress-bar-small .progress-fill { height: 100%; background: #FF4D6D; border-radius: 3px; transition: width 0.5s ease-out; }
 
     /* VISTA CATEGORIAS */
     .categories-area { text-align: center; }
@@ -173,6 +185,7 @@ export class SwipeGameComponent implements OnInit {
   selectedCategory: string = '';
   cards: any[] = [];
   stats: any = null;
+  progress: any = null;
 
   private api = inject(LoveApiService);
   private toastCtrl = inject(ToastController);
@@ -188,8 +201,13 @@ export class SwipeGameComponent implements OnInit {
     addIcons({ heartDislikeOutline, heartOutline, arrowBack, statsChartOutline, 'infinite-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M256 256s-48-96-126-96c-54.12 0-98 43-98 96s43.88 96 98 96c37.51 0 71-22.41 94-48M256 256s48 96 126 96c54.12 0 98-43 98-96s-43.88-96-98-96c-37.51 0-71 22.41-94 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="48"/></svg>' });
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.loadCategories();
+    try {
+      this.progress = await this.api.getGamesProgress();
+    } catch (e) {
+      console.error('Error fetching progress', e);
+    }
   }
 
   goBack() {

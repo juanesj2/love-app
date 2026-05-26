@@ -13,8 +13,12 @@ import { Location } from '@angular/common';
     <div class="questions-container">
       <div class="q-header">
         <button class="back-btn" (click)="goBack()"><ion-icon name="arrow-back"></ion-icon></button>
-        <h2>Jueguitos</h2>
-        <p>Responde a ciegas y descubre qué ha puesto tu pareja.</p>
+        <h2>Test de Pareja</h2>
+        <p>Responde con sinceridad y descubre los secretos de tu pareja.</p>
+        <div class="progress-container" *ngIf="questions.length > 0">
+          <div class="progress-bar"><div class="progress-fill" [style.width.%]="percentage"></div></div>
+          <span class="progress-text">{{ percentage }}% completado</span>
+        </div>
       </div>
 
       <div class="custom-toggle-container">
@@ -52,7 +56,7 @@ import { Location } from '@angular/common';
             </div>
           </div>
           <div *ngIf="pendingQuestions.length === 0" class="empty-state">
-             ¡Al día! No tienes preguntas nuevas pendientes.
+             ¡Al día! Has respondido a todas las preguntas candentes de esta sección.
           </div>
         </ng-container>
 
@@ -96,7 +100,7 @@ import { Location } from '@angular/common';
             </div>
           </div>
           <div *ngIf="completedQuestions.length === 0" class="empty-state">
-             Aún no has respondido ninguna pregunta.
+             Aún no has respondido ninguna pregunta de esta sección. ¡Atrévete con la primera!
           </div>
         </ng-container>
 
@@ -104,11 +108,20 @@ import { Location } from '@angular/common';
     </div>
   `,
   styles: [`
+    :host {
+      display: block;
+      height: 100%;
+    }
     .questions-container { padding: 20px; background: #fff0f3; min-height: 100vh; padding-bottom: 80px; }
     .q-header { text-align: center; margin-bottom: 20px; position: relative; }
     .back-btn { position: absolute; left: 0; top: 0; background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; }
     .q-header h2 { color: #590D22; margin: 0 0 5px; font-weight: 800; font-size: 1.8rem; padding-top: 5px; }
     .q-header p { color: #a4133c; margin: 0; font-size: 0.95rem; }
+
+    .progress-container { display: flex; align-items: center; gap: 8px; margin-top: 15px; padding: 0 10px; }
+    .progress-bar { flex: 1; height: 8px; background: rgba(0,0,0,0.05); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; background: #FF4D6D; border-radius: 4px; transition: width 0.5s ease-out; }
+    .progress-text { font-size: 0.8rem; font-weight: bold; color: #a4133c; white-space: nowrap; }
 
     .q-list { display: flex; flex-direction: column; gap: 15px; }
     .q-card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(255,77,109,0.1); }
@@ -134,9 +147,9 @@ import { Location } from '@angular/common';
     .custom-toggle-container { display: flex; background: rgba(255,255,255,0.6); padding: 5px; border-radius: 30px; margin: 0 0 15px 0; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
     .toggle-pill { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 0; border-radius: 25px; font-weight: 700; color: #888; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
     .toggle-pill.active { background: white; color: #FF4D6D; box-shadow: 0 4px 10px rgba(255,77,109,0.15); transform: scale(1.02); }
-    .category-filter-container { display: flex; gap: 8px; overflow-x: auto; padding: 5px; margin-bottom: 15px; scrollbar-width: none; -ms-overflow-style: none; }
+    .category-filter-container { display: flex; gap: 8px; overflow-x: auto; padding: 5px; margin-bottom: 15px; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; }
     .category-filter-container::-webkit-scrollbar { display: none; }
-    .category-pill { padding: 6px 14px; background: rgba(255, 77, 109, 0.1); color: #590D22; border-radius: 20px; font-size: 0.85rem; font-weight: bold; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
+    .category-pill { flex-shrink: 0; padding: 6px 14px; background: rgba(255, 77, 109, 0.1); color: #590D22; border-radius: 20px; font-size: 0.85rem; font-weight: bold; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
     .category-pill.active { background: #FF4D6D; color: white; box-shadow: 0 3px 8px rgba(255,77,109,0.3); }
     .empty-state { text-align: center; color: #a4133c; padding: 30px; font-weight: bold; opacity: 0.8; }
   `],
@@ -164,6 +177,15 @@ export class QuestionsWidgetComponent implements OnInit {
 
   get completedQuestions() {
     return this.questions.filter(q => (q.status === 'waiting_partner' || q.status === 'answered') && (this.selectedCategory === 'Todas' || q.category === this.selectedCategory));
+  }
+
+  get totalCompletedQuestions() {
+    return this.questions.filter(q => q.status === 'waiting_partner' || q.status === 'answered');
+  }
+
+  get percentage() {
+    if (this.questions.length === 0) return 0;
+    return Math.round((this.totalCompletedQuestions.length / this.questions.length) * 100);
   }
 
   private api = inject(LoveApiService);

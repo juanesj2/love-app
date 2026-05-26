@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { LoveApiService } from '../../services/love-api.service';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arrowBack } from 'ionicons/icons';
@@ -20,7 +21,11 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
           <div class="game-icon-bg"><ion-icon name="game-controller-outline"></ion-icon></div>
           <div class="game-info">
             <h3>Test de Pareja</h3>
-            <p>Descubre cuánto os conocéis respondiendo a ciegas a preguntas clásicas.</p>
+            <p>Descubre cuánto os conocéis respondiendo a preguntas de todo tipo, desde divertidas hasta muy íntimas.</p>
+            <div class="progress-container" *ngIf="progress">
+              <div class="progress-bar"><div class="progress-fill" [style.width.%]="progress.questions?.percentage || 0"></div></div>
+              <span class="progress-text">{{ progress.questions?.percentage || 0 }}% completado</span>
+            </div>
           </div>
         </div>
 
@@ -28,7 +33,11 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
           <div class="game-icon-bg"><ion-icon name="swap-horizontal-outline"></ion-icon></div>
           <div class="game-info">
             <h3>Tinder de Pareja</h3>
-            <p>Desliza para responder preguntas rápidas y descubre en qué coincidís.</p>
+            <p>Desliza rápido y descubre vuestra afinidad en diferentes temas, incluyendo los más candentes.</p>
+            <div class="progress-container" *ngIf="progress">
+              <div class="progress-bar"><div class="progress-fill" [style.width.%]="progress.swipe?.percentage || 0"></div></div>
+              <span class="progress-text">{{ progress.swipe?.percentage || 0 }}% completado</span>
+            </div>
           </div>
         </div>
 
@@ -36,7 +45,11 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
           <div class="game-icon-bg"><ion-icon name="color-palette-outline"></ion-icon></div>
           <div class="game-info">
             <h3>Reto de Dibujo</h3>
-            <p>Dibujad algo al mismo tiempo y comparad vuestras obras de arte.</p>
+            <p>Sacad vuestro lado creativo (y atrevido) dibujando los retos propuestos al mismo tiempo.</p>
+            <div class="progress-container" *ngIf="progress">
+              <div class="progress-bar"><div class="progress-fill" [style.width.%]="progress.drawing?.percentage || 0"></div></div>
+              <span class="progress-text">{{ progress.drawing?.percentage || 0 }}% completado</span>
+            </div>
           </div>
         </div>
       </div>
@@ -59,13 +72,29 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
     .test-card .game-icon-bg { background: linear-gradient(135deg, #FF9A9E, #FECFEF); }
     .swipe-card .game-icon-bg { background: linear-gradient(135deg, #FF4D6D, #c9184a); }
     .draw-card .game-icon-bg { background: linear-gradient(135deg, #a2d2ff, #bde0fe); color: #023e8a; }
+
+    .progress-container { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+    .progress-bar { flex: 1; height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; background: #FF4D6D; border-radius: 3px; transition: width 0.5s ease-out; }
+    .progress-text { font-size: 0.75rem; font-weight: bold; color: #a4133c; white-space: nowrap; }
   `],
   standalone: true,
   imports: [CommonModule, IonIcon]
 })
-export class GamesHubComponent {
+export class GamesHubComponent implements OnInit {
+  progress: any = null;
+  private api = inject(LoveApiService);
+
   constructor(private router: Router) {
     addIcons({ gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arrowBack });
+  }
+
+  async ngOnInit() {
+    try {
+      this.progress = await this.api.getGamesProgress();
+    } catch (e) {
+      console.error('Error fetching games progress', e);
+    }
   }
 
   goBack() {

@@ -28,28 +28,28 @@
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
         </provider>
 
-        <receiver android:name=".LoveWidgetProvider" android:exported="true">
+        <receiver android:name=".LoveWidgetProvider" android:exported="true" android:label="@string/widget_love_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info" />
         </receiver>
 
-        <receiver android:name=".Counter1x1WidgetProvider" android:exported="true">
+        <receiver android:name=".Counter1x1WidgetProvider" android:exported="true" android:label="@string/widget_counter_1x1_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_counter_1x1_info" />
         </receiver>
 
-        <receiver android:name=".CounterPhotoWidgetProvider" android:exported="true">
+        <receiver android:name=".CounterPhotoWidgetProvider" android:exported="true" android:label="@string/widget_counter_photo_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_counter_photo_info" />
         </receiver>
 
-        <receiver android:name=".DailyPhotoWidgetProvider" android:exported="true">
+        <receiver android:name=".DailyPhotoWidgetProvider" android:exported="true" android:label="@string/widget_daily_photo_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -58,6 +58,7 @@
     </application>
 
     <!-- Permissions -->
-
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 </manifest>

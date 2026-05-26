@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, ToastController, AlertController, ActionSheetController } from '@ionic/angular';
+import { IonicModule, ToastController, AlertController, ActionSheetController, ModalController } from '@ionic/angular';
 import { LoveApiService } from '../../services/love-api.service';
 import { environment } from '../../../environments/environment';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
@@ -141,40 +141,42 @@ import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, 
         <button class="selection-btn download" (click)="downloadSelected()" [disabled]="selectedPhotos.size === 0"><ion-icon name="download"></ion-icon></button>
       </div>
 
-      <!-- Pantalla superpuesta de Colecciones (Modal) -->
-      <ion-modal [isOpen]="isAlbumsModalOpen" (didDismiss)="closeAlbumsModal()" initialBreakpoint="0.75" [breakpoints]="[0, 0.75, 1]" style="--background: #fff;">
-        <ng-template>
-          <div class="albums-modal-content">
-            <div class="modal-header">
-              <h2>Tus Colecciones</h2>
-              <button class="close-btn" (click)="closeAlbumsModal()"><ion-icon name="close"></ion-icon></button>
+      <!-- Pantalla superpuesta de Colecciones (Overlay CSS) -->
+      <div class="albums-overlay" *ngIf="isAlbumsModalOpen" (click)="closeAlbumsModal()">
+        <div class="albums-sheet" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>Tus Colecciones</h2>
+            <button class="close-btn" (click)="closeAlbumsModal()"><ion-icon name="close"></ion-icon></button>
+          </div>
+          
+          <div class="albums-grid">
+            <div class="album-item create-new" (click)="createNewAlbum()">
+              <div class="album-cover empty">
+                <ion-icon name="add"></ion-icon>
+              </div>
+              <span class="album-name">Crear Nuevo</span>
             </div>
             
-            <div class="albums-grid">
-              <div class="album-item create-new" (click)="createNewAlbum()">
-                <div class="album-cover empty">
-                  <ion-icon name="add"></ion-icon>
+            <div class="album-item" *ngFor="let album of albums" (click)="openAlbum(album)">
+              <div class="album-cover" [style.backgroundImage]="album.cover_image ? 'url(' + environment.storageUrl + album.cover_image + ')' : ''">
+                <ion-icon name="heart" *ngIf="!album.cover_image" style="color: white; font-size: 2rem;"></ion-icon>
+                <div class="change-cover-btn" (click)="changeAlbumCover(album.id, $event)">
+                  <ion-icon name="camera"></ion-icon>
                 </div>
-                <span class="album-name">Crear Nuevo</span>
               </div>
-              
-              <div class="album-item" *ngFor="let album of albums" (click)="openAlbum(album)">
-                <div class="album-cover" [style.backgroundImage]="album.cover_image ? 'url(' + environment.storageUrl + album.cover_image + ')' : ''">
-                  <ion-icon name="heart" *ngIf="!album.cover_image" style="color: white; font-size: 2rem;"></ion-icon>
-                  <div class="change-cover-btn" (click)="changeAlbumCover(album.id, $event)">
-                    <ion-icon name="camera"></ion-icon>
-                  </div>
-                </div>
-                <span class="album-name">{{ album.name }}</span>
-              </div>
+              <span class="album-name">{{ album.name }}</span>
             </div>
           </div>
-        </ng-template>
-      </ion-modal>
+        </div>
+      </div>
 
     </div>
   `,
   styles: [`
+    :host {
+      display: block;
+      height: 100%;
+    }
     .photo-widget-container { padding: 15px; height: 100%; display: flex; flex-direction: column; background: linear-gradient(135deg, #fff5f8 0%, #ffe3e9 100%); font-family: 'Inter', sans-serif; }
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
     .header-actions { display: flex; align-items: center; gap: 10px; }
@@ -253,7 +255,10 @@ import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, 
     .selection-btn.download { color: #FF4D6D; }
     .selection-btn.download:disabled { opacity: 0.5; color: #ccc; }
     
-    .albums-modal-content { padding: 20px; background: #fff5f8; height: 100%; border-radius: 25px 25px 0 0; }
+    .albums-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; flex-direction: column; justify-content: flex-end; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .albums-sheet { background: #fff5f8; width: 100%; height: 90%; border-radius: 25px 25px 0 0; padding: 20px; padding-bottom: 40px; overflow-y: auto; -webkit-overflow-scrolling: touch; animation: slideUp 0.3s cubic-bezier(0.4,0,0.2,1); }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
     .modal-header h2 { margin: 0; font-size: 1.6rem; font-weight: 800; color: #590D22; }
     .close-btn { background: rgba(0,0,0,0.05); border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; }

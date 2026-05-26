@@ -8,7 +8,7 @@ import { Preferences } from '@capacitor/preferences';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { LocationService } from '../../services/location.service';
 import { addIcons } from 'ionicons';
-import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline } from 'ionicons/icons';
+import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle } from 'ionicons/icons';
 
 @Component({
   selector: 'app-mas-widget',
@@ -153,6 +153,10 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
     </div>
   `,
   styles: [`
+    :host {
+      display: block;
+      height: 100%;
+    }
     .mas-container { padding: 15px; height: 100%; display: flex; flex-direction: column; background: linear-gradient(135deg, #fff5f8 0%, #ffe3e9 100%); font-family: 'Inter', sans-serif; overflow-y: auto; }
     .header { margin-bottom: 20px; }
     .title { margin: 0; font-size: 1.6rem; font-weight: 800; color: #590D22; letter-spacing: -0.5px; }
@@ -178,11 +182,13 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
     .value { display: block; font-size: 1.4rem; font-weight: 800; color: #590D22; }
     .label { display: block; font-size: 0.7rem; font-weight: 600; color: #a4133c; text-transform: uppercase; margin-top: 2px; }
 
-    .milestone-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: rgba(255,255,255,0.5); border-radius: 10px; margin-bottom: 8px; }
-    .m-title { display: block; font-weight: bold; color: #590D22; font-size: 0.95rem; }
-    .m-date { font-size: 0.75rem; color: #888; }
-    .m-days { font-weight: 900; color: #FF4D6D; background: #fff0f3; padding: 4px 8px; border-radius: 8px; font-size: 0.85rem; }
-    .delete-m { color: #ccc; font-size: 1.2rem; cursor: pointer; margin-left: 8px; }
+    .milestone-item { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,240,243,0.7)); border-radius: 14px; margin-bottom: 10px; border: 1px solid rgba(255,77,109,0.15); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    .milestone-info { flex: 1; overflow: hidden; }
+    .m-title { display: block; font-weight: 700; color: #590D22; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .m-date { font-size: 0.75rem; color: #a4133c; font-weight: 500; margin-top: 2px; display: block; }
+    .m-days { font-weight: 900; color: white; background: linear-gradient(135deg, #FF4D6D, #c9184a); padding: 5px 10px; border-radius: 10px; font-size: 0.8rem; white-space: nowrap; box-shadow: 0 2px 6px rgba(255,77,109,0.3); }
+    .delete-m { color: #ffb3c1; font-size: 1.3rem; cursor: pointer; flex-shrink: 0; transition: color 0.2s; }
+    .delete-m:active { color: #FF4D6D; }
     .add-milestone { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
     .add-milestone input { padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 77, 109, 0.2); background: rgba(255,255,255,0.9); color: #590D22; font-family: 'Inter', sans-serif; outline: none; }
     .add-milestone input::placeholder { color: #aaa; }
@@ -244,7 +250,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   myUserId: 'juan' | 'roberta' = 'juan';
 
   constructor() {
-    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline });
+    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle });
   }
 
   async ngOnInit() {

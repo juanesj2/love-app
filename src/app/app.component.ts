@@ -11,7 +11,4 @@ import { environment } from '../environments/environment';
 export class AppComponent {
   private notificationService = inject(NotificationService);
 
-  constructor() {
-    this.notificationService.init();
-  }
 }

@@ -2,49 +2,114 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF0F3">
+    android:background="#2A2A3E">
 
+    <!-- Map background image -->
     <ImageView
-        android:id="@+id/widget_map"
+        android:id="@+id/widget_map_bg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@android:color/transparent" />
+        android:alpha="0.7" />
 
+    <!-- Overlay content -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="#D9FFF0F3"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center"
-        android:padding="8dp">
+        android:padding="10dp">
 
-        <TextView
-            android:id="@+id/widget_title"
+        <!-- Avatar row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_weight="1">
+
+            <!-- My Avatar column -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/widget_my_avatar"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/avatar_circle_bg" />
+            </LinearLayout>
+
+            <!-- Distance pill in the center -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/widget_distance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/distance_pill_bg"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:text="..."
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Partner Avatar column -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/widget_map"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/avatar_circle_bg" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Bottom info -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Love Widget"
-            android:textColor="#FF4D6D"
-            android:textSize="12sp"
-            android:textStyle="bold" />
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginTop="4dp">
 
-        <TextView
-            android:id="@+id/widget_distance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Cargando..."
-            android:textColor="#590D22"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            <TextView
+                android:id="@+id/widget_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Love Widget"
+                android:textColor="#FF4D6D"
+                android:textSize="10sp"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/widget_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Actualizando..."
-            android:textColor="#E5989B"
-            android:textSize="10sp" />
+            <TextView
+                android:id="@+id/widget_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Actualizando..."
+                android:textColor="#AAAAAA"
+                android:textSize="9sp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

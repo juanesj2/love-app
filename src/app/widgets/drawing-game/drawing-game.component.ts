@@ -12,13 +12,18 @@ import { Location } from '@angular/common';
     <div class="drawing-container">
       <div class="header">
         <button class="back-btn" (click)="goBack()"><ion-icon name="arrow-back"></ion-icon></button>
-        <h2>Reto de Dibujo</h2>
+        <div class="header-titles">
+          <h2>Reto de Dibujo</h2>
+          <div class="progress-bar-small" *ngIf="progress">
+            <div class="progress-fill" [style.width.%]="progress.drawing?.percentage || 0"></div>
+          </div>
+        </div>
       </div>
 
       <!-- VISTA DE CATEGORIAS -->
       <ng-container *ngIf="gameState === 'categories'">
         <div class="categories-area">
-          <p class="subtitle">Elige un tema para dibujar</p>
+          <p class="subtitle">Elige un tema para dar rienda suelta a tu imaginación</p>
           
           <div class="category-grid">
             <div class="cat-card all-card" (click)="selectCategory('')">
@@ -53,7 +58,7 @@ import { Location } from '@angular/common';
           <div class="waiting-state">
             <div class="spinner">⏳</div>
             <h3>Esperando a tu pareja</h3>
-            <p>Tu dibujo se ha guardado. Vuelve más tarde o dile a tu pareja que haga su dibujo.</p>
+            <p>Tu obra de arte se ha guardado. Dile a tu pareja que acepte el reto para ver ambos resultados.</p>
             <button class="primary-btn mt-20" (click)="checkResult()">Comprobar</button>
           </div>
         </ng-container>
@@ -80,18 +85,26 @@ import { Location } from '@angular/common';
 
       <div class="empty-state" *ngIf="!prompt && gameState === 'init'">
         <h3>No hay más retos</h3>
-        <p>Habéis completado todos los retos de esta categoría. ¡Elige otra o vuelve pronto!</p>
+        <p>¡Habéis superado todos los retos candentes de esta categoría! Elegid otra para seguir jugando.</p>
       </div>
     </div>
   `,
   styles: [`
+    :host {
+      display: block;
+      height: 100%;
+    }
     .drawing-container { padding: 20px; background: #fff0f3; min-height: 100vh; display: flex; flex-direction: column; }
     .header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-    .back-btn { background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; }
-    .header h2 { color: #590D22; margin: 0; font-weight: 800; font-size: 1.5rem; }
+    .back-btn { background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; flex-shrink: 0; }
+    .header-titles { flex: 1; text-align: center; display: flex; flex-direction: column; align-items: center; margin-right: 40px; }
+    .header-titles h2 { color: #590D22; margin: 0 0 5px; font-weight: 800; font-size: 1.5rem; }
+    .progress-bar-small { width: 100px; height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden; }
+    .progress-bar-small .progress-fill { height: 100%; background: #FF4D6D; border-radius: 3px; transition: width 0.5s ease-out; }
 
     /* VISTA CATEGORIAS */
     .categories-area { text-align: center; }
+    .subtitle { color: #a4133c; font-weight: bold; margin-bottom: 15px; }
     .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
     .cat-card { background: white; border-radius: 15px; padding: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s; }
     .cat-card:active { transform: scale(0.95); }
@@ -146,6 +159,7 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
   prompt: any = null;
   gameState: 'categories' | 'init' | 'drawing' | 'waiting' | 'completed' = 'categories';
   result: any = null;
+  progress: any = null;
 
   private isDrawing = false;
   private api = inject(LoveApiService);
@@ -156,8 +170,13 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
     addIcons({ arrowBack, trashOutline, checkmarkCircleOutline, 'infinite-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M256 256s-48-96-126-96c-54.12 0-98 43-98 96s43.88 96 98 96c37.51 0 71-22.41 94-48M256 256s48 96 126 96c54.12 0 98-43 98-96s-43.88-96-98-96c-37.51 0-71 22.41-94 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="48"/></svg>' });
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.loadCategories();
+    try {
+      this.progress = await this.api.getGamesProgress();
+    } catch (e) {
+      console.error('Error fetching progress', e);
+    }
   }
 
   ngAfterViewInit() {}
@@ -165,8 +184,16 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
   async loadCategories() {
     try {
       this.categories = await this.api.getDrawingCategories();
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      const toast = await this.toastCtrl.create({
+        message: 'Error al cargar categorías. Revisa tu backend.',
+        duration: 3000,
+        color: 'danger',
+        position: 'bottom',
+        icon: 'warning-outline'
+      });
+      toast.present();
     }
   }
 
@@ -191,9 +218,18 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
     try {
       this.prompt = await this.api.getDrawingPrompt(this.selectedCategory);
       this.checkResult(); 
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
       this.gameState = 'init';
+      
+      const toast = await this.toastCtrl.create({
+        message: e?.status === 404 ? 'No hay retos disponibles.' : 'Error al cargar el reto.',
+        duration: 3000,
+        color: e?.status === 404 ? 'warning' : 'danger',
+        position: 'bottom',
+        icon: 'alert-circle-outline'
+      });
+      toast.present();
     }
   }
 

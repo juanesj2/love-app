@@ -2,6 +2,10 @@
 <resources>
     <string name="app_name">love-widget</string>
     <string name="title_activity_main">love-widget</string>
-    <string name="package_name">io.ionic.starter</string>
-    <string name="custom_url_scheme">io.ionic.starter</string>
+    <string name="package_name">com.juanesj2.lovewidget</string>
+    <string name="custom_url_scheme">com.juanesj2.lovewidget</string>
+    <string name="widget_love_label">Widget de Amor (Distancia y Mapa)</string>
+    <string name="widget_counter_1x1_label">Widget Contador (1x1)</string>
+    <string name="widget_counter_photo_label">Widget Contador con Foto (2x2)</string>
+    <string name="widget_daily_photo_label">Widget Foto Diaria Pareja (2x2)</string>
 </resources>

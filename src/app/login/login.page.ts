@@ -7,6 +7,7 @@ import { addIcons } from 'ionicons';
 import { person, heart } from 'ionicons/icons';
 import { LocationService } from '../services/location.service';
 import { LoveApiService } from '../services/love-api.service';
+import { NotificationService } from '../services/notification.service';
 import { environment } from '../../environments/environment';
 
 import { Preferences } from '@capacitor/preferences';
@@ -22,6 +23,7 @@ export class LoginPage implements OnInit {
   private router = inject(Router);
   private locationService = inject(LocationService);
   private loveApi = inject(LoveApiService);
+  private notificationService = inject(NotificationService);
   private alertCtrl = inject(AlertController);
   private toastCtrl = inject(ToastController);
 
@@ -45,6 +47,7 @@ export class LoginPage implements OnInit {
     const storedUser = localStorage.getItem('love_widget_user');
     const { value: token } = await Preferences.get({ key: 'auth_token' });
     if (storedUser && token) {
+      this.notificationService.init();
       this.router.navigate(['/home']);
     }
   }
@@ -77,6 +80,8 @@ export class LoginPage implements OnInit {
               localStorage.setItem('love_widget_user', userId);
               // Guardar nativamente para el Widget de Android
               await Preferences.set({ key: 'myUserId', value: userId });
+              // Pedir notificaciones y guardar token ahora que estamos logueados
+              this.notificationService.init();
               // Redirigir a home
               this.router.navigate(['/home']);
             } catch (e) {

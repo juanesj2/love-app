@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package com.juanesj2.lovewidget;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -10,10 +10,12 @@ import java.util.concurrent.TimeUnit;
 import android.content.SharedPreferences;
 import android.widget.RemoteViews;
 
-public class DailyPhotoWidgetProvider extends AppWidgetProvider {
+public class Counter1x1WidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+        updateWidgetFromCache(context, appWidgetManager, appWidgetIds);
+        
         PeriodicWorkRequest workRequest = new PeriodicWorkRequest.Builder(
                 CounterWidgetWorker.class, 15, TimeUnit.MINUTES)
                 .build();
@@ -22,5 +24,16 @@ public class DailyPhotoWidgetProvider extends AppWidgetProvider {
                 "CounterWidgetUpdate",
                 ExistingPeriodicWorkPolicy.KEEP,
                 workRequest);
+    }
+    
+    public static void updateWidgetFromCache(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+        SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
+        String counterText = prefs.getString("lastCounterText", "-- Días");
+        
+        for (int appWidgetId : appWidgetIds) {
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_counter_1x1);
+            views.setTextViewText(R.id.widget_counter_text, counterText);
+            appWidgetManager.updateAppWidget(appWidgetId, views);
+        }
     }
 }

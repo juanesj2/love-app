@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package com.juanesj2.lovewidget;
 
 import android.content.Context;
 import androidx.annotation.NonNull;
@@ -32,8 +32,15 @@ public class CounterWidgetWorker extends Worker {
         Context context = getApplicationContext();
         SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
         
-        String startDateString = prefs.getString("relationshipStartDate", "");
-        String albumId = prefs.getString("widgetAlbumId", "feed");
+        String startDateString = prefs.getString("_cap_relationshipStartDate", "");
+        if (startDateString == null || startDateString.isEmpty()) {
+            startDateString = prefs.getString("relationshipStartDate", "");
+        }
+        
+        String albumId = prefs.getString("_cap_widgetAlbumId", "");
+        if (albumId == null || albumId.isEmpty()) {
+            albumId = prefs.getString("widgetAlbumId", "feed");
+        }
         
         String counterText = "-- Días";
         
@@ -92,20 +99,6 @@ public class CounterWidgetWorker extends Worker {
                 appWidgetManager.updateAppWidget(id, views);
             }
             
-            // 3. Update Daily Widget
-            ComponentName widgetDaily = new ComponentName(context, DailyPhotoWidgetProvider.class);
-            int[] idsDaily = appWidgetManager.getAppWidgetIds(widgetDaily);
-            for (int id : idsDaily) {
-                RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_daily_photo);
-                if (photoBitmap != null) {
-                    views.setImageViewBitmap(R.id.widget_daily_photo, photoBitmap);
-                    views.setTextViewText(R.id.widget_daily_title, "");
-                } else {
-                    views.setTextViewText(R.id.widget_daily_title, "Sin fotos");
-                }
-                appWidgetManager.updateAppWidget(id, views);
-            }
-            
             return Result.success();
             
         } catch (Exception e) {
@@ -116,9 +109,11 @@ public class CounterWidgetWorker extends Worker {
     
     private String fetchLatestPhotoUrl(String albumId) {
         try {
-            // For simplicity, we fetch all photos if feed, or from specific endpoint if album.
-            // But since our API doesn't have a specific album endpoint right now, we can fetch all photos and filter.
-            URL url = new URL("https://enfoca.alwaysdata.net/api/love-album/photos");
+            String urlStr = "https://enfoca.alwaysdata.net/api/love-album/photos";
+            if (albumId != null && !albumId.isEmpty() && !albumId.equals("feed")) {
+                urlStr += "?album_id=" + albumId;
+            }
+            URL url = new URL(urlStr);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
@@ -128,7 +123,10 @@ public class CounterWidgetWorker extends Worker {
             // Let's assume the API might need auth. If it needs auth, we read it from preferences.
             Context context = getApplicationContext();
             SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
-            String token = prefs.getString("auth_token", "");
+            String token = prefs.getString("_cap_auth_token", "");
+            if (token == null || token.isEmpty()) {
+                token = prefs.getString("auth_token", "");
+            }
             if (!token.isEmpty()) {
                 conn.setRequestProperty("Authorization", "Bearer " + token);
             }

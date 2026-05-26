@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { LoveApiService } from '../../services/love-api.service';
 import { environment } from '../../../environments/environment';
+import { addIcons } from 'ionicons';
+import { paperPlane, hourglassOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-chat-widget',
@@ -47,6 +49,10 @@ import { environment } from '../../../environments/environment';
     </div>
   `,
   styles: [`
+    :host {
+      display: block;
+      height: 100%;
+    }
     .chat-wrapper { display: flex; flex-direction: column; height: 100%; background: #fdf5f7; font-family: 'Inter', sans-serif; position: relative; }
     
     .chat-header { padding: 15px 20px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255, 77, 109, 0.1); z-index: 10; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
@@ -93,6 +99,10 @@ export class ChatWidgetComponent implements OnInit, AfterViewChecked {
   messages: any[] = [];
   newMessage: string = '';
   sending = false;
+
+  constructor() {
+    addIcons({ paperPlane, hourglassOutline });
+  }
 
   ngOnInit() {
     this.loadMessages();

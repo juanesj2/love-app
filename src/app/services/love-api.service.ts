@@ -163,6 +163,11 @@ export class LoveApiService {
 
   // --- GAMES ---
   
+  async getGamesProgress(): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.get(`${API_BASE_URL}/love-album/games/progress`, { headers }));
+  }
+
   async getSwipeCategories(): Promise<string[]> {
     const headers = await this.getHeaders();
     return firstValueFrom(this.http.get<string[]>(`${API_BASE_URL}/love-album/games/swipe/categories`, { headers }));

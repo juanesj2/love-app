@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package com.juanesj2.lovewidget;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -10,29 +10,32 @@ import java.util.concurrent.TimeUnit;
 import android.content.SharedPreferences;
 import android.widget.RemoteViews;
 
-public class CounterPhotoWidgetProvider extends AppWidgetProvider {
+public class LoveWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         updateWidgetFromCache(context, appWidgetManager, appWidgetIds);
         
+        // Android mínimo permite 15 minutos de intervalo
         PeriodicWorkRequest workRequest = new PeriodicWorkRequest.Builder(
-                CounterWidgetWorker.class, 15, TimeUnit.MINUTES)
+                LoveWidgetWorker.class, 15, TimeUnit.MINUTES)
                 .build();
                 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-                "CounterWidgetUpdate",
+                "LoveWidgetUpdate",
                 ExistingPeriodicWorkPolicy.KEEP,
                 workRequest);
     }
     
     public static void updateWidgetFromCache(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
-        String counterText = prefs.getString("lastCounterText", "-- Días");
+        String lastDistance = prefs.getString("lastDistance", "Conectando...");
+        String lastTime = prefs.getString("lastTime", "");
         
         for (int appWidgetId : appWidgetIds) {
-            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_counter_photo);
-            views.setTextViewText(R.id.widget_counter_text_large, counterText);
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
+            views.setTextViewText(R.id.widget_distance, lastDistance);
+            views.setTextViewText(R.id.widget_time, lastTime);
             appWidgetManager.updateAppWidget(appWidgetId, views);
         }
     }

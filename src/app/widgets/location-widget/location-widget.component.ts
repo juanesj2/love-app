@@ -51,9 +51,14 @@ import { LoveApiService } from '../../services/love-api.service';
     </div>
   `,
   styles: [`
+    :host {
+      display: block;
+      height: 100%;
+    }
     .location-container { height: 100%; display: flex; flex-direction: column; position: relative; }
     .map-wrapper { flex: 1; position: relative; }
     #map { width: 100%; height: 100%; background: #1a1a1a; }
+    ::ng-deep .leaflet-tile-pane { /* Removed invert filter */ }
     
     .center-map-btn { position: absolute; top: 15px; right: 15px; z-index: 2000; width: 44px; height: 44px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.4); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-size: 1.5rem; transition: transform 0.2s; }
     .center-map-btn:active { transform: scale(0.9); }
@@ -99,6 +104,9 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
   public myAvatarUrl = '';
   public partnerAvatarUrl = '';
 
+  public myMood = '';
+  public partnerMood = '';
+
   public myLastPos?: L.LatLng;
   public partnerLastPos?: L.LatLng;
 
@@ -108,6 +116,7 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
   private connectionLine?: L.Polyline;
 
   private locationsSub?: Subscription;
+  private moodInterval: any;
 
   private hasCentered = false;
 
@@ -123,6 +132,7 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
   ngOnInit() {
     setTimeout(() => {
       this.initMap();
+      this.loadMoods();
       this.startTracking();
       this.loadNextMilestone();
     }, 100);
@@ -131,10 +141,16 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
     this.locationService.updateMyLocation(this.myUserId, myName).catch(err => {
       console.error('Error GPS', err);
     });
+
+    // Poll moods every 15 seconds
+    this.moodInterval = setInterval(() => this.loadMoods(), 15000);
   }
 
   ngOnDestroy() {
     this.locationsSub?.unsubscribe();
+    if (this.moodInterval) {
+      clearInterval(this.moodInterval);
+    }
   }
 
   async loadNextMilestone() {
@@ -167,11 +183,36 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
     }
   }
 
+  async loadMoods() {
+    try {
+      const info = await this.api.getCoupleInfo().catch(() => null);
+      if (info) {
+        this.myMood = info.my_mood || '';
+        this.partnerMood = info.partner_mood || '';
+        this.refreshMarkers();
+      }
+    } catch (e) {
+      console.error('Error loading moods', e);
+    }
+  }
+
+  private refreshMarkers() {
+    if (!this.map) return;
+    if (this.areTogether) return;
+    
+    if (this.myLastPos) {
+      this.updateMarker('me', this.myLastPos, this.myAvatarUrl);
+    }
+    if (this.partnerLastPos) {
+      this.updateMarker('partner', this.partnerLastPos, this.partnerAvatarUrl);
+    }
+  }
+
   private initMap() {
     this.map = L.map('map', { zoomControl: false }).setView([40.4168, -3.7038], 15);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
-      attribution: '&copy; OpenStreetMap'
+      attribution: '&copy; CartoDB'
     }).addTo(this.map);
   }
 
@@ -183,45 +224,40 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
       if (me) this.myAvatarUrl = me.avatar || '';
       if (partner) this.partnerAvatarUrl = partner.avatar || '';
 
-      if (me?.position && partner?.position) {
-        const p1 = L.latLng(me.position.latitude, me.position.longitude);
-        const p2 = L.latLng(partner.position.latitude, partner.position.longitude);
-        this.myLastPos = p1;
-        this.partnerLastPos = p2;
+      // Fallback a Cuenca y Albacete si no hay posición en Firestore
+      const myPos = me?.position 
+        ? L.latLng(me.position.latitude, me.position.longitude)
+        : (this.myUserId === 'juan' ? L.latLng(40.0708, -2.1374) : L.latLng(38.9942, -1.8585));
 
-        const distanceMeters = p1.distanceTo(p2);
-        this.areTogether = distanceMeters < 50; 
+      const partnerPos = partner?.position
+        ? L.latLng(partner.position.latitude, partner.position.longitude)
+        : (this.partnerId === 'juan' ? L.latLng(40.0708, -2.1374) : L.latLng(38.9942, -1.8585));
 
-        if (this.areTogether) {
-          this.clearMapElements();
-          if (!this.hasCentered) {
-            this.map.setView(p1, 15);
-            this.hasCentered = true;
-          }
-        } else {
-          this.updateMarker('me', p1, me.avatar);
-          this.updateMarker('partner', p2, partner.avatar);
-          this.drawConnection(p1, p2);
-          
-          const midPoint = L.latLng((p1.lat + p2.lat) / 2, (p1.lng + p2.lng) / 2);
-          const distText = distanceMeters > 1000
-            ? `${(distanceMeters / 1000).toFixed(1)} km`
-            : `${Math.round(distanceMeters)} m`;
-          this.updateDistanceMarker(midPoint, distText);
-          
-          if (!this.hasCentered) {
-            this.centerMap();
-            this.hasCentered = true;
-          }
-        }
-      } else if (me?.position) {
-        const p1 = L.latLng(me.position.latitude, me.position.longitude);
-        this.myLastPos = p1;
-        this.areTogether = false;
+      this.myLastPos = myPos;
+      this.partnerLastPos = partnerPos;
+
+      const distanceMeters = myPos.distanceTo(partnerPos);
+      this.areTogether = distanceMeters < 50; 
+
+      if (this.areTogether) {
         this.clearMapElements();
-        this.updateMarker('me', p1, me.avatar);
         if (!this.hasCentered) {
-          this.map.setView(p1, 14);
+          this.map.setView(myPos, 15);
+          this.hasCentered = true;
+        }
+      } else {
+        this.updateMarker('me', myPos, me?.avatar);
+        this.updateMarker('partner', partnerPos, partner?.avatar);
+        this.drawConnection(myPos, partnerPos);
+        
+        const midPoint = L.latLng((myPos.lat + partnerPos.lat) / 2, (myPos.lng + partnerPos.lng) / 2);
+        const distText = distanceMeters > 1000
+          ? `${(distanceMeters / 1000).toLocaleString('es-ES', { maximumFractionDigits: 0 })} km`
+          : `${Math.round(distanceMeters)} m`;
+        this.updateDistanceMarker(midPoint, distText);
+        
+        if (!this.hasCentered) {
+          this.centerMap();
           this.hasCentered = true;
         }
       }
@@ -249,11 +285,22 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
       ? `background-image: url('${avatarUrl}'); background-size: cover; background-position: center;`
       : `background-color: white;`;
 
+    const mood = type === 'me' ? this.myMood : this.partnerMood;
+    const moodHtml = mood
+      ? `<div style="position: absolute; top: -8px; right: -8px; background: white; width: 28px; height: 28px; border-radius: 50%; border: 2px solid #FF4D6D; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.2); z-index: 10;">${mood}</div>`
+      : '';
+
     const htmlIcon = L.divIcon({
       className: 'custom-div-icon',
-      html: `<div style="${backgroundStyle} width:54px; height:54px; border-radius:50%; border:3px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.4);"></div>`,
-      iconSize: [54, 54],
-      iconAnchor: [27, 27]
+      html: `
+        <div style="position: relative; width: 0; height: 0; display: flex; align-items: center; justify-content: center;">
+          <div style="${backgroundStyle} position: absolute; width:54px; height:54px; border-radius:50%; border:3px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.4); box-sizing: border-box; transform: translate(-50%, -50%);">
+            ${moodHtml}
+          </div>
+        </div>
+      `,
+      iconSize: [0, 0],
+      iconAnchor: [0, 0]
     });
 
     if (type === 'me') {
@@ -277,9 +324,9 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
   private updateDistanceMarker(latLng: L.LatLng, text: string) {
     const htmlIcon = L.divIcon({
       className: 'distance-pill-icon',
-      html: `<div style="background: white; color: #333; font-weight: 800; border-radius: 16px; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1px solid #eee; white-space: nowrap; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">${text}</div>`,
-      iconSize: [110, 32],
-      iconAnchor: [55, 16]
+      html: `<div style="background: white; color: #222; font-weight: 800; border-radius: 24px; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.25); white-space: nowrap; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; box-sizing: border-box; font-family: 'Inter', sans-serif;">${text}</div>`,
+      iconSize: [120, 40],
+      iconAnchor: [60, 20]
     });
 
     if (this.distanceMarker) {
@@ -318,3 +365,4 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
     }
   }
 }
+
