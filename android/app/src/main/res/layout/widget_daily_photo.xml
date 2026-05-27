@@ -2,24 +2,13 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF0F3">
+    android:background="#2A2A3E">
 
+    <!-- The ImageView that will contain the composited canvas with the photo and badges -->
     <ImageView
         android:id="@+id/widget_daily_photo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@android:color/transparent" />
+        android:scaleType="centerCrop" />
 
-    <TextView
-        android:id="@+id/widget_daily_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="#80000000"
-        android:textColor="#FFFFFF"
-        android:textSize="14sp"
-        android:padding="8dp"
-        android:text="Fotos Diarias"
-        android:gravity="center" />
 </FrameLayout>

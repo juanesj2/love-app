@@ -29,12 +29,10 @@ public class LoveWidgetProvider extends AppWidgetProvider {
     
     public static void updateWidgetFromCache(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
-        String lastDistance = prefs.getString("lastDistance", "Conectando...");
-        String lastTime = prefs.getString("lastTime", "");
+        String lastTime = prefs.getString("lastTime", "Actualizando...");
         
         for (int appWidgetId : appWidgetIds) {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
-            views.setTextViewText(R.id.widget_distance, lastDistance);
             views.setTextViewText(R.id.widget_time, lastTime);
             appWidgetManager.updateAppWidget(appWidgetId, views);
         }

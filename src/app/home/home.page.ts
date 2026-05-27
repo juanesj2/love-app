@@ -126,7 +126,7 @@ import { Preferences } from '@capacitor/preferences';
   imports: [IonHeader, IonToolbar, IonContent, IonFooter, IonIcon, CommonModule, FormsModule, LocationWidgetComponent, PhotoWidgetComponent, ChatWidgetComponent, MasWidgetComponent, QuestionsWidgetComponent],
 })
 export class HomePage implements OnInit {
-  selectedWidget: 'location' | 'photo' | 'chat' | 'mas' | 'game' = 'location';
+  selectedWidget: 'location' | 'photo' | 'chat' | 'mas' | 'game' = 'photo';
   uploading = false;
   pokeAnimation = false;
 
