@@ -25,7 +25,7 @@ import { paperPlane, hourglassOutline } from 'ionicons/icons';
             <span class="sender" *ngIf="!isMine(msg)">{{msg.user?.name}}</span>
             
             <div class="photo-reply" *ngIf="msg.photo">
-              <img [src]="environment.storageUrl + msg.photo.image_path" />
+              <ion-img [src]="environment.storageUrl + msg.photo.image_path"></ion-img>
             </div>
 
             <p class="text" *ngIf="msg.mensaje && msg.mensaje !== 'null'">{{msg.mensaje}}</p>
@@ -66,7 +66,8 @@ import { paperPlane, hourglassOutline } from 'ionicons/icons';
     .messages-content { flex: 1; --background: transparent; }
     .messages-inner { padding: 20px 15px; display: flex; flex-direction: column; gap: 12px; }
     
-    .message-wrapper { display: flex; width: 100%; }
+    .message-wrapper { display: flex; width: 100%; animation: slideUp 0.3s ease-out forwards; opacity: 0; transform: translateY(10px); }
+    @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
     .message-wrapper.mine { justify-content: flex-end; }
     .message-wrapper:not(.mine) { justify-content: flex-start; }
     
@@ -78,9 +79,9 @@ import { paperPlane, hourglassOutline } from 'ionicons/icons';
     .sender { font-size: 0.75rem; font-weight: 700; color: #FF4D6D; margin-bottom: 4px; display: block; }
     .text { margin: 0; word-wrap: break-word; }
     
-    .photo-reply img { width: 100%; max-width: 200px; border-radius: 12px; margin-bottom: 8px; border: 2px solid rgba(255,255,255,0.2); display: block; }
+    .photo-reply ion-img { width: 100%; max-width: 200px; border-radius: 12px; margin-bottom: 8px; border: 2px solid rgba(255,255,255,0.2); display: block; overflow: hidden; }
     .only-photo { padding: 4px; background: transparent !important; box-shadow: none !important; border: none !important; }
-    .only-photo .photo-reply img { margin-bottom: 0; }
+    .only-photo .photo-reply ion-img { margin-bottom: 0; }
     
     .input-area { padding: 15px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-top: 1px solid rgba(255, 77, 109, 0.1); }
     .input-container { display: flex; align-items: center; gap: 10px; background: #f5ecee; border-radius: 30px; padding: 6px 6px 6px 20px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02); border: 1px solid rgba(255, 77, 109, 0.15); transition: all 0.3s; }

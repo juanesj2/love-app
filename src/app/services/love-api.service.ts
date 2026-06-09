@@ -103,10 +103,13 @@ export class LoveApiService {
   }
 
   // --- FOTOGRAFÍAS ---
-  async getPhotos(albumId?: number): Promise<any[]> {
+  async getPhotos(albumId?: number, page: number = 1): Promise<any> {
     const headers = await this.getHeaders();
-    const url = albumId ? `${API_BASE_URL}/love-album/photos?album_id=${albumId}` : `${API_BASE_URL}/love-album/photos`;
-    return firstValueFrom(this.http.get<any[]>(url, { headers }));
+    let url = `${API_BASE_URL}/love-album/photos?page=${page}`;
+    if (albumId) {
+      url += `&album_id=${albumId}`;
+    }
+    return firstValueFrom(this.http.get<any>(url, { headers }));
   }
 
   async downloadPhotoBlob(id: number): Promise<Blob> {

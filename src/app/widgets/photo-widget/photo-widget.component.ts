@@ -62,7 +62,7 @@ import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, 
 
           <div class="photo-card" *ngFor="let photo of group.photos">
             <div class="image-wrapper">
-              <img [src]="environment.storageUrl + photo.image_path" class="main-photo" />
+              <ion-img [src]="environment.storageUrl + photo.image_path" class="main-photo"></ion-img>
             </div>
             
             <div class="photo-details">
@@ -114,7 +114,7 @@ import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, 
                    (touchstart)="startPress(photo)" (touchend)="endPress()"
                    (click)="onPhotoClick(photo)"
                    [class.selected]="selectedPhotos.has(photo.id)">
-                <img [src]="environment.storageUrl + photo.image_path" class="grid-photo" />
+                <ion-img [src]="environment.storageUrl + photo.image_path" class="grid-photo"></ion-img>
                 <div class="selection-overlay" *ngIf="selectionMode">
                   <ion-icon name="checkmark-circle" *ngIf="selectedPhotos.has(photo.id)"></ion-icon>
                   <ion-icon name="ellipse-outline" *ngIf="!selectedPhotos.has(photo.id)"></ion-icon>
@@ -127,6 +127,9 @@ import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, 
           </div>
         </ng-container>
 
+        <ion-infinite-scroll (ionInfinite)="loadMore($event)">
+          <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Cargando más fotos..."></ion-infinite-scroll-content>
+        </ion-infinite-scroll>
       </ion-content>
 
       <ng-template #noFeedPhotos>
@@ -247,7 +250,14 @@ import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, 
     .select-all-wrapper ion-icon { font-size: 1.5rem; }
 
     .grid-view { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 0 10px; }
-    .grid-photo-container { position: relative; width: 100%; aspect-ratio: 1; cursor: pointer; overflow: hidden; border-radius: 8px; transition: all 0.2s; }
+    .grid-photo-container { position: relative; width: 100%; aspect-ratio: 1; cursor: pointer; overflow: hidden; border-radius: 8px; transition: all 0.2s; animation: scaleIn 0.4s ease-out forwards; opacity: 0; transform: scale(0.9); }
+    @keyframes scaleIn { to { opacity: 1; transform: scale(1); } }
+    
+    .photo-card { animation: fadeInUp 0.5s ease-out forwards; opacity: 0; transform: translateY(20px); }
+    @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+    
+    ion-img::part(image) { transition: transform 0.3s ease; }
+    .photo-card:active ion-img::part(image) { transform: scale(0.98); }
     .grid-photo { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
     .grid-photo-container:active .grid-photo { transform: scale(0.95); }
     .grid-photo-container.selected { border: 3px solid #FF4D6D; transform: scale(0.95); }
@@ -361,10 +371,16 @@ export class PhotoWidgetComponent implements OnInit {
     this.loadData();
   }
 
+  currentPage = 1;
+  lastPage = 1;
+
   async loadData() {
     try {
+      this.currentPage = 1;
       this.coupleInfo = await this.api.getCoupleInfo();
-      this.photos = await this.api.getPhotos(this.currentAlbum ? this.currentAlbum.id : undefined);
+      const response = await this.api.getPhotos(this.currentAlbum ? this.currentAlbum.id : undefined, this.currentPage);
+      this.photos = response.data || response;
+      this.lastPage = response.last_page || 1;
       this.groupPhotosByDate();
       this.groupPhotosForGallery();
       this.albums = await this.api.getAlbums();
@@ -374,7 +390,28 @@ export class PhotoWidgetComponent implements OnInit {
     }
   }
 
+  async loadMore(event: any) {
+    if (this.currentPage >= this.lastPage) {
+      event.target.complete();
+      event.target.disabled = true;
+      return;
+    }
+    this.currentPage++;
+    try {
+      const response = await this.api.getPhotos(this.currentAlbum ? this.currentAlbum.id : undefined, this.currentPage);
+      const newPhotos = response.data || [];
+      this.photos = [...this.photos, ...newPhotos];
+      this.groupPhotosByDate();
+      this.groupPhotosForGallery();
+      event.target.complete();
+    } catch (e) {
+      event.target.complete();
+    }
+  }
+
   async handleRefresh(event: any) {
+    const infiniteScroll = document.querySelector('ion-infinite-scroll');
+    if (infiniteScroll) infiniteScroll.disabled = false;
     await this.loadData();
     event.target.complete();
   }
@@ -530,7 +567,12 @@ export class PhotoWidgetComponent implements OnInit {
     try {
       await this.api.reactToPhoto(photoId, emoji);
       await this.api.sendMessage(emoji, photoId); // Mandar la reacción al chat también
-      this.loadData(); // recargar
+      // Actualización local para no perder la paginación
+      const photo = this.photos.find(p => p.id === photoId);
+      if (photo) {
+        if (!photo.reactions) photo.reactions = [];
+        photo.reactions.push({ content: emoji, user: { name: 'Yo' } });
+      }
     } catch (e) {
       console.error(e);
       this.showError('No se pudo guardar la reacción.');

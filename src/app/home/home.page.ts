@@ -1,5 +1,5 @@
 import { Component, inject, ViewChild, OnInit } from '@angular/core';
-import { IonContent, IonFooter, IonHeader, IonToolbar, ActionSheetController, AlertController, IonRefresher, IonRefresherContent } from '@ionic/angular/standalone';
+import { IonContent, IonFooter, IonHeader, IonToolbar, ActionSheetController, AlertController } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -165,7 +165,7 @@ import { App } from '@capacitor/app';
     .prompt-btn:disabled { opacity: 0.7; pointer-events: none; }
   `],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonContent, IonFooter, IonIcon, CommonModule, FormsModule, LocationWidgetComponent, PhotoWidgetComponent, ChatWidgetComponent, MasWidgetComponent, QuestionsWidgetComponent, IonRefresher, IonRefresherContent],
+  imports: [IonHeader, IonToolbar, IonContent, IonFooter, IonIcon, CommonModule, FormsModule, LocationWidgetComponent, PhotoWidgetComponent, ChatWidgetComponent, MasWidgetComponent, QuestionsWidgetComponent],
 })
 export class HomePage implements OnInit {
   selectedWidget: 'location' | 'photo' | 'chat' | 'mas' | 'game' = 'photo';
