@@ -130,8 +130,10 @@ public class CounterWidgetWorker extends Worker {
                 views.setTextViewText(R.id.widget_album_name, albumName);
                 if (photoBitmap != null) {
                     views.setImageViewBitmap(R.id.widget_photo_large, photoBitmap);
+                    views.setViewVisibility(R.id.widget_photo_title, android.view.View.GONE);
                 } else {
                     views.setImageViewResource(R.id.widget_photo_large, R.drawable.ic_launcher_background);
+                    views.setViewVisibility(R.id.widget_photo_title, android.view.View.VISIBLE);
                     views.setTextViewText(R.id.widget_photo_title, "No hay fotos");
                 }
                 
