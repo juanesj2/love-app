@@ -472,22 +472,56 @@ public class DailyPhotoWidgetWorker extends Worker {
             conn.setDoInput(true);
             conn.connect();
             if (conn.getResponseCode() == 200) {
-                Bitmap originalBitmap = BitmapFactory.decodeStream(conn.getInputStream());
-                if (originalBitmap != null) {
+                // 1. Descargar imagen a memoria (como bytes comprimidos para no agotar la RAM)
+                java.io.InputStream is = conn.getInputStream();
+                java.io.ByteArrayOutputStream buffer = new java.io.ByteArrayOutputStream();
+                int nRead;
+                byte[] data = new byte[16384];
+                while ((nRead = is.read(data, 0, data.length)) != -1) {
+                    buffer.write(data, 0, nRead);
+                }
+                buffer.flush();
+                byte[] imageBytes = buffer.toByteArray();
+                is.close();
+                
+                // 2. Leer solo las dimensiones de la imagen
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, options);
+                
+                // Calcular factor de reducción (inSampleSize)
+                int reqWidth = 600;
+                int reqHeight = 600;
+                int inSampleSize = 1;
+                
+                if (options.outHeight > reqHeight || options.outWidth > reqWidth) {
+                    final int halfHeight = options.outHeight / 2;
+                    final int halfWidth = options.outWidth / 2;
+                    while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
+                        inSampleSize *= 2;
+                    }
+                }
+                
+                // 3. Decodificar la imagen real ya reducida
+                options.inJustDecodeBounds = false;
+                options.inSampleSize = inSampleSize;
+                Bitmap decodedBitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, options);
+                
+                // 4. Asegurarnos que no exceda el TransactionTooLargeException
+                if (decodedBitmap != null) {
+                    int width = decodedBitmap.getWidth();
+                    int height = decodedBitmap.getHeight();
                     int maxDim = 600;
-                    int width = originalBitmap.getWidth();
-                    int height = originalBitmap.getHeight();
-                    
                     if (width > maxDim || height > maxDim) {
                         float ratio = Math.min((float) maxDim / width, (float) maxDim / height);
-                        Bitmap scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, Math.round(width * ratio), Math.round(height * ratio), true);
-                        if (scaledBitmap != originalBitmap) {
-                            originalBitmap.recycle();
+                        Bitmap scaledBitmap = Bitmap.createScaledBitmap(decodedBitmap, Math.round(width * ratio), Math.round(height * ratio), true);
+                        if (scaledBitmap != decodedBitmap) {
+                            decodedBitmap.recycle();
                         }
                         return scaledBitmap;
                     }
                 }
-                return originalBitmap;
+                return decodedBitmap;
             }
         } catch (Exception e) {}
         return null;
