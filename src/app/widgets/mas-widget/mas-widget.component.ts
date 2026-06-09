@@ -153,9 +153,8 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
         <ion-icon name="log-out-outline" class="logout-icon"></ion-icon>
         <span>Cerrar sesión</span>
       </div>
+      </div>
     </ion-content>
-
-    </div>
   `,
   styles: [`
     :host {

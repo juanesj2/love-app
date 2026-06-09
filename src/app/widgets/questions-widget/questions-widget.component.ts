@@ -107,7 +107,7 @@ import { Location } from '@angular/common';
              Aún no has respondido ninguna pregunta de esta sección. ¡Atrévete con la primera!
           </div>
         </ng-container>
-
+      </div>
       </div>
     </ion-content>
   `,
