@@ -55,21 +55,40 @@ public class CounterWidgetWorker extends Worker {
         
         try {
             if (!startDateString.isEmpty()) {
-                // Parse the date (ISO 8601 or simple string)
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.getDefault());
-                Date startDate = sdf.parse(startDateString);
-                
-                if (startDate != null && startDate.before(new Date())) {
-                    long diffInMillis = new Date().getTime() - startDate.getTime();
-                    long days = diffInMillis / (1000 * 60 * 60 * 24);
-                    long years = days / 365;
-                    long remainingDays = days % 365;
+                try {
+                    // Try parsing ISO 8601 string or simple string
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.getDefault());
+                    Date startDate = sdf.parse(startDateString);
                     
-                    if (years > 0) {
-                        counterText = years + " Años\n" + remainingDays + " Días";
-                    } else {
-                        counterText = days + " Días";
+                    if (startDate != null && startDate.before(new Date())) {
+                        long diffInMillis = new Date().getTime() - startDate.getTime();
+                        long days = diffInMillis / (1000 * 60 * 60 * 24);
+                        long years = days / 365;
+                        long remainingDays = days % 365;
+                        
+                        if (years > 0) {
+                            counterText = years + " Años\n" + remainingDays + " Días";
+                        } else {
+                            counterText = days + " Días";
+                        }
                     }
+                } catch (Exception e) {
+                    // Fallback para fechas antiguas
+                    try {
+                        SimpleDateFormat sdfOld = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                        Date startDate = sdfOld.parse(startDateString.substring(0, 10));
+                        if (startDate != null && startDate.before(new Date())) {
+                            long diffInMillis = new Date().getTime() - startDate.getTime();
+                            long days = diffInMillis / (1000 * 60 * 60 * 24);
+                            long years = days / 365;
+                            long remainingDays = days % 365;
+                            if (years > 0) {
+                                counterText = years + " Años\n" + remainingDays + " Días";
+                            } else {
+                                counterText = days + " Días";
+                            }
+                        }
+                    } catch (Exception ignored) { }
                 }
             }
             
@@ -209,7 +228,24 @@ public class CounterWidgetWorker extends Worker {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoInput(true);
             conn.connect();
-            return BitmapFactory.decodeStream(conn.getInputStream());
+            
+            Bitmap originalBitmap = BitmapFactory.decodeStream(conn.getInputStream());
+            if (originalBitmap != null) {
+                // Redimensionar para evitar TransactionTooLargeException (límite de 1MB en Binder)
+                int maxDim = 600;
+                int width = originalBitmap.getWidth();
+                int height = originalBitmap.getHeight();
+                
+                if (width > maxDim || height > maxDim) {
+                    float ratio = Math.min((float) maxDim / width, (float) maxDim / height);
+                    Bitmap scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, Math.round(width * ratio), Math.round(height * ratio), true);
+                    if (scaledBitmap != originalBitmap) {
+                        originalBitmap.recycle();
+                    }
+                    return scaledBitmap;
+                }
+            }
+            return originalBitmap;
         } catch (Exception e) {
             e.printStackTrace();
             return null;

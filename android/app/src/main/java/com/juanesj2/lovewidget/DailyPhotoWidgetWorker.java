@@ -472,7 +472,22 @@ public class DailyPhotoWidgetWorker extends Worker {
             conn.setDoInput(true);
             conn.connect();
             if (conn.getResponseCode() == 200) {
-                return BitmapFactory.decodeStream(conn.getInputStream());
+                Bitmap originalBitmap = BitmapFactory.decodeStream(conn.getInputStream());
+                if (originalBitmap != null) {
+                    int maxDim = 600;
+                    int width = originalBitmap.getWidth();
+                    int height = originalBitmap.getHeight();
+                    
+                    if (width > maxDim || height > maxDim) {
+                        float ratio = Math.min((float) maxDim / width, (float) maxDim / height);
+                        Bitmap scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, Math.round(width * ratio), Math.round(height * ratio), true);
+                        if (scaledBitmap != originalBitmap) {
+                            originalBitmap.recycle();
+                        }
+                        return scaledBitmap;
+                    }
+                }
+                return originalBitmap;
             }
         } catch (Exception e) {}
         return null;
