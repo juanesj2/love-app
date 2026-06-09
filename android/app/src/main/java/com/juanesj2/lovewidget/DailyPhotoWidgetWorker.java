@@ -65,7 +65,7 @@ public class DailyPhotoWidgetWorker extends Worker {
                 String uploaderEmail = "";
                 int uploaderId = -1;
                 
-                for (int i = 0; i < photos.length(); i++) {
+                for (int i = photos.length() - 1; i >= 0; i--) {
                     JSONObject photo = photos.getJSONObject(i);
                     int photoUserId = photo.optInt("user_id", -1);
                     

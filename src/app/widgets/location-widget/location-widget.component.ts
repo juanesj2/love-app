@@ -242,7 +242,7 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
       if (this.areTogether) {
         this.clearMapElements();
         if (!this.hasCentered) {
-          this.map.setView(myPos, 15);
+          this.centerMap();
           this.hasCentered = true;
         }
       } else {
@@ -265,7 +265,7 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
   }
 
   public centerMap() {
-    if (this.myLastPos && this.partnerLastPos && !this.areTogether) {
+    if (this.myLastPos && this.partnerLastPos) {
       const bounds = L.latLngBounds([this.myLastPos, this.partnerLastPos]);
       this.map.fitBounds(bounds, { padding: [60, 60], maxZoom: 14 });
     } else if (this.myLastPos) {

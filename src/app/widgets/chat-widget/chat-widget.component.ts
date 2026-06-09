@@ -12,7 +12,6 @@ import { paperPlane, hourglassOutline } from 'ionicons/icons';
   template: `
     <div class="chat-wrapper">
       <div class="chat-header">
-        <h2>Nuestro Rincón</h2>
         <div class="status-dot"></div>
       </div>
 

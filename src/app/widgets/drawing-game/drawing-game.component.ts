@@ -1,17 +1,20 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoveApiService, API_BASE_URL } from '../../services/love-api.service';
-import { IonIcon, ToastController } from '@ionic/angular/standalone';
+import { IonIcon, ToastController, IonContent, IonRefresher, IonRefresherContent } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { arrowBack, trashOutline, checkmarkCircleOutline } from 'ionicons/icons';
+import { arrowBack, trashOutline, checkmarkCircleOutline, arrowUndoOutline } from 'ionicons/icons';
 import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-drawing-game',
-  template: `
-    <div class="drawing-container">
-      <div class="header">
-        <button class="back-btn" (click)="goBack()"><ion-icon name="arrow-back"></ion-icon></button>
+    <ion-content>
+      <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+      <div class="drawing-container">
+        <div class="header">
+          <button class="back-btn" (click)="goBack()"><ion-icon name="arrow-back"></ion-icon></button>
         <div class="header-titles">
           <h2>Reto de Dibujo</h2>
           <div class="progress-bar-small" *ngIf="progress">
@@ -48,7 +51,15 @@ import { Location } from '@angular/common';
           <div class="canvas-wrapper">
             <canvas #drawingCanvas (touchstart)="startDrawing($event)" (touchmove)="draw($event)" (touchend)="stopDrawing()" (mousedown)="startDrawing($event)" (mousemove)="draw($event)" (mouseup)="stopDrawing()" (mouseleave)="stopDrawing()"></canvas>
           </div>
+          <div class="color-picker">
+            <input type="color" [value]="currentColor" (input)="setColorFromPicker($event)" class="native-color-picker" />
+            <div class="color-btn" style="background: #000000;" (click)="setColor('#000000')"></div>
+            <div class="color-btn" style="background: #ff0000;" (click)="setColor('#ff0000')"></div>
+            <div class="color-btn" style="background: #0000ff;" (click)="setColor('#0000ff')"></div>
+            <div class="color-btn" style="background: #008000;" (click)="setColor('#008000')"></div>
+          </div>
           <div class="tools">
+            <button class="tool-btn warning" (click)="undo()"><ion-icon name="arrow-undo-outline"></ion-icon> Deshacer</button>
             <button class="tool-btn danger" (click)="clearCanvas()"><ion-icon name="trash-outline"></ion-icon> Borrar</button>
             <button class="tool-btn success" (click)="submitDrawing()"><ion-icon name="checkmark-circle-outline"></ion-icon> Terminar</button>
           </div>
@@ -88,13 +99,14 @@ import { Location } from '@angular/common';
         <p>¡Habéis superado todos los retos candentes de esta categoría! Elegid otra para seguir jugando.</p>
       </div>
     </div>
+    </ion-content>
   `,
   styles: [`
     :host {
       display: block;
       height: 100%;
     }
-    .drawing-container { padding: 20px; background: #fff0f3; min-height: 100vh; display: flex; flex-direction: column; }
+    .drawing-container { padding: 20px; background: #fff0f3; min-height: 100vh; display: flex; flex-direction: column; overflow-y: auto; height: 100vh; box-sizing: border-box; }
     .header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
     .back-btn { background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; flex-shrink: 0; }
     .header-titles { flex: 1; text-align: center; display: flex; flex-direction: column; align-items: center; margin-right: 40px; }
@@ -123,7 +135,13 @@ import { Location } from '@angular/common';
     canvas { width: 100%; height: 100%; touch-action: none; display: block; }
     
     .tools { display: flex; gap: 10px; margin-top: 20px; }
+    .color-picker { display: flex; gap: 10px; justify-content: center; align-items: center; margin-top: 15px; }
+    .color-btn { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .native-color-picker { width: 40px; height: 40px; border: none; border-radius: 50%; cursor: pointer; padding: 0; background: none; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .native-color-picker::-webkit-color-swatch-wrapper { padding: 0; }
+    .native-color-picker::-webkit-color-swatch { border: 2px solid white; border-radius: 50%; }
     .tool-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 10px; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; color: white; }
+    .tool-btn.warning { background: #f4a261; }
     .tool-btn.danger { background: #e63946; }
     .tool-btn.success { background: #2a9d8f; }
 
@@ -148,7 +166,7 @@ import { Location } from '@angular/common';
     .empty-state p { color: #a4133c; margin-bottom: 20px; }
   `],
   standalone: true,
-  imports: [CommonModule, IonIcon]
+  imports: [CommonModule, IonIcon, IonContent, IonRefresher, IonRefresherContent]
 })
 export class DrawingGameComponent implements OnInit, AfterViewInit {
   @ViewChild('drawingCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
@@ -162,12 +180,14 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
   progress: any = null;
 
   private isDrawing = false;
+  private drawingHistory: ImageData[] = [];
+  public currentColor: string = '#000000';
   private api = inject(LoveApiService);
   private toastCtrl = inject(ToastController);
   private location = inject(Location);
 
   constructor() {
-    addIcons({ arrowBack, trashOutline, checkmarkCircleOutline, 'infinite-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M256 256s-48-96-126-96c-54.12 0-98 43-98 96s43.88 96 98 96c37.51 0 71-22.41 94-48M256 256s48 96 126 96c54.12 0 98-43 98-96s-43.88-96-98-96c-37.51 0-71 22.41-94 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="48"/></svg>' });
+    addIcons({ arrowBack, trashOutline, checkmarkCircleOutline, arrowUndoOutline, 'infinite-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M256 256s-48-96-126-96c-54.12 0-98 43-98 96s43.88 96 98 96c37.51 0 71-22.41 94-48M256 256s48 96 126 96c54.12 0 98-43 98-96s-43.88-96-98-96c-37.51 0-71 22.41-94 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="48"/></svg>' });
   }
 
   async ngOnInit() {
@@ -177,6 +197,20 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
     } catch (e) {
       console.error('Error fetching progress', e);
     }
+  }
+
+  async handleRefresh(event: any) {
+    if (this.gameState === 'categories') {
+      await this.loadCategories();
+    } else if (this.prompt) {
+      await this.checkResult();
+    }
+    
+    try {
+      this.progress = await this.api.getGamesProgress();
+    } catch (e) {}
+
+    event.target.complete();
   }
 
   ngAfterViewInit() {}
@@ -249,11 +283,14 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
           this.ctx.lineCap = 'round';
           this.ctx.lineJoin = 'round';
           this.ctx.lineWidth = 4;
-          this.ctx.strokeStyle = '#590D22';
+          this.ctx.strokeStyle = this.currentColor;
           
           // White background
           this.ctx.fillStyle = '#ffffff';
           this.ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          this.drawingHistory = [];
+          this.saveHistory();
         }
       }
     }, 100);
@@ -327,6 +364,7 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
     if (this.isDrawing) {
       this.ctx.closePath();
       this.isDrawing = false;
+      this.saveHistory();
     }
   }
 
@@ -334,6 +372,34 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
     const canvas = this.canvasRef.nativeElement;
     this.ctx.fillStyle = '#ffffff';
     this.ctx.fillRect(0, 0, canvas.width, canvas.height);
+    this.saveHistory();
+  }
+
+  setColor(color: string) {
+    this.currentColor = color;
+    if (this.ctx) {
+      this.ctx.strokeStyle = this.currentColor;
+    }
+  }
+
+  setColorFromPicker(event: any) {
+    const color = event.target.value;
+    this.setColor(color);
+  }
+
+  saveHistory() {
+    if (this.ctx && this.canvasRef) {
+      const canvas = this.canvasRef.nativeElement;
+      this.drawingHistory.push(this.ctx.getImageData(0, 0, canvas.width, canvas.height));
+    }
+  }
+
+  undo() {
+    if (this.drawingHistory.length > 1 && this.ctx && this.canvasRef) {
+      this.drawingHistory.pop(); // remove current state
+      const previousState = this.drawingHistory[this.drawingHistory.length - 1];
+      this.ctx.putImageData(previousState, 0, 0);
+    }
   }
 
   async submitDrawing() {

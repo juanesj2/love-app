@@ -1,5 +1,5 @@
 import { Component, inject, ViewChild, OnInit } from '@angular/core';
-import { IonContent, IonFooter, IonHeader, IonToolbar, ActionSheetController } from '@ionic/angular/standalone';
+import { IonContent, IonFooter, IonHeader, IonToolbar, ActionSheetController, AlertController, IonRefresher, IonRefresherContent } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -44,11 +44,15 @@ import { Preferences } from '@capacitor/preferences';
     </ion-header>
 
     <ion-content>
+      <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+
       <app-photo-widget *ngIf="selectedWidget === 'photo'" #photoWidget></app-photo-widget>
-      <app-chat-widget *ngIf="selectedWidget === 'chat'"></app-chat-widget>
-      <app-location-widget *ngIf="selectedWidget === 'location'"></app-location-widget>
-      <app-mas-widget *ngIf="selectedWidget === 'mas'" (openGameEvent)="selectedWidget = 'game'"></app-mas-widget>
-      <app-questions-widget *ngIf="selectedWidget === 'game'"></app-questions-widget>
+      <app-chat-widget *ngIf="selectedWidget === 'chat'" #chatWidget></app-chat-widget>
+      <app-location-widget *ngIf="selectedWidget === 'location'" #locationWidget></app-location-widget>
+      <app-mas-widget *ngIf="selectedWidget === 'mas'" (openGameEvent)="selectedWidget = 'game'" #masWidget></app-mas-widget>
+      <app-questions-widget *ngIf="selectedWidget === 'game'" #gameWidget></app-questions-widget>
     </ion-content>
 
     <ion-footer class="custom-footer">
@@ -123,7 +127,7 @@ import { Preferences } from '@capacitor/preferences';
     @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
   `],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonContent, IonFooter, IonIcon, CommonModule, FormsModule, LocationWidgetComponent, PhotoWidgetComponent, ChatWidgetComponent, MasWidgetComponent, QuestionsWidgetComponent],
+  imports: [IonHeader, IonToolbar, IonContent, IonFooter, IonIcon, CommonModule, FormsModule, LocationWidgetComponent, PhotoWidgetComponent, ChatWidgetComponent, MasWidgetComponent, QuestionsWidgetComponent, IonRefresher, IonRefresherContent],
 })
 export class HomePage implements OnInit {
   selectedWidget: 'location' | 'photo' | 'chat' | 'mas' | 'game' = 'photo';
@@ -141,8 +145,13 @@ export class HomePage implements OnInit {
   private locationService = inject(LocationService);
   private toastController = inject(ToastController);
   private actionSheetCtrl = inject(ActionSheetController);
+  private alertController = inject(AlertController);
 
   @ViewChild('photoWidget') photoWidgetComp?: PhotoWidgetComponent;
+  @ViewChild('chatWidget') chatWidgetComp?: ChatWidgetComponent;
+  @ViewChild('locationWidget') locationWidgetComp?: LocationWidgetComponent;
+  @ViewChild('masWidget') masWidgetComp?: MasWidgetComponent;
+  @ViewChild('gameWidget') gameWidgetComp?: QuestionsWidgetComponent;
 
   constructor() {
     addIcons({ imagesOutline, images, chatbubblesOutline, chatbubbles, add, hourglassOutline, mapOutline, map, ellipsisHorizontalOutline, ellipsisHorizontal, heart, happyOutline, sadOutline, flameOutline, bedOutline });
@@ -175,6 +184,21 @@ export class HomePage implements OnInit {
     } catch (e) {
       console.log('No se pudo cargar la info de la cabecera');
     }
+  }
+
+  async handleRefresh(event: any) {
+    await this.loadHeaderData();
+    if (this.selectedWidget === 'photo' && this.photoWidgetComp) {
+      await this.photoWidgetComp.loadData();
+    } else if (this.selectedWidget === 'chat' && this.chatWidgetComp) {
+      await this.chatWidgetComp.loadMessages();
+    } else if (this.selectedWidget === 'game' && this.gameWidgetComp) {
+      await this.gameWidgetComp.loadQuestions();
+    } else if (this.selectedWidget === 'mas' && this.masWidgetComp) {
+      await this.masWidgetComp.loadMilestones();
+    }
+    // Location widget no tiene carga propia explícita, los flujos son con RxJS observables
+    event.target.complete();
   }
 
   async openMoodSelector() {
@@ -246,19 +270,48 @@ export class HomePage implements OnInit {
         quality: 90,
         allowEditing: false,
         resultType: CameraResultType.Uri,
-        source: CameraSource.Camera,
+        source: CameraSource.Prompt,
         direction: CameraDirection.Front // Usar la cámara delantera por defecto
       });
 
       if (image.webPath) {
-        this.uploading = true;
-        
         // Convert webPath to File object
         const response = await fetch(image.webPath);
         const blob = await response.blob();
         const file = new File([blob], "camera_photo.jpg", { type: blob.type });
 
-        await this.api.uploadPhoto(file, '');
+        const alert = await this.alertController.create({
+          header: 'Añadir descripción',
+          inputs: [
+            {
+              name: 'description',
+              type: 'textarea',
+              placeholder: 'Escribe algo bonito (opcional)...'
+            }
+          ],
+          buttons: [
+            {
+              text: 'Cancelar',
+              role: 'cancel'
+            },
+            {
+              text: 'Subir',
+              role: 'confirm'
+            }
+          ]
+        });
+
+        await alert.present();
+        const { data, role } = await alert.onDidDismiss();
+
+        if (role === 'cancel') {
+          return;
+        }
+
+        this.uploading = true;
+        const text = data?.values?.description || '';
+
+        await this.api.uploadPhoto(file, text);
         this.selectedWidget = 'photo';
         
         setTimeout(async () => {
