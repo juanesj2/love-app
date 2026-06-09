@@ -25,6 +25,10 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Matrix;
 import android.util.Log;
+import android.text.TextPaint;
+import android.text.StaticLayout;
+import android.text.Layout;
+import android.text.TextUtils;
 
 public class DailyPhotoWidgetWorker extends Worker {
 
@@ -63,6 +67,7 @@ public class DailyPhotoWidgetWorker extends Worker {
                 String partnerPhotoPath = null;
                 String uploaderName = "";
                 String uploaderEmail = "";
+                String photoDescription = "";
                 int uploaderId = -1;
                 
                 for (int i = photos.length() - 1; i >= 0; i--) {
@@ -84,6 +89,7 @@ public class DailyPhotoWidgetWorker extends Worker {
 
                     if (!isMyPhoto) {
                         partnerPhotoPath = photo.getString("image_path");
+                        photoDescription = photo.optString("description", "");
                         if (userObj != null) {
                             uploaderName = userObj.optString("name", "");
                             uploaderEmail = userObj.optString("email", "");
@@ -95,6 +101,7 @@ public class DailyPhotoWidgetWorker extends Worker {
 
                 if (partnerPhotoPath == null && photos.length() > 0) {
                     partnerPhotoPath = photos.getJSONObject(0).getString("image_path");
+                    photoDescription = photos.getJSONObject(0).optString("description", "");
                     JSONObject userObj = photos.getJSONObject(0).optJSONObject("user");
                     if (userObj != null) {
                         uploaderName = userObj.optString("name", "");
@@ -124,7 +131,7 @@ public class DailyPhotoWidgetWorker extends Worker {
                     Bitmap photoBitmap = fetchBitmap(imageUrl, token);
 
                     if (photoBitmap != null) {
-                        Bitmap compositedBitmap = createCompositedWidgetBitmap(photoBitmap, streak, avatarBitmap, uploaderName);
+                        Bitmap compositedBitmap = createCompositedWidgetBitmap(photoBitmap, streak, avatarBitmap, uploaderName, photoDescription);
 
                         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
                         ComponentName thisWidget = new ComponentName(context, DailyPhotoWidgetProvider.class);
@@ -146,7 +153,7 @@ public class DailyPhotoWidgetWorker extends Worker {
         return Result.retry();
     }
     
-    private Bitmap createCompositedWidgetBitmap(Bitmap photo, int streak, Bitmap avatar, String name) {
+    private Bitmap createCompositedWidgetBitmap(Bitmap photo, int streak, Bitmap avatar, String name, String description) {
         int width = 600;
         int height = 600;
         Bitmap output = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -171,8 +178,55 @@ public class DailyPhotoWidgetWorker extends Worker {
         // Draw Badges
         drawStreakBadge(canvas, streak);
         drawAvatarBadge(canvas, avatar, name, height);
+        drawDescriptionBadge(canvas, description, width, height);
         
         return output;
+    }
+
+    private void drawDescriptionBadge(Canvas canvas, String description, int canvasWidth, int canvasHeight) {
+        if (description == null || description.trim().isEmpty()) return;
+        
+        TextPaint textPaint = new TextPaint();
+        textPaint.setColor(Color.WHITE);
+        textPaint.setTextSize(34f);
+        textPaint.setAntiAlias(true);
+        textPaint.setShadowLayer(3f, 1f, 1f, Color.BLACK);
+
+        int margin = 30;
+        int maxWidth = canvasWidth - margin * 2;
+        
+        if (description.length() > 80) {
+            description = description.substring(0, 77) + "...";
+        }
+        
+        StaticLayout staticLayout;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            staticLayout = StaticLayout.Builder.obtain(description, 0, description.length(), textPaint, maxWidth)
+                    .setAlignment(Layout.Alignment.ALIGN_CENTER)
+                    .setMaxLines(2)
+                    .setEllipsize(TextUtils.TruncateAt.END)
+                    .build();
+        } else {
+            staticLayout = new StaticLayout(description, textPaint, maxWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
+        }
+        
+        int textHeight = staticLayout.getHeight();
+        int padding = 15;
+        int bgHeight = textHeight + padding * 2;
+        
+        int yOffset = 30; // top margin, we can place description at the top center
+        
+        Paint bgPaint = new Paint();
+        bgPaint.setColor(Color.parseColor("#70000000"));
+        bgPaint.setAntiAlias(true);
+        
+        RectF bgRect = new RectF(margin, yOffset, canvasWidth - margin, yOffset + bgHeight);
+        canvas.drawRoundRect(bgRect, 20f, 20f, bgPaint);
+        
+        canvas.save();
+        canvas.translate(margin, yOffset + padding);
+        staticLayout.draw(canvas);
+        canvas.restore();
     }
     
     private void drawStreakBadge(Canvas canvas, int streak) {
