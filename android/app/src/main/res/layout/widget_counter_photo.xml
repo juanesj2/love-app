@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
@@ -36,10 +37,24 @@
             android:textStyle="bold"
             android:textAlignment="center"
             android:shadowColor="#FF4D6D"
-            android:shadowDx="0"
             android:shadowDy="0"
             android:shadowRadius="20"
             android:layout_marginTop="8dp" />
+            
+        <TextView
+            android:id="@+id/widget_album_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#FFB3C1"
+            android:textSize="12sp"
+            android:textStyle="italic"
+            android:textAlignment="center"
+            android:shadowColor="#000000"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="5"
+            android:layout_marginTop="6dp" />
     </LinearLayout>
 
     <!-- Lado Derecho: Foto -->

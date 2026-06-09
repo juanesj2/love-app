@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonIcon, ToastController, ActionSheetController } from '@ionic/angular/standalone';
+import { IonContent, IonRefresher, IonRefresherContent, IonIcon, ToastController, ActionSheetController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { LoveApiService } from '../../services/love-api.service';
 import { Preferences } from '@capacitor/preferences';
@@ -13,7 +13,11 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 @Component({
   selector: 'app-mas-widget',
   template: `
-    <div class="mas-container">
+    <ion-content class="scroll-content">
+      <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+      <div class="mas-container">
       <div class="header">
         <h2 class="title">Más opciones</h2>
       </div>
@@ -149,6 +153,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
         <ion-icon name="log-out-outline" class="logout-icon"></ion-icon>
         <span>Cerrar sesión</span>
       </div>
+    </ion-content>
 
     </div>
   `,
@@ -157,7 +162,8 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
       display: block;
       height: 100%;
     }
-    .mas-container { padding: 15px; height: 100%; display: flex; flex-direction: column; background: linear-gradient(135deg, #fff5f8 0%, #ffe3e9 100%); font-family: 'Inter', sans-serif; overflow-y: auto; }
+    .scroll-content { --background: transparent; }
+    .mas-container { padding: 20px; font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #fff5f8 0%, #ffe3e9 100%); min-height: 100%; padding-bottom: 40px; }
     .header { margin-bottom: 20px; }
     .title { margin: 0; font-size: 1.6rem; font-weight: 800; color: #590D22; letter-spacing: -0.5px; }
 
@@ -223,7 +229,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
     .logout-icon { font-size: 1.4rem; color: #a4133c; }
   `],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonIcon]
+  imports: [CommonModule, FormsModule, IonIcon, IonContent, IonRefresher, IonRefresherContent]
 })
 export class MasWidgetComponent implements OnInit, OnDestroy {
   @Output() openGameEvent = new EventEmitter<void>();
@@ -259,21 +265,17 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
       const info = await this.api.getCoupleInfo();
       
       // Determinar quién soy para el avatar
-      if (info.my_mood !== undefined) { // Asumiendo que getCoupleInfo devuelve info del usuario actual
-        // Necesitamos saber mi nombre. getCoupleInfo nos da partner_name.
-        // Si el partner_name es "Roberta" o "roberta", yo soy juan.
+      if (info.my_mood !== undefined) { 
         if (info.partner_name && info.partner_name.toLowerCase() === 'roberta') {
           this.myUserId = 'juan';
         } else if (info.partner_name && info.partner_name.toLowerCase() === 'juan') {
           this.myUserId = 'roberta';
         } else {
-          // Fallback, tratar de deducir desde un perfil de usuario si existiera
           this.myUserId = 'juan';
         }
       }
 
       if (info.couple && info.couple.relationship_start_date) {
-        // Format to datetime-local
         const d = new Date(info.couple.relationship_start_date);
         d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
         this.startDate = d.toISOString().slice(0, 16);
@@ -327,7 +329,6 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     
     // Sync with backend
     try {
-      // Date to SQL format roughly
       const d = new Date(this.startDate);
       const iso = d.toISOString().replace('T', ' ').substring(0, 19);
       await this.api.updateCoupleInfo({ relationship_start_date: iso });
@@ -340,6 +341,11 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
   async loadMilestones() {
     this.milestones = await this.api.getMilestones();
+  }
+
+  async handleRefresh(event: any) {
+    await this.loadMilestones();
+    event.target.complete();
   }
 
   async addMilestone() {
@@ -389,7 +395,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     await Preferences.set({ key: 'localBucketList', value: JSON.stringify(this.bucketList) });
   }
 
-  calculateDays(dateStr: string) {
+  calculateDays(dateStr: string): number {
     const d = new Date(dateStr).getTime();
     const now = new Date().getTime();
     return Math.floor(Math.abs(now - d) / (1000 * 60 * 60 * 24));
@@ -401,6 +407,16 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
   async saveSelectedAlbum() {
     await Preferences.set({ key: 'widgetAlbumId', value: this.selectedAlbumId });
+    
+    let albumName = "Feed General";
+    if (this.selectedAlbumId !== 'feed') {
+      const album = this.albums.find(a => a.id == this.selectedAlbumId);
+      if (album) {
+        albumName = album.name;
+      }
+    }
+    await Preferences.set({ key: 'widgetAlbumName', value: albumName });
+    
     this.showToast('Configuración guardada. El widget tardará unos minutos en actualizarse.', 'success');
   }
 

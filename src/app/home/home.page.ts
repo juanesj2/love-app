@@ -17,6 +17,7 @@ import { LoveApiService } from '../services/love-api.service';
 import { LocationService } from '../services/location.service';
 import { Camera, CameraResultType, CameraSource, CameraDirection } from '@capacitor/camera';
 import { Preferences } from '@capacitor/preferences';
+import { App } from '@capacitor/app';
 
 @Component({
   selector: 'app-home',
@@ -43,10 +44,7 @@ import { Preferences } from '@capacitor/preferences';
       </ion-toolbar>
     </ion-header>
 
-    <ion-content>
-      <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
-        <ion-refresher-content></ion-refresher-content>
-      </ion-refresher>
+    <ion-content [scrollY]="false">
 
       <app-photo-widget *ngIf="selectedWidget === 'photo'" #photoWidget></app-photo-widget>
       <app-chat-widget *ngIf="selectedWidget === 'chat'" #chatWidget></app-chat-widget>
@@ -95,7 +93,30 @@ import { Preferences } from '@capacitor/preferences';
           <span>Más</span>
         </div>
       </div>
+      </div>
     </ion-footer>
+
+    <!-- Custom Upload Prompt Overlay -->
+    <div class="home-overlay" *ngIf="pendingPhotoFile" (click)="cancelUpload()">
+      <div class="prompt-sheet" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Añadir descripción</h2>
+        </div>
+        <div class="prompt-body">
+          <div class="prompt-preview-container">
+            <img [src]="pendingPhotoPreview" class="prompt-preview" />
+          </div>
+          <textarea class="premium-textarea" placeholder="Escribe algo bonito (opcional)..." [(ngModel)]="pendingPhotoText"></textarea>
+        </div>
+        <div class="prompt-actions">
+          <button class="prompt-btn cancel" (click)="cancelUpload()" [disabled]="uploading">Cancelar</button>
+          <button class="prompt-btn confirm" (click)="confirmUpload()" [disabled]="uploading">
+            <span *ngIf="!uploading">Subir</span>
+            <span *ngIf="uploading">⏳</span>
+          </button>
+        </div>
+      </div>
+    </div>
   `,
   styles: [`
     ion-toolbar { --background: white; }
@@ -125,6 +146,24 @@ import { Preferences } from '@capacitor/preferences';
     .plus-circle.uploading { animation: pulse 1.5s infinite; }
     
     @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+    /* Custom Upload Prompt */
+    .home-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 1000; display: flex; align-items: flex-end; }
+    .prompt-sheet { background: #fff; width: 100%; border-radius: 25px 25px 0 0; padding: 20px; padding-bottom: 40px; box-shadow: 0 -10px 20px rgba(0,0,0,0.1); }
+    .modal-header { margin-bottom: 20px; text-align: center; }
+    .modal-header h2 { margin: 0; font-size: 1.3rem; font-weight: 800; color: #590D22; }
+    .prompt-body { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
+    .prompt-preview-container { width: 100%; display: flex; justify-content: center; background: #fff5f8; border-radius: 15px; overflow: hidden; max-height: 250px; }
+    .prompt-preview { max-width: 100%; max-height: 250px; object-fit: contain; }
+    .premium-textarea { width: 100%; min-height: 100px; border: 2px solid rgba(255, 77, 109, 0.2); border-radius: 15px; padding: 15px; font-size: 1rem; color: #590D22; background: rgba(255, 255, 255, 0.8); resize: none; outline: none; transition: border-color 0.3s; }
+    .premium-textarea:focus { border-color: #FF4D6D; }
+    .premium-textarea::placeholder { color: #a08c92; }
+    
+    .prompt-actions { display: flex; gap: 10px; }
+    .prompt-btn { flex: 1; padding: 14px; border-radius: 20px; font-weight: bold; font-size: 1.1rem; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+    .prompt-btn.cancel { background: #f1f3f5; color: #888; }
+    .prompt-btn.confirm { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3); }
+    .prompt-btn:disabled { opacity: 0.7; pointer-events: none; }
   `],
   standalone: true,
   imports: [IonHeader, IonToolbar, IonContent, IonFooter, IonIcon, CommonModule, FormsModule, LocationWidgetComponent, PhotoWidgetComponent, ChatWidgetComponent, MasWidgetComponent, QuestionsWidgetComponent, IonRefresher, IonRefresherContent],
@@ -140,6 +179,10 @@ export class HomePage implements OnInit {
   
   myAvatarUrl = '';
   partnerAvatarUrl = '';
+
+  pendingPhotoFile: File | null = null;
+  pendingPhotoPreview: string = '';
+  pendingPhotoText: string = '';
 
   private api = inject(LoveApiService);
   private locationService = inject(LocationService);
@@ -157,6 +200,17 @@ export class HomePage implements OnInit {
     addIcons({ imagesOutline, images, chatbubblesOutline, chatbubbles, add, hourglassOutline, mapOutline, map, ellipsisHorizontalOutline, ellipsisHorizontal, heart, happyOutline, sadOutline, flameOutline, bedOutline });
   }
 
+  async checkWidgetIntent() {
+    const res = await Preferences.get({ key: 'widget_open_tab' });
+    if (res.value) {
+      const tab = res.value as 'location' | 'photo' | 'chat' | 'mas' | 'game';
+      if (['location', 'photo', 'chat', 'mas', 'game'].includes(tab)) {
+        this.selectedWidget = tab;
+      }
+      await Preferences.remove({ key: 'widget_open_tab' });
+    }
+  }
+
   async ngOnInit() {
     this.loadHeaderData();
     // Poll header data every 30 seconds
@@ -166,6 +220,14 @@ export class HomePage implements OnInit {
     const { value } = await Preferences.get({ key: 'firebase_user_id' });
     const myId = value || 'juan';
     const partnerId = myId === 'juan' ? 'roberta' : 'juan';
+
+    // Widget Intent listener
+    App.addListener('appStateChange', async ({ isActive }) => {
+      if (isActive) {
+        this.checkWidgetIntent();
+      }
+    });
+    this.checkWidgetIntent();
 
     this.locationService.listenToUserLocation(myId as 'juan'|'roberta').subscribe((data: any) => {
       if (data && data.avatar) this.myAvatarUrl = data.avatar;
@@ -278,67 +340,249 @@ export class HomePage implements OnInit {
         // Convert webPath to File object
         const response = await fetch(image.webPath);
         const blob = await response.blob();
-        const file = new File([blob], "camera_photo.jpg", { type: blob.type });
-
-        const alert = await this.alertController.create({
-          header: 'Añadir descripción',
-          inputs: [
-            {
-              name: 'description',
-              type: 'textarea',
-              placeholder: 'Escribe algo bonito (opcional)...'
-            }
-          ],
-          buttons: [
-            {
-              text: 'Cancelar',
-              role: 'cancel'
-            },
-            {
-              text: 'Subir',
-              role: 'confirm'
-            }
-          ]
-        });
-
-        await alert.present();
-        const { data, role } = await alert.onDidDismiss();
-
-        if (role === 'cancel') {
-          return;
-        }
-
-        this.uploading = true;
-        const text = data?.values?.description || '';
-
-        await this.api.uploadPhoto(file, text);
-        this.selectedWidget = 'photo';
-        
-        setTimeout(async () => {
-          if (this.photoWidgetComp) {
-            await this.photoWidgetComp.loadData();
-          }
-        }, 100);
-
-        const toast = await this.toastController.create({
-          message: '¡Recuerdo subido con éxito!',
-          duration: 2500,
-          color: 'success',
-          position: 'top',
-        });
-        await toast.present();
+        this.pendingPhotoFile = new File([blob], "camera_photo.jpg", { type: blob.type });
+        this.pendingPhotoPreview = URL.createObjectURL(this.pendingPhotoFile);
+        this.pendingPhotoText = '';
       }
     } catch (e: any) {
       if (e.message && e.message.includes('User cancelled')) {
-        // User closed the camera, do nothing
-        return;
+        console.log('User cancelled camera');
+      } else {
+        console.error(e);
       }
-      console.error('Error al subir', e);
+    }
+  }
+
+  cancelUpload() {
+    this.pendingPhotoFile = null;
+    this.pendingPhotoPreview = '';
+    this.pendingPhotoText = '';
+  }
+
+  async confirmUpload() {
+    if (!this.pendingPhotoFile) return;
+
+    this.uploading = true;
+    try {
+      await this.api.uploadPhoto(this.pendingPhotoFile, this.pendingPhotoText);
+      this.cancelUpload();
+
+      this.selectedWidget = 'photo';
+      
+      setTimeout(async () => {
+        if (this.photoWidgetComp) {
+          await this.photoWidgetComp.loadData();
+        }
+      }, 100);
+
       const toast = await this.toastController.create({
-        message: 'Error al subir la foto.',
+        message: '¡Recuerdo subido con éxito!',
+        duration: 2500,
+        color: 'success',
+        position: 'top',
+      });
+      await toast.present();
+    } catch (e) {
+      console.error(e);
+      const toast = await this.toastController.create({
+        message: 'Error al subir la foto',
+        duration: 2500,
+        color: 'danger',
+        position: 'top',
+      });
+  constructor() {
+    addIcons({ imagesOutline, images, chatbubblesOutline, chatbubbles, add, hourglassOutline, mapOutline, map, ellipsisHorizontalOutline, ellipsisHorizontal, heart, happyOutline, sadOutline, flameOutline, bedOutline });
+  }
+
+  async checkWidgetIntent() {
+    const res = await Preferences.get({ key: 'widget_open_tab' });
+    if (res.value) {
+      const tab = res.value as 'location' | 'photo' | 'chat' | 'mas' | 'game';
+      if (['location', 'photo', 'chat', 'mas', 'game'].includes(tab)) {
+        this.selectedWidget = tab;
+      }
+      await Preferences.remove({ key: 'widget_open_tab' });
+    }
+  }
+
+  async ngOnInit() {
+    this.loadHeaderData();
+    // Poll header data every 30 seconds
+    setInterval(() => this.loadHeaderData(), 30000);
+
+    // Load avatars from Firebase
+    const { value } = await Preferences.get({ key: 'firebase_user_id' });
+    const myId = value || 'juan';
+    const partnerId = myId === 'juan' ? 'roberta' : 'juan';
+
+    // Widget Intent listener
+    App.addListener('appStateChange', async ({ isActive }) => {
+      if (isActive) {
+        this.checkWidgetIntent();
+      }
+    });
+    this.checkWidgetIntent();
+
+    this.locationService.listenToUserLocation(myId as 'juan'|'roberta').subscribe((data: any) => {
+      if (data && data.avatar) this.myAvatarUrl = data.avatar;
+    });
+    this.locationService.listenToUserLocation(partnerId as 'juan'|'roberta').subscribe((data: any) => {
+      if (data && data.avatar) this.partnerAvatarUrl = data.avatar;
+    });
+  }
+
+  async loadHeaderData() {
+    try {
+      const data = await this.api.getCoupleInfo();
+      if (data.my_mood) this.myMood = data.my_mood;
+      if (data.partner_mood) this.partnerMood = data.partner_mood;
+      if (data.partner_name) this.partnerInitial = data.partner_name.charAt(0).toUpperCase();
+    } catch (e) {
+      console.log('No se pudo cargar la info de la cabecera');
+    }
+  }
+
+  async handleRefresh(event: any) {
+    await this.loadHeaderData();
+    if (this.selectedWidget === 'photo' && this.photoWidgetComp) {
+      await this.photoWidgetComp.loadData();
+    } else if (this.selectedWidget === 'chat' && this.chatWidgetComp) {
+      await this.chatWidgetComp.loadMessages();
+    } else if (this.selectedWidget === 'game' && this.gameWidgetComp) {
+      await this.gameWidgetComp.loadQuestions();
+    } else if (this.selectedWidget === 'mas' && this.masWidgetComp) {
+      await this.masWidgetComp.loadMilestones();
+    }
+    // Location widget no tiene carga propia explícita, los flujos son con RxJS observables
+    event.target.complete();
+  }
+
+  async openMoodSelector() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: '¿Cómo te sientes hoy?',
+      buttons: [
+        { text: 'Feliz 😊', handler: () => this.setMood('😊') },
+        { text: 'Cansado/a 😴', handler: () => this.setMood('😴') },
+        { text: 'Estresado/a 🤯', handler: () => this.setMood('🤯') },
+        { text: 'Mimoso/a 🥰', handler: () => this.setMood('🥰') },
+        { text: 'Triste 🥺', handler: () => this.setMood('🥺') },
+        { text: 'Cancelar', role: 'cancel' }
+      ]
+    });
+    await actionSheet.present();
+  }
+
+  async setMood(mood: string) {
+    this.myMood = mood;
+    try {
+      await this.api.updateCoupleInfo({ current_mood: mood });
+      const toast = await this.toastController.create({
+        message: 'Estado de ánimo actualizado',
+        duration: 2000,
+        color: 'success',
+        position: 'top'
+      });
+      toast.present();
+    } catch (e) {
+      console.error(e);
+      const toast = await this.toastController.create({
+        message: 'Error al actualizar el estado',
         duration: 3000,
         color: 'danger',
         position: 'top'
+      });
+      toast.present();
+    }
+  }
+
+  async sendPoke() {
+    this.pokeAnimation = true;
+    try {
+      await Haptics.impact({ style: ImpactStyle.Heavy });
+      await this.api.sendPoke();
+      const toast = await this.toastController.create({
+        message: '¡Zumbido enviado! 🐝',
+        duration: 2000,
+        color: 'danger',
+        position: 'top'
+      });
+      toast.present();
+    } catch (e) {
+      console.error(e);
+      const toast = await this.toastController.create({
+        message: 'Error al enviar el zumbido',
+        duration: 3000,
+        color: 'danger',
+        position: 'top'
+      });
+      toast.present();
+    }
+    setTimeout(() => { this.pokeAnimation = false; }, 1500);
+  }
+
+  async takePicture() {
+    try {
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Uri,
+        source: CameraSource.Prompt,
+        direction: CameraDirection.Front // Usar la cámara delantera por defecto
+      });
+
+      if (image.webPath) {
+        // Convert webPath to File object
+        const response = await fetch(image.webPath);
+        const blob = await response.blob();
+        this.pendingPhotoFile = new File([blob], "camera_photo.jpg", { type: blob.type });
+        this.pendingPhotoPreview = URL.createObjectURL(this.pendingPhotoFile);
+        this.pendingPhotoText = '';
+      }
+    } catch (e: any) {
+      if (e.message && e.message.includes('User cancelled')) {
+        console.log('User cancelled camera');
+      } else {
+        console.error(e);
+      }
+    }
+  }
+
+  cancelUpload() {
+    this.pendingPhotoFile = null;
+    this.pendingPhotoPreview = '';
+    this.pendingPhotoText = '';
+  }
+
+  async confirmUpload() {
+    if (!this.pendingPhotoFile) return;
+
+    this.uploading = true;
+    try {
+      await this.api.uploadPhoto(this.pendingPhotoFile, this.pendingPhotoText);
+      this.cancelUpload();
+
+      this.selectedWidget = 'photo';
+      
+      setTimeout(async () => {
+        if (this.photoWidgetComp) {
+          await this.photoWidgetComp.loadData();
+        }
+      }, 100);
+
+      const toast = await this.toastController.create({
+        message: '¡Recuerdo subido con éxito!',
+        duration: 2500,
+        color: 'success',
+        position: 'top',
+      });
+      await toast.present();
+    } catch (e) {
+      console.error(e);
+      const toast = await this.toastController.create({
+        message: 'Error al subir la foto',
+        duration: 2500,
+        color: 'danger',
+        position: 'top',
       });
       await toast.present();
     } finally {

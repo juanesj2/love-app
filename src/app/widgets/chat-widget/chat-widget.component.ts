@@ -15,19 +15,24 @@ import { paperPlane, hourglassOutline } from 'ionicons/icons';
         <div class="status-dot"></div>
       </div>
 
-      <div class="messages" #msgContainer>
+      <ion-content class="messages-content" #msgContainer>
+        <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+          <ion-refresher-content></ion-refresher-content>
+        </ion-refresher>
+        <div class="messages-inner">
         <div class="message-wrapper" *ngFor="let msg of messages" [class.mine]="isMine(msg)">
-          <div class="bubble">
+          <div class="bubble" [class.only-photo]="msg.photo && (!msg.mensaje || msg.mensaje === 'null')">
             <span class="sender" *ngIf="!isMine(msg)">{{msg.user?.name}}</span>
             
             <div class="photo-reply" *ngIf="msg.photo">
               <img [src]="environment.storageUrl + msg.photo.image_path" />
             </div>
 
-            <p class="text">{{msg.mensaje}}</p>
+            <p class="text" *ngIf="msg.mensaje && msg.mensaje !== 'null'">{{msg.mensaje}}</p>
           </div>
         </div>
-      </div>
+        </div>
+      </ion-content>
 
       <div class="input-area">
         <div class="input-container">
@@ -58,8 +63,8 @@ import { paperPlane, hourglassOutline } from 'ionicons/icons';
     .chat-header h2 { margin: 0; font-size: 1.3rem; font-weight: 800; color: #590D22; }
     .status-dot { width: 10px; height: 10px; background: #00d26a; border-radius: 50%; box-shadow: 0 0 8px rgba(0, 210, 106, 0.6); }
 
-    .messages { flex: 1; overflow-y: auto; padding: 20px 15px; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; }
-    .messages::-webkit-scrollbar { width: 0px; }
+    .messages-content { flex: 1; --background: transparent; }
+    .messages-inner { padding: 20px 15px; display: flex; flex-direction: column; gap: 12px; }
     
     .message-wrapper { display: flex; width: 100%; }
     .message-wrapper.mine { justify-content: flex-end; }
@@ -73,7 +78,9 @@ import { paperPlane, hourglassOutline } from 'ionicons/icons';
     .sender { font-size: 0.75rem; font-weight: 700; color: #FF4D6D; margin-bottom: 4px; display: block; }
     .text { margin: 0; word-wrap: break-word; }
     
-    .photo-reply img { width: 100%; max-width: 200px; border-radius: 12px; margin-bottom: 8px; border: 2px solid rgba(255,255,255,0.2); }
+    .photo-reply img { width: 100%; max-width: 200px; border-radius: 12px; margin-bottom: 8px; border: 2px solid rgba(255,255,255,0.2); display: block; }
+    .only-photo { padding: 4px; background: transparent !important; box-shadow: none !important; border: none !important; }
+    .only-photo .photo-reply img { margin-bottom: 0; }
     
     .input-area { padding: 15px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-top: 1px solid rgba(255, 77, 109, 0.1); }
     .input-container { display: flex; align-items: center; gap: 10px; background: #f5ecee; border-radius: 30px; padding: 6px 6px 6px 20px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02); border: 1px solid rgba(255, 77, 109, 0.15); transition: all 0.3s; }
@@ -113,8 +120,16 @@ export class ChatWidgetComponent implements OnInit, AfterViewChecked {
 
   scrollToBottom(): void {
     try {
-      this.msgContainer.nativeElement.scrollTop = this.msgContainer.nativeElement.scrollHeight;
+      if (this.msgContainer && this.msgContainer.nativeElement) {
+        // Ionic's ion-content scrollToBottom method
+        this.msgContainer.nativeElement.scrollToBottom(300).catch(() => {});
+      }
     } catch(err) { }
+  }
+
+  async handleRefresh(event: any) {
+    await this.loadMessages();
+    event.target.complete();
   }
 
   async loadMessages() {

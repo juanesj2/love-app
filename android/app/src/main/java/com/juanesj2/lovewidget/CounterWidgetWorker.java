@@ -8,6 +8,10 @@ import android.content.SharedPreferences;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.widget.RemoteViews;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.ExistingWorkPolicy;
+import java.util.concurrent.TimeUnit;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import java.net.HttpURLConnection;
@@ -40,6 +44,11 @@ public class CounterWidgetWorker extends Worker {
         String albumId = prefs.getString("_cap_widgetAlbumId", "");
         if (albumId == null || albumId.isEmpty()) {
             albumId = prefs.getString("widgetAlbumId", "feed");
+        }
+        
+        String albumName = prefs.getString("_cap_widgetAlbumName", "");
+        if (albumName == null || albumName.isEmpty()) {
+            albumName = prefs.getString("widgetAlbumName", "Feed General");
         }
         
         String counterText = "-- Días";
@@ -81,6 +90,15 @@ public class CounterWidgetWorker extends Worker {
             for (int id : ids1x1) {
                 RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_counter_1x1);
                 views.setTextViewText(R.id.widget_counter_text, counterText);
+                
+                android.content.Intent intent = new android.content.Intent(context, MainActivity.class);
+                intent.putExtra("open_tab", "mas");
+                android.app.PendingIntent pendingIntent = android.app.PendingIntent.getActivity(
+                    context, id, intent, android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE
+                );
+                // Attach to the main container or root view, here widget_counter_text is always visible
+                views.setOnClickPendingIntent(R.id.widget_root, pendingIntent);
+                
                 appWidgetManager.updateAppWidget(id, views);
             }
             
@@ -90,19 +108,42 @@ public class CounterWidgetWorker extends Worker {
             for (int id : idsPhoto) {
                 RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_counter_photo);
                 views.setTextViewText(R.id.widget_counter_text_large, counterText);
+                views.setTextViewText(R.id.widget_album_name, albumName);
                 if (photoBitmap != null) {
                     views.setImageViewBitmap(R.id.widget_photo_large, photoBitmap);
-                    views.setTextViewText(R.id.widget_photo_title, "");
                 } else {
-                    views.setTextViewText(R.id.widget_photo_title, "Sin fotos");
+                    views.setImageViewResource(R.id.widget_photo_large, R.drawable.ic_launcher_background);
+                    views.setTextViewText(R.id.widget_photo_title, "No hay fotos");
                 }
+                
+                android.content.Intent intent = new android.content.Intent(context, MainActivity.class);
+                intent.putExtra("open_tab", "mas");
+                android.app.PendingIntent pendingIntent = android.app.PendingIntent.getActivity(
+                    context, id + 1000, intent, android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE
+                );
+                // Attach to the left counter panel
+                views.setOnClickPendingIntent(R.id.widget_root, pendingIntent);
+                
                 appWidgetManager.updateAppWidget(id, views);
             }
+            
+            // Program next update in 2 minutes
+            OneTimeWorkRequest nextRequest = new OneTimeWorkRequest.Builder(CounterWidgetWorker.class)
+                    .setInitialDelay(2, TimeUnit.MINUTES)
+                    .build();
+            WorkManager.getInstance(context).enqueueUniqueWork("CounterWidgetUpdate", ExistingWorkPolicy.REPLACE, nextRequest);
             
             return Result.success();
             
         } catch (Exception e) {
             e.printStackTrace();
+            
+            // Retry in 2 minutes if it fails too
+            OneTimeWorkRequest nextRequest = new OneTimeWorkRequest.Builder(CounterWidgetWorker.class)
+                    .setInitialDelay(2, TimeUnit.MINUTES)
+                    .build();
+            WorkManager.getInstance(context).enqueueUniqueWork("CounterWidgetUpdate", ExistingWorkPolicy.REPLACE, nextRequest);
+            
             return Result.retry();
         }
     }
@@ -142,12 +183,18 @@ public class CounterWidgetWorker extends Worker {
             
             JSONArray photos = new JSONArray(content.toString());
             if (photos.length() > 0) {
-                // If feed, return first photo (they are ordered by latest)
-                // If specific album, we should filter. For now, just return latest photo overall.
-                // Or try to pick a random one? Let's just pick a random one from the latest 10 to give a "carousel" feel.
-                int maxIndex = Math.min(10, photos.length());
-                int randomIndex = (int)(Math.random() * maxIndex);
-                JSONObject photo = photos.getJSONObject(randomIndex);
+                int currentIndex = prefs.getInt("counterWidgetPhotoIndex", 0);
+                
+                // Ensure index is within bounds (e.g. if photos were deleted)
+                if (currentIndex >= photos.length()) {
+                    currentIndex = 0;
+                }
+                
+                JSONObject photo = photos.getJSONObject(currentIndex);
+                
+                // Save the next index to show in the carousel
+                prefs.edit().putInt("counterWidgetPhotoIndex", currentIndex + 1).apply();
+                
                 return photo.getString("image_path");
             }
         } catch (Exception e) {

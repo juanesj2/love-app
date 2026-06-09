@@ -48,6 +48,7 @@ export class LoginPage implements OnInit {
     const { value: token } = await Preferences.get({ key: 'auth_token' });
     if (storedUser && token) {
       this.notificationService.init();
+      this.locationService.updateMyLocation(storedUser as 'juan' | 'roberta', storedUser);
       this.router.navigate(['/home']);
     }
   }
@@ -82,6 +83,7 @@ export class LoginPage implements OnInit {
               await Preferences.set({ key: 'myUserId', value: userId });
               // Pedir notificaciones y guardar token ahora que estamos logueados
               this.notificationService.init();
+              this.locationService.updateMyLocation(userId, userId);
               // Redirigir a home
               this.router.navigate(['/home']);
             } catch (e) {

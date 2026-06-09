@@ -69,10 +69,18 @@ public class DailyPhotoWidgetWorker extends Worker {
                 String uploaderEmail = "";
                 String photoDescription = "";
                 int uploaderId = -1;
+                String newestPartnerDate = "";
                 
-                for (int i = photos.length() - 1; i >= 0; i--) {
+                String newestAnyPath = null;
+                String newestAnyDesc = "";
+                String newestAnyName = "";
+                String newestAnyEmail = "";
+                String newestAnyDate = "";
+                
+                for (int i = 0; i < photos.length(); i++) {
                     JSONObject photo = photos.getJSONObject(i);
                     int photoUserId = photo.optInt("user_id", -1);
+                    String createdAt = photo.optString("created_at", "");
                     
                     boolean isMyPhoto = false;
                     if (myUserId > 0 && photoUserId == myUserId) {
@@ -88,26 +96,34 @@ public class DailyPhotoWidgetWorker extends Worker {
                     }
 
                     if (!isMyPhoto) {
-                        partnerPhotoPath = photo.getString("image_path");
-                        photoDescription = photo.optString("description", "");
-                        if (userObj != null) {
-                            uploaderName = userObj.optString("name", "");
-                            uploaderEmail = userObj.optString("email", "");
+                        if (createdAt.compareTo(newestPartnerDate) > 0) {
+                            newestPartnerDate = createdAt;
+                            partnerPhotoPath = photo.optString("image_path", "");
+                            photoDescription = photo.optString("description", "");
+                            if (userObj != null) {
+                                uploaderName = userObj.optString("name", "");
+                                uploaderEmail = userObj.optString("email", "");
+                            }
+                            uploaderId = photoUserId;
                         }
-                        uploaderId = photoUserId;
-                        break;
+                    }
+
+                    if (createdAt.compareTo(newestAnyDate) > 0) {
+                        newestAnyDate = createdAt;
+                        newestAnyPath = photo.optString("image_path", "");
+                        newestAnyDesc = photo.optString("description", "");
+                        if (userObj != null) {
+                            newestAnyName = userObj.optString("name", "");
+                            newestAnyEmail = userObj.optString("email", "");
+                        }
                     }
                 }
 
-                if (partnerPhotoPath == null && photos.length() > 0) {
-                    partnerPhotoPath = photos.getJSONObject(0).getString("image_path");
-                    photoDescription = photos.getJSONObject(0).optString("description", "");
-                    JSONObject userObj = photos.getJSONObject(0).optJSONObject("user");
-                    if (userObj != null) {
-                        uploaderName = userObj.optString("name", "");
-                        uploaderEmail = userObj.optString("email", "");
-                    }
-                    uploaderId = photos.getJSONObject(0).optInt("user_id", -1);
+                if (partnerPhotoPath == null && newestAnyPath != null) {
+                    partnerPhotoPath = newestAnyPath;
+                    photoDescription = newestAnyDesc;
+                    uploaderName = newestAnyName;
+                    uploaderEmail = newestAnyEmail;
                 }
                 
                 if (uploaderName.isEmpty()) {
@@ -140,6 +156,14 @@ public class DailyPhotoWidgetWorker extends Worker {
                         for (int appWidgetId : appWidgetIds) {
                             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_daily_photo);
                             views.setImageViewBitmap(R.id.widget_daily_photo, compositedBitmap);
+                            
+                            android.content.Intent intent = new android.content.Intent(context, MainActivity.class);
+                            intent.putExtra("open_tab", "photo");
+                            android.app.PendingIntent pendingIntent = android.app.PendingIntent.getActivity(
+                                context, appWidgetId, intent, android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE
+                            );
+                            views.setOnClickPendingIntent(R.id.widget_daily_photo, pendingIntent);
+                            
                             appWidgetManager.updateAppWidget(appWidgetId, views);
                         }
                         return Result.success();
@@ -155,7 +179,7 @@ public class DailyPhotoWidgetWorker extends Worker {
     
     private Bitmap createCompositedWidgetBitmap(Bitmap photo, int streak, Bitmap avatar, String name, String description) {
         int width = 600;
-        int height = 600;
+        int height = 900;
         Bitmap output = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
         
@@ -184,7 +208,7 @@ public class DailyPhotoWidgetWorker extends Worker {
     }
 
     private void drawDescriptionBadge(Canvas canvas, String description, int canvasWidth, int canvasHeight) {
-        if (description == null || description.trim().isEmpty()) return;
+        if (description == null || description.trim().isEmpty() || description.equals("null")) return;
         
         TextPaint textPaint = new TextPaint();
         textPaint.setColor(Color.WHITE);
@@ -214,7 +238,7 @@ public class DailyPhotoWidgetWorker extends Worker {
         int padding = 15;
         int bgHeight = textHeight + padding * 2;
         
-        int yOffset = 30; // top margin, we can place description at the top center
+        int yOffset = 70; // top margin, we can place description at the top center
         
         Paint bgPaint = new Paint();
         bgPaint.setColor(Color.parseColor("#70000000"));
@@ -258,8 +282,8 @@ public class DailyPhotoWidgetWorker extends Worker {
         int width = textBounds.width() + paddingX * 2;
         int height = textBounds.height() + paddingY * 2;
         
-        int x = 30; // margin left
-        int y = 30; // margin top
+        int x = 60; // margin left
+        int y = 120; // margin top (increased for more space)
         
         RectF rect = new RectF(x, y, x + width, y + height);
         canvas.drawRoundRect(rect, 40f, 40f, bgPaint);
@@ -270,8 +294,8 @@ public class DailyPhotoWidgetWorker extends Worker {
 
     private void drawAvatarBadge(Canvas canvas, Bitmap avatarBitmap, String name, int canvasHeight) {
         int radius = 55;
-        int x = 30 + radius;
-        int y = canvasHeight - 30 - radius;
+        int x = 60 + radius;
+        int y = canvasHeight - 120 - radius; // Increased bottom margin
         
         Paint bgPaint = new Paint();
         bgPaint.setColor(Color.parseColor("#80000000"));

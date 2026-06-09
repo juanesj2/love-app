@@ -2,9 +2,10 @@ import { Injectable, inject } from '@angular/core';
 import { Firestore, doc, docData, setDoc, updateDoc, GeoPoint } from '@angular/fire/firestore';
 import { Geolocation } from '@capacitor/geolocation';
 import { registerPlugin } from '@capacitor/core';
-
-const BackgroundGeolocation = registerPlugin<any>('BackgroundGeolocation');
 import { Observable } from 'rxjs';
+import type { BackgroundGeolocationPlugin } from '@capacitor-community/background-geolocation';
+
+const BackgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>('BackgroundGeolocation');
 
 export interface UserLocation {
   name: string;

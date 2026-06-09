@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoveApiService } from '../../services/love-api.service';
-import { IonIcon, ToastController } from '@ionic/angular/standalone';
+import { IonIcon, ToastController, IonContent, IonRefresher, IonRefresherContent } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { helpCircleOutline, checkmarkCircleOutline, lockClosedOutline, alertCircleOutline, arrowBack } from 'ionicons/icons';
 import { Location } from '@angular/common';
@@ -10,7 +10,11 @@ import { Location } from '@angular/common';
 @Component({
   selector: 'app-questions-widget',
   template: `
-    <div class="questions-container">
+    <ion-content class="scroll-content">
+      <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+      <div class="questions-container">
       <div class="q-header">
         <button class="back-btn" (click)="goBack()"><ion-icon name="arrow-back"></ion-icon></button>
         <h2>Test de Pareja</h2>
@@ -105,14 +109,15 @@ import { Location } from '@angular/common';
         </ng-container>
 
       </div>
-    </div>
+    </ion-content>
   `,
   styles: [`
     :host {
       display: block;
       height: 100%;
     }
-    .questions-container { padding: 20px; background: #fff0f3; min-height: 100vh; padding-bottom: 80px; overflow-y: auto; height: 100vh; box-sizing: border-box; }
+    .scroll-content { --background: transparent; }
+    .questions-container { padding: 20px; background: #fff0f3; min-height: 100%; padding-bottom: 80px; box-sizing: border-box; }
     .q-header { text-align: center; margin-bottom: 20px; position: relative; }
     .back-btn { position: absolute; left: 0; top: 0; background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; }
     .q-header h2 { color: #590D22; margin: 0 0 5px; font-weight: 800; font-size: 1.8rem; padding-top: 5px; }
@@ -154,7 +159,7 @@ import { Location } from '@angular/common';
     .empty-state { text-align: center; color: #a4133c; padding: 30px; font-weight: bold; opacity: 0.8; }
   `],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonIcon]
+  imports: [CommonModule, FormsModule, IonIcon, IonContent, IonRefresher, IonRefresherContent]
 })
 export class QuestionsWidgetComponent implements OnInit {
   questions: any[] = [];
@@ -210,6 +215,11 @@ export class QuestionsWidgetComponent implements OnInit {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  async handleRefresh(event: any) {
+    await this.loadQuestions();
+    event.target.complete();
   }
 
   async submitAnswer(id: number) {

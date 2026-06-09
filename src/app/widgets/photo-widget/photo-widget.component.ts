@@ -5,6 +5,7 @@ import { IonicModule, ToastController, AlertController, ActionSheetController, M
 import { LoveApiService } from '../../services/love-api.service';
 import { environment } from '../../../environments/environment';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Capacitor } from '@capacitor/core';
 import { addIcons } from 'ionicons';
 import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline } from 'ionicons/icons';
 
@@ -45,10 +46,12 @@ import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, 
         </div>
       </div>
 
-      <div class="photos-list" *ngIf="groupedPhotos.length > 0; else noPhotos">
-        
-        <!-- VISTA FEED -->
-        <ng-container *ngIf="viewMode === 'feed'">
+      <ion-content class="scroll-content">
+        <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+          <ion-refresher-content></ion-refresher-content>
+        </ion-refresher>
+
+        <div class="photos-list" *ngIf="groupedPhotos.length > 0 && viewMode === 'feed'; else noFeedPhotos">
           <div *ngFor="let group of groupedPhotos" class="date-group">
             
             <div class="date-header">
@@ -85,7 +88,7 @@ import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, 
           </div>
 
         </div>
-        </ng-container>
+        </div>
 
         <!-- VISTA GRID (GALERÍA) -->
         <ng-container *ngIf="viewMode === 'grid'">
@@ -124,10 +127,10 @@ import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, 
           </div>
         </ng-container>
 
-      </div>
+      </ion-content>
 
-      <ng-template #noPhotos>
-        <div class="empty-state">
+      <ng-template #noFeedPhotos>
+        <div class="empty-state" *ngIf="viewMode === 'feed'">
           <ion-icon name="images-outline" class="empty-icon"></ion-icon>
           <p>No hay fotos aún.</p>
           <p *ngIf="!currentAlbum">¡Sube una para empezar la racha!</p>
@@ -138,7 +141,16 @@ import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, 
       <div class="selection-actions" *ngIf="selectionMode">
         <button class="selection-btn cancel" (click)="cancelSelection()"><ion-icon name="close"></ion-icon></button>
         <span class="selection-count">{{selectedPhotos.size}} seleccionadas</span>
-        <button class="selection-btn download" (click)="downloadSelected()" [disabled]="selectedPhotos.size === 0"><ion-icon name="download"></ion-icon></button>
+        
+        <!-- Si estamos añadiendo a un álbum, mostramos el botón de añadir -->
+        <button class="selection-btn add" *ngIf="addingToAlbumId" (click)="addSelectedToAlbum()" [disabled]="selectedPhotos.size === 0">
+          <ion-icon name="add-circle"></ion-icon>
+        </button>
+        
+        <!-- Si no, mostramos el de descargar -->
+        <button class="selection-btn download" *ngIf="!addingToAlbumId" (click)="downloadSelected()" [disabled]="selectedPhotos.size === 0">
+          <ion-icon name="download"></ion-icon>
+        </button>
       </div>
 
       <!-- Pantalla superpuesta de Colecciones (Overlay CSS) -->
@@ -170,6 +182,28 @@ import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, 
         </div>
       </div>
 
+      <!-- Custom Upload Prompt Overlay -->
+      <div class="albums-overlay" *ngIf="pendingPhotoFile" (click)="cancelUpload()">
+        <div class="albums-sheet prompt-sheet" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>Un recuerdo especial</h2>
+          </div>
+          <div class="prompt-body">
+            <div class="prompt-preview-container">
+              <img [src]="pendingPhotoPreview" class="prompt-preview" />
+            </div>
+            <textarea class="premium-textarea" placeholder="Escribe algo bonito sobre este momento (opcional)..." [(ngModel)]="pendingPhotoText"></textarea>
+          </div>
+          <div class="prompt-actions">
+            <button class="prompt-btn cancel" (click)="cancelUpload()" [disabled]="uploading">Cancelar</button>
+            <button class="prompt-btn confirm" (click)="confirmUpload()" [disabled]="uploading">
+              <span *ngIf="!uploading">Subir</span>
+              <span *ngIf="uploading">⏳</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
   `,
   styles: [`
@@ -196,8 +230,8 @@ import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, 
     .streak-icon { font-size: 1.2rem; }
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     
-    .photos-list { flex: 1; overflow-y: auto; padding-bottom: 10px; }
-    .photos-list::-webkit-scrollbar { width: 0px; }
+    .scroll-content { flex: 1; --background: transparent; }
+    .photos-list { padding-bottom: 10px; }
     
     .date-header { display: flex; align-items: center; justify-content: center; margin: 15px 0 25px 0; }
     .date-text { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; color: #a4133c; margin: 0 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); text-transform: capitalize; }
@@ -253,27 +287,38 @@ import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, 
     .selection-btn:active { transform: scale(0.9); }
     .selection-btn.cancel { color: #888; }
     .selection-btn.download { color: #FF4D6D; }
-    .selection-btn.download:disabled { opacity: 0.5; color: #ccc; }
+    .selection-btn.add { color: #FF4D6D; }
+    .selection-btn.download:disabled, .selection-btn.add:disabled { opacity: 0.5; color: #ccc; }
     
-    .albums-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; flex-direction: column; justify-content: flex-end; animation: fadeIn 0.2s ease; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .albums-sheet { background: #fff5f8; width: 100%; height: 90%; border-radius: 25px 25px 0 0; padding: 20px; padding-bottom: 40px; overflow-y: auto; -webkit-overflow-scrolling: touch; animation: slideUp 0.3s cubic-bezier(0.4,0,0.2,1); }
-    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-    .modal-header h2 { margin: 0; font-size: 1.6rem; font-weight: 800; color: #590D22; }
-    .close-btn { background: rgba(0,0,0,0.05); border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; }
+    /* Modals & Overlays */
+    .albums-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 1000; display: flex; align-items: flex-end; }
+    .albums-sheet { background: #fff; width: 100%; border-radius: 25px 25px 0 0; padding: 20px; box-shadow: 0 -10px 20px rgba(0,0,0,0.1); max-height: 80vh; overflow-y: auto; }
+    
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-header h2 { margin: 0; font-size: 1.3rem; font-weight: 800; color: #590D22; }
+    .close-btn { background: #f1f3f5; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #555; cursor: pointer; }
     
     .albums-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
-    .album-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: transform 0.2s; }
-    .album-item:active { transform: scale(0.95); }
-    .album-cover { width: 100%; aspect-ratio: 1; border-radius: 20px; background: linear-gradient(135deg, #FF4D6D, #c9184a); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(201,24,74,0.3); background-size: cover; background-position: center; position: relative; }
-    .album-cover.empty { background: rgba(255, 77, 109, 0.1); border: 2px dashed #FF4D6D; box-shadow: none; }
-    .album-cover.empty ion-icon { font-size: 2rem; color: #FF4D6D; }
-    .album-name { font-size: 0.85rem; font-weight: 600; color: #590D22; text-align: center; }
+    .album-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
+    .album-cover { width: 100%; aspect-ratio: 1; border-radius: 15px; background-size: cover; background-position: center; background-color: #ffb3c1; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .album-cover.empty { background: white; border: 2px dashed #ffb3c1; color: #ffb3c1; font-size: 2rem; }
+    .album-name { font-size: 0.85rem; font-weight: 700; color: #590D22; text-align: center; }
+    .change-cover-btn { position: absolute; bottom: 5px; right: 5px; background: rgba(255,255,255,0.8); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #FF4D6D; font-size: 1.1rem; }
+
+    /* Custom Upload Prompt */
+    .prompt-sheet { padding-bottom: 30px; }
+    .prompt-body { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
+    .prompt-preview-container { width: 100%; display: flex; justify-content: center; background: #fff5f8; border-radius: 15px; overflow: hidden; max-height: 250px; }
+    .prompt-preview { max-width: 100%; max-height: 250px; object-fit: contain; }
+    .premium-textarea { width: 100%; min-height: 100px; border: 2px solid rgba(255, 77, 109, 0.2); border-radius: 15px; padding: 15px; font-size: 1rem; color: #590D22; background: rgba(255, 255, 255, 0.8); resize: none; outline: none; transition: border-color 0.3s; }
+    .premium-textarea:focus { border-color: #FF4D6D; }
+    .premium-textarea::placeholder { color: #a08c92; }
     
-    .change-cover-btn { position: absolute; bottom: 5px; right: 5px; background: rgba(255,255,255,0.8); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-    .change-cover-btn ion-icon { font-size: 1.2rem; color: #FF4D6D; }
-    .upload-fab { --background: #FF4D6D; --color: white; }
+    .prompt-actions { display: flex; gap: 10px; }
+    .prompt-btn { flex: 1; padding: 14px; border-radius: 20px; font-weight: bold; font-size: 1.1rem; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+    .prompt-btn.cancel { background: #f1f3f5; color: #888; }
+    .prompt-btn.confirm { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3); }
+    .prompt-btn:disabled { opacity: 0.7; pointer-events: none; }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
@@ -285,6 +330,10 @@ export class PhotoWidgetComponent implements OnInit {
   private actionSheetCtrl = inject(ActionSheetController);
   public environment = environment;
   
+  pendingPhotoFile: File | null = null;
+  pendingPhotoPreview: string = '';
+  pendingPhotoText: string = '';
+
   photos: any[] = [];
   groupedPhotos: any[] = [];
   galleryGroups: any[] = [];
@@ -297,6 +346,8 @@ export class PhotoWidgetComponent implements OnInit {
 
   selectionMode = false;
   selectedPhotos = new Set<number>();
+  addingToAlbumId: number | null = null;
+  
   longPressTimeout: any;
 
   coupleInfo: any = null;
@@ -312,15 +363,20 @@ export class PhotoWidgetComponent implements OnInit {
 
   async loadData() {
     try {
-      this.coupleInfo = await this.api.getCoupleInfo().catch(() => null);
-      this.photos = await this.api.getPhotos(this.currentAlbum?.id).catch(() => []);
+      this.coupleInfo = await this.api.getCoupleInfo();
+      this.photos = await this.api.getPhotos(this.currentAlbum ? this.currentAlbum.id : undefined);
       this.groupPhotosByDate();
       this.groupPhotosForGallery();
-      this.albums = await this.api.getAlbums().catch(() => []); // Ignorar error si backend no está actualizado
+      this.albums = await this.api.getAlbums();
     } catch (e) {
       console.error(e);
-      this.showError('Error inesperado al cargar datos.');
+      this.showError('No se pudo cargar la galería. Comprueba tu conexión.');
     }
+  }
+
+  async handleRefresh(event: any) {
+    await this.loadData();
+    event.target.complete();
   }
 
   groupPhotosByDate() {
@@ -434,22 +490,21 @@ export class PhotoWidgetComponent implements OnInit {
   async changeAlbumCover(albumId: number, event: Event) {
     event.stopPropagation();
     
-    this.presentPhotoOptions(async (source) => {
-      try {
-        const image = await Camera.getPhoto({
-          quality: 60, width: 600, height: 600, allowEditing: true, resultType: CameraResultType.DataUrl, source: source
-        });
-        
-        if (image.dataUrl) {
-          // @ts-ignore
-          await this.api.updateAlbumCover(albumId, image.dataUrl);
-          this.loadData();
-          this.showSuccess('Portada actualizada');
-        }
-      } catch (e) {
-        console.log('User cancelled or error', e);
+    try {
+      const source = Capacitor.getPlatform() === 'web' ? CameraSource.Photos : CameraSource.Prompt;
+      const image = await Camera.getPhoto({
+        quality: 60, width: 600, height: 600, allowEditing: true, resultType: CameraResultType.DataUrl, source: source
+      });
+      
+      if (image.dataUrl) {
+        // @ts-ignore
+        await this.api.updateAlbumCover(albumId, image.dataUrl);
+        this.loadData();
+        this.showSuccess('Portada actualizada');
       }
-    });
+    } catch (e) {
+      console.log('User cancelled or error', e);
+    }
   }
 
   openAlbum(album: any) {
@@ -521,40 +576,107 @@ export class PhotoWidgetComponent implements OnInit {
   }
 
   async uploadNewPhoto() {
-    this.presentPhotoOptions(async (source) => {
-      try {
-        const image = await Camera.getPhoto({
-          quality: 80, allowEditing: false, resultType: CameraResultType.Uri, source: source
-        });
-        
-        if (image.webPath) {
-          const response = await fetch(image.webPath);
-          const blob = await response.blob();
-          const file = new File([blob], `photo_${new Date().getTime()}.jpg`, { type: blob.type });
-          
-          this.uploading = true;
-          try {
-            await this.api.uploadPhoto(file, '', this.currentAlbum?.id);
-            this.loadData();
-            this.showSuccess('¡Recuerdo subido con éxito!');
-          } catch (e: any) {
-            console.error('Error completo:', e);
-            let errorMsg = 'Ocurrió un problema al subir la foto.';
-            if (e.error && e.error.errors) {
-              const firstErrorKey = Object.keys(e.error.errors)[0];
-              errorMsg = e.error.errors[firstErrorKey][0];
-            } else if (e.error && e.error.message) {
-              errorMsg = e.error.message;
+    if (this.currentAlbum) {
+      // Preguntar si quiere tomar/subir foto o elegir de la app
+      const actionSheet = await this.actionSheetCtrl.create({
+        header: 'Añadir al álbum',
+        buttons: [
+          {
+            text: 'Fotos de la app',
+            icon: 'images',
+            handler: () => {
+              this.startAddingToAlbum();
             }
-            this.showError(errorMsg);
-          } finally {
-            this.uploading = false;
+          },
+          {
+            text: 'Subir nueva',
+            icon: 'cloud-upload',
+            handler: () => {
+              this.takeAndUploadPhoto();
+            }
+          },
+          {
+            text: 'Cancelar',
+            icon: 'close',
+            role: 'cancel'
           }
-        }
-      } catch (e) {
-        console.log('User cancelled or error', e);
+        ]
+      });
+      await actionSheet.present();
+    } else {
+      this.takeAndUploadPhoto();
+    }
+  }
+
+  async takeAndUploadPhoto() {
+    try {
+      const source = Capacitor.getPlatform() === 'web' ? CameraSource.Photos : CameraSource.Prompt;
+      const image = await Camera.getPhoto({
+        quality: 80, allowEditing: false, resultType: CameraResultType.Uri, source: source
+      });
+      
+      if (image.webPath) {
+        const response = await fetch(image.webPath);
+        const blob = await response.blob();
+        this.pendingPhotoFile = new File([blob], `photo_${new Date().getTime()}.jpg`, { type: blob.type });
+        this.pendingPhotoPreview = URL.createObjectURL(this.pendingPhotoFile);
+        this.pendingPhotoText = '';
       }
-    });
+    } catch (e) {
+      console.log('User cancelled or error', e);
+    }
+  }
+
+  cancelUpload() {
+    this.pendingPhotoFile = null;
+    this.pendingPhotoPreview = '';
+    this.pendingPhotoText = '';
+  }
+
+  async confirmUpload() {
+    if (!this.pendingPhotoFile) return;
+    this.uploading = true;
+    try {
+      await this.api.uploadPhoto(this.pendingPhotoFile, this.pendingPhotoText, this.currentAlbum?.id);
+      this.cancelUpload();
+      this.loadData();
+      this.showSuccess('¡Recuerdo subido con éxito!');
+    } catch (e: any) {
+      console.error(e);
+      this.showError('Error al subir: ' + (e.message || 'Error desconocido'));
+    } finally {
+      this.uploading = false;
+    }
+  }
+
+  startAddingToAlbum() {
+    this.addingToAlbumId = this.currentAlbum.id;
+    this.currentAlbum = null; // Volver al feed general
+    this.activateSelectionMode();
+    this.loadData(); // Cargar todas las fotos
+  }
+
+  async addSelectedToAlbum() {
+    if (!this.addingToAlbumId) return;
+    
+    const selectedIds = Array.from(this.selectedPhotos);
+    this.showSuccess(`Añadiendo ${selectedIds.length} foto(s)...`);
+    
+    try {
+      await this.api.assignPhotosToAlbum(this.addingToAlbumId, selectedIds);
+      // Volver a abrir el álbum
+      const targetAlbum = this.albums.find(a => a.id === this.addingToAlbumId);
+      this.cancelSelection();
+      if (targetAlbum) {
+        this.openAlbum(targetAlbum);
+      } else {
+        this.loadData();
+      }
+      this.showSuccess('Fotos añadidas al álbum');
+    } catch (e) {
+      console.error(e);
+      this.showError('Error al añadir las fotos al álbum');
+    }
   }
 
   // --- Selección y Descarga ---
@@ -627,6 +749,14 @@ export class PhotoWidgetComponent implements OnInit {
   cancelSelection() {
     this.selectionMode = false;
     this.selectedPhotos.clear();
+    
+    if (this.addingToAlbumId) {
+      const targetAlbum = this.albums.find(a => a.id === this.addingToAlbumId);
+      this.addingToAlbumId = null;
+      if (targetAlbum) {
+        this.openAlbum(targetAlbum);
+      }
+    }
   }
 
   async downloadSelected() {

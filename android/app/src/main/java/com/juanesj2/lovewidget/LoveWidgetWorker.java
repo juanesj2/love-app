@@ -79,17 +79,37 @@ public class LoveWidgetWorker extends Worker {
                 double centerLon = (myLoc.getLongitude() + partnerLoc.getLongitude()) / 2.0;
                 int zoom = calculateZoom(distance);
                 
-                // Fetch dark map background
-                int tileX = lonToTile(centerLon, zoom);
-                int tileY = latToTile(centerLat, zoom);
-                String tileUrl = String.format(Locale.US,
-                    "https://a.basemaps.cartocdn.com/dark_all/%d/%d/%d@2x.png",
-                    zoom, tileX, tileY);
-                Bitmap mapBitmap = fetchBitmap(tileUrl);
-
-                if (mapBitmap != null) {
-                    // Create mutable bitmap to draw on
-                    Bitmap mutableBitmap = mapBitmap.copy(Bitmap.Config.ARGB_8888, true);
+                // Center point calculation
+                double exactTileX = (centerLon + 180.0) / 360.0 * (1 << zoom);
+                double exactTileY = (1 - Math.log(Math.tan(Math.toRadians(centerLat)) + 1 / Math.cos(Math.toRadians(centerLat))) / Math.PI) / 2 * (1 << zoom);
+                
+                // We want exactTileX and exactTileY to be precisely at pixel (256, 256) of our 512x512 output
+                Bitmap mapBitmap = Bitmap.createBitmap(512, 512, Bitmap.Config.ARGB_8888);
+                Canvas mapCanvas = new Canvas(mapBitmap);
+                
+                int startTileX = (int) Math.floor(exactTileX - 0.5);
+                int startTileY = (int) Math.floor(exactTileY - 0.5);
+                
+                boolean hasAnyTile = false;
+                for (int dx = 0; dx <= 1; dx++) {
+                    for (int dy = 0; dy <= 1; dy++) {
+                        int tx = startTileX + dx;
+                        int ty = startTileY + dy;
+                        String tUrl = String.format(Locale.US, "https://a.basemaps.cartocdn.com/dark_all/%d/%d/%d@2x.png", zoom, tx, ty);
+                        Bitmap tBmp = fetchBitmap(tUrl);
+                        if (tBmp != null) {
+                            hasAnyTile = true;
+                            // Where does this tile go?
+                            // tile top-left in world units is tx, ty
+                            float px = (float) ((tx - exactTileX) * 512.0 + 256.0);
+                            float py = (float) ((ty - exactTileY) * 512.0 + 256.0);
+                            mapCanvas.drawBitmap(tBmp, px, py, null);
+                        }
+                    }
+                }
+                
+                if (hasAnyTile) {
+                    Bitmap mutableBitmap = mapBitmap;
                     Canvas canvas = new Canvas(mutableBitmap);
 
                     // Fetch avatars
@@ -115,29 +135,24 @@ public class LoveWidgetWorker extends Worker {
                             partnerMood = info.optString("partner_mood", "");
                         }
                     }
+                
+                // The avatars are drawn based on their offset from the center (which is now exactly at 256, 256)
+                int mapWidth = 512;
+                int mapHeight = 512;
+                
+                double scale = 256 * Math.pow(2, zoom) * 2; // *2 because @2x tile is 512x512
+                
+                int myX = 256 + (int) (lonToPixelX(myLoc.getLongitude(), scale) - lonToPixelX(centerLon, scale));
+                int myY = 256 + (int) (latToPixelY(myLoc.getLatitude(), scale) - latToPixelY(centerLat, scale));
+                
+                int partnerX = 256 + (int) (lonToPixelX(partnerLoc.getLongitude(), scale) - lonToPixelX(centerLon, scale));
+                int partnerY = 256 + (int) (latToPixelY(partnerLoc.getLatitude(), scale) - latToPixelY(centerLat, scale));
 
-                    // Calculate pixel coordinates
-                    int mapWidth = mutableBitmap.getWidth(); // Should be 512 for CartoDB @2x
-                    int mapHeight = mutableBitmap.getHeight();
-                    
-                    double scale = 256 * Math.pow(2, zoom) * 2; // *2 because @2x tile is 512x512
-                    
-                    // We need to find the exact pixel coordinates on this specific tile
-                    // The tile is at tileX, tileY
-                    double tileStartLon = tileToLon(tileX, zoom);
-                    double tileStartLat = tileToLat(tileY, zoom);
-                    
-                    int myX = (int) (lonToPixelX(myLoc.getLongitude(), scale) - lonToPixelX(tileStartLon, scale));
-                    int myY = (int) (latToPixelY(myLoc.getLatitude(), scale) - latToPixelY(tileStartLat, scale));
-                    
-                    int partnerX = (int) (lonToPixelX(partnerLoc.getLongitude(), scale) - lonToPixelX(tileStartLon, scale));
-                    int partnerY = (int) (latToPixelY(partnerLoc.getLatitude(), scale) - latToPixelY(tileStartLat, scale));
-
-                    // Clamp to visible area if out of bounds (approximate fallback)
-                    myX = Math.max(50, Math.min(mapWidth - 50, myX));
-                    myY = Math.max(50, Math.min(mapHeight - 50, myY));
-                    partnerX = Math.max(50, Math.min(mapWidth - 50, partnerX));
-                    partnerY = Math.max(50, Math.min(mapHeight - 50, partnerY));
+                    // Clamp to safe visible area so they NEVER go off screen or under bottom text
+                    myX = Math.max(100, Math.min(mapWidth - 100, myX));
+                    myY = Math.max(100, Math.min(mapHeight - 100, myY));
+                    partnerX = Math.max(100, Math.min(mapWidth - 100, partnerX));
+                    partnerY = Math.max(100, Math.min(mapHeight - 100, partnerY));
 
                     // Draw Line
                     if (distance >= 50) {
@@ -150,15 +165,18 @@ public class LoveWidgetWorker extends Worker {
                         canvas.drawLine(myX, myY, partnerX, partnerY, linePaint);
                     }
 
-                    // Draw Distance Pill
+                    // Draw Distance Pill (UNDER avatars)
                     if (distance >= 50) {
                         Paint pillPaint = new Paint();
                         pillPaint.setColor(Color.WHITE);
                         pillPaint.setAntiAlias(true);
                         
+                        // Add a subtle drop shadow to the pill so it stands out
+                        pillPaint.setShadowLayer(6f, 0f, 2f, Color.parseColor("#40000000"));
+                        
                         Paint textPaint = new Paint();
                         textPaint.setColor(Color.parseColor("#333333"));
-                        textPaint.setTextSize(34f);
+                        textPaint.setTextSize(24f); // Smaller text for smaller avatars
                         textPaint.setFakeBoldText(true);
                         textPaint.setAntiAlias(true);
                         textPaint.setTextAlign(Paint.Align.CENTER);
@@ -166,53 +184,68 @@ public class LoveWidgetWorker extends Worker {
                         Rect textBounds = new Rect();
                         textPaint.getTextBounds(distanceText, 0, distanceText.length(), textBounds);
                         
-                        int pillWidth = textBounds.width() + 60;
-                        int pillHeight = textBounds.height() + 30;
+                        int pillWidth = textBounds.width() + 40; // Less padding
+                        int pillHeight = textBounds.height() + 20;
                         
                         int midX = (myX + partnerX) / 2;
                         int midY = (myY + partnerY) / 2;
                         
                         RectF pillRect = new RectF(midX - pillWidth/2f, midY - pillHeight/2f, midX + pillWidth/2f, midY + pillHeight/2f);
-                        canvas.drawRoundRect(pillRect, 30f, 30f, pillPaint);
+                        canvas.drawRoundRect(pillRect, pillHeight/2f, pillHeight/2f, pillPaint);
                         
                         canvas.drawText(distanceText, midX, midY - textBounds.exactCenterY(), textPaint);
                     } else {
-                        // Draw just distance pill in center of map
-                        Paint pillPaint = new Paint();
-                        pillPaint.setColor(Color.parseColor("#FF4D6D"));
-                        pillPaint.setAntiAlias(true);
+                        // "Together" state: White Card
+                        int midX = mapWidth / 2;
+                        int midY = mapHeight / 2;
                         
+                        // Draw white card
+                        int cardWidth = 280;
+                        int cardHeight = 240;
+                        RectF cardRect = new RectF(midX - cardWidth/2f, midY - cardHeight/2f, midX + cardWidth/2f, midY + cardHeight/2f);
+                        
+                        Paint cardPaint = new Paint();
+                        cardPaint.setColor(Color.WHITE);
+                        cardPaint.setAntiAlias(true);
+                        cardPaint.setShadowLayer(15f, 0f, 8f, Color.parseColor("#44000000"));
+                        canvas.drawRoundRect(cardRect, 40f, 40f, cardPaint);
+                        
+                        // Override myX, myY, partnerX, partnerY so the avatars are drawn side by side inside the card
+                        myX = midX - 25;
+                        myY = midY - 30;
+                        partnerX = midX + 25;
+                        partnerY = midY - 30;
+                        
+                        // Draw text below them
                         Paint textPaint = new Paint();
-                        textPaint.setColor(Color.WHITE);
-                        textPaint.setTextSize(34f);
+                        textPaint.setColor(Color.parseColor("#D81B60")); // Deep pink like the screenshot
+                        textPaint.setTextSize(36f);
                         textPaint.setFakeBoldText(true);
                         textPaint.setAntiAlias(true);
                         textPaint.setTextAlign(Paint.Align.CENTER);
                         
-                        Rect textBounds = new Rect();
-                        textPaint.getTextBounds(distanceText, 0, distanceText.length(), textBounds);
+                        canvas.drawText("¡Estamos", midX, midY + 45, textPaint);
+                        canvas.drawText("juntos! ❤️", midX, midY + 85, textPaint);
                         
-                        int pillWidth = textBounds.width() + 60;
-                        int pillHeight = textBounds.height() + 30;
-                        
-                        int midX = mapWidth / 2;
-                        int midY = mapHeight / 2;
-                        
-                        RectF pillRect = new RectF(midX - pillWidth/2f, midY - pillHeight/2f, midX + pillWidth/2f, midY + pillHeight/2f);
-                        canvas.drawRoundRect(pillRect, 30f, 30f, pillPaint);
-                        canvas.drawText(distanceText, midX, midY - textBounds.exactCenterY(), textPaint);
+                        // Add some floating hearts to simulate the animation effect the user mentioned
+                        Paint heartPaint = new Paint();
+                        heartPaint.setAntiAlias(true);
+                        heartPaint.setTextSize(26f);
+                        canvas.drawText("❤️", midX - 90, midY - 70, heartPaint);
+                        canvas.drawText("💖", midX + 100, midY - 30, heartPaint);
+                        canvas.drawText("✨", midX - 80, midY + 60, heartPaint);
                     }
 
-                    // Draw Avatars
+                    // Draw Avatars (ON TOP of pill)
                     if (myAvatarBitmap != null) {
-                        Bitmap circularMy = getCircularBitmapWithBorder(myAvatarBitmap, 120);
-                        canvas.drawBitmap(circularMy, myX - 60, myY - 60, null);
-                        drawMoodBadge(canvas, myMood, myX, myY, 60);
+                        Bitmap circularMy = getCircularBitmapWithBorder(myAvatarBitmap, 70);
+                        canvas.drawBitmap(circularMy, myX - 35, myY - 35, null);
+                        drawMoodBadge(canvas, myMood, myX, myY, 35);
                     }
                     if (partnerAvatarBitmap != null) {
-                        Bitmap circularPartner = getCircularBitmapWithBorder(partnerAvatarBitmap, 120);
-                        canvas.drawBitmap(circularPartner, partnerX - 60, partnerY - 60, null);
-                        drawMoodBadge(canvas, partnerMood, partnerX, partnerY, 60);
+                        Bitmap circularPartner = getCircularBitmapWithBorder(partnerAvatarBitmap, 70);
+                        canvas.drawBitmap(circularPartner, partnerX - 35, partnerY - 35, null);
+                        drawMoodBadge(canvas, partnerMood, partnerX, partnerY, 35);
                     }
 
                     // Update Widget
@@ -224,6 +257,17 @@ public class LoveWidgetWorker extends Worker {
                         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
                         views.setImageViewBitmap(R.id.widget_map_bg, mutableBitmap);
                         views.setTextViewText(R.id.widget_time, timeText);
+                        
+                        android.content.Intent intent = new android.content.Intent(context, MainActivity.class);
+                        intent.putExtra("open_tab", "location");
+                        android.app.PendingIntent pendingIntent = android.app.PendingIntent.getActivity(
+                            context, 
+                            appWidgetId, 
+                            intent, 
+                            android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE
+                        );
+                        views.setOnClickPendingIntent(R.id.widget_map_bg, pendingIntent);
+                        
                         appWidgetManager.updateAppWidget(appWidgetId, views);
                     }
                     
@@ -237,11 +281,11 @@ public class LoveWidgetWorker extends Worker {
         return Result.retry();
     }
 
-    private void drawMoodBadge(Canvas canvas, String mood, int avatarX, int avatarY, int radius) {
+    private void drawMoodBadge(Canvas canvas, String mood, int avatarX, int avatarY, int avatarRadius) {
         if (mood == null || mood.isEmpty()) return;
         
-        int badgeX = (int)(avatarX + radius * 0.7); 
-        int badgeY = (int)(avatarY - radius * 0.7);
+        int badgeX = (int)(avatarX + avatarRadius * 0.7); 
+        int badgeY = (int)(avatarY - avatarRadius * 0.7);
         
         Paint circlePaint = new Paint();
         circlePaint.setColor(Color.WHITE);
@@ -250,14 +294,14 @@ public class LoveWidgetWorker extends Worker {
         Paint borderPaint = new Paint();
         borderPaint.setColor(Color.parseColor("#FF4D6D"));
         borderPaint.setStyle(Paint.Style.STROKE);
-        borderPaint.setStrokeWidth(5f);
+        borderPaint.setStrokeWidth(4f);
         borderPaint.setAntiAlias(true);
         
-        canvas.drawCircle(badgeX, badgeY, 24f, circlePaint);
-        canvas.drawCircle(badgeX, badgeY, 24f, borderPaint);
+        canvas.drawCircle(badgeX, badgeY, 20f, circlePaint);
+        canvas.drawCircle(badgeX, badgeY, 20f, borderPaint);
         
         Paint emojiPaint = new Paint();
-        emojiPaint.setTextSize(30f);
+        emojiPaint.setTextSize(26f);
         emojiPaint.setAntiAlias(true);
         emojiPaint.setTextAlign(Paint.Align.CENTER);
         
@@ -279,7 +323,7 @@ public class LoveWidgetWorker extends Worker {
         paint.setColor(Color.WHITE);
         
         // draw circular image
-        canvas.drawCircle(size / 2f, size / 2f, size / 2f - 8f, paint);
+        canvas.drawCircle(size / 2f, size / 2f, size / 2f - 6f, paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, rect, rectF, paint);
         
@@ -287,8 +331,8 @@ public class LoveWidgetWorker extends Worker {
         paint.setXfermode(null);
         paint.setStyle(Paint.Style.STROKE);
         paint.setColor(Color.WHITE);
-        paint.setStrokeWidth(8f);
-        canvas.drawCircle(size / 2f, size / 2f, size / 2f - 4f, paint);
+        paint.setStrokeWidth(6f);
+        canvas.drawCircle(size / 2f, size / 2f, size / 2f - 3f, paint);
         
         return output;
     }
@@ -341,6 +385,22 @@ public class LoveWidgetWorker extends Worker {
         return (0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) * scale;
     }
     
+    private int calculateZoom(float distanceMeters) {
+        if (distanceMeters < 1000) return 15;
+        if (distanceMeters < 2500) return 14;
+        if (distanceMeters < 5000) return 13;
+        if (distanceMeters < 10000) return 12;
+        if (distanceMeters < 25000) return 11;
+        if (distanceMeters < 50000) return 10;
+        if (distanceMeters < 100000) return 9;
+        if (distanceMeters < 200000) return 8;
+        if (distanceMeters < 400000) return 7;
+        if (distanceMeters < 800000) return 6;
+        if (distanceMeters < 1600000) return 5;
+        if (distanceMeters < 3200000) return 4;
+        return 3;
+    }
+
     private double tileToLon(int x, int z) {
         return x / Math.pow(2.0, z) * 360.0 - 180;
     }
@@ -410,15 +470,7 @@ public class LoveWidgetWorker extends Worker {
         }
     }
     
-    private int calculateZoom(float distanceMeters) {
-        if (distanceMeters < 500) return 15;
-        if (distanceMeters < 2000) return 13;
-        if (distanceMeters < 10000) return 11;
-        if (distanceMeters < 50000) return 9;
-        if (distanceMeters < 200000) return 7;
-        if (distanceMeters < 1000000) return 5;
-        return 3;
-    }
+
     
     private int lonToTile(double lon, int zoom) {
         return (int) Math.floor((lon + 180.0) / 360.0 * (1 << zoom));

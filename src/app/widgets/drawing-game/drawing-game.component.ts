@@ -8,6 +8,7 @@ import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-drawing-game',
+  template: `
     <ion-content>
       <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
         <ion-refresher-content></ion-refresher-content>
@@ -23,9 +24,18 @@ import { Location } from '@angular/common';
         </div>
       </div>
 
-      <!-- VISTA DE CATEGORIAS -->
-      <ng-container *ngIf="gameState === 'categories'">
-        <div class="categories-area">
+      <!-- VISTA DE CATEGORIAS O LISTA DE COMPLETADAS -->
+      <ng-container *ngIf="gameState === 'categories' || gameState === 'completed_list'">
+        <div class="custom-toggle-container">
+          <div class="toggle-pill" [class.active]="gameState === 'categories'" (click)="gameState = 'categories'">
+            <ion-icon name="play-circle-outline"></ion-icon> Jugar
+          </div>
+          <div class="toggle-pill" [class.active]="gameState === 'completed_list'" (click)="loadCompletedList()">
+            <ion-icon name="checkmark-circle-outline"></ion-icon> Ya hechas
+          </div>
+        </div>
+
+        <div class="categories-area" *ngIf="gameState === 'categories'">
           <p class="subtitle">Elige un tema para dar rienda suelta a tu imaginación</p>
           
           <div class="category-grid">
@@ -38,9 +48,49 @@ import { Location } from '@angular/common';
             </div>
           </div>
         </div>
+
+        <div class="completed-list-area" *ngIf="gameState === 'completed_list'">
+          <div *ngIf="completedPrompts.length === 0 && waitingPrompts.length === 0" class="empty-state">
+            <p>Aún no habéis completado ningún dibujo 🎨</p>
+          </div>
+
+          <div *ngIf="waitingPrompts.length > 0" class="mb-20">
+            <h3 class="section-title">Esperando a tu pareja ({{waitingPrompts.length}})</h3>
+            <div class="drawing-item" *ngFor="let p of waitingPrompts">
+              <h4 class="d-title">{{ p.prompt_text }}</h4>
+              <div class="d-grid">
+                <div class="d-col">
+                  <img [src]="getImageUrl(p.my_drawing)" class="d-img-thumb" />
+                  <span>Tú</span>
+                </div>
+                <div class="d-col d-hidden">
+                  <ion-icon name="lock-closed-outline"></ion-icon>
+                  <span>Pareja</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="completedPrompts.length > 0">
+            <h3 class="section-title">Completadas ({{completedPrompts.length}})</h3>
+            <div class="drawing-item" *ngFor="let p of completedPrompts">
+              <h4 class="d-title">{{ p.prompt_text }}</h4>
+              <div class="d-grid">
+                <div class="d-col">
+                  <img [src]="getImageUrl(p.my_drawing)" class="d-img-thumb" />
+                  <span>Tú</span>
+                </div>
+                <div class="d-col">
+                  <img [src]="getImageUrl(p.partner_drawing)" class="d-img-thumb" />
+                  <span>Pareja</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </ng-container>
 
-      <div class="content" *ngIf="prompt && gameState !== 'categories'">
+      <div class="content" *ngIf="prompt && gameState !== 'categories' && gameState !== 'completed_list'">
         <div class="prompt-card">
           <p>Dibuja:</p>
           <h3 *ngIf="selectedCategory" class="cat-badge">{{ selectedCategory }}</h3>
@@ -131,6 +181,22 @@ import { Location } from '@angular/common';
     .cat-badge { display: inline-block; background: #ffb3c1; color: #590d22; font-size: 0.8rem; padding: 3px 8px; border-radius: 10px; margin-top: 5px; }
     .prompt-card h3 { margin: 5px 0 0; color: #590D22; font-size: 1.3rem; font-weight: 800; }
 
+    /* TOGGLE TABS */
+    .custom-toggle-container { display: flex; background: rgba(255,255,255,0.6); padding: 5px; border-radius: 30px; margin: 0 0 15px 0; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+    .toggle-pill { flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px; padding: 10px 0; border-radius: 25px; font-weight: 700; color: #888; transition: all 0.3s; cursor: pointer; font-size: 0.9rem; position: relative; }
+    .toggle-pill.active { background: white; color: #FF4D6D; box-shadow: 0 4px 10px rgba(255,77,109,0.15); transform: scale(1.02); }
+
+    /* LISTA COMPLETA */
+    .section-title { color: #590D22; font-size: 1.1rem; border-bottom: 2px solid #ffb3c1; padding-bottom: 5px; margin-bottom: 15px; text-align: left; }
+    .mb-20 { margin-bottom: 20px; }
+    .drawing-item { background: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; }
+    .d-title { margin: 0 0 15px; color: #590D22; font-weight: bold; font-size: 1.1rem; }
+    .d-grid { display: flex; gap: 15px; }
+    .d-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 0.8rem; font-weight: bold; color: #FF4D6D; text-transform: uppercase; }
+    .d-img-thumb { width: 100%; aspect-ratio: 1; object-fit: contain; background: #f8f9fa; border-radius: 10px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+    .d-hidden { background: #f1f3f5; border-radius: 10px; justify-content: center; color: #888; font-size: 0.9rem; aspect-ratio: 1; margin-bottom: 20px; }
+    .d-hidden ion-icon { font-size: 2rem; margin-bottom: 5px; }
+
     .canvas-wrapper { flex: 1; background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; position: relative; min-height: 350px; }
     canvas { width: 100%; height: 100%; touch-action: none; display: block; }
     
@@ -175,9 +241,12 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
   categories: string[] = [];
   selectedCategory: string = '';
   prompt: any = null;
-  gameState: 'categories' | 'init' | 'drawing' | 'waiting' | 'completed' = 'categories';
+  gameState: 'categories' | 'completed_list' | 'init' | 'drawing' | 'waiting' | 'completed' = 'categories';
   result: any = null;
   progress: any = null;
+
+  completedPrompts: any[] = [];
+  waitingPrompts: any[] = [];
 
   private isDrawing = false;
   private drawingHistory: ImageData[] = [];
@@ -187,7 +256,7 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
   private location = inject(Location);
 
   constructor() {
-    addIcons({ arrowBack, trashOutline, checkmarkCircleOutline, arrowUndoOutline, 'infinite-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M256 256s-48-96-126-96c-54.12 0-98 43-98 96s43.88 96 98 96c37.51 0 71-22.41 94-48M256 256s48 96 126 96c54.12 0 98-43 98-96s-43.88-96-98-96c-37.51 0-71 22.41-94 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="48"/></svg>' });
+    addIcons({ arrowBack, trashOutline, checkmarkCircleOutline, arrowUndoOutline, 'play-circle-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M112 111v290c0 17.44 17 28.52 31 20.16l247.9-148.37c12.12-7.25 12.12-26.33 0-33.58L143 90.84c-14-8.36-31 2.72-31 20.16z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/></svg>', 'lock-closed-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M336 208v-95a80 80 0 00-160 0v95" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="96" y="208" width="320" height="272" rx="48" ry="48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>', 'infinite-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M256 256s-48-96-126-96c-54.12 0-98 43-98 96s43.88 96 98 96c37.51 0 71-22.41 94-48M256 256s48 96 126 96c54.12 0 98-43 98-96s-43.88-96-98-96c-37.51 0-71 22.41-94 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="48"/></svg>' });
   }
 
   async ngOnInit() {
@@ -202,6 +271,8 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
   async handleRefresh(event: any) {
     if (this.gameState === 'categories') {
       await this.loadCategories();
+    } else if (this.gameState === 'completed_list') {
+      await this.loadCompletedList();
     } else if (this.prompt) {
       await this.checkResult();
     }
@@ -238,8 +309,19 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
     await this.loadPrompt();
   }
 
+  async loadCompletedList() {
+    this.gameState = 'completed_list';
+    try {
+      const allPrompts = await this.api.getAllDrawingPrompts();
+      this.completedPrompts = allPrompts.filter(p => p.status === 'completed');
+      this.waitingPrompts = allPrompts.filter(p => p.status === 'waiting_partner');
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   goBack() {
-    if (this.gameState !== 'categories') {
+    if (this.gameState !== 'categories' && this.gameState !== 'completed_list') {
       this.gameState = 'categories';
       this.selectedCategory = '';
       this.prompt = null;

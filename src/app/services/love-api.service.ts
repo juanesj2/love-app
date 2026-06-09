@@ -142,6 +142,11 @@ export class LoveApiService {
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/photos`, formData, { headers }));
   }
 
+  async assignPhotosToAlbum(albumId: number, photoIds: number[]): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/albums/${albumId}/photos`, { photo_ids: photoIds }, { headers }));
+  }
+
   async reactToPhoto(photoId: number, emoji: string): Promise<any> {
     const headers = await this.getHeaders();
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/photos/${photoId}/reactions`, { content: emoji }, { headers }));
@@ -179,6 +184,11 @@ export class LoveApiService {
     return firstValueFrom(this.http.get<any[]>(url, { headers }));
   }
 
+  async getAllSwipeCards(): Promise<any[]> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/games/swipe/all`, { headers }));
+  }
+
   async answerSwipe(questionId: number, answer: boolean): Promise<any> {
     const headers = await this.getHeaders();
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/games/swipe/answer`, { question_id: questionId, answer }, { headers }));
@@ -199,6 +209,11 @@ export class LoveApiService {
     const headers = await this.getHeaders();
     const url = category ? `${API_BASE_URL}/love-album/games/drawing/prompt?category=${encodeURIComponent(category)}` : `${API_BASE_URL}/love-album/games/drawing/prompt`;
     return firstValueFrom(this.http.get(url, { headers }));
+  }
+
+  async getAllDrawingPrompts(): Promise<any[]> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/games/drawing/all`, { headers }));
   }
 
   async uploadDrawing(promptId: number, base64Image: string): Promise<any> {
