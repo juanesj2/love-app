@@ -27,9 +27,9 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
               </div>
               
               <div class="bubble-wrapper">
-                <div class="reply-context" *ngIf="chatMeta[msg.id]?.replyTo" (click)="scrollToMessage(chatMeta[msg.id].replyTo.id)">
-                  <span class="reply-context-name">{{chatMeta[msg.id].replyTo.user}}</span>
-                  <span class="reply-context-text">{{chatMeta[msg.id].replyTo.text}}</span>
+                <div class="reply-context" *ngIf="msg.reply_to" (click)="scrollToMessage(msg.reply_to.id)">
+                  <span class="reply-context-name">{{msg.reply_to.user}}</span>
+                  <span class="reply-context-text">{{msg.reply_to.text}}</span>
                 </div>
 
                 <div class="bubble" [class.only-photo]="msg.photo && (!msg.mensaje || msg.mensaje === 'null')">
@@ -323,7 +323,12 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       if (this.isEditing && this.editingMsgId) {
         await this.api.editMessage(this.editingMsgId, this.newMessage);
       } else {
-        await this.api.sendMessage(this.newMessage);
+        const replyPayload = isReplyingTo ? {
+          id: isReplyingTo.id,
+          user: isReplyingTo.user?.name,
+          text: isReplyingTo.mensaje || '📷 Foto'
+        } : undefined;
+        await this.api.sendMessage(this.newMessage, undefined, replyPayload);
       }
       
       this.newMessage = '';
@@ -332,23 +337,6 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       this.editingMsgId = null;
       
       await this.loadMessages();
-      
-      if (isReplyingTo) {
-         const myName = localStorage.getItem('love_widget_user') === 'juan' ? 'Juan' : 'Roberta';
-         const myLastMsg = this.messages.slice().reverse().find(m => m.user?.name === myName);
-         if (myLastMsg) {
-           const metaDoc = doc(this.firestore, 'locations', 'chat_meta');
-           await setDoc(metaDoc, {
-             [myLastMsg.id]: {
-                replyTo: {
-                   id: isReplyingTo.id,
-                   user: isReplyingTo.user?.name,
-                   text: isReplyingTo.mensaje || '📷 Foto'
-                }
-             }
-           }, { merge: true });
-         }
-      }
       
       setTimeout(() => this.scrollToBottom(true), 100);
       // Removed success toast so it doesn't interrupt chat flow
@@ -466,27 +454,22 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   hasReactions(msg: any): boolean {
-    return this.chatMeta[msg.id]?.reactions && Object.keys(this.chatMeta[msg.id].reactions).length > 0;
+    return msg.reactions && msg.reactions.length > 0;
   }
 
   getReactions(msg: any): string[] {
     if (!this.hasReactions(msg)) return [];
-    return Object.values(this.chatMeta[msg.id].reactions);
+    return msg.reactions.map((r: any) => r.reaction);
   }
 
   async addReaction(msg: any, emoji: string) {
     this.showReactionsMsgId = null;
-    const myName = localStorage.getItem('love_widget_user') === 'juan' ? 'Juan' : 'Roberta';
-    const metaDoc = doc(this.firestore, 'locations', 'chat_meta');
-    
-    // We use setDoc with merge: true to avoid overwriting other messages
-    await setDoc(metaDoc, {
-      [msg.id]: {
-        reactions: {
-          [myName]: emoji
-        }
-      }
-    }, { merge: true });
+    try {
+      await this.api.reactToChatMessage(msg.id, emoji);
+      await this.loadMessages();
+    } catch (error) {
+      console.error('Error adding reaction:', error);
+    }
   }
 
   isMine(msg: any): boolean {

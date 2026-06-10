@@ -166,9 +166,10 @@ export class LoveApiService {
     return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/chat`, { headers }));
   }
 
-  async sendMessage(mensaje: string, photoId?: number): Promise<any> {
+  async sendMessage(mensaje: string, photoId?: number, replyTo?: any): Promise<any> {
     const body: any = { mensaje };
     if (photoId) body.love_photo_id = photoId;
+    if (replyTo) body.reply_to = replyTo;
     
     const headers = await this.getHeaders();
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/chat`, body, { headers }));
@@ -177,6 +178,11 @@ export class LoveApiService {
   async editMessage(id: number, mensaje: string): Promise<any> {
     const headers = await this.getHeaders();
     return firstValueFrom(this.http.put(`${API_BASE_URL}/love-album/chat/${id}`, { mensaje }, { headers }));
+  }
+
+  async reactToChatMessage(id: number, reaction: string): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/chat/${id}/react`, { reaction }, { headers }));
   }
 
   // --- GAMES ---
