@@ -3,11 +3,11 @@ import { Preferences } from '@capacitor/preferences';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ToastController, IonContent } from '@ionic/angular';
-import { Firestore, doc, getDoc } from '@angular/fire/firestore';
+import { Firestore, doc, getDoc, onSnapshot, setDoc } from '@angular/fire/firestore';
 import { LoveApiService } from '../../services/love-api.service';
 import { environment } from '../../../environments/environment';
 import { addIcons } from 'ionicons';
-import { paperPlane, hourglassOutline } from 'ionicons/icons';
+import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sad, flame, thumbsUp } from 'ionicons/icons';
 @Component({
   selector: 'app-chat-widget',
   template: `
@@ -17,29 +17,73 @@ import { paperPlane, hourglassOutline } from 'ionicons/icons';
           <ion-refresher-content></ion-refresher-content>
         </ion-refresher>
         <div class="messages-inner">
-        <div class="message-wrapper" *ngFor="let msg of messages" [class.mine]="isMine(msg)">
-          <div class="msg-avatar-container" *ngIf="!isMine(msg)">
-            <img *ngIf="avatars[msg.user?.name]" [src]="avatars[msg.user.name]" class="msg-avatar" />
-            <div *ngIf="!avatars[msg.user?.name]" class="msg-avatar-fallback">{{ msg.user?.name?.charAt(0) || 'U' }}</div>
-          </div>
-          <div class="bubble" [class.only-photo]="msg.photo && (!msg.mensaje || msg.mensaje === 'null')">
-            <span class="sender" *ngIf="!isMine(msg)">{{msg.user?.name}}</span>
-            
-            <div class="photo-reply" *ngIf="msg.photo">
-              <ion-img [src]="environment.storageUrl + msg.photo.image_path"></ion-img>
-            </div>
+        <ion-item-sliding *ngFor="let msg of messages">
+          <ion-item class="transparent-item" lines="none" (touchstart)="onTouchStart($event, msg)" (touchend)="onTouchEnd()" (touchcancel)="onTouchEnd()">
+            <div class="message-wrapper" [class.mine]="isMine(msg)">
+              <div class="msg-avatar-container" *ngIf="!isMine(msg)">
+                <img *ngIf="avatars[msg.user?.name]" [src]="avatars[msg.user.name]" class="msg-avatar" />
+                <div *ngIf="!avatars[msg.user?.name]" class="msg-avatar-fallback">{{ msg.user?.name?.charAt(0) || 'U' }}</div>
+              </div>
+              
+              <div class="bubble-wrapper">
+                <div class="reply-context" *ngIf="chatMeta[msg.id]?.replyTo" (click)="scrollToMessage(chatMeta[msg.id].replyTo.id)">
+                  <span class="reply-context-name">{{chatMeta[msg.id].replyTo.user}}</span>
+                  <span class="reply-context-text">{{chatMeta[msg.id].replyTo.text}}</span>
+                </div>
 
-            <p class="text" *ngIf="msg.mensaje && msg.mensaje !== 'null'">{{msg.mensaje}}</p>
-          </div>
-          <div class="msg-avatar-container" *ngIf="isMine(msg)">
-            <img *ngIf="avatars[msg.user?.name]" [src]="avatars[msg.user.name]" class="msg-avatar" />
-            <div *ngIf="!avatars[msg.user?.name]" class="msg-avatar-fallback">{{ msg.user?.name?.charAt(0) || 'U' }}</div>
-          </div>
-        </div>
+                <div class="bubble" [class.only-photo]="msg.photo && (!msg.mensaje || msg.mensaje === 'null')">
+                  <span class="sender" *ngIf="!isMine(msg)">{{msg.user?.name}}</span>
+                  
+                  <div class="photo-reply" *ngIf="msg.photo">
+                    <ion-img [src]="environment.storageUrl + msg.photo.image_path"></ion-img>
+                  </div>
+
+                  <p class="text" *ngIf="msg.mensaje && msg.mensaje !== 'null'">{{msg.mensaje}}</p>
+                  
+                  <div class="reactions-container" *ngIf="hasReactions(msg)">
+                    <span class="reaction" *ngFor="let r of getReactions(msg)">{{r}}</span>
+                  </div>
+                </div>
+
+                <div class="reactions-popover" *ngIf="showReactionsMsgId === msg.id">
+                  <span (click)="addReaction(msg, '❤️')">❤️</span>
+                  <span (click)="addReaction(msg, '😂')">😂</span>
+                  <span (click)="addReaction(msg, '🥺')">🥺</span>
+                  <span (click)="addReaction(msg, '🔥')">🔥</span>
+                  <span (click)="addReaction(msg, '👍')">👍</span>
+                </div>
+              </div>
+
+              <div class="msg-avatar-container" *ngIf="isMine(msg)">
+                <img *ngIf="avatars[msg.user?.name]" [src]="avatars[msg.user.name]" class="msg-avatar" />
+                <div *ngIf="!avatars[msg.user?.name]" class="msg-avatar-fallback">{{ msg.user?.name?.charAt(0) || 'U' }}</div>
+              </div>
+            </div>
+          </ion-item>
+          
+          <ion-item-options [side]="isMine(msg) ? 'start' : 'end'">
+            <ion-item-option color="light" class="reply-option" (click)="replyToMessage(msg)">
+              <ion-icon slot="icon-only" name="arrow-undo-outline" color="primary"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
         </div>
       </ion-content>
 
       <div class="input-area">
+        <div class="reply-preview-container" *ngIf="replyingTo">
+          <div class="reply-preview">
+            <div class="reply-header">
+              <div class="reply-title">
+                <ion-icon name="arrow-undo-outline"></ion-icon>
+                <span>Respondiendo a <strong>{{replyingTo.user?.name}}</strong></span>
+              </div>
+              <ion-icon name="close" class="close-reply" (click)="replyingTo = null"></ion-icon>
+            </div>
+            <div class="reply-text">{{replyingTo.mensaje && replyingTo.mensaje !== 'null' ? replyingTo.mensaje : '📷 Foto'}}</div>
+          </div>
+        </div>
+
         <div class="input-container">
           <input 
             type="text" 
@@ -89,14 +133,39 @@ import { paperPlane, hourglassOutline } from 'ionicons/icons';
     .only-photo { padding: 4px; background: transparent !important; box-shadow: none !important; border: none !important; }
     .only-photo .photo-reply ion-img { margin-bottom: 0; }
     
-    .input-area { padding: 15px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-top: 1px solid rgba(255, 77, 109, 0.1); }
-    .input-container { display: flex; align-items: center; gap: 10px; background: #f5ecee; border-radius: 30px; padding: 6px 6px 6px 20px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02); border: 1px solid rgba(255, 77, 109, 0.15); transition: all 0.3s; }
-    .input-container:focus-within { background: white; border-color: #FF4D6D; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.1); }
+    .bubble-wrapper { display: flex; flex-direction: column; max-width: 80%; position: relative; }
+    .message-wrapper.mine .bubble-wrapper { align-items: flex-end; }
+    .message-wrapper:not(.mine) .bubble-wrapper { align-items: flex-start; }
     
-    .premium-input { flex: 1; border: none; background: transparent; font-size: 1.05rem; color: #333; outline: none; }
-    .premium-input::placeholder { color: #a08c92; }
+    .reply-context { background: rgba(0,0,0,0.05); padding: 6px 10px; border-radius: 8px; font-size: 0.8rem; margin-bottom: -8px; z-index: 0; opacity: 0.8; padding-bottom: 12px; cursor: pointer; border-left: 3px solid #FF4D6D; }
+    .mine .reply-context { background: rgba(255, 77, 109, 0.2); border-left: none; border-right: 3px solid white; color: #333; }
+    .reply-context-name { font-weight: bold; color: #FF4D6D; display: block; font-size: 0.75rem; }
+    .mine .reply-context-name { color: #c9184a; }
+    .reply-context-text { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
     
-    .send-btn { width: 42px; height: 42px; border-radius: 50%; border: none; background: #e0d4d7; color: white; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; }
+    .reactions-popover { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: white; padding: 6px 12px; border-radius: 20px; display: flex; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); z-index: 100; animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    @keyframes popIn { from { transform: translateX(-50%) scale(0.5); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
+    .reactions-popover span { font-size: 1.5rem; cursor: pointer; transition: transform 0.2s; }
+    .reactions-popover span:active { transform: scale(1.3); }
+    
+    .reactions-container { position: absolute; bottom: -12px; right: 10px; background: white; padding: 2px 6px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; gap: 2px; border: 1px solid rgba(0,0,0,0.05); z-index: 2; }
+    .mine .reactions-container { right: auto; left: 10px; }
+    .reaction { font-size: 0.9rem; }
+    
+    .reply-preview-container { padding: 10px 15px 0; width: 100%; }
+    .reply-preview { background: white; border-radius: 12px; padding: 10px 15px; border-left: 4px solid #FF4D6D; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 4px; }
+    .reply-header { display: flex; justify-content: space-between; align-items: center; }
+    .reply-title { display: flex; align-items: center; gap: 6px; color: #FF4D6D; font-size: 0.85rem; }
+    .close-reply { color: #999; font-size: 1.2rem; cursor: pointer; }
+    .reply-text { font-size: 0.9rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .input-area { background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; }
+    .input-container { padding: 10px 15px; display: flex; align-items: center; gap: 10px; }
+    
+    .premium-input { flex: 1; background: #f8f9fa; border: 1px solid rgba(0,0,0,0.05); border-radius: 20px; padding: 12px 20px; font-size: 1rem; color: #333; outline: none; transition: all 0.3s ease; }
+    .premium-input:focus { background: white; border-color: #FF4D6D; box-shadow: 0 0 0 3px rgba(255,77,109,0.1); }
+    
+    .send-btn { width: 44px; height: 44px; border-radius: 50%; border: none; background: #e0d4d7; color: white; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; }
     .send-btn.active { background: linear-gradient(135deg, #FF4D6D 0%, #c9184a 100%); box-shadow: 0 4px 12px rgba(255, 77, 109, 0.4); transform: rotate(-10deg); }
     .send-btn.active:hover { transform: rotate(0deg) scale(1.1); }
   `],
@@ -114,9 +183,15 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   newMessage: string = '';
   sending = false;
   avatars: { [key: string]: string } = {};
+  
+  replyingTo: any = null;
+  chatMeta: any = {};
+  showReactionsMsgId: number | null = null;
+  
+  private touchTimer: any;
 
   constructor() {
-    addIcons({ paperPlane, hourglassOutline });
+    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sad, flame, thumbsUp });
   }
 
   private viewInitialized = false;
@@ -124,6 +199,16 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.loadAvatars();
     this.loadMessages();
+    this.listenToChatMeta();
+  }
+
+  listenToChatMeta() {
+    const metaDoc = doc(this.firestore, 'locations', 'chat_meta');
+    onSnapshot(metaDoc, (snap) => {
+      if (snap.exists()) {
+        this.chatMeta = snap.data();
+      }
+    });
   }
 
   async loadAvatars() {
@@ -190,18 +275,87 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     if (!this.newMessage.trim() || this.sending) return;
     
     this.sending = true;
+    const isReplyingTo = this.replyingTo;
+    
     try {
       await this.api.sendMessage(this.newMessage);
       this.newMessage = '';
+      this.replyingTo = null;
       await this.loadMessages();
+      
+      if (isReplyingTo) {
+         const myName = localStorage.getItem('love_widget_user') === 'juan' ? 'Juan' : 'Roberta';
+         const myLastMsg = this.messages.slice().reverse().find(m => m.user?.name === myName);
+         if (myLastMsg) {
+           const metaDoc = doc(this.firestore, 'locations', 'chat_meta');
+           await setDoc(metaDoc, {
+             [myLastMsg.id]: {
+                replyTo: {
+                   id: isReplyingTo.id,
+                   user: isReplyingTo.user?.name,
+                   text: isReplyingTo.mensaje || '📷 Foto'
+                }
+             }
+           }, { merge: true });
+         }
+      }
+      
       setTimeout(() => this.scrollToBottom(true), 100);
-      this.showSuccess('Mensaje enviado con éxito');
+      // Removed success toast so it doesn't interrupt chat flow
     } catch (e) {
       console.error(e);
       this.showError('Ocurrió un error al enviar tu mensaje. Inténtalo de nuevo.');
     } finally {
       this.sending = false;
     }
+  }
+
+  // --- Swipes y Reacciones ---
+
+  onTouchStart(event: any, msg: any) {
+    this.touchTimer = setTimeout(() => {
+      this.showReactionsMsgId = msg.id;
+    }, 500);
+  }
+
+  onTouchEnd() {
+    clearTimeout(this.touchTimer);
+  }
+
+  replyToMessage(msg: any) {
+    this.replyingTo = msg;
+    const input = document.querySelector('.premium-input') as HTMLInputElement;
+    if (input) input.focus();
+  }
+
+  scrollToMessage(id: number) {
+    // In a real app we'd scroll to the DOM element with this ID
+    // For now we'll just log or implement a simple scroll
+    console.log('Scroll to', id);
+  }
+
+  hasReactions(msg: any): boolean {
+    return this.chatMeta[msg.id]?.reactions && Object.keys(this.chatMeta[msg.id].reactions).length > 0;
+  }
+
+  getReactions(msg: any): string[] {
+    if (!this.hasReactions(msg)) return [];
+    return Object.values(this.chatMeta[msg.id].reactions);
+  }
+
+  async addReaction(msg: any, emoji: string) {
+    this.showReactionsMsgId = null;
+    const myName = localStorage.getItem('love_widget_user') === 'juan' ? 'Juan' : 'Roberta';
+    const metaDoc = doc(this.firestore, 'locations', 'chat_meta');
+    
+    // We use setDoc with merge: true to avoid overwriting other messages
+    await setDoc(metaDoc, {
+      [msg.id]: {
+        reactions: {
+          [myName]: emoji
+        }
+      }
+    }, { merge: true });
   }
 
   isMine(msg: any): boolean {
