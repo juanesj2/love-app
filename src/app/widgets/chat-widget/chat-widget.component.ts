@@ -76,8 +76,9 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
         </div>t>
       </ion-content>
 
-      <ion-popover [isOpen]="showReactionsMsgId !== null" [event]="popoverEvent" (didDismiss)="closePopover()" class="reactions-popover-host" [showBackdrop]="false">
-        <ng-template>
+      <!-- Custom emoji overlay (replaces ion-popover for Capacitor compatibility) -->
+      <div class="reactions-overlay" *ngIf="showReactionsMsgId !== null" (click)="closePopover()">
+        <div class="reactions-bar" (click)="$event.stopPropagation()">
           <div class="reactions-popover-content" *ngIf="!showCustomEmojiInput">
             <span (click)="addReaction(activeMsg, '❤️')">❤️</span>
             <span (click)="addReaction(activeMsg, '😂')">😂</span>
@@ -91,8 +92,8 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
             <input type="text" id="customEmojiInput" placeholder="Añade emoji" (keyup.enter)="addCustomReaction(customEmojiInput.value)" #customEmojiInput class="custom-emoji-field">
             <button class="add-btn" (click)="addCustomReaction(customEmojiInput.value)">OK</button>
           </div>
-        </ng-template>
-      </ion-popover>
+        </div>
+      </div>
 
       <div class="input-area">
         <div class="reply-preview-container" *ngIf="replyingTo || isEditing">
@@ -182,9 +183,10 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
     .mine .reply-context-name { color: #c9184a; }
     .reply-context-text { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; color: #666; }
     
-    .reactions-popover-host { --width: auto; --box-shadow: none; --background: transparent; --backdrop-opacity: 1; }
-    .reactions-popover-host::part(backdrop) { background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(4px); }
-    .reactions-popover-host::part(content) { overflow: visible; border-radius: 24px; }
+    .reactions-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999; background: rgba(0,0,0,0.3); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; animation: fadeIn 0.15s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .reactions-bar { animation: popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     .reactions-popover-content { display: flex; gap: 12px; padding: 12px 16px; font-size: 1.8rem; justify-content: center; align-items: center; border: 1px solid rgba(0,0,0,0.08); border-radius: 24px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
     .reactions-popover-content span { cursor: pointer; transition: transform 0.2s; }
     .reactions-popover-content span:active { transform: scale(1.3); }
@@ -361,30 +363,16 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   // --- Swipes y Reacciones ---
 
   activeMsg: any = null;
-  popoverEvent: Event | null = null;
   showCustomEmojiInput = false;
 
   pressTimer: any;
 
   startPress(event: any, msg: any) {
-    // Capture coordinates immediately before the event goes stale
-    const touchX = event.touches && event.touches.length > 0 ? event.touches[0].clientX : event.clientX;
-    const touchY = event.touches && event.touches.length > 0 ? event.touches[0].clientY : event.clientY;
-
     this.pressTimer = setTimeout(async () => {
       try {
         await Haptics.impact({ style: ImpactStyle.Heavy });
       } catch (e) {}
       
-      // Create a fresh MouseEvent so ion-popover can read valid coordinates
-      const syntheticEvent = new MouseEvent('click', {
-        clientX: touchX,
-        clientY: touchY,
-        bubbles: true,
-        cancelable: true
-      });
-
-      this.popoverEvent = syntheticEvent;
       this.activeMsg = msg;
       this.showReactionsMsgId = msg.id;
       this.showCustomEmojiInput = false;
@@ -398,10 +386,10 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   onContextMenu(event: any, msg: any) {
     if (event && event.preventDefault) event.preventDefault();
-    this.popoverEvent = event;
     this.activeMsg = msg;
     this.showReactionsMsgId = msg.id;
     this.showCustomEmojiInput = false;
+    this.cdr.detectChanges();
   }
 
   closePopover() {
