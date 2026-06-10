@@ -149,13 +149,13 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
     .message-wrapper.mine { justify-content: flex-end; }
     .message-wrapper:not(.mine) { justify-content: flex-start; }
     
-    .bubble { width: fit-content; max-width: 80%; padding: 8px 12px; border-radius: 12px; font-size: 1rem; line-height: 1.4; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+    .bubble { width: fit-content; max-width: 100%; padding: 8px 12px; border-radius: 12px; font-size: 1rem; line-height: 1.4; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
     
     .mine .bubble { background: #FF4D6D; color: white; border-bottom-right-radius: 4px; }
     .message-wrapper:not(.mine) .bubble { background: white; color: #333; border-bottom-left-radius: 4px; border: 1px solid rgba(0,0,0,0.05); }
     
     .sender { font-size: 0.75rem; font-weight: 700; color: #FF4D6D; margin-bottom: 4px; display: block; }
-    .text { margin: 0; word-wrap: break-word; }
+    .text { margin: 0; word-break: break-word; white-space: pre-wrap; }
     .edited-label { font-size: 0.7rem; opacity: 0.7; margin-left: 4px; font-style: italic; }
     
     .msg-avatar-container { width: 28px; height: 28px; flex-shrink: 0; border-radius: 50%; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); background: white; }
@@ -167,7 +167,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
     .only-photo { padding: 4px; background: transparent !important; box-shadow: none !important; border: none !important; }
     .only-photo .photo-reply img { margin-bottom: 0; }
     
-    .bubble-wrapper { display: flex; flex-direction: column; max-width: 80%; position: relative; margin-bottom: 14px; transition: all 0.3s; }
+    .bubble-wrapper { display: flex; flex-direction: column; max-width: 85%; position: relative; margin-bottom: 14px; transition: all 0.3s; }
     .message-wrapper.mine .bubble-wrapper { align-items: flex-end; }
     .message-wrapper:not(.mine) .bubble-wrapper { align-items: flex-start; }
     
