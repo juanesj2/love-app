@@ -3,6 +3,7 @@ import { Preferences } from '@capacitor/preferences';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ToastController, IonContent } from '@ionic/angular';
+import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { LoveApiService } from '../../services/love-api.service';
 import { environment } from '../../../environments/environment';
 import { addIcons } from 'ionicons';
@@ -11,16 +12,16 @@ import { paperPlane, hourglassOutline } from 'ionicons/icons';
   selector: 'app-chat-widget',
   template: `
     <div class="chat-wrapper">
-      <div class="chat-header">
-        <div class="status-dot"></div>
-      </div>
-
       <ion-content class="messages-content" #msgContainer>
         <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
           <ion-refresher-content></ion-refresher-content>
         </ion-refresher>
         <div class="messages-inner">
         <div class="message-wrapper" *ngFor="let msg of messages" [class.mine]="isMine(msg)">
+          <div class="msg-avatar-container" *ngIf="!isMine(msg)">
+            <img *ngIf="avatars[msg.user?.name]" [src]="avatars[msg.user.name]" class="msg-avatar" />
+            <div *ngIf="!avatars[msg.user?.name]" class="msg-avatar-fallback">{{ msg.user?.name?.charAt(0) || 'U' }}</div>
+          </div>
           <div class="bubble" [class.only-photo]="msg.photo && (!msg.mensaje || msg.mensaje === 'null')">
             <span class="sender" *ngIf="!isMine(msg)">{{msg.user?.name}}</span>
             
@@ -29,6 +30,10 @@ import { paperPlane, hourglassOutline } from 'ionicons/icons';
             </div>
 
             <p class="text" *ngIf="msg.mensaje && msg.mensaje !== 'null'">{{msg.mensaje}}</p>
+          </div>
+          <div class="msg-avatar-container" *ngIf="isMine(msg)">
+            <img *ngIf="avatars[msg.user?.name]" [src]="avatars[msg.user.name]" class="msg-avatar" />
+            <div *ngIf="!avatars[msg.user?.name]" class="msg-avatar-fallback">{{ msg.user?.name?.charAt(0) || 'U' }}</div>
           </div>
         </div>
         </div>
@@ -59,14 +64,10 @@ import { paperPlane, hourglassOutline } from 'ionicons/icons';
     }
     .chat-wrapper { display: flex; flex-direction: column; height: 100%; background: #fdf5f7; font-family: 'Inter', sans-serif; position: relative; }
     
-    .chat-header { padding: 15px 20px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255, 77, 109, 0.1); z-index: 10; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-    .chat-header h2 { margin: 0; font-size: 1.3rem; font-weight: 800; color: #590D22; }
-    .status-dot { width: 10px; height: 10px; background: #00d26a; border-radius: 50%; box-shadow: 0 0 8px rgba(0, 210, 106, 0.6); }
-
     .messages-content { flex: 1; --background: transparent; }
     .messages-inner { padding: 20px 15px; display: flex; flex-direction: column; gap: 12px; }
     
-    .message-wrapper { display: flex; width: 100%; animation: slideUp 0.3s ease-out forwards; opacity: 0; transform: translateY(10px); }
+    .message-wrapper { display: flex; width: 100%; animation: slideUp 0.3s ease-out forwards; opacity: 0; transform: translateY(10px); gap: 8px; align-items: flex-end; }
     @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
     .message-wrapper.mine { justify-content: flex-end; }
     .message-wrapper:not(.mine) { justify-content: flex-start; }
@@ -78,6 +79,11 @@ import { paperPlane, hourglassOutline } from 'ionicons/icons';
     
     .sender { font-size: 0.75rem; font-weight: 700; color: #FF4D6D; margin-bottom: 4px; display: block; }
     .text { margin: 0; word-wrap: break-word; }
+    
+    .msg-avatar-container { width: 28px; height: 28px; flex-shrink: 0; border-radius: 50%; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); background: white; }
+    .msg-avatar { width: 100%; height: 100%; object-fit: cover; }
+    .msg-avatar-fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; font-weight: bold; font-size: 0.8rem; }
+    
     
     .photo-reply ion-img { width: 100%; max-width: 200px; border-radius: 12px; margin-bottom: 8px; border: 2px solid rgba(255,255,255,0.2); display: block; overflow: hidden; }
     .only-photo { padding: 4px; background: transparent !important; box-shadow: none !important; border: none !important; }
@@ -101,11 +107,13 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   @ViewChild(IonContent, { static: false }) private msgContainer!: IonContent;
   private api = inject(LoveApiService);
   private toastController = inject(ToastController);
+  private firestore = inject(Firestore);
   public environment = environment;
   
   messages: any[] = [];
   newMessage: string = '';
   sending = false;
+  avatars: { [key: string]: string } = {};
 
   constructor() {
     addIcons({ paperPlane, hourglassOutline });
@@ -114,7 +122,23 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   private viewInitialized = false;
 
   ngOnInit() {
+    this.loadAvatars();
     this.loadMessages();
+  }
+
+  async loadAvatars() {
+    try {
+      const juanDoc = await getDoc(doc(this.firestore, 'locations', 'juan'));
+      if (juanDoc.exists() && juanDoc.data()?.['avatar']) {
+        this.avatars['Juan'] = juanDoc.data()['avatar'];
+      }
+      const robertaDoc = await getDoc(doc(this.firestore, 'locations', 'roberta'));
+      if (robertaDoc.exists() && robertaDoc.data()?.['avatar']) {
+        this.avatars['Roberta'] = robertaDoc.data()['avatar'];
+      }
+    } catch (e) {
+      console.error('Error loading avatars', e);
+    }
   }
 
   ngAfterViewInit() {
