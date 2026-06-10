@@ -13,6 +13,10 @@ import { Location } from '@angular/common';
   imports: [CommonModule, FormsModule, IonicModule],
   template: `
     <ion-content class="roulette-content">
+      <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+      
       <div class="header">
         <button class="back-btn" (click)="goBack()"><ion-icon name="arrow-back"></ion-icon></button>
         <h2>Ruleta de Citas</h2>
@@ -140,6 +144,11 @@ export class RouletteWidgetComponent implements OnInit {
     } catch(e) {
       console.error(e);
     }
+  }
+
+  async handleRefresh(event: any) {
+    await this.loadOptions();
+    event.target.complete();
   }
 
   goBack() {
