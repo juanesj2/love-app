@@ -17,6 +17,7 @@ import { Location } from '@angular/common';
         <button class="back-btn" (click)="goBack()"><ion-icon name="arrow-back"></ion-icon></button>
         <h2>Ruleta de Citas</h2>
         <p>¿Qué hacemos hoy?</p>
+        <button class="fill-btn" (click)="fillSampleDates()"><ion-icon name="sync-outline"></ion-icon></button>
       </div>
 
       <div class="roulette-container">
@@ -59,6 +60,7 @@ import { Location } from '@angular/common';
     .roulette-content { --background: #fdf5f7; }
     .header { text-align: center; padding: 20px 20px 10px; position: relative; }
     .back-btn { position: absolute; left: 20px; top: 20px; background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; z-index: 10; }
+    .fill-btn { position: absolute; right: 20px; top: 20px; background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; z-index: 10; }
     .header h2 { color: #590D22; margin: 0 0 5px; font-weight: 800; font-size: 1.8rem; padding-top: 5px; }
     .header p { color: #a4133c; margin: 0; font-size: 0.95rem; }
 
@@ -163,6 +165,12 @@ export class RouletteWidgetComponent implements OnInit {
     this.options.push(val);
     this.newOption = '';
     this.saveOptions();
+  }
+
+  fillSampleDates() {
+    this.options = ['Peli y Manta', 'Cena Fuera', 'Cocinar Juntos', 'Masajes', 'Noche de Juegos', 'Paseo Nocturno', 'Maratón Series', 'Cata Vinos'];
+    this.saveOptions();
+    this.showToast('Ruleta rellenada con citas de prueba.');
   }
 
   getColor(index: number) {
