@@ -164,7 +164,8 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
     .mine .reply-context-name { color: #c9184a; }
     .reply-context-text { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; color: #666; }
     
-    .reactions-popover-host { --width: auto; --box-shadow: none; --background: transparent; }
+    .reactions-popover-host { --width: auto; --box-shadow: none; --background: transparent; --backdrop-opacity: 1; }
+    .reactions-popover-host::part(backdrop) { background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(4px); }
     .reactions-popover-host::part(content) { overflow: visible; border-radius: 24px; }
     .reactions-popover-content { display: flex; gap: 12px; padding: 12px 16px; font-size: 1.8rem; justify-content: center; align-items: center; border: 1px solid rgba(0,0,0,0.08); border-radius: 24px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
     .reactions-popover-content span { cursor: pointer; transition: transform 0.2s; }
