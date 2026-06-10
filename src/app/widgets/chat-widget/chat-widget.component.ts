@@ -18,7 +18,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
         </ion-refresher>
         
         <ion-list class="messages-inner">
-        <ion-item-sliding *ngFor="let msg of messages" #slidingItem>
+        <ion-item-sliding *ngFor="let msg of messages" #slidingItem [id]="'msg-' + msg.id">
           <ion-item class="transparent-item" lines="none" (contextmenu)="onContextMenu($event, msg)">
             <div class="message-wrapper" [class.mine]="isMine(msg)">
               <div class="msg-avatar-container" *ngIf="!isMine(msg)">
@@ -148,9 +148,15 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
     .only-photo { padding: 4px; background: transparent !important; box-shadow: none !important; border: none !important; }
     .only-photo .photo-reply ion-img { margin-bottom: 0; }
     
-    .bubble-wrapper { display: flex; flex-direction: column; max-width: 80%; position: relative; margin-bottom: 14px; }
+    .bubble-wrapper { display: flex; flex-direction: column; max-width: 80%; position: relative; margin-bottom: 14px; transition: all 0.3s; }
     .message-wrapper.mine .bubble-wrapper { align-items: flex-end; }
     .message-wrapper:not(.mine) .bubble-wrapper { align-items: flex-start; }
+    
+    .highlight-msg .bubble { animation: highlight-pulse 1.5s ease; }
+    @keyframes highlight-pulse {
+      0% { background-color: rgba(255, 77, 109, 0.4); box-shadow: 0 0 15px rgba(255, 77, 109, 0.4); transform: scale(1.02); }
+      100% { background-color: var(--background, white); box-shadow: 0 2px 5px rgba(0,0,0,0.05); transform: scale(1); }
+    }
     
     .reply-context { background: rgba(0,0,0,0.05); padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; margin-bottom: 6px; z-index: 0; opacity: 0.95; cursor: pointer; border-left: 4px solid #FF4D6D; }
     .mine .reply-context { background: rgba(255, 77, 109, 0.15); border-left: none; border-right: 4px solid #FF4D6D; color: #333; }
@@ -387,9 +393,14 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   scrollToMessage(id: number) {
-    // In a real app we'd scroll to the DOM element with this ID
-    // For now we'll just log or implement a simple scroll
-    console.log('Scroll to', id);
+    const el = document.getElementById(`msg-${id}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('highlight-msg');
+      setTimeout(() => el.classList.remove('highlight-msg'), 1500);
+    } else {
+      console.log('Message not found on current page:', id);
+    }
   }
 
   hasReactions(msg: any): boolean {
