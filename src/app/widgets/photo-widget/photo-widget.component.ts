@@ -395,11 +395,11 @@ export class PhotoWidgetComponent implements OnInit {
 
   async loadAvatars() {
     try {
-      const juanDoc = await getDoc(doc(this.firestore, 'users', 'juan'));
+      const juanDoc = await getDoc(doc(this.firestore, 'locations', 'juan'));
       if (juanDoc.exists() && juanDoc.data()?.['avatar']) {
         this.avatars['Juan'] = juanDoc.data()['avatar'];
       }
-      const robertaDoc = await getDoc(doc(this.firestore, 'users', 'roberta'));
+      const robertaDoc = await getDoc(doc(this.firestore, 'locations', 'roberta'));
       if (robertaDoc.exists() && robertaDoc.data()?.['avatar']) {
         this.avatars['Roberta'] = robertaDoc.data()['avatar'];
       }
