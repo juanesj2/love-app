@@ -326,7 +326,11 @@ export class HomePage implements OnInit, OnDestroy {
         allowEditing: false,
         resultType: CameraResultType.Uri,
         source: CameraSource.Prompt,
-        direction: CameraDirection.Front // Usar la cámara delantera por defecto
+        direction: CameraDirection.Front, // Usar la cámara delantera por defecto
+        promptLabelHeader: 'Añadir Foto',
+        promptLabelCancel: 'Cancelar',
+        promptLabelPhoto: 'De la Galería',
+        promptLabelPicture: 'Tomar Foto'
       });
 
       if (image.webPath) {

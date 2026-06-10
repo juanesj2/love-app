@@ -607,7 +607,11 @@ export class PhotoWidgetComponent implements OnInit {
     try {
       const source = Capacitor.getPlatform() === 'web' ? CameraSource.Photos : CameraSource.Prompt;
       const image = await Camera.getPhoto({
-        quality: 60, width: 600, height: 600, allowEditing: true, resultType: CameraResultType.DataUrl, source: source
+        quality: 60, width: 600, height: 600, allowEditing: true, resultType: CameraResultType.DataUrl, source: source,
+        promptLabelHeader: 'Cambiar Portada',
+        promptLabelCancel: 'Cancelar',
+        promptLabelPhoto: 'De la Galería',
+        promptLabelPicture: 'Tomar Foto'
       });
       
       if (image.dataUrl) {
@@ -771,7 +775,11 @@ export class PhotoWidgetComponent implements OnInit {
     try {
       const source = Capacitor.getPlatform() === 'web' ? CameraSource.Photos : CameraSource.Prompt;
       const image = await Camera.getPhoto({
-        quality: 70, width: 800, height: 800, allowEditing: false, resultType: CameraResultType.Uri, source: source
+        quality: 70, width: 800, height: 800, allowEditing: false, resultType: CameraResultType.Uri, source: source,
+        promptLabelHeader: 'Añadir Foto',
+        promptLabelCancel: 'Cancelar',
+        promptLabelPhoto: 'De la Galería',
+        promptLabelPicture: 'Tomar Foto'
       });
       
       if (image.webPath) {
