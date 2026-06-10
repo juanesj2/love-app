@@ -152,14 +152,14 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
     .message-wrapper.mine .bubble-wrapper { align-items: flex-end; }
     .message-wrapper:not(.mine) .bubble-wrapper { align-items: flex-start; }
     
-    .reply-context { background: rgba(0,0,0,0.05); padding: 6px 10px; border-radius: 8px; font-size: 0.8rem; margin-bottom: -8px; z-index: 0; opacity: 0.8; padding-bottom: 12px; cursor: pointer; border-left: 3px solid #FF4D6D; }
-    .mine .reply-context { background: rgba(255, 77, 109, 0.2); border-left: none; border-right: 3px solid white; color: #333; }
-    .reply-context-name { font-weight: bold; color: #FF4D6D; display: block; font-size: 0.75rem; }
+    .reply-context { background: rgba(0,0,0,0.05); padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; margin-bottom: 6px; z-index: 0; opacity: 0.95; cursor: pointer; border-left: 4px solid #FF4D6D; }
+    .mine .reply-context { background: rgba(255, 77, 109, 0.15); border-left: none; border-right: 4px solid #FF4D6D; color: #333; }
+    .reply-context-name { font-weight: bold; color: #FF4D6D; display: block; font-size: 0.75rem; margin-bottom: 2px; }
     .mine .reply-context-name { color: #c9184a; }
-    .reply-context-text { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+    .reply-context-text { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; color: #666; }
     
     .reactions-popover-host { --width: auto; --border-radius: 24px; --box-shadow: 0 4px 16px rgba(0,0,0,0.15); --background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-    .reactions-popover-content { display: flex; gap: 12px; padding: 12px 16px; font-size: 1.8rem; justify-content: center; align-items: center; }
+    .reactions-popover-content { display: flex; gap: 12px; padding: 12px 16px; font-size: 1.8rem; justify-content: center; align-items: center; border: 1px solid rgba(0,0,0,0.08); border-radius: 24px; }
     .reactions-popover-content span { cursor: pointer; transition: transform 0.2s; }
     .reactions-popover-content span:active { transform: scale(1.3); }
     .custom-emoji-btn { background: rgba(0,0,0,0.05); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem !important; color: #666; }
