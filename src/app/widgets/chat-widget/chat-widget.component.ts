@@ -41,7 +41,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
 
                   <p class="text" *ngIf="msg.mensaje && msg.mensaje !== 'null'">
                     {{msg.mensaje}}
-                    <span class="edited-label" *ngIf="msg.updated_at && msg.updated_at !== msg.created_at">(editado)</span>
+                    <span class="edited-label" *ngIf="msg.is_edited">(editado)</span>
                   </p>
                   
                   <div class="reactions-container" *ngIf="hasReactions(msg)">
