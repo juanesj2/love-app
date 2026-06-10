@@ -177,6 +177,11 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
         </button>
       </div>
 
+      <div class="selection-actions" *ngIf="pickingCoverForAlbumId" style="justify-content: flex-start; padding-left: 20px;">
+        <button class="selection-btn cancel" (click)="cancelPickingCover()"><ion-icon name="close"></ion-icon></button>
+        <span class="selection-count" style="margin-left: 15px;">Elige foto para portada</span>
+      </div>
+
       <!-- Pantalla superpuesta de Colecciones (Overlay CSS) -->
       <div class="albums-overlay" *ngIf="isAlbumsModalOpen" (click)="closeAlbumsModal()">
         <div class="albums-sheet" (click)="$event.stopPropagation()">
@@ -601,25 +606,68 @@ export class PhotoWidgetComponent implements OnInit {
     await actionSheet.present();
   }
 
+  pickingCoverForAlbumId: number | null = null;
+
   async changeAlbumCover(albumId: number, event: Event) {
     event.stopPropagation();
     
-    this.presentPhotoOptions(async (source) => {
-      try {
-        const image = await Camera.getPhoto({
-          quality: 60, width: 600, height: 600, allowEditing: true, resultType: CameraResultType.DataUrl, source: source
-        });
-        
-        if (image.dataUrl) {
-          // @ts-ignore
-          await this.api.updateAlbumCover(albumId, image.dataUrl);
-          this.loadData();
-          this.showSuccess('Portada actualizada');
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Cambiar Portada',
+      cssClass: 'premium-action-sheet',
+      buttons: [
+        {
+          text: 'Fotos de la app',
+          icon: 'images',
+          handler: () => {
+            this.startPickingCover(albumId);
+          }
+        },
+        {
+          text: 'Tomar Foto',
+          icon: 'camera',
+          handler: () => {
+            this.takeAndUploadCover(albumId, CameraSource.Camera);
+          }
+        },
+        {
+          text: 'De la Galería',
+          icon: 'image',
+          handler: () => {
+            this.takeAndUploadCover(albumId, CameraSource.Photos);
+          }
+        },
+        {
+          text: 'Cancelar',
+          icon: 'close',
+          role: 'cancel'
         }
-      } catch (e) {
-        console.log('User cancelled or error', e);
-      }
+      ]
     });
+    await actionSheet.present();
+  }
+
+  async takeAndUploadCover(albumId: number, source: CameraSource) {
+    try {
+      const image = await Camera.getPhoto({
+        quality: 60, width: 600, height: 600, allowEditing: true, resultType: CameraResultType.DataUrl, source: source
+      });
+      
+      if (image.dataUrl) {
+        await this.api.uploadAlbumCover(albumId, image.dataUrl);
+        this.loadData();
+        this.showSuccess('Portada actualizada');
+      }
+    } catch (e) {
+      console.log('User cancelled or error', e);
+    }
+  }
+
+  startPickingCover(albumId: number) {
+    this.pickingCoverForAlbumId = albumId;
+    this.isAlbumsModalOpen = false; // Cerramos el modal para que vea las fotos
+    this.currentAlbum = null; // Mostramos todas las fotos
+    this.showSuccess('Selecciona una foto para la portada');
+    this.loadData();
   }
 
   openAlbum(album: any) {
@@ -905,11 +953,46 @@ export class PhotoWidgetComponent implements OnInit {
   }
   
   onPhotoClick(photo: any) {
+    if (this.pickingCoverForAlbumId) {
+      this.setPhotoAsCover(this.pickingCoverForAlbumId, photo);
+      return;
+    }
     if (this.selectionMode) {
       this.toggleSelection(photo);
     } else {
       this.viewMode = 'feed';
       // Aquí se podría hacer scroll hacia la foto si quisieramos
+    }
+  }
+
+  async setPhotoAsCover(albumId: number, photo: any) {
+    try {
+      this.showSuccess('Descargando imagen para la portada...');
+      const blob = await this.api.downloadPhotoBlob(photo.id);
+      
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64data = reader.result as string;
+        try {
+          await this.api.uploadAlbumCover(albumId, base64data);
+          this.pickingCoverForAlbumId = null;
+          this.loadData();
+          this.showSuccess('Portada actualizada');
+        } catch(e) {
+          this.showError('Error al actualizar la portada');
+        }
+      }
+      reader.readAsDataURL(blob);
+    } catch(e) {
+      this.showError('Error al procesar la foto');
+    }
+  }
+
+  cancelPickingCover() {
+    const targetAlbum = this.albums.find(a => a.id === this.pickingCoverForAlbumId);
+    this.pickingCoverForAlbumId = null;
+    if (targetAlbum) {
+      this.openAlbum(targetAlbum);
     }
   }
 
