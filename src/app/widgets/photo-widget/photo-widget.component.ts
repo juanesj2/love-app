@@ -979,6 +979,8 @@ export class PhotoWidgetComponent implements OnInit {
         try {
           await this.api.uploadAlbumCover(albumId, base64data);
           this.pickingCoverForAlbumId = null;
+          this.isAlbumsModalOpen = true; // Reabrir el modal para ver el cambio
+          this.cdr.detectChanges();
           this.loadData();
           this.showSuccess('Portada actualizada');
         } catch(e) {
@@ -992,11 +994,9 @@ export class PhotoWidgetComponent implements OnInit {
   }
 
   cancelPickingCover() {
-    const targetAlbum = this.albums.find(a => a.id === this.pickingCoverForAlbumId);
     this.pickingCoverForAlbumId = null;
-    if (targetAlbum) {
-      this.openAlbum(targetAlbum);
-    }
+    this.isAlbumsModalOpen = true; // Volvemos a abrir el modal de álbumes
+    this.cdr.detectChanges(); // Forzamos actualización UI para que sea instantáneo
   }
 
   cancelSelection() {
