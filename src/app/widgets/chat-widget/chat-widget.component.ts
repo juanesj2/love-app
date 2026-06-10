@@ -111,6 +111,8 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
     .messages-content { flex: 1; --background: transparent; }
     .messages-inner { padding: 20px 15px; display: flex; flex-direction: column; gap: 12px; }
     
+    .transparent-item { --background: #fdf5f7; --inner-padding-end: 0; --padding-start: 0; }
+    
     .message-wrapper { display: flex; width: 100%; animation: slideUp 0.3s ease-out forwards; opacity: 0; transform: translateY(10px); gap: 8px; align-items: flex-end; }
     @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
     .message-wrapper.mine { justify-content: flex-end; }
