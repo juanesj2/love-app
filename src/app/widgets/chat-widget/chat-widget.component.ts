@@ -19,7 +19,14 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
         
         <ion-list class="messages-inner">
         <ion-item-sliding *ngFor="let msg of messages; trackBy: trackByMsgId" #slidingItem [id]="'msg-' + msg.id">
-          <ion-item class="transparent-item" lines="none" (contextmenu)="onContextMenu($event, msg)">
+          <ion-item class="transparent-item" lines="none" 
+            (contextmenu)="onContextMenu($event, msg)"
+            (touchstart)="startPress($event, msg)"
+            (touchend)="endPress()"
+            (touchmove)="endPress()"
+            (mousedown)="startPress($event, msg)"
+            (mouseup)="endPress()"
+            (mouseleave)="endPress()">
             <div class="message-wrapper" [class.mine]="isMine(msg)">
               <div class="msg-avatar-container" *ngIf="!isMine(msg)">
                 <img *ngIf="avatars[msg.user?.name]" [src]="avatars[msg.user.name]" class="msg-avatar" />
@@ -57,7 +64,15 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
             </div>
           </ion-item>
           
-          <ion-item-options [side]="isMine(msg) ? 'end' : 'start'" (ionSwipe)="onSwipeReply(msg, slidingItem)" class="custom-options">
+          <ion-item-options side="end" *ngIf="isMine(msg)" (ionSwipe)="onSwipeReply(msg, slidingItem)" class="custom-options">
+            <ion-item-option color="light" class="reply-option" expandable (click)="onSwipeReply(msg, slidingItem)">
+              <div class="reply-icon-circle">
+                <ion-icon name="arrow-undo-outline"></ion-icon>
+              </div>
+            </ion-item-option>
+          </ion-item-options>
+
+          <ion-item-options side="start" *ngIf="!isMine(msg)" (ionSwipe)="onSwipeReply(msg, slidingItem)" class="custom-options">
             <ion-item-option color="light" class="reply-option" expandable (click)="onSwipeReply(msg, slidingItem)">
               <div class="reply-icon-circle">
                 <ion-icon name="arrow-undo-outline"></ion-icon>
@@ -353,6 +368,18 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   activeMsg: any = null;
   popoverEvent: Event | null = null;
   showCustomEmojiInput = false;
+
+  pressTimer: any;
+
+  startPress(event: any, msg: any) {
+    this.pressTimer = setTimeout(() => {
+      this.onContextMenu(event, msg);
+    }, 500); // 500ms para considerar long press
+  }
+
+  endPress() {
+    clearTimeout(this.pressTimer);
+  }
 
   onContextMenu(event: any, msg: any) {
     event.preventDefault();
