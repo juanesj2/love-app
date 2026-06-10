@@ -397,8 +397,20 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     const el = document.getElementById(`msg-${id}`);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      el.classList.add('highlight-msg');
-      setTimeout(() => el.classList.remove('highlight-msg'), 1500);
+      
+      // Use IntersectionObserver to wait until the message is visible before animating
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          el.classList.add('highlight-msg');
+          setTimeout(() => el.classList.remove('highlight-msg'), 1500);
+          observer.disconnect();
+        }
+      }, { threshold: 0.5 });
+      
+      observer.observe(el);
+      
+      // Fallback just in case the observer fails to trigger (e.g. if it's a very tall message)
+      setTimeout(() => observer.disconnect(), 2000);
     } else {
       console.log('Message not found on current page:', id);
     }
