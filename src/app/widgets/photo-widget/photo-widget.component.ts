@@ -575,6 +575,7 @@ export class PhotoWidgetComponent implements OnInit {
   async presentPhotoOptions(callback: (source: CameraSource) => void) {
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Seleccionar Imagen',
+      cssClass: 'premium-action-sheet',
       buttons: [
         {
           text: 'Tomar Foto',
@@ -737,6 +738,7 @@ export class PhotoWidgetComponent implements OnInit {
       // Preguntar si quiere tomar/subir foto o elegir de la app
       const actionSheet = await this.actionSheetCtrl.create({
         header: 'Añadir al álbum',
+        cssClass: 'premium-action-sheet',
         buttons: [
           {
             text: 'Fotos de la app',
@@ -976,6 +978,7 @@ export class PhotoWidgetComponent implements OnInit {
 
     const actionSheet = await this.actionSheetCtrl.create({
       header: `Opciones: ${this.currentAlbum.name}`,
+      cssClass: 'premium-action-sheet',
       buttons: [
         {
           text: 'Renombrar álbum',
@@ -1012,6 +1015,7 @@ export class PhotoWidgetComponent implements OnInit {
   async promptRenameAlbum() {
     const alert = await this.alertController.create({
       header: 'Renombrar Álbum',
+      cssClass: 'custom-love-alert',
       inputs: [
         {
           name: 'name',
@@ -1047,6 +1051,7 @@ export class PhotoWidgetComponent implements OnInit {
     const alert = await this.alertController.create({
       header: 'Eliminar Álbum',
       message: '¿Estás seguro? Las fotos exclusivas de este álbum también se borrarán.',
+      cssClass: 'custom-love-alert',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
@@ -1074,6 +1079,7 @@ export class PhotoWidgetComponent implements OnInit {
     const alert = await this.alertController.create({
       header: 'Eliminar Fotos',
       message: `¿Estás seguro de eliminar ${this.selectedPhotos.size} foto(s)?`,
+      cssClass: 'custom-love-alert',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
