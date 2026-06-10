@@ -22,6 +22,10 @@ export const routes: Routes = [
     loadComponent: () => import('./widgets/drawing-game/drawing-game.component').then(m => m.DrawingGameComponent)
   },
   {
+    path: 'games/roulette',
+    loadComponent: () => import('./widgets/roulette-widget/roulette-widget.component').then(m => m.RouletteWidgetComponent)
+  },
+  {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full',

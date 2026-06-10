@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { LoveApiService } from '../../services/love-api.service';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arrowBack } from 'ionicons/icons';
+import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arrowBack, apertureOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-games-hub',
@@ -52,6 +52,14 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
             </div>
           </div>
         </div>
+
+        <div class="game-card roulette-card" (click)="goTo('games/roulette')">
+          <div class="game-icon-bg"><ion-icon name="aperture-outline"></ion-icon></div>
+          <div class="game-info">
+            <h3>Ruleta de Citas</h3>
+            <p>Gira la ruleta mágica para decidir el plan del fin de semana. ¡Añade vuestros planes favoritos!</p>
+          </div>
+        </div>
       </div>
     </div>
   `,
@@ -72,6 +80,7 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
     .test-card .game-icon-bg { background: linear-gradient(135deg, #FF9A9E, #FECFEF); }
     .swipe-card .game-icon-bg { background: linear-gradient(135deg, #FF4D6D, #c9184a); }
     .draw-card .game-icon-bg { background: linear-gradient(135deg, #a2d2ff, #bde0fe); color: #023e8a; }
+    .roulette-card .game-icon-bg { background: linear-gradient(135deg, #ffd166, #ff9f1c); color: white; }
 
     .progress-container { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
     .progress-bar { flex: 1; height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden; }
@@ -86,7 +95,7 @@ export class GamesHubComponent implements OnInit {
   private api = inject(LoveApiService);
 
   constructor(private router: Router) {
-    addIcons({ gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arrowBack });
+    addIcons({ gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arrowBack, apertureOutline });
   }
 
   async ngOnInit() {
