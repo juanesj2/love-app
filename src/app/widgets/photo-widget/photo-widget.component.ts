@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -371,6 +371,7 @@ export class PhotoWidgetComponent implements OnInit {
   private toastController = inject(ToastController);
   private alertController = inject(AlertController);
   private actionSheetCtrl = inject(ActionSheetController);
+  private cdr = inject(ChangeDetectorRef);
   public environment = environment;
   
   pendingPhotoFile: File | null = null;
@@ -666,6 +667,7 @@ export class PhotoWidgetComponent implements OnInit {
     this.pickingCoverForAlbumId = albumId;
     this.isAlbumsModalOpen = false; // Cerramos el modal para que vea las fotos
     this.currentAlbum = null; // Mostramos todas las fotos
+    this.cdr.detectChanges(); // Forzamos actualización de la UI
     this.showSuccess('Selecciona una foto para la portada');
     this.loadData();
   }
