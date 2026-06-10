@@ -7,7 +7,7 @@ import { Firestore, doc, getDoc, onSnapshot, setDoc } from '@angular/fire/firest
 import { LoveApiService } from '../../services/love-api.service';
 import { environment } from '../../../environments/environment';
 import { addIcons } from 'ionicons';
-import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sad, flame, thumbsUp } from 'ionicons/icons';
+import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sad, flame, thumbsUp, pencil } from 'ionicons/icons';
 @Component({
   selector: 'app-chat-widget',
   template: `
@@ -229,7 +229,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   private touchTimer: any;
 
   constructor() {
-    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sad, flame, thumbsUp });
+    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sad, flame, thumbsUp, pencil });
   }
 
   private viewInitialized = false;
