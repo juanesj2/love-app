@@ -39,7 +39,10 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
                     <ion-img [src]="environment.storageUrl + msg.photo.image_path"></ion-img>
                   </div>
 
-                  <p class="text" *ngIf="msg.mensaje && msg.mensaje !== 'null'">{{msg.mensaje}}</p>
+                  <p class="text" *ngIf="(chatMeta[msg.id]?.edit?.text || msg.mensaje) && (chatMeta[msg.id]?.edit?.text || msg.mensaje) !== 'null'">
+                    {{chatMeta[msg.id]?.edit?.text || msg.mensaje}}
+                    <span class="edited-label" *ngIf="chatMeta[msg.id]?.edit">(editado)</span>
+                  </p>
                   
                   <div class="reactions-container" *ngIf="hasReactions(msg)">
                     <span class="reaction" *ngFor="let r of getReactions(msg)">{{r}}</span>
@@ -140,6 +143,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
     
     .sender { font-size: 0.75rem; font-weight: 700; color: #FF4D6D; margin-bottom: 4px; display: block; }
     .text { margin: 0; word-wrap: break-word; }
+    .edited-label { font-size: 0.7rem; opacity: 0.7; margin-left: 4px; font-style: italic; }
     
     .msg-avatar-container { width: 28px; height: 28px; flex-shrink: 0; border-radius: 50%; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); background: white; }
     .msg-avatar { width: 100%; height: 100%; object-fit: cover; }
@@ -317,7 +321,15 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     
     try {
       if (this.isEditing && this.editingMsgId) {
-        await this.api.editMessage(this.editingMsgId, this.newMessage);
+        const metaDoc = doc(this.firestore, 'locations', 'chat_meta');
+        await setDoc(metaDoc, {
+          [this.editingMsgId]: {
+            edit: {
+               text: this.newMessage,
+               time: new Date().toISOString()
+            }
+          }
+        }, { merge: true });
       } else {
         await this.api.sendMessage(this.newMessage);
       }
@@ -408,7 +420,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     this.closePopover();
     this.isEditing = true;
     this.editingMsgId = msg.id;
-    this.newMessage = msg.mensaje;
+    this.newMessage = this.chatMeta[msg.id]?.edit?.text || msg.mensaje;
     this.replyingTo = null;
     setTimeout(() => {
       const input = document.querySelector('.premium-input') as HTMLInputElement;
