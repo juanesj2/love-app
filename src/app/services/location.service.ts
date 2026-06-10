@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Firestore, doc, docData, setDoc, updateDoc, GeoPoint } from '@angular/fire/firestore';
+import { Firestore, doc, docData, setDoc, GeoPoint } from '@angular/fire/firestore';
 import { Geolocation } from '@capacitor/geolocation';
 import { registerPlugin } from '@capacitor/core';
 import { Observable } from 'rxjs';

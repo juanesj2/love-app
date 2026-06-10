@@ -1,9 +1,9 @@
 import { Component, inject, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { PluginListenerHandle } from '@capacitor/core';
-import { IonContent, IonFooter, IonHeader, IonToolbar, ActionSheetController, AlertController } from '@ionic/angular/standalone';
+import { IonContent, IonFooter, IonHeader, IonToolbar, AlertController } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ToastController, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { imagesOutline, images, chatbubblesOutline, chatbubbles, add, hourglassOutline, mapOutline, map, ellipsisHorizontalOutline, ellipsisHorizontal, heart, happyOutline, sadOutline, flameOutline, bedOutline } from 'ionicons/icons';
@@ -173,6 +173,7 @@ export class HomePage implements OnInit, OnDestroy {
   uploading = false;
   pokeAnimation = false;
   private appStateListener?: PluginListenerHandle;
+  private subscriptions: Subscription[] = [];
 
   myMood = '';
   partnerMood = '';
@@ -188,7 +189,6 @@ export class HomePage implements OnInit, OnDestroy {
   private api = inject(LoveApiService);
   private locationService = inject(LocationService);
   private toastController = inject(ToastController);
-  private actionSheetCtrl = inject(ActionSheetController);
   private alertController = inject(AlertController);
 
   @ViewChild('photoWidget') photoWidgetComp?: PhotoWidgetComponent;
@@ -229,18 +229,19 @@ export class HomePage implements OnInit, OnDestroy {
     });
     this.checkWidgetIntent();
 
-    this.locationService.listenToUserLocation(myId as 'juan'|'roberta').subscribe((data: any) => {
+    this.subscriptions.push(this.locationService.listenToUserLocation(myId as 'juan'|'roberta').subscribe((data: any) => {
       if (data && data.avatar) this.myAvatarUrl = data.avatar;
-    });
-    this.locationService.listenToUserLocation(partnerId as 'juan'|'roberta').subscribe((data: any) => {
+    }));
+    this.subscriptions.push(this.locationService.listenToUserLocation(partnerId as 'juan'|'roberta').subscribe((data: any) => {
       if (data && data.avatar) this.partnerAvatarUrl = data.avatar;
-    });
+    }));
   }
 
   ngOnDestroy() {
     if (this.appStateListener) {
       this.appStateListener.remove();
     }
+    this.subscriptions.forEach(s => s.unsubscribe());
   }
 
   async loadHeaderData() {
@@ -252,21 +253,6 @@ export class HomePage implements OnInit, OnDestroy {
     } catch (e) {
       console.log('No se pudo cargar la info de la cabecera');
     }
-  }
-
-  async handleRefresh(event: any) {
-    await this.loadHeaderData();
-    if (this.selectedWidget === 'photo' && this.photoWidgetComp) {
-      await this.photoWidgetComp.loadData();
-    } else if (this.selectedWidget === 'chat' && this.chatWidgetComp) {
-      await this.chatWidgetComp.loadMessages();
-    } else if (this.selectedWidget === 'game' && this.gameWidgetComp) {
-      await this.gameWidgetComp.loadQuestions();
-    } else if (this.selectedWidget === 'mas' && this.masWidgetComp) {
-      await this.masWidgetComp.loadMilestones();
-    }
-    // Location widget no tiene carga propia explícita, los flujos son con RxJS observables
-    event.target.complete();
   }
 
   async openMoodSelector() {

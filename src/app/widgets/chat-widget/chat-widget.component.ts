@@ -1,13 +1,13 @@
-import { Component, inject, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ToastController, IonContent } from '@ionic/angular';
-import { Firestore, doc, getDoc, onSnapshot, setDoc } from '@angular/fire/firestore';
+import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { LoveApiService } from '../../services/love-api.service';
 import { environment } from '../../../environments/environment';
 import { addIcons } from 'ionicons';
-import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sad, flame, thumbsUp, pencil } from 'ionicons/icons';
+import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'ionicons/icons';
 @Component({
   selector: 'app-chat-widget',
   template: `
@@ -18,7 +18,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
         </ion-refresher>
         
         <ion-list class="messages-inner">
-        <ion-item-sliding *ngFor="let msg of messages" #slidingItem [id]="'msg-' + msg.id">
+        <ion-item-sliding *ngFor="let msg of messages; trackBy: trackByMsgId" #slidingItem [id]="'msg-' + msg.id">
           <ion-item class="transparent-item" lines="none" (contextmenu)="onContextMenu($event, msg)">
             <div class="message-wrapper" [class.mine]="isMine(msg)">
               <div class="msg-avatar-container" *ngIf="!isMine(msg)">
@@ -228,18 +228,29 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   
   replyingTo: any = null;
   showReactionsMsgId: number | null = null;
-  
-  private touchTimer: any;
+  currentUser: string = '';
+  private timeouts: any[] = [];
 
   constructor() {
-    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sad, flame, thumbsUp, pencil });
+    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, pencil });
   }
 
   private viewInitialized = false;
 
   ngOnInit() {
+    this.currentUser = localStorage.getItem('love_widget_user') === 'juan' ? 'Juan' : 'Roberta';
     this.loadAvatars();
     this.loadMessages();
+  }
+
+  ngOnDestroy() {
+    this.timeouts.forEach(t => clearTimeout(t));
+  }
+
+  safeTimeout(fn: Function, ms: number) {
+    const id = setTimeout(fn, ms);
+    this.timeouts.push(id);
+    return id;
   }
 
   async loadAvatars() {
@@ -259,9 +270,9 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.viewInitialized = true;
-    setTimeout(() => this.scrollToBottom(false), 50);
-    setTimeout(() => this.scrollToBottom(false), 300);
-    setTimeout(() => this.scrollToBottom(false), 600);
+    this.safeTimeout(() => this.scrollToBottom(false), 50);
+    this.safeTimeout(() => this.scrollToBottom(false), 300);
+    this.safeTimeout(() => this.scrollToBottom(false), 600);
   }
 
   scrollToBottom(animated: boolean = true): void {
@@ -282,8 +293,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       const cache = await Preferences.get({ key: 'chat_cache' });
       if (cache.value) {
         this.messages = JSON.parse(cache.value);
-        setTimeout(() => this.scrollToBottom(false), 50);
-        setTimeout(() => this.scrollToBottom(false), 300);
+        this.safeTimeout(() => this.scrollToBottom(false), 50);
+        this.safeTimeout(() => this.scrollToBottom(false), 300);
       }
 
       // 2. Fetch de la red en segundo plano
@@ -292,8 +303,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       // 3. Actualizar la vista solo si hay cambios (evita parpadeos)
       if (JSON.stringify(this.messages) !== JSON.stringify(newMessages)) {
         this.messages = newMessages;
-        setTimeout(() => this.scrollToBottom(false), 100);
-        setTimeout(() => this.scrollToBottom(true), 500);
+        this.safeTimeout(() => this.scrollToBottom(false), 100);
+        this.safeTimeout(() => this.scrollToBottom(true), 500);
         await Preferences.set({ key: 'chat_cache', value: JSON.stringify(this.messages) });
       }
     } catch (e) {
@@ -327,7 +338,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       
       await this.loadMessages();
       
-      setTimeout(() => this.scrollToBottom(true), 100);
+      this.safeTimeout(() => this.scrollToBottom(true), 100);
       // Removed success toast so it doesn't interrupt chat flow
     } catch (e) {
       console.error(e);
@@ -358,7 +369,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   openCustomEmoji() {
     this.showCustomEmojiInput = true;
-    setTimeout(() => {
+    this.safeTimeout(() => {
       const input = document.getElementById('customEmojiInput');
       if (input) input.focus();
     }, 100);
@@ -375,8 +386,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   canEditMessage(msg: any): boolean {
     if (!msg || !msg.created_at) return false;
-    const myName = localStorage.getItem('love_widget_user') === 'juan' ? 'Juan' : 'Roberta';
-    if (msg.user?.name !== myName) return false;
+    if (msg.user?.name !== this.currentUser) return false;
     
     // Check if within 2 minutes
     const msgDate = new Date(msg.created_at);
@@ -391,7 +401,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     this.editingMsgId = msg.id;
     this.newMessage = msg.mensaje;
     this.replyingTo = null;
-    setTimeout(() => {
+    this.safeTimeout(() => {
       const input = document.querySelector('.premium-input') as HTMLInputElement;
       if (input) input.focus();
     }, 150);
@@ -406,14 +416,14 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   onSwipeReply(msg: any, slidingItem: any) {
     this.replyToMessage(msg);
-    setTimeout(() => {
+    this.safeTimeout(() => {
       slidingItem.close();
     }, 100);
   }
 
   replyToMessage(msg: any) {
     this.replyingTo = msg;
-    setTimeout(() => {
+    this.safeTimeout(() => {
       const input = document.querySelector('.premium-input') as HTMLInputElement;
       if (input) input.focus();
     }, 150);
@@ -428,7 +438,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       const observer = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting) {
           el.classList.add('highlight-msg');
-          setTimeout(() => el.classList.remove('highlight-msg'), 1500);
+          this.safeTimeout(() => el.classList.remove('highlight-msg'), 1500);
           observer.disconnect();
         }
       }, { threshold: 0.5 });
@@ -436,7 +446,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       observer.observe(el);
       
       // Fallback just in case the observer fails to trigger (e.g. if it's a very tall message)
-      setTimeout(() => observer.disconnect(), 2000);
+      this.safeTimeout(() => observer.disconnect(), 2000);
     } else {
       console.log('Message not found on current page:', id);
     }
@@ -462,12 +472,12 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   isMine(msg: any): boolean {
-    const stored = localStorage.getItem('love_widget_user'); // 'juan' or 'roberta'
-    if (!stored || !msg || !msg.user) return false;
-    
-    // Comparar por nombre ya que sabemos cómo se llaman los usuarios en la BD
-    const myName = stored === 'juan' ? 'Juan' : 'Roberta';
-    return msg.user.name === myName;
+    if (!msg || !msg.user) return false;
+    return msg.user.name === this.currentUser;
+  }
+
+  trackByMsgId(index: number, msg: any) {
+    return msg.id;
   }
   
   private async showError(message: string) {
@@ -477,17 +487,6 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       color: 'danger',
       position: 'top',
       icon: 'alert-circle-outline'
-    });
-    await toast.present();
-  }
-
-  private async showSuccess(message: string) {
-    const toast = await this.toastController.create({
-      message,
-      duration: 2000,
-      color: 'success',
-      position: 'top',
-      icon: 'checkmark-circle-outline'
     });
     await toast.present();
   }

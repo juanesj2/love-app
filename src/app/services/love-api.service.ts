@@ -33,10 +33,13 @@ export class LoveApiService {
         this.token$.next(value);
       }
     }
-    return new HttpHeaders({
-      'Authorization': `Bearer ${t}`,
+    let headers = new HttpHeaders({
       'Accept': 'application/json'
     });
+    if (t) {
+      headers = headers.set('Authorization', `Bearer ${t}`);
+    }
+    return headers;
   }
 
   // --- AUTH ---

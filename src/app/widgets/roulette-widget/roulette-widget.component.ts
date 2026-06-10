@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ToastController } from '@ionic/angular';
@@ -26,11 +26,11 @@ import { Location } from '@angular/common';
 
       <div class="roulette-container">
         <div class="roulette-wheel" [style.transform]="'rotate(' + currentRotation + 'deg)'" [style.transition]="isSpinning ? 'transform 4s cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none'">
-          <div class="roulette-slice" *ngFor="let option of options; let i = index" [style.transform]="getSliceTransform(i)">
+          <div class="roulette-slice" *ngFor="let option of options; let i = index">
             <svg viewBox="0 0 100 100" class="slice-svg">
-              <path [attr.d]="getSlicePath(i)" [attr.fill]="getColor(i)" />
+              <path [attr.d]="sliceData[i]?.path" [attr.fill]="sliceData[i]?.color" />
             </svg>
-            <div class="slice-text" [style.transform]="getTextTransform(i)">{{ option }}</div>
+            <div class="slice-text" [style.transform]="sliceData[i]?.textTransform">{{ option }}</div>
           </div>
         </div>
         <div class="roulette-pointer"></div>
@@ -103,7 +103,7 @@ import { Location } from '@angular/common';
     .add-option button { width: 50px; height: 50px; border-radius: 12px; background: #FF4D6D; color: white; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; }
   `]
 })
-export class RouletteWidgetComponent implements OnInit {
+export class RouletteWidgetComponent implements OnInit, OnDestroy {
   private firestore = inject(Firestore);
   private toastCtrl = inject(ToastController);
   private location = inject(Location);
@@ -116,6 +116,8 @@ export class RouletteWidgetComponent implements OnInit {
   winner: string | null = null;
   
   colors = ['#FF4D6D', '#FF8FA3', '#FFB3C1', '#c9184a', '#a4133c', '#ff758f', '#ffccd5', '#590D22'];
+  sliceData: any[] = [];
+  private spinTimeout: any;
 
   constructor() {
     addIcons({ closeCircle, addCircleOutline, syncOutline, arrowBack });
@@ -125,12 +127,25 @@ export class RouletteWidgetComponent implements OnInit {
     this.loadOptions();
   }
 
+  ngOnDestroy() {
+    if (this.spinTimeout) clearTimeout(this.spinTimeout);
+  }
+
+  computeSliceData() {
+    this.sliceData = this.options.map((opt, i) => ({
+      path: this.getSlicePath(i),
+      color: this.getColor(i),
+      textTransform: this.getTextTransform(i)
+    }));
+  }
+
   async loadOptions() {
     try {
       const docRef = doc(this.firestore, 'locations', 'roulette_options');
       const snap = await getDoc(docRef);
       if (snap.exists() && snap.data()['list']) {
         this.options = snap.data()['list'];
+        this.computeSliceData();
       }
     } catch(e) {
       console.error(e);
@@ -161,6 +176,7 @@ export class RouletteWidgetComponent implements OnInit {
       return;
     }
     this.options.splice(index, 1);
+    this.computeSliceData();
     this.saveOptions();
   }
 
@@ -173,11 +189,13 @@ export class RouletteWidgetComponent implements OnInit {
     }
     this.options.push(val);
     this.newOption = '';
+    this.computeSliceData();
     this.saveOptions();
   }
 
   fillSampleDates() {
     this.options = ['Peli y Manta', 'Cena Fuera', 'Cocinar Juntos', 'Masajes', 'Noche de Juegos', 'Paseo Nocturno', 'Maratón Series', 'Cata Vinos'];
+    this.computeSliceData();
     this.saveOptions();
     this.showToast('Ruleta rellenada con citas de prueba.');
   }
@@ -200,11 +218,6 @@ export class RouletteWidgetComponent implements OnInit {
     const largeArcFlag = angle > 180 ? 1 : 0;
 
     return `M 50 50 L ${startX} ${startY} A 50 50 0 ${largeArcFlag} 1 ${endX} ${endY} Z`;
-  }
-
-  getSliceTransform(index: number) {
-    // We already calculate absolute positions in SVG, so the slice div doesn't rotate, just the wheel
-    return 'none';
   }
 
   getTextTransform(index: number) {
@@ -236,7 +249,7 @@ export class RouletteWidgetComponent implements OnInit {
     
     this.currentRotation = this.currentRotation + extraSpins + targetAngle - (this.currentRotation % 360);
     
-    setTimeout(() => {
+    this.spinTimeout = setTimeout(() => {
       this.isSpinning = false;
       this.winner = this.options[winnerIndex];
       // Haptic feedback would be cool here!
