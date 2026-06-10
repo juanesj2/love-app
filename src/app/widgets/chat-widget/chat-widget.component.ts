@@ -123,7 +123,8 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
     .messages-content { flex: 1; --background: transparent; }
     .messages-inner { padding: 20px 15px; display: flex; flex-direction: column; gap: 12px; background: transparent !important; }
     
-    .transparent-item { --background: transparent; --inner-padding-end: 0; --padding-start: 0; }
+    ion-item-sliding { background: transparent !important; }
+    .transparent-item { --background: transparent !important; background: transparent !important; --inner-padding-end: 0; --padding-start: 0; }
     
     .message-wrapper { display: flex; width: 100%; animation: slideUp 0.3s ease-out forwards; opacity: 0; transform: translateY(10px); gap: 8px; align-items: flex-end; }
     @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
@@ -170,9 +171,9 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
     .reactions-container { position: absolute; bottom: -12px; right: 10px; background: white; padding: 2px 6px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; gap: 2px; border: 1px solid rgba(0,0,0,0.05); z-index: 2; }
     .mine .reactions-container { right: auto; left: 10px; }
     
-    .custom-options { background: transparent; border: none; }
-    .reply-option { --background: transparent; --color: transparent; }
-    .reply-option::part(native) { background: transparent; padding: 0 20px; }
+    .custom-options { background: transparent !important; border: none; }
+    .reply-option { --background: transparent !important; --color: transparent !important; background: transparent !important; }
+    .reply-option::part(native) { background: transparent !important; padding: 0 20px; }
     .reply-icon-circle { width: 40px; height: 40px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     .reply-icon-circle ion-icon { font-size: 1.5rem; color: #FF4D6D; }
     .reaction { font-size: 0.9rem; }
