@@ -54,7 +54,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
             </div>
           </ion-item>
           
-          <ion-item-options [side]="isMine(msg) ? 'start' : 'end'">
+          <ion-item-options side="start">
             <ion-item-option color="light" class="reply-option" (click)="replyToMessage(msg)">
               <ion-icon slot="icon-only" name="arrow-undo-outline" color="primary"></ion-icon>
             </ion-item-option>
@@ -145,7 +145,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
     .only-photo { padding: 4px; background: transparent !important; box-shadow: none !important; border: none !important; }
     .only-photo .photo-reply ion-img { margin-bottom: 0; }
     
-    .bubble-wrapper { display: flex; flex-direction: column; max-width: 80%; position: relative; }
+    .bubble-wrapper { display: flex; flex-direction: column; max-width: 80%; position: relative; margin-bottom: 14px; }
     .message-wrapper.mine .bubble-wrapper { align-items: flex-end; }
     .message-wrapper:not(.mine) .bubble-wrapper { align-items: flex-start; }
     
