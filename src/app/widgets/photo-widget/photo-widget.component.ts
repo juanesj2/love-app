@@ -996,7 +996,7 @@ export class PhotoWidgetComponent implements OnInit {
         },
         {
           text: 'Eliminar álbum',
-          icon: 'trash',
+          icon: 'trash-outline',
           role: 'destructive',
           handler: () => {
             this.promptDeleteAlbum();
