@@ -78,7 +78,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
             </div>
             
             <div class="image-wrapper">
-              <ion-img [src]="environment.storageUrl + photo.image_path" class="main-photo"></ion-img>
+              <img [src]="environment.storageUrl + photo.image_path" class="main-photo" loading="lazy" />
             </div>
             
             <div class="photo-details">
@@ -130,7 +130,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
                    (touchstart)="startPress(photo)" (touchend)="endPress()"
                    (click)="onPhotoClick(photo)"
                    [class.selected]="selectedPhotos.has(photo.id)">
-                <ion-img [src]="environment.storageUrl + photo.image_path" class="grid-photo"></ion-img>
+                <img [src]="environment.storageUrl + photo.image_path" class="grid-photo" loading="lazy" />
                 <div class="selection-overlay" *ngIf="selectionMode">
                   <ion-icon name="checkmark-circle" *ngIf="selectedPhotos.has(photo.id)"></ion-icon>
                   <ion-icon name="ellipse-outline" *ngIf="!selectedPhotos.has(photo.id)"></ion-icon>
@@ -282,8 +282,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .photo-card { animation: fadeInUp 0.5s ease-out forwards; opacity: 0; transform: translateY(20px); }
     @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
     
-    ion-img::part(image) { transition: transform 0.3s ease; }
-    .photo-card:active ion-img::part(image) { transform: scale(0.98); }
+    .photo-card:active img.main-photo { transform: scale(0.98); }
     .grid-photo { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
     .grid-photo-container:active .grid-photo { transform: scale(0.95); }
     .grid-photo-container.selected { border: 3px solid #FF4D6D; transform: scale(0.95); }

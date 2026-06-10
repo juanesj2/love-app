@@ -36,7 +36,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
                   <span class="sender" *ngIf="!isMine(msg)">{{msg.user?.name}}</span>
                   
                   <div class="photo-reply" *ngIf="msg.photo">
-                    <ion-img [src]="environment.storageUrl + msg.photo.image_path"></ion-img>
+                    <img [src]="environment.storageUrl + msg.photo.image_path" loading="lazy" />
                   </div>
 
                   <p class="text" *ngIf="msg.mensaje && msg.mensaje !== 'null'">
@@ -150,9 +150,9 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
     .msg-avatar-fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; font-weight: bold; font-size: 0.8rem; }
     
     
-    .photo-reply ion-img { width: 100%; max-width: 200px; border-radius: 12px; margin-bottom: 8px; border: 2px solid rgba(255,255,255,0.2); display: block; overflow: hidden; }
+    .photo-reply img { width: 100%; max-width: 200px; border-radius: 12px; margin-bottom: 8px; border: 2px solid rgba(255,255,255,0.2); display: block; overflow: hidden; }
     .only-photo { padding: 4px; background: transparent !important; box-shadow: none !important; border: none !important; }
-    .only-photo .photo-reply ion-img { margin-bottom: 0; }
+    .only-photo .photo-reply img { margin-bottom: 0; }
     
     .bubble-wrapper { display: flex; flex-direction: column; max-width: 80%; position: relative; margin-bottom: 14px; transition: all 0.3s; }
     .message-wrapper.mine .bubble-wrapper { align-items: flex-end; }
