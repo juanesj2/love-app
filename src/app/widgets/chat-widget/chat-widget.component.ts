@@ -18,12 +18,22 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
           <ion-refresher-content></ion-refresher-content>
         </ion-refresher>
         
-        <ion-list class="messages-inner">
-        <ion-item-sliding *ngFor="let msg of messages; trackBy: trackByMsgId" #slidingItem [id]="'msg-' + msg.id">
-          <ion-item class="transparent-item" lines="none" 
+        <div class="messages-inner">
+        <div class="message-row" *ngFor="let msg of messages; trackBy: trackByMsgId" [id]="'msg-' + msg.id">
+          <!-- Iconos de swipe -->
+          <div class="swipe-icon-left" [id]="'swipe-icon-' + msg.id" *ngIf="isMine(msg)">
+            <div class="reply-icon-circle"><ion-icon name="arrow-undo-outline"></ion-icon></div>
+          </div>
+          <div class="swipe-icon-right" [id]="'swipe-icon-' + msg.id" *ngIf="!isMine(msg)">
+            <div class="reply-icon-circle"><ion-icon name="arrow-undo-outline"></ion-icon></div>
+          </div>
+
+          <!-- Contenido del mensaje deslizable -->
+          <div class="message-content-wrapper" [id]="'slide-el-' + msg.id"
             (contextmenu)="onContextMenu($event, msg)"
-            (touchstart)="startPress($event, msg)"
-            (touchend)="endPress()"
+            (touchstart)="ts($event, msg)"
+            (touchmove)="tm($event, msg)"
+            (touchend)="te($event, msg)"
             (mousedown)="startPress($event, msg)"
             (mouseup)="endPress()"
             (mouseleave)="endPress()">
@@ -40,7 +50,6 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
                 </div>
 
                 <div class="bubble" [class.only-photo]="msg.photo && (!msg.mensaje || msg.mensaje === 'null')">
-                  <!-- Sender name removed as requested -->
                   
                   <div class="photo-reply" *ngIf="msg.photo">
                     <img [src]="environment.storageUrl + msg.photo.image_path" loading="lazy" />
@@ -62,25 +71,9 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
                 <div *ngIf="!avatars[msg.user?.name]" class="msg-avatar-fallback">{{ msg.user?.name?.charAt(0) || 'U' }}</div>
               </div>
             </div>
-          </ion-item>
-          
-          <ion-item-options side="end" (ionSwipe)="onSwipeReply(msg, slidingItem)" class="custom-options">
-            <ion-item-option *ngIf="isMine(msg)" color="light" class="reply-option" expandable (click)="onSwipeReply(msg, slidingItem)">
-              <div class="reply-icon-circle">
-                <ion-icon name="arrow-undo-outline"></ion-icon>
-              </div>
-            </ion-item-option>
-          </ion-item-options>
-
-          <ion-item-options side="start" (ionSwipe)="onSwipeReply(msg, slidingItem)" class="custom-options">
-            <ion-item-option *ngIf="!isMine(msg)" color="light" class="reply-option" expandable (click)="onSwipeReply(msg, slidingItem)">
-              <div class="reply-icon-circle">
-                <ion-icon name="arrow-undo-outline"></ion-icon>
-              </div>
-            </ion-item-option>
-          </ion-item-options>
-        </ion-item-sliding>
-        </ion-list>
+          </div>
+        </div>
+        </div>t>
       </ion-content>
 
       <ion-popover [isOpen]="showReactionsMsgId !== null" [event]="popoverEvent" (didDismiss)="closePopover()" class="reactions-popover-host" [showBackdrop]="false">
@@ -141,10 +134,14 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
     .chat-wrapper { display: flex; flex-direction: column; height: 100%; background: #fdf5f7; font-family: 'Inter', sans-serif; position: relative; }
     
     .messages-content { flex: 1; --background: transparent; }
-    .messages-inner { padding: 20px 15px; display: flex; flex-direction: column; gap: 12px; background: transparent !important; }
+    .messages-inner { padding: 20px 15px; display: flex; flex-direction: column; background: transparent !important; }
     
-    ion-item-sliding { background: #fdf5f7 !important; }
-    .transparent-item { --background: #fdf5f7 !important; background: #fdf5f7 !important; --inner-padding-end: 0; --padding-start: 0; }
+    .message-row { position: relative; width: 100%; display: flex; align-items: center; margin-bottom: 12px; }
+    .message-content-wrapper { width: 100%; position: relative; z-index: 2; transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+    
+    .swipe-icon-left, .swipe-icon-right { position: absolute; top: 50%; transform: translateY(-50%) scale(0); z-index: 1; opacity: 0; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+    .swipe-icon-left { right: 10px; }
+    .swipe-icon-right { left: 10px; }
     
     .message-wrapper { display: flex; width: 100%; animation: slideUp 0.3s ease-out forwards; opacity: 0; transform: translateY(10px); gap: 8px; align-items: flex-end; }
     @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
@@ -202,9 +199,6 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
     .reactions-container { position: absolute; bottom: -12px; right: 10px; background: white; padding: 2px 6px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; gap: 2px; border: 1px solid rgba(0,0,0,0.05); z-index: 2; }
     .mine .reactions-container { right: auto; left: 10px; }
     
-    .custom-options { background: transparent !important; border: none; }
-    .reply-option { --background: transparent !important; --color: transparent !important; background: transparent !important; }
-    .reply-option::part(native) { background: transparent !important; padding: 0 20px; }
     .reply-icon-circle { width: 40px; height: 40px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     .reply-icon-circle ion-icon { font-size: 1.5rem; color: #FF4D6D; }
     .reaction { font-size: 0.9rem; }
@@ -454,11 +448,88 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     this.newMessage = '';
   }
 
-  onSwipeReply(msg: any, slidingItem: any) {
-    this.replyToMessage(msg);
-    this.safeTimeout(() => {
-      slidingItem.close();
-    }, 100);
+  // --- Custom Swipe Logic ---
+  swipeStartX = 0;
+  swipingMsgId: number | null = null;
+
+  ts(event: any, msg: any) {
+    if (event.touches && event.touches.length > 0) {
+      this.swipeStartX = event.touches[0].clientX;
+      this.swipingMsgId = msg.id;
+    }
+    this.startPress(event, msg);
+  }
+
+  tm(event: any, msg: any) {
+    if (this.swipingMsgId !== msg.id || !event.touches) return;
+    
+    const x = event.touches[0].clientX;
+    const deltaX = x - this.swipeStartX;
+    
+    if (Math.abs(deltaX) > 10) {
+      this.endPress();
+    }
+
+    const isMine = this.isMine(msg);
+    if (isMine && deltaX > 0) return;
+    if (!isMine && deltaX < 0) return;
+
+    let move = deltaX;
+    if (move > 60) move = 60 + (move - 60) * 0.2;
+    if (move < -60) move = -60 + (move + 60) * 0.2;
+
+    const el = document.getElementById('slide-el-' + msg.id);
+    const iconEl = document.getElementById('swipe-icon-' + msg.id);
+
+    if (el) {
+      el.style.transform = `translateX(${move}px)`;
+      el.style.transition = 'none';
+    }
+
+    if (iconEl) {
+      const progress = Math.min(Math.abs(move) / 60, 1);
+      iconEl.style.opacity = progress.toString();
+      iconEl.style.transform = `translateY(-50%) scale(${progress})`;
+      iconEl.style.transition = 'none';
+      if (progress >= 1) {
+        iconEl.style.transform = `translateY(-50%) scale(1.1)`;
+      }
+    }
+  }
+
+  te(event: any, msg: any) {
+    this.endPress();
+    if (this.swipingMsgId !== msg.id) return;
+    this.swipingMsgId = null;
+
+    const el = document.getElementById('slide-el-' + msg.id);
+    const iconEl = document.getElementById('swipe-icon-' + msg.id);
+
+    let move = 0;
+    if (el && el.style.transform.includes('translateX')) {
+      const match = el.style.transform.match(/translateX\(([-\d\.]+)px\)/);
+      if (match) move = parseFloat(match[1]);
+    }
+
+    if (el) {
+      el.style.transform = 'translateX(0)';
+      el.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
+    }
+
+    if (iconEl) {
+      iconEl.style.opacity = '0';
+      iconEl.style.transform = 'translateY(-50%) scale(0)';
+      iconEl.style.transition = 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
+    }
+
+    const isMine = this.isMine(msg);
+    if (isMine && move <= -50) {
+      this.replyToMessage(msg);
+      Haptics.impact({ style: ImpactStyle.Light }).catch(()=>{});
+    } else if (!isMine && move >= 50) {
+      this.replyToMessage(msg);
+      Haptics.impact({ style: ImpactStyle.Light }).catch(()=>{});
+    }
   }
 
   replyToMessage(msg: any) {
