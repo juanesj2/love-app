@@ -69,7 +69,7 @@ import { Location } from '@angular/common';
     
     .slice-svg { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
     
-    .slice-text { position: absolute; top: 50%; left: 50%; transform-origin: 0 0; color: white; font-weight: bold; font-size: 0.85rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); white-space: nowrap; }
+    .slice-text { position: absolute; top: 50%; left: 50%; transform-origin: 0 0; color: white; font-weight: bold; font-size: 0.85rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); white-space: nowrap; max-width: 85px; overflow: hidden; text-overflow: ellipsis; }
     
     .roulette-pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid #590D22; z-index: 10; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2)); }
     
@@ -194,9 +194,9 @@ export class RouletteWidgetComponent implements OnInit {
     const numOptions = this.options.length;
     const angle = 360 / numOptions;
     const midAngle = (index * angle) + (angle / 2);
-    // Position text in the middle of the slice
+    // Position text towards the outer edge of the slice
     const rot = midAngle - 90;
-    return `rotate(${rot}deg) translate(25px, 0)`; // 25px is halfway out the radius (50px)
+    return `rotate(${rot}deg) translate(55px, 0)`; 
   }
 
   spin() {
