@@ -200,7 +200,8 @@ public class DailyPhotoWidgetWorker extends Worker {
         canvas.drawBitmap(photo, matrix, new Paint(Paint.FILTER_BITMAP_FLAG));
         
         // Draw Badges
-        drawStreakBadge(canvas, streak);
+        boolean hasDescription = description != null && !description.trim().isEmpty() && !description.equals("null");
+        drawStreakBadge(canvas, streak, hasDescription);
         drawAvatarBadge(canvas, avatar, name, height);
         drawDescriptionBadge(canvas, description, width, height);
         
@@ -253,7 +254,7 @@ public class DailyPhotoWidgetWorker extends Worker {
         canvas.restore();
     }
     
-    private void drawStreakBadge(Canvas canvas, int streak) {
+    private void drawStreakBadge(Canvas canvas, int streak, boolean hasDescription) {
         if (streak <= 0) return;
         
         Paint bgPaint = new Paint();
@@ -283,7 +284,7 @@ public class DailyPhotoWidgetWorker extends Worker {
         int height = textBounds.height() + paddingY * 2;
         
         int x = 60; // margin left
-        int y = 120; // margin top (increased for more space)
+        int y = hasDescription ? 210 : 120; // margin top (baja si hay descripción)
         
         RectF rect = new RectF(x, y, x + width, y + height);
         canvas.drawRoundRect(rect, 40f, 40f, bgPaint);
