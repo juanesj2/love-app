@@ -1,4 +1,6 @@
 import { Component, inject, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { App } from '@capacitor/app';
+import { PluginListenerHandle } from '@capacitor/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonRefresher, IonRefresherContent, IonIcon, ToastController, ActionSheetController } from '@ionic/angular/standalone';
@@ -251,6 +253,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
   timeTogether = { years: 0, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
   private timer: any;
+  private appStateListener?: PluginListenerHandle;
   uploadingAvatar = false;
   myUserId: 'juan' | 'roberta' = 'juan';
 
@@ -306,6 +309,14 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     }
 
     this.startTimer();
+
+    this.appStateListener = await App.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) {
+        this.startTimer();
+      } else {
+        this.stopTimer();
+      }
+    });
   }
 
   async showToast(message: string, color: 'success' | 'danger' | 'warning' | 'medium') {
@@ -319,7 +330,10 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.timer) clearInterval(this.timer);
+    this.stopTimer();
+    if (this.appStateListener) {
+      this.appStateListener.remove();
+    }
   }
 
   async saveStartDate() {
@@ -420,10 +434,18 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   }
 
   startTimer() {
+    this.stopTimer();
     this.calculateTime();
     this.timer = setInterval(() => {
       this.calculateTime();
     }, 1000);
+  }
+
+  stopTimer() {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
   }
 
   calculateTime() {

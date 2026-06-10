@@ -1,4 +1,6 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { App } from '@capacitor/app';
+import { PluginListenerHandle } from '@capacitor/core';
 import { CommonModule } from '@angular/common';
 import { IonIcon } from '@ionic/angular/standalone';
 import * as L from 'leaflet';
@@ -129,7 +131,9 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnInit() {
+  private appStateListener?: PluginListenerHandle;
+
+  async ngOnInit() {
     setTimeout(() => {
       this.initMap();
       this.loadMoods();
@@ -142,14 +146,37 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
       console.error('Error GPS', err);
     });
 
-    // Poll moods every 15 seconds
-    this.moodInterval = setInterval(() => this.loadMoods(), 15000);
+    // Start interval
+    this.startMoodInterval();
+
+    this.appStateListener = await App.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) {
+        this.loadMoods();
+        this.startMoodInterval();
+      } else {
+        this.stopMoodInterval();
+      }
+    });
+  }
+
+  private startMoodInterval() {
+    if (!this.moodInterval) {
+      this.moodInterval = setInterval(() => this.loadMoods(), 15000);
+    }
+  }
+
+  private stopMoodInterval() {
+    if (this.moodInterval) {
+      clearInterval(this.moodInterval);
+      this.moodInterval = null;
+    }
   }
 
   ngOnDestroy() {
     this.locationsSub?.unsubscribe();
-    if (this.moodInterval) {
-      clearInterval(this.moodInterval);
+    this.stopMoodInterval();
+    if (this.appStateListener) {
+      this.appStateListener.remove();
     }
   }
 

@@ -1,4 +1,5 @@
 import { Component, inject, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Preferences } from '@capacitor/preferences';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ToastController } from '@ionic/angular';
@@ -6,7 +7,6 @@ import { LoveApiService } from '../../services/love-api.service';
 import { environment } from '../../../environments/environment';
 import { addIcons } from 'ionicons';
 import { paperPlane, hourglassOutline } from 'ionicons/icons';
-
 @Component({
   selector: 'app-chat-widget',
   template: `
@@ -135,7 +135,22 @@ export class ChatWidgetComponent implements OnInit, AfterViewChecked {
 
   async loadMessages() {
     try {
-      this.messages = await this.api.getChatMessages();
+      // 1. Mostrar caché primero para experiencia instantánea
+      const cache = await Preferences.get({ key: 'chat_cache' });
+      if (cache.value) {
+        this.messages = JSON.parse(cache.value);
+        setTimeout(() => this.scrollToBottom(), 50);
+      }
+
+      // 2. Fetch de la red en segundo plano
+      const newMessages = await this.api.getChatMessages();
+      
+      // 3. Actualizar la vista solo si hay cambios (evita parpadeos)
+      if (JSON.stringify(this.messages) !== JSON.stringify(newMessages)) {
+        this.messages = newMessages;
+        await Preferences.set({ key: 'chat_cache', value: JSON.stringify(this.messages) });
+        setTimeout(() => this.scrollToBottom(), 50);
+      }
     } catch (e) {
       console.error(e);
       this.showError('No pudimos cargar los mensajes. ¿Hay conexión?');

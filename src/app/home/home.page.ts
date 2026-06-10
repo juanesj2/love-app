@@ -1,4 +1,5 @@
-import { Component, inject, ViewChild, OnInit } from '@angular/core';
+import { Component, inject, ViewChild, OnInit, OnDestroy } from '@angular/core';
+import { PluginListenerHandle } from '@capacitor/core';
 import { IonContent, IonFooter, IonHeader, IonToolbar, ActionSheetController, AlertController } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -167,10 +168,11 @@ import { App } from '@capacitor/app';
   standalone: true,
   imports: [IonHeader, IonToolbar, IonContent, IonFooter, IonIcon, CommonModule, FormsModule, LocationWidgetComponent, PhotoWidgetComponent, ChatWidgetComponent, MasWidgetComponent, QuestionsWidgetComponent],
 })
-export class HomePage implements OnInit {
+export class HomePage implements OnInit, OnDestroy {
   selectedWidget: 'location' | 'photo' | 'chat' | 'mas' | 'game' = 'photo';
   uploading = false;
   pokeAnimation = false;
+  private appStateListener?: PluginListenerHandle;
 
   myMood = '';
   partnerMood = '';
@@ -212,18 +214,17 @@ export class HomePage implements OnInit {
 
   async ngOnInit() {
     this.loadHeaderData();
-    // Poll header data every 30 seconds
-    setInterval(() => this.loadHeaderData(), 30000);
 
     // Load avatars from Firebase
     const { value } = await Preferences.get({ key: 'firebase_user_id' });
     const myId = value || 'juan';
     const partnerId = myId === 'juan' ? 'roberta' : 'juan';
 
-    // Widget Intent listener
-    App.addListener('appStateChange', async ({ isActive }) => {
+    // Widget Intent listener & Background Polling replacement
+    this.appStateListener = await App.addListener('appStateChange', async ({ isActive }) => {
       if (isActive) {
         this.checkWidgetIntent();
+        this.loadHeaderData(); // Refrescar info al volver a la app
       }
     });
     this.checkWidgetIntent();
@@ -234,6 +235,12 @@ export class HomePage implements OnInit {
     this.locationService.listenToUserLocation(partnerId as 'juan'|'roberta').subscribe((data: any) => {
       if (data && data.avatar) this.partnerAvatarUrl = data.avatar;
     });
+  }
+
+  ngOnDestroy() {
+    if (this.appStateListener) {
+      this.appStateListener.remove();
+    }
   }
 
   async loadHeaderData() {

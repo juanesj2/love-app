@@ -1,4 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { Preferences } from '@capacitor/preferences';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ToastController, AlertController, ActionSheetController, ModalController } from '@ionic/angular';
@@ -377,13 +378,44 @@ export class PhotoWidgetComponent implements OnInit {
   async loadData() {
     try {
       this.currentPage = 1;
+      
+      // 1. Mostrar caché primero si no estamos en un álbum específico
+      if (!this.currentAlbum) {
+        const cachePhotos = await Preferences.get({ key: 'feed_photos_cache' });
+        const cacheCouple = await Preferences.get({ key: 'couple_info_cache' });
+        const cacheAlbums = await Preferences.get({ key: 'albums_cache' });
+        
+        if (cachePhotos.value) {
+          this.photos = JSON.parse(cachePhotos.value);
+          this.groupPhotosByDate();
+          this.groupPhotosForGallery();
+        }
+        if (cacheCouple.value) this.coupleInfo = JSON.parse(cacheCouple.value);
+        if (cacheAlbums.value) this.albums = JSON.parse(cacheAlbums.value);
+      }
+
+      // 2. Carga desde red en segundo plano
       this.coupleInfo = await this.api.getCoupleInfo();
       const response = await this.api.getPhotos(this.currentAlbum ? this.currentAlbum.id : undefined, this.currentPage);
-      this.photos = response.data || response;
       this.lastPage = response.last_page || 1;
-      this.groupPhotosByDate();
-      this.groupPhotosForGallery();
+      const newPhotos = response.data || response;
+      
+      // 3. Actualizar vistas solo si cambió algo
+      if (JSON.stringify(this.photos) !== JSON.stringify(newPhotos)) {
+        this.photos = newPhotos;
+        this.groupPhotosByDate();
+        this.groupPhotosForGallery();
+        if (!this.currentAlbum) {
+          await Preferences.set({ key: 'feed_photos_cache', value: JSON.stringify(this.photos) });
+        }
+      }
+      
       this.albums = await this.api.getAlbums();
+      if (!this.currentAlbum) {
+        await Preferences.set({ key: 'couple_info_cache', value: JSON.stringify(this.coupleInfo) });
+        await Preferences.set({ key: 'albums_cache', value: JSON.stringify(this.albums) });
+      }
+
     } catch (e) {
       console.error(e);
       this.showError('No se pudo cargar la galería. Comprueba tu conexión.');
@@ -654,7 +686,7 @@ export class PhotoWidgetComponent implements OnInit {
     try {
       const source = Capacitor.getPlatform() === 'web' ? CameraSource.Photos : CameraSource.Prompt;
       const image = await Camera.getPhoto({
-        quality: 80, allowEditing: false, resultType: CameraResultType.Uri, source: source
+        quality: 70, width: 800, height: 800, allowEditing: false, resultType: CameraResultType.Uri, source: source
       });
       
       if (image.webPath) {
