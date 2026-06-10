@@ -157,3 +157,41 @@
     border: 1px solid #ddd !important;
   }
 }
+
+/* Premium Action Sheet Styling */
+.premium-action-sheet {
+  --background: rgba(255, 255, 255, 0.95);
+  --backdrop-opacity: 0.4;
+  --color: #FF4D6D;
+  --button-color: #590D22;
+  --button-color-cancel: #FF4D6D;
+  
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  .action-sheet-wrapper {
+    border-top-left-radius: 28px !important;
+    border-top-right-radius: 28px !important;
+    box-shadow: 0 -10px 40px rgba(255, 77, 109, 0.15) !important;
+  }
+
+  .action-sheet-title {
+    font-weight: 800 !important;
+    font-size: 1.3rem !important;
+    text-align: center !important;
+    padding: 25px 10px 15px !important;
+  }
+
+  .action-sheet-button {
+    font-weight: 600 !important;
+    font-size: 1.15rem !important;
+    justify-content: center !important;
+    text-align: center !important;
+    padding: 18px !important;
+  }
+
+  .action-sheet-button.action-sheet-cancel {
+    font-weight: 800 !important;
+    margin-top: 10px !important;
+  }
+}

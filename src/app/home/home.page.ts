@@ -272,6 +272,7 @@ export class HomePage implements OnInit, OnDestroy {
   async openMoodSelector() {
     const actionSheet = await this.actionSheetCtrl.create({
       header: '¿Cómo te sientes hoy?',
+      cssClass: 'premium-action-sheet',
       buttons: [
         { text: 'Feliz 😊', handler: () => this.setMood('😊') },
         { text: 'Cansado/a 😴', handler: () => this.setMood('😴') },
