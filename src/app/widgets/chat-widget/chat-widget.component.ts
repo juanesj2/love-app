@@ -222,12 +222,11 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   public environment = environment;
   
   messages: any[] = [];
-  newMessage: string = '';
+  newMessage = '';
   sending = false;
   avatars: { [key: string]: string } = {};
   
   replyingTo: any = null;
-  chatMeta: any = {};
   showReactionsMsgId: number | null = null;
   
   private touchTimer: any;
@@ -241,16 +240,6 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.loadAvatars();
     this.loadMessages();
-    this.listenToChatMeta();
-  }
-
-  listenToChatMeta() {
-    const metaDoc = doc(this.firestore, 'locations', 'chat_meta');
-    onSnapshot(metaDoc, (snap) => {
-      if (snap.exists()) {
-        this.chatMeta = snap.data();
-      }
-    });
   }
 
   async loadAvatars() {
