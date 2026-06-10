@@ -164,9 +164,10 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
     .reactions-popover-content span:active { transform: scale(1.3); }
     .custom-emoji-btn { background: rgba(0,0,0,0.05); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem !important; color: #666; }
     
-    .custom-input-mode { padding: 8px 12px; gap: 8px; }
-    .custom-emoji-field { border: none; background: rgba(0,0,0,0.05); padding: 8px 12px; border-radius: 16px; font-size: 1.5rem; width: 120px; outline: none; text-align: center; }
-    .add-btn { background: #FF4D6D; color: white; border: none; padding: 8px 12px; border-radius: 16px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
+    .custom-input-mode { padding: 12px; gap: 12px; }
+    .custom-emoji-field { border: none; background: #f0f0f0; color: #333; padding: 10px 16px; border-radius: 24px; font-size: 1.5rem; width: 140px; outline: none; text-align: center; }
+    .custom-emoji-field::placeholder { color: #aaa; font-size: 1rem; }
+    .add-btn { background: #FF4D6D; color: white; border: none; padding: 10px 20px; border-radius: 24px; font-weight: bold; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 10px rgba(255,77,109,0.3); }
     
     .reactions-container { position: absolute; bottom: -12px; right: 10px; background: white; padding: 2px 6px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; gap: 2px; border: 1px solid rgba(0,0,0,0.05); z-index: 2; }
     .mine .reactions-container { right: auto; left: 10px; }
