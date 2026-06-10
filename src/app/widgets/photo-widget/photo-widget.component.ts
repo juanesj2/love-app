@@ -9,6 +9,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Capacitor } from '@capacitor/core';
 import { addIcons } from 'ionicons';
 import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline } from 'ionicons/icons';
+import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 
 // ... (Resto del decorador y imports no cambian, los saltamos por ahora, inyectaremos el AlertController abajo)
 
@@ -64,8 +65,8 @@ import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, 
           <div class="photo-card" *ngFor="let photo of group.photos">
             <div class="card-header">
               <div class="card-user-info">
-                <img *ngIf="photo.user?.avatar" [src]="environment.storageUrl + photo.user.avatar" class="card-avatar" />
-                <div *ngIf="!photo.user?.avatar" class="card-avatar-fallback">{{ photo.user?.name?.charAt(0) || 'U' }}</div>
+                <img *ngIf="avatars[photo.user?.name]" [src]="avatars[photo.user.name]" class="card-avatar" />
+                <div *ngIf="!avatars[photo.user?.name]" class="card-avatar-fallback">{{ photo.user?.name?.charAt(0) || 'U' }}</div>
                 <span class="card-username">{{photo.user?.name}}</span>
               </div>
               <button *ngIf="isMine(photo)" class="delete-post-btn" (click)="deletePhoto(photo)">
@@ -363,12 +364,11 @@ export class PhotoWidgetComponent implements OnInit {
   pendingPhotoPreview: string = '';
   pendingPhotoText: string = '';
 
+  viewMode: 'feed' | 'grid' = 'feed';
   photos: any[] = [];
   groupedPhotos: any[] = [];
   galleryGroups: any[] = [];
-  
-  viewMode: 'feed' | 'grid' = 'feed';
-  
+
   albums: any[] = [];
   isAlbumsModalOpen = false;
   currentAlbum: any = null;
@@ -381,13 +381,31 @@ export class PhotoWidgetComponent implements OnInit {
 
   coupleInfo: any = null;
   uploading = false;
+  avatars: { [key: string]: string } = {};
+  private firestore = inject(Firestore);
 
   constructor() {
     addIcons({ arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline });
   }
 
   ngOnInit() {
+    this.loadAvatars();
     this.loadData();
+  }
+
+  async loadAvatars() {
+    try {
+      const juanDoc = await getDoc(doc(this.firestore, 'users', 'juan'));
+      if (juanDoc.exists() && juanDoc.data()?.['avatar']) {
+        this.avatars['Juan'] = juanDoc.data()['avatar'];
+      }
+      const robertaDoc = await getDoc(doc(this.firestore, 'users', 'roberta'));
+      if (robertaDoc.exists() && robertaDoc.data()?.['avatar']) {
+        this.avatars['Roberta'] = robertaDoc.data()['avatar'];
+      }
+    } catch (e) {
+      console.error('Error loading avatars', e);
+    }
   }
 
   currentPage = 1;
