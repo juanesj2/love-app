@@ -8,7 +8,7 @@ import { environment } from '../../../environments/environment';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Capacitor } from '@capacitor/core';
 import { addIcons } from 'ionicons';
-import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline } from 'ionicons/icons';
+import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline } from 'ionicons/icons';
 
 // ... (Resto del decorador y imports no cambian, los saltamos por ahora, inyectaremos el AlertController abajo)
 
@@ -62,12 +62,23 @@ import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, 
             </div>
 
           <div class="photo-card" *ngFor="let photo of group.photos">
+            <div class="card-header">
+              <div class="card-user-info">
+                <img *ngIf="photo.user?.avatar" [src]="environment.storageUrl + photo.user.avatar" class="card-avatar" />
+                <div *ngIf="!photo.user?.avatar" class="card-avatar-fallback">{{ photo.user?.name?.charAt(0) || 'U' }}</div>
+                <span class="card-username">{{photo.user?.name}}</span>
+              </div>
+              <button *ngIf="isMine(photo)" class="delete-post-btn" (click)="deletePhoto(photo)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </button>
+            </div>
+            
             <div class="image-wrapper">
               <ion-img [src]="environment.storageUrl + photo.image_path" class="main-photo"></ion-img>
             </div>
             
             <div class="photo-details">
-              <p *ngIf="photo.description" class="description"><strong>{{photo.user.name}}:</strong> {{photo.description}}</p>
+              <p *ngIf="photo.description" class="description">{{photo.description}}</p>
               
               <div class="reactions-list" *ngIf="photo.reactions?.length">
                 <span class="reaction-bubble" *ngFor="let r of photo.reactions">{{r.content}}</span>
@@ -267,6 +278,13 @@ import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, 
     
     .photo-card { max-width: 500px; margin: 0 auto 25px auto; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border-radius: 24px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.8); transition: transform 0.3s ease; }
     .photo-card:hover { transform: translateY(-5px); }
+    .card-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.03); }
+    .card-user-info { display: flex; align-items: center; gap: 10px; }
+    .card-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid #FF4D6D; }
+    .card-avatar-fallback { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; }
+    .card-username { font-weight: 700; color: #590D22; font-size: 0.95rem; text-transform: capitalize; }
+    .delete-post-btn { background: none; border: none; color: #ffb3c1; font-size: 1.2rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+    .delete-post-btn:hover { color: #FF4D6D; transform: scale(1.1); }
     .image-wrapper { width: 100%; max-height: 450px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fff5f8; }
     .main-photo { width: 100%; height: 100%; max-height: 450px; object-fit: contain; display: block; }
     
@@ -365,7 +383,7 @@ export class PhotoWidgetComponent implements OnInit {
   uploading = false;
 
   constructor() {
-    addIcons({ arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline });
+    addIcons({ arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline });
   }
 
   ngOnInit() {
@@ -626,6 +644,45 @@ export class PhotoWidgetComponent implements OnInit {
           handler: (data) => {
             if (data.emoji) {
               this.react(photoId, data.emoji);
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  isMine(photo: any): boolean {
+    const stored = localStorage.getItem('love_widget_user');
+    if (!stored || !photo || !photo.user) return false;
+    const myName = stored === 'juan' ? 'Juan' : 'Roberta';
+    return photo.user.name === myName;
+  }
+
+  async deletePhoto(photo: any) {
+    const alert = await this.alertController.create({
+      header: '¿Eliminar foto?',
+      message: '¿Estás seguro de que quieres borrar este recuerdo para siempre?',
+      cssClass: 'custom-love-alert',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: async () => {
+            try {
+              await this.api.deletePhoto(photo.id);
+              this.showSuccess('Foto eliminada');
+              // Remove locally
+              this.photos = this.photos.filter(p => p.id !== photo.id);
+              this.groupPhotosByDate();
+              this.groupPhotosForGallery();
+              if (!this.currentAlbum) {
+                await Preferences.set({ key: 'feed_photos_cache', value: JSON.stringify(this.photos) });
+              }
+            } catch (e) {
+              console.error(e);
+              this.showError('No se pudo eliminar la foto');
             }
           }
         }

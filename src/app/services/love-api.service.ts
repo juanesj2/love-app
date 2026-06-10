@@ -155,6 +155,11 @@ export class LoveApiService {
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/photos/${photoId}/reactions`, { content: emoji }, { headers }));
   }
 
+  async deletePhoto(photoId: number): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.delete(`${API_BASE_URL}/love-album/photos/${photoId}`, { headers }));
+  }
+
   // --- CHAT ---
   async getChatMessages(): Promise<any[]> {
     const headers = await this.getHeaders();
