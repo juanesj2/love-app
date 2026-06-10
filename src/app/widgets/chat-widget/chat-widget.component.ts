@@ -98,7 +98,7 @@ import { paperPlane, hourglassOutline } from 'ionicons/icons';
   imports: [CommonModule, FormsModule, IonicModule]
 })
 export class ChatWidgetComponent implements OnInit, AfterViewInit {
-  @ViewChild('msgContainer', { static: false }) private msgContainer!: IonContent;
+  @ViewChild(IonContent, { static: false }) private msgContainer!: IonContent;
   private api = inject(LoveApiService);
   private toastController = inject(ToastController);
   public environment = environment;
@@ -119,13 +119,15 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.viewInitialized = true;
-    setTimeout(() => this.scrollToBottom(), 100);
+    setTimeout(() => this.scrollToBottom(false), 50);
+    setTimeout(() => this.scrollToBottom(false), 300);
+    setTimeout(() => this.scrollToBottom(false), 600);
   }
 
-  scrollToBottom(): void {
+  scrollToBottom(animated: boolean = true): void {
     if (!this.viewInitialized || !this.msgContainer) return;
     try {
-      this.msgContainer.scrollToBottom(300).catch(() => {});
+      this.msgContainer.scrollToBottom(animated ? 300 : 0).catch(() => {});
     } catch(err) { }
   }
 
@@ -140,7 +142,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       const cache = await Preferences.get({ key: 'chat_cache' });
       if (cache.value) {
         this.messages = JSON.parse(cache.value);
-        setTimeout(() => this.scrollToBottom(), 100);
+        setTimeout(() => this.scrollToBottom(false), 50);
+        setTimeout(() => this.scrollToBottom(false), 300);
       }
 
       // 2. Fetch de la red en segundo plano
@@ -149,7 +152,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       // 3. Actualizar la vista solo si hay cambios (evita parpadeos)
       if (JSON.stringify(this.messages) !== JSON.stringify(newMessages)) {
         this.messages = newMessages;
-        setTimeout(() => this.scrollToBottom(), 100);
+        setTimeout(() => this.scrollToBottom(false), 100);
+        setTimeout(() => this.scrollToBottom(true), 500);
         await Preferences.set({ key: 'chat_cache', value: JSON.stringify(this.messages) });
       }
     } catch (e) {
@@ -166,6 +170,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       await this.api.sendMessage(this.newMessage);
       this.newMessage = '';
       await this.loadMessages();
+      setTimeout(() => this.scrollToBottom(true), 100);
       this.showSuccess('Mensaje enviado con éxito');
     } catch (e) {
       console.error(e);
