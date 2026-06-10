@@ -1,12 +1,12 @@
 import { Component, inject, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { PluginListenerHandle } from '@capacitor/core';
-import { IonContent, IonFooter, IonHeader, IonToolbar, AlertController } from '@ionic/angular/standalone';
+import { IonContent, IonFooter, IonHeader, IonToolbar, AlertController, ActionSheetController } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { ToastController, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { imagesOutline, images, chatbubblesOutline, chatbubbles, add, hourglassOutline, mapOutline, map, ellipsisHorizontalOutline, ellipsisHorizontal, heart, happyOutline, sadOutline, flameOutline, bedOutline } from 'ionicons/icons';
+import { imagesOutline, images, chatbubblesOutline, chatbubbles, add, hourglassOutline, mapOutline, map, ellipsisHorizontalOutline, ellipsisHorizontal, heart, happyOutline, sadOutline, flameOutline, bedOutline, camera, image, close } from 'ionicons/icons';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 import { LocationWidgetComponent } from '../widgets/location-widget/location-widget.component';
@@ -190,6 +190,7 @@ export class HomePage implements OnInit, OnDestroy {
   private locationService = inject(LocationService);
   private toastController = inject(ToastController);
   private alertController = inject(AlertController);
+  private actionSheetCtrl = inject(ActionSheetController);
 
   @ViewChild('photoWidget') photoWidgetComp?: PhotoWidgetComponent;
   @ViewChild('chatWidget') chatWidgetComp?: ChatWidgetComponent;
@@ -198,7 +199,7 @@ export class HomePage implements OnInit, OnDestroy {
   @ViewChild('gameWidget') gameWidgetComp?: QuestionsWidgetComponent;
 
   constructor() {
-    addIcons({ imagesOutline, images, chatbubblesOutline, chatbubbles, add, hourglassOutline, mapOutline, map, ellipsisHorizontalOutline, ellipsisHorizontal, heart, happyOutline, sadOutline, flameOutline, bedOutline });
+    addIcons({ imagesOutline, images, chatbubblesOutline, chatbubbles, add, hourglassOutline, mapOutline, map, ellipsisHorizontalOutline, ellipsisHorizontal, heart, happyOutline, sadOutline, flameOutline, bedOutline, camera, image, close });
   }
 
   async checkWidgetIntent() {
@@ -317,6 +318,35 @@ export class HomePage implements OnInit, OnDestroy {
       toast.present();
     }
     setTimeout(() => { this.pokeAnimation = false; }, 1500);
+  }
+
+  async presentPhotoOptions(callback: (source: CameraSource) => void) {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Añadir Foto',
+      cssClass: 'premium-action-sheet',
+      buttons: [
+        {
+          text: 'Tomar Foto',
+          icon: 'camera',
+          handler: () => {
+            callback(CameraSource.Camera);
+          }
+        },
+        {
+          text: 'De la Galería',
+          icon: 'image',
+          handler: () => {
+            callback(CameraSource.Photos);
+          }
+        },
+        {
+          text: 'Cancelar',
+          icon: 'close',
+          role: 'cancel'
+        }
+      ]
+    });
+    await actionSheet.present();
   }
 
   async takePicture() {

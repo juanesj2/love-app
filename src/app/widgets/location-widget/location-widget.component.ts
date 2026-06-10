@@ -2,14 +2,14 @@ import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { App } from '@capacitor/app';
 import { PluginListenerHandle } from '@capacitor/core';
 import { CommonModule } from '@angular/common';
-import { IonIcon } from '@ionic/angular/standalone';
+import { IonIcon, ActionSheetController } from '@ionic/angular/standalone';
 import * as L from 'leaflet';
 import { LocationService } from '../../services/location.service';
 import { Subscription, combineLatest } from 'rxjs';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Preferences } from '@capacitor/preferences';
 import { addIcons } from 'ionicons';
-import { locateOutline, flagOutline } from 'ionicons/icons';
+import { locateOutline, flagOutline, camera, image, close } from 'ionicons/icons';
 import { LoveApiService } from '../../services/love-api.service';
 
 @Component({
@@ -92,6 +92,7 @@ import { LoveApiService } from '../../services/love-api.service';
 export class LocationWidgetComponent implements OnInit, OnDestroy {
   private locationService = inject(LocationService);
   private api = inject(LoveApiService);
+  private actionSheetCtrl = inject(ActionSheetController);
 
   public nextMilestone: any = null;
   public daysRemaining: number = 0;
@@ -123,7 +124,7 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
   private hasCentered = false;
 
   constructor() {
-    addIcons({ locateOutline, flagOutline });
+    addIcons({ locateOutline, flagOutline, camera, image, close });
     const storedUser = localStorage.getItem('love_widget_user') as 'juan' | 'roberta';
     if (storedUser) {
       this.myUserId = storedUser;
@@ -375,6 +376,19 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
         opacity: 0.8
       }).addTo(this.map);
     }
+  }
+
+  async presentPhotoOptions(callback: (source: CameraSource) => void) {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Cambiar Mi Foto',
+      cssClass: 'premium-action-sheet',
+      buttons: [
+        { text: 'Tomar Foto', icon: 'camera', handler: () => callback(CameraSource.Camera) },
+        { text: 'De la Galería', icon: 'image', handler: () => callback(CameraSource.Photos) },
+        { text: 'Cancelar', icon: 'close', role: 'cancel' }
+      ]
+    });
+    await actionSheet.present();
   }
 
   async changeMyAvatar() {
