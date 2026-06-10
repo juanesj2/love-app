@@ -227,6 +227,7 @@
 
   .alert-button {
     width: 100% !important;
+    text-transform: none !important;
     font-weight: 600 !important;
     font-size: 1.15rem !important;
     color: #590D22 !important;
@@ -235,8 +236,14 @@
     border: 1px solid rgba(255, 77, 109, 0.1) !important;
     box-shadow: 0 4px 10px rgba(0,0,0,0.03) !important;
     margin: 0 !important;
-    justify-content: center !important;
     padding: 16px 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+
+  .alert-button .alert-button-inner {
+    justify-content: center !important;
+    width: 100% !important;
   }
 
   .alert-button.mood-cancel-btn {
@@ -247,5 +254,6 @@
     margin-top: 5px !important;
     font-weight: 800 !important;
     padding: 10px 0 !important;
+    text-transform: uppercase !important;
   }
 }
