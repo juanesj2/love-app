@@ -604,25 +604,22 @@ export class PhotoWidgetComponent implements OnInit {
   async changeAlbumCover(albumId: number, event: Event) {
     event.stopPropagation();
     
-    try {
-      const source = Capacitor.getPlatform() === 'web' ? CameraSource.Photos : CameraSource.Prompt;
-      const image = await Camera.getPhoto({
-        quality: 60, width: 600, height: 600, allowEditing: true, resultType: CameraResultType.DataUrl, source: source,
-        promptLabelHeader: 'Cambiar Portada',
-        promptLabelCancel: 'Cancelar',
-        promptLabelPhoto: 'De la Galería',
-        promptLabelPicture: 'Tomar Foto'
-      });
-      
-      if (image.dataUrl) {
-        // @ts-ignore
-        await this.api.updateAlbumCover(albumId, image.dataUrl);
-        this.loadData();
-        this.showSuccess('Portada actualizada');
+    this.presentPhotoOptions(async (source) => {
+      try {
+        const image = await Camera.getPhoto({
+          quality: 60, width: 600, height: 600, allowEditing: true, resultType: CameraResultType.DataUrl, source: source
+        });
+        
+        if (image.dataUrl) {
+          // @ts-ignore
+          await this.api.updateAlbumCover(albumId, image.dataUrl);
+          this.loadData();
+          this.showSuccess('Portada actualizada');
+        }
+      } catch (e) {
+        console.log('User cancelled or error', e);
       }
-    } catch (e) {
-      console.log('User cancelled or error', e);
-    }
+    });
   }
 
   openAlbum(album: any) {
@@ -739,7 +736,6 @@ export class PhotoWidgetComponent implements OnInit {
 
   async uploadNewPhoto() {
     if (this.currentAlbum) {
-      // Preguntar si quiere tomar/subir foto o elegir de la app
       const actionSheet = await this.actionSheetCtrl.create({
         header: 'Añadir al álbum',
         cssClass: 'premium-action-sheet',
@@ -752,10 +748,17 @@ export class PhotoWidgetComponent implements OnInit {
             }
           },
           {
-            text: 'Subir nueva',
-            icon: 'cloud-upload',
+            text: 'Tomar Foto',
+            icon: 'camera',
             handler: () => {
-              this.takeAndUploadPhoto();
+              this.takeAndUploadPhoto(CameraSource.Camera);
+            }
+          },
+          {
+            text: 'De la Galería',
+            icon: 'image',
+            handler: () => {
+              this.takeAndUploadPhoto(CameraSource.Photos);
             }
           },
           {
@@ -767,19 +770,16 @@ export class PhotoWidgetComponent implements OnInit {
       });
       await actionSheet.present();
     } else {
-      this.takeAndUploadPhoto();
+      this.presentPhotoOptions((source) => {
+        this.takeAndUploadPhoto(source);
+      });
     }
   }
 
-  async takeAndUploadPhoto() {
+  async takeAndUploadPhoto(source: CameraSource) {
     try {
-      const source = Capacitor.getPlatform() === 'web' ? CameraSource.Photos : CameraSource.Prompt;
       const image = await Camera.getPhoto({
-        quality: 70, width: 800, height: 800, allowEditing: false, resultType: CameraResultType.Uri, source: source,
-        promptLabelHeader: 'Añadir Foto',
-        promptLabelCancel: 'Cancelar',
-        promptLabelPhoto: 'De la Galería',
-        promptLabelPicture: 'Tomar Foto'
+        quality: 70, width: 800, height: 800, allowEditing: false, resultType: CameraResultType.Uri, source: source
       });
       
       if (image.webPath) {

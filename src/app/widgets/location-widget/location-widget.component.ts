@@ -392,22 +392,19 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
   }
 
   async changeMyAvatar() {
-    try {
-      const image = await Camera.getPhoto({
-        quality: 60, width: 300, height: 300, allowEditing: true, resultType: CameraResultType.DataUrl, source: CameraSource.Prompt,
-        promptLabelHeader: 'Cambiar Mi Foto',
-        promptLabelCancel: 'Cancelar',
-        promptLabelPhoto: 'De la Galería',
-        promptLabelPicture: 'Tomar Foto'
-      });
-      if (image.dataUrl) {
-        this.uploadingAvatar = true;
-        await this.locationService.uploadAvatar(this.myUserId, image.dataUrl);
+    this.presentPhotoOptions(async (source) => {
+      try {
+        const image = await Camera.getPhoto({
+          quality: 60, width: 300, height: 300, allowEditing: true, resultType: CameraResultType.DataUrl, source: source
+        });
+        if (image.dataUrl) {
+          this.uploadingAvatar = true;
+          await this.locationService.uploadAvatar(this.myUserId, image.dataUrl);
+          this.uploadingAvatar = false;
+        }
+      } catch (e) {
         this.uploadingAvatar = false;
       }
-    } catch (e) {
-      this.uploadingAvatar = false;
-    }
+    });
   }
 }
-
