@@ -371,16 +371,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         await Haptics.impact({ style: ImpactStyle.Heavy });
       } catch (e) {}
       
-      let popoverEv = event;
-      if (event && event.touches && event.touches.length > 0) {
-        popoverEv = {
-          clientX: event.touches[0].clientX,
-          clientY: event.touches[0].clientY,
-          target: event.target,
-          preventDefault: () => {}
-        };
-      }
-      this.onContextMenu(popoverEv, msg);
+      this.onContextMenu(event, msg);
     }, 400);
   }
 
@@ -450,11 +441,13 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   // --- Custom Swipe Logic ---
   swipeStartX = 0;
+  swipeStartY = 0;
   swipingMsgId: number | null = null;
 
   ts(event: any, msg: any) {
     if (event.touches && event.touches.length > 0) {
       this.swipeStartX = event.touches[0].clientX;
+      this.swipeStartY = event.touches[0].clientY;
       this.swipingMsgId = msg.id;
     }
     this.startPress(event, msg);
@@ -464,9 +457,11 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     if (this.swipingMsgId !== msg.id || !event.touches) return;
     
     const x = event.touches[0].clientX;
+    const y = event.touches[0].clientY;
     const deltaX = x - this.swipeStartX;
+    const deltaY = y - this.swipeStartY;
     
-    if (Math.abs(deltaX) > 10) {
+    if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) {
       this.endPress();
     }
 
