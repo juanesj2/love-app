@@ -33,7 +33,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
                 </div>
 
                 <div class="bubble" [class.only-photo]="msg.photo && (!msg.mensaje || msg.mensaje === 'null')">
-                  <span class="sender" *ngIf="!isMine(msg)">{{msg.user?.name}}</span>
+                  <!-- Sender name removed as requested -->
                   
                   <div class="photo-reply" *ngIf="msg.photo">
                     <img [src]="environment.storageUrl + msg.photo.image_path" loading="lazy" />
@@ -128,8 +128,8 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
     .messages-content { flex: 1; --background: transparent; }
     .messages-inner { padding: 20px 15px; display: flex; flex-direction: column; gap: 12px; background: transparent !important; }
     
-    ion-item-sliding { background: transparent !important; }
-    .transparent-item { --background: transparent !important; background: transparent !important; --inner-padding-end: 0; --padding-start: 0; }
+    ion-item-sliding { background: #fdf5f7 !important; }
+    .transparent-item { --background: #fdf5f7 !important; background: #fdf5f7 !important; --inner-padding-end: 0; --padding-start: 0; }
     
     .message-wrapper { display: flex; width: 100%; animation: slideUp 0.3s ease-out forwards; opacity: 0; transform: translateY(10px); gap: 8px; align-items: flex-end; }
     @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
