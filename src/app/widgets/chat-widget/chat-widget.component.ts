@@ -16,9 +16,10 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
         <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
           <ion-refresher-content></ion-refresher-content>
         </ion-refresher>
-        <div class="messages-inner">
+        
+        <ion-list class="messages-inner">
         <ion-item-sliding *ngFor="let msg of messages">
-          <ion-item class="transparent-item" lines="none" (touchstart)="onTouchStart($event, msg)" (touchend)="onTouchEnd()" (touchcancel)="onTouchEnd()">
+          <ion-item class="transparent-item" lines="none" (contextmenu)="onContextMenu($event, msg)">
             <div class="message-wrapper" [class.mine]="isMine(msg)">
               <div class="msg-avatar-container" *ngIf="!isMine(msg)">
                 <img *ngIf="avatars[msg.user?.name]" [src]="avatars[msg.user.name]" class="msg-avatar" />
@@ -44,14 +45,6 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
                     <span class="reaction" *ngFor="let r of getReactions(msg)">{{r}}</span>
                   </div>
                 </div>
-
-                <div class="reactions-popover" *ngIf="showReactionsMsgId === msg.id">
-                  <span (click)="addReaction(msg, '❤️')">❤️</span>
-                  <span (click)="addReaction(msg, '😂')">😂</span>
-                  <span (click)="addReaction(msg, '🥺')">🥺</span>
-                  <span (click)="addReaction(msg, '🔥')">🔥</span>
-                  <span (click)="addReaction(msg, '👍')">👍</span>
-                </div>
               </div>
 
               <div class="msg-avatar-container" *ngIf="isMine(msg)">
@@ -67,8 +60,20 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
             </ion-item-option>
           </ion-item-options>
         </ion-item-sliding>
-        </div>
+        </ion-list>
       </ion-content>
+
+      <ion-popover [isOpen]="showReactionsMsgId !== null" [event]="popoverEvent" (didDismiss)="showReactionsMsgId = null" class="reactions-popover-host">
+        <ng-template>
+          <div class="reactions-popover-content">
+            <span (click)="addReaction(activeMsg, '❤️')">❤️</span>
+            <span (click)="addReaction(activeMsg, '😂')">😂</span>
+            <span (click)="addReaction(activeMsg, '🥺')">🥺</span>
+            <span (click)="addReaction(activeMsg, '🔥')">🔥</span>
+            <span (click)="addReaction(activeMsg, '👍')">👍</span>
+          </div>
+        </ng-template>
+      </ion-popover>
 
       <div class="input-area">
         <div class="reply-preview-container" *ngIf="replyingTo">
@@ -145,10 +150,10 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
     .mine .reply-context-name { color: #c9184a; }
     .reply-context-text { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
     
-    .reactions-popover { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: white; padding: 6px 12px; border-radius: 20px; display: flex; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); z-index: 100; animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    @keyframes popIn { from { transform: translateX(-50%) scale(0.5); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
-    .reactions-popover span { font-size: 1.5rem; cursor: pointer; transition: transform 0.2s; }
-    .reactions-popover span:active { transform: scale(1.3); }
+    .reactions-popover-host { --width: 250px; }
+    .reactions-popover-content { display: flex; gap: 15px; padding: 15px; font-size: 1.8rem; background: white; justify-content: center; }
+    .reactions-popover-content span { cursor: pointer; transition: transform 0.2s; }
+    .reactions-popover-content span:active { transform: scale(1.3); }
     
     .reactions-container { position: absolute; bottom: -12px; right: 10px; background: white; padding: 2px 6px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; gap: 2px; border: 1px solid rgba(0,0,0,0.05); z-index: 2; }
     .mine .reactions-container { right: auto; left: 10px; }
@@ -314,14 +319,14 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   // --- Swipes y Reacciones ---
 
-  onTouchStart(event: any, msg: any) {
-    this.touchTimer = setTimeout(() => {
-      this.showReactionsMsgId = msg.id;
-    }, 500);
-  }
+  activeMsg: any = null;
+  popoverEvent: Event | null = null;
 
-  onTouchEnd() {
-    clearTimeout(this.touchTimer);
+  onContextMenu(event: any, msg: any) {
+    event.preventDefault();
+    this.popoverEvent = event;
+    this.activeMsg = msg;
+    this.showReactionsMsgId = msg.id;
   }
 
   replyToMessage(msg: any) {
