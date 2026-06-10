@@ -63,14 +63,19 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
         </ion-list>
       </ion-content>
 
-      <ion-popover [isOpen]="showReactionsMsgId !== null" [event]="popoverEvent" (didDismiss)="showReactionsMsgId = null" class="reactions-popover-host">
+      <ion-popover [isOpen]="showReactionsMsgId !== null" [event]="popoverEvent" (didDismiss)="closePopover()" class="reactions-popover-host" [showBackdrop]="false">
         <ng-template>
-          <div class="reactions-popover-content">
+          <div class="reactions-popover-content" *ngIf="!showCustomEmojiInput">
             <span (click)="addReaction(activeMsg, '❤️')">❤️</span>
             <span (click)="addReaction(activeMsg, '😂')">😂</span>
             <span (click)="addReaction(activeMsg, '🥺')">🥺</span>
             <span (click)="addReaction(activeMsg, '🔥')">🔥</span>
             <span (click)="addReaction(activeMsg, '👍')">👍</span>
+            <span class="custom-emoji-btn" (click)="openCustomEmoji()">➕</span>
+          </div>
+          <div class="reactions-popover-content custom-input-mode" *ngIf="showCustomEmojiInput">
+            <input type="text" id="customEmojiInput" placeholder="Añade emoji" (keyup.enter)="addCustomReaction(customEmojiInput.value)" #customEmojiInput class="custom-emoji-field">
+            <button class="add-btn" (click)="addCustomReaction(customEmojiInput.value)">OK</button>
           </div>
         </ng-template>
       </ion-popover>
@@ -150,10 +155,15 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
     .mine .reply-context-name { color: #c9184a; }
     .reply-context-text { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
     
-    .reactions-popover-host { --width: 250px; }
-    .reactions-popover-content { display: flex; gap: 15px; padding: 15px; font-size: 1.8rem; background: white; justify-content: center; }
+    .reactions-popover-host { --width: auto; --border-radius: 24px; --box-shadow: 0 4px 16px rgba(0,0,0,0.15); --background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+    .reactions-popover-content { display: flex; gap: 12px; padding: 12px 16px; font-size: 1.8rem; justify-content: center; align-items: center; }
     .reactions-popover-content span { cursor: pointer; transition: transform 0.2s; }
     .reactions-popover-content span:active { transform: scale(1.3); }
+    .custom-emoji-btn { background: rgba(0,0,0,0.05); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem !important; color: #666; }
+    
+    .custom-input-mode { padding: 8px 12px; gap: 8px; }
+    .custom-emoji-field { border: none; background: rgba(0,0,0,0.05); padding: 8px 12px; border-radius: 16px; font-size: 1.5rem; width: 120px; outline: none; text-align: center; }
+    .add-btn { background: #FF4D6D; color: white; border: none; padding: 8px 12px; border-radius: 16px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
     
     .reactions-container { position: absolute; bottom: -12px; right: 10px; background: white; padding: 2px 6px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; gap: 2px; border: 1px solid rgba(0,0,0,0.05); z-index: 2; }
     .mine .reactions-container { right: auto; left: 10px; }
@@ -321,12 +331,33 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   activeMsg: any = null;
   popoverEvent: Event | null = null;
+  showCustomEmojiInput = false;
 
   onContextMenu(event: any, msg: any) {
     event.preventDefault();
     this.popoverEvent = event;
     this.activeMsg = msg;
     this.showReactionsMsgId = msg.id;
+    this.showCustomEmojiInput = false;
+  }
+
+  closePopover() {
+    this.showReactionsMsgId = null;
+    this.showCustomEmojiInput = false;
+  }
+
+  openCustomEmoji() {
+    this.showCustomEmojiInput = true;
+    setTimeout(() => {
+      const input = document.getElementById('customEmojiInput');
+      if (input) input.focus();
+    }, 100);
+  }
+
+  addCustomReaction(emoji: string) {
+    if (!emoji || !emoji.trim()) return;
+    this.addReaction(this.activeMsg, emoji.trim());
+    this.closePopover();
   }
 
   replyToMessage(msg: any) {
