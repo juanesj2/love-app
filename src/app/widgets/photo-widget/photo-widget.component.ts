@@ -667,6 +667,7 @@ export class PhotoWidgetComponent implements OnInit {
     this.pickingCoverForAlbumId = albumId;
     this.isAlbumsModalOpen = false; // Cerramos el modal para que vea las fotos
     this.currentAlbum = null; // Mostramos todas las fotos
+    this.viewMode = 'grid'; // Cambiamos a la vista de galería
     this.cdr.detectChanges(); // Forzamos actualización de la UI
     this.showSuccess('Selecciona una foto para la portada');
     this.loadData();
