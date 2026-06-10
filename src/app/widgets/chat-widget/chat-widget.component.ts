@@ -74,6 +74,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
             <span (click)="addReaction(activeMsg, '🔥')">🔥</span>
             <span (click)="addReaction(activeMsg, '👍')">👍</span>
             <span class="custom-emoji-btn" (click)="openCustomEmoji()">➕</span>
+            <span class="custom-emoji-btn edit-btn" *ngIf="canEditMessage(activeMsg)" (click)="startEditingMessage(activeMsg)"><ion-icon name="pencil"></ion-icon></span>
           </div>
           <div class="reactions-popover-content custom-input-mode" *ngIf="showCustomEmojiInput">
             <input type="text" id="customEmojiInput" placeholder="Añade emoji" (keyup.enter)="addCustomReaction(customEmojiInput.value)" #customEmojiInput class="custom-emoji-field">
@@ -83,16 +84,17 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
       </ion-popover>
 
       <div class="input-area">
-        <div class="reply-preview-container" *ngIf="replyingTo">
+        <div class="reply-preview-container" *ngIf="replyingTo || isEditing">
           <div class="reply-preview">
             <div class="reply-header">
               <div class="reply-title">
-                <ion-icon name="arrow-undo-outline"></ion-icon>
-                <span>Respondiendo a <strong>{{replyingTo.user?.name}}</strong></span>
+                <ion-icon [name]="isEditing ? 'pencil' : 'arrow-undo-outline'"></ion-icon>
+                <span *ngIf="replyingTo">Respondiendo a <strong>{{replyingTo.user?.name}}</strong></span>
+                <span *ngIf="isEditing">Editando mensaje</span>
               </div>
-              <ion-icon name="close" class="close-reply" (click)="replyingTo = null"></ion-icon>
+              <ion-icon name="close" class="close-reply" (click)="cancelReplyOrEdit()"></ion-icon>
             </div>
-            <div class="reply-text">{{replyingTo.mensaje && replyingTo.mensaje !== 'null' ? replyingTo.mensaje : '📷 Foto'}}</div>
+            <div class="reply-text" *ngIf="replyingTo">{{replyingTo.mensaje && replyingTo.mensaje !== 'null' ? replyingTo.mensaje : '📷 Foto'}}</div>
           </div>
         </div>
 
@@ -170,7 +172,8 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
     .reactions-popover-content { display: flex; gap: 12px; padding: 12px 16px; font-size: 1.8rem; justify-content: center; align-items: center; border: 1px solid rgba(0,0,0,0.08); border-radius: 24px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
     .reactions-popover-content span { cursor: pointer; transition: transform 0.2s; }
     .reactions-popover-content span:active { transform: scale(1.3); }
-    .custom-emoji-btn { background: rgba(0,0,0,0.05); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem !important; color: #666; }
+    .custom-emoji-btn { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.05); color: #FF4D6D; font-size: 1.2rem !important; }
+    .custom-emoji-btn.edit-btn { background: rgba(255, 77, 109, 0.1); }
     
     .custom-input-mode { padding: 12px; gap: 12px; }
     .custom-emoji-field { border: none; background: #f0f0f0; color: #333; padding: 10px 16px; border-radius: 24px; font-size: 1.5rem; width: 140px; outline: none; text-align: center; }
@@ -313,9 +316,17 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     const isReplyingTo = this.replyingTo;
     
     try {
-      await this.api.sendMessage(this.newMessage);
+      if (this.isEditing && this.editingMsgId) {
+        await this.api.editMessage(this.editingMsgId, this.newMessage);
+      } else {
+        await this.api.sendMessage(this.newMessage);
+      }
+      
       this.newMessage = '';
       this.replyingTo = null;
+      this.isEditing = false;
+      this.editingMsgId = null;
+      
       await this.loadMessages();
       
       if (isReplyingTo) {
@@ -376,6 +387,40 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     if (!emoji || !emoji.trim()) return;
     this.addReaction(this.activeMsg, emoji.trim());
     this.closePopover();
+  }
+
+  isEditing = false;
+  editingMsgId: number | null = null;
+
+  canEditMessage(msg: any): boolean {
+    if (!msg || !msg.created_at) return false;
+    const myName = localStorage.getItem('love_widget_user') === 'juan' ? 'Juan' : 'Roberta';
+    if (msg.user?.name !== myName) return false;
+    
+    // Check if within 2 minutes
+    const msgDate = new Date(msg.created_at);
+    const now = new Date();
+    const diffMs = now.getTime() - msgDate.getTime();
+    return diffMs <= 120000; // 120000 ms = 2 minutes
+  }
+
+  startEditingMessage(msg: any) {
+    this.closePopover();
+    this.isEditing = true;
+    this.editingMsgId = msg.id;
+    this.newMessage = msg.mensaje;
+    this.replyingTo = null;
+    setTimeout(() => {
+      const input = document.querySelector('.premium-input') as HTMLInputElement;
+      if (input) input.focus();
+    }, 150);
+  }
+
+  cancelReplyOrEdit() {
+    this.replyingTo = null;
+    this.isEditing = false;
+    this.editingMsgId = null;
+    this.newMessage = '';
   }
 
   onSwipeReply(msg: any, slidingItem: any) {

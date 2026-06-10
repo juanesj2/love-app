@@ -174,6 +174,11 @@ export class LoveApiService {
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/chat`, body, { headers }));
   }
 
+  async editMessage(id: number, mensaje: string): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.put(`${API_BASE_URL}/love-album/chat/${id}`, { mensaje }, { headers }));
+  }
+
   // --- GAMES ---
   
   async getGamesProgress(): Promise<any> {
