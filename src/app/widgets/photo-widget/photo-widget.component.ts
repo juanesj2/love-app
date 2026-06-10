@@ -8,7 +8,7 @@ import { environment } from '../../../environments/environment';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Capacitor } from '@capacitor/core';
 import { addIcons } from 'ionicons';
-import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline } from 'ionicons/icons';
+import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline } from 'ionicons/icons';
 import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 
 // ... (Resto del decorador y imports no cambian, los saltamos por ahora, inyectaremos el AlertController abajo)
@@ -30,6 +30,9 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
           <h2 class="title albums-btn" (click)="openAlbumsModal()">
             {{ currentAlbum ? currentAlbum.name : 'Nuestros Álbums' }} <ion-icon name="chevron-down-outline" style="font-size: 1.2rem;"></ion-icon>
           </h2>
+          <button class="header-icon-btn" *ngIf="currentAlbum" (click)="openAlbumOptions()">
+            <ion-icon name="settings-outline"></ion-icon>
+          </button>
           <button class="header-icon-btn" (click)="activateSelectionMode()" *ngIf="currentAlbum && photos.length > 0">
             <ion-icon name="checkmark-done-outline"></ion-icon>
           </button>
@@ -166,6 +169,11 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
         <!-- Si no, mostramos el de descargar -->
         <button class="selection-btn download" *ngIf="!addingToAlbumId" (click)="downloadSelected()" [disabled]="selectedPhotos.size === 0">
           <ion-icon name="download"></ion-icon>
+        </button>
+        
+        <!-- Botón para eliminar fotos seleccionadas (tanto en general como de álbum) -->
+        <button class="selection-btn delete" *ngIf="!addingToAlbumId" (click)="deleteSelectedPhotos()" [disabled]="selectedPhotos.size === 0" style="color: #FF4D6D; background: rgba(255, 77, 109, 0.1);">
+          <ion-icon name="trash-outline"></ion-icon>
         </button>
       </div>
 
@@ -385,7 +393,7 @@ export class PhotoWidgetComponent implements OnInit {
   private firestore = inject(Firestore);
 
   constructor() {
-    addIcons({ arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline });
+    addIcons({ arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline });
   }
 
   ngOnInit() {
@@ -961,5 +969,138 @@ export class PhotoWidgetComponent implements OnInit {
       icon: 'checkmark-circle-outline'
     });
     await toast.present();
+  }
+
+  async openAlbumOptions() {
+    if (!this.currentAlbum) return;
+
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: `Opciones: ${this.currentAlbum.name}`,
+      buttons: [
+        {
+          text: 'Renombrar álbum',
+          icon: 'pencil-outline',
+          handler: () => {
+            this.promptRenameAlbum();
+          }
+        },
+        {
+          text: 'Cambiar portada',
+          icon: 'camera',
+          handler: () => {
+            this.changeAlbumCover(this.currentAlbum.id, new Event('click'));
+          }
+        },
+        {
+          text: 'Eliminar álbum',
+          icon: 'trash',
+          role: 'destructive',
+          handler: () => {
+            this.promptDeleteAlbum();
+          }
+        },
+        {
+          text: 'Cancelar',
+          icon: 'close',
+          role: 'cancel'
+        }
+      ]
+    });
+    await actionSheet.present();
+  }
+
+  async promptRenameAlbum() {
+    const alert = await this.alertController.create({
+      header: 'Renombrar Álbum',
+      inputs: [
+        {
+          name: 'name',
+          type: 'text',
+          value: this.currentAlbum.name,
+          placeholder: 'Nuevo nombre'
+        }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Guardar',
+          handler: async (data) => {
+            if (data.name && data.name.trim().length > 0) {
+              try {
+                const updated = await this.api.updateAlbum(this.currentAlbum.id, data.name.trim());
+                this.currentAlbum.name = updated.name;
+                const idx = this.albums.findIndex(a => a.id === this.currentAlbum.id);
+                if (idx !== -1) this.albums[idx].name = updated.name;
+                this.showSuccess('Álbum renombrado');
+              } catch (e) {
+                this.showError('Error al renombrar el álbum');
+              }
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  async promptDeleteAlbum() {
+    const alert = await this.alertController.create({
+      header: 'Eliminar Álbum',
+      message: '¿Estás seguro? Las fotos exclusivas de este álbum también se borrarán.',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: async () => {
+            try {
+              await this.api.deleteAlbum(this.currentAlbum.id);
+              this.albums = this.albums.filter(a => a.id !== this.currentAlbum.id);
+              this.clearAlbum();
+              this.showSuccess('Álbum eliminado');
+            } catch (e) {
+              this.showError('Error al eliminar el álbum');
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  async deleteSelectedPhotos() {
+    if (this.selectedPhotos.size === 0) return;
+
+    const alert = await this.alertController.create({
+      header: 'Eliminar Fotos',
+      message: `¿Estás seguro de eliminar ${this.selectedPhotos.size} foto(s)?`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: async () => {
+            let successCount = 0;
+            for (const id of Array.from(this.selectedPhotos)) {
+              try {
+                await this.api.deletePhoto(id);
+                this.photos = this.photos.filter(p => p.id !== id);
+                successCount++;
+              } catch (e) {
+                console.error('Error al borrar foto', id, e);
+              }
+            }
+            this.selectedPhotos.clear();
+            this.selectionMode = false;
+            this.groupPhotosByDate();
+            this.groupPhotosForGallery();
+            if (successCount > 0) {
+              this.showSuccess(`Se han borrado ${successCount} fotos.`);
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 }

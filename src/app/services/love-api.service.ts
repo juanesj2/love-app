@@ -132,6 +132,17 @@ export class LoveApiService {
     return res.album;
   }
 
+  async updateAlbum(id: number, name: string): Promise<any> {
+    const headers = await this.getHeaders();
+    const res: any = await firstValueFrom(this.http.put(`${API_BASE_URL}/love-album/albums/${id}`, { name }, { headers }));
+    return res.album;
+  }
+
+  async deleteAlbum(id: number): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.delete(`${API_BASE_URL}/love-album/albums/${id}`, { headers }));
+  }
+
   async uploadAlbumCover(albumId: number, base64Image: string): Promise<any> {
     const headers = await this.getHeaders();
     const res: any = await firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/albums/${albumId}/cover`, { image: base64Image }, { headers }));
