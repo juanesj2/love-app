@@ -270,19 +270,19 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   async openMoodSelector() {
-    const actionSheet = await this.actionSheetCtrl.create({
-      header: '¿Cómo te sientes hoy?',
-      cssClass: 'premium-action-sheet',
+    const alert = await this.alertController.create({
+      header: '¿Cómo te sientes?',
+      cssClass: 'premium-mood-alert',
       buttons: [
         { text: 'Feliz 😊', handler: () => this.setMood('😊') },
         { text: 'Cansado/a 😴', handler: () => this.setMood('😴') },
         { text: 'Estresado/a 🤯', handler: () => this.setMood('🤯') },
         { text: 'Mimoso/a 🥰', handler: () => this.setMood('🥰') },
         { text: 'Triste 🥺', handler: () => this.setMood('🥺') },
-        { text: 'Cancelar', role: 'cancel' }
+        { text: 'Cancelar', role: 'cancel', cssClass: 'mood-cancel-btn' }
       ]
     });
-    await actionSheet.present();
+    await alert.present();
   }
 
   async setMood(mood: string) {

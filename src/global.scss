@@ -195,3 +195,57 @@
     margin-top: 10px !important;
   }
 }
+
+/* Premium Mood Alert Styling */
+.premium-mood-alert {
+  --backdrop-opacity: 0.5;
+  --background: rgba(255, 245, 247, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  .alert-wrapper {
+    border-radius: 28px !important;
+    border: 1px solid rgba(255, 77, 109, 0.2) !important;
+    box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15) !important;
+    padding-bottom: 10px !important;
+  }
+  
+  .alert-title {
+    font-weight: 800 !important;
+    color: #FF4D6D !important;
+    font-size: 1.4rem !important;
+    text-align: center !important;
+    padding-top: 20px !important;
+  }
+
+  .alert-button-group {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 10px 20px 20px !important;
+    gap: 12px !important;
+  }
+
+  .alert-button {
+    width: 100% !important;
+    font-weight: 600 !important;
+    font-size: 1.15rem !important;
+    color: #590D22 !important;
+    background: white !important;
+    border-radius: 16px !important;
+    border: 1px solid rgba(255, 77, 109, 0.1) !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03) !important;
+    margin: 0 !important;
+    justify-content: center !important;
+    padding: 16px 0 !important;
+  }
+
+  .alert-button.mood-cancel-btn {
+    background: transparent !important;
+    color: #FF4D6D !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin-top: 5px !important;
+    font-weight: 800 !important;
+    padding: 10px 0 !important;
+  }
+}
