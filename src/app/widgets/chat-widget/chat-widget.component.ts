@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ToastController, IonContent } from '@ionic/angular';
@@ -23,7 +24,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
             (contextmenu)="onContextMenu($event, msg)"
             (touchstart)="startPress($event, msg)"
             (touchend)="endPress()"
-            (touchmove)="endPress()"
+            (touchcancel)="endPress()"
             (mousedown)="startPress($event, msg)"
             (mouseup)="endPress()"
             (mouseleave)="endPress()">
@@ -64,15 +65,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
             </div>
           </ion-item>
           
-          <ion-item-options side="end" *ngIf="isMine(msg)" (ionSwipe)="onSwipeReply(msg, slidingItem)" class="custom-options">
-            <ion-item-option color="light" class="reply-option" expandable (click)="onSwipeReply(msg, slidingItem)">
-              <div class="reply-icon-circle">
-                <ion-icon name="arrow-undo-outline"></ion-icon>
-              </div>
-            </ion-item-option>
-          </ion-item-options>
-
-          <ion-item-options side="start" *ngIf="!isMine(msg)" (ionSwipe)="onSwipeReply(msg, slidingItem)" class="custom-options">
+          <ion-item-options side="start" (ionSwipe)="onSwipeReply(msg, slidingItem)" class="custom-options">
             <ion-item-option color="light" class="reply-option" expandable (click)="onSwipeReply(msg, slidingItem)">
               <div class="reply-icon-circle">
                 <ion-icon name="arrow-undo-outline"></ion-icon>
@@ -372,9 +365,22 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   pressTimer: any;
 
   startPress(event: any, msg: any) {
-    this.pressTimer = setTimeout(() => {
-      this.onContextMenu(event, msg);
-    }, 500); // 500ms para considerar long press
+    this.pressTimer = setTimeout(async () => {
+      try {
+        await Haptics.impact({ style: ImpactStyle.Heavy });
+      } catch (e) {}
+      
+      let popoverEv = event;
+      if (event && event.touches && event.touches.length > 0) {
+        popoverEv = {
+          clientX: event.touches[0].clientX,
+          clientY: event.touches[0].clientY,
+          target: event.target,
+          preventDefault: () => {}
+        };
+      }
+      this.onContextMenu(popoverEv, msg);
+    }, 400);
   }
 
   endPress() {
@@ -382,7 +388,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   onContextMenu(event: any, msg: any) {
-    event.preventDefault();
+    if (event && event.preventDefault) event.preventDefault();
     this.popoverEvent = event;
     this.activeMsg = msg;
     this.showReactionsMsgId = msg.id;
