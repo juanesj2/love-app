@@ -1,8 +1,8 @@
-import { Component, inject, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Component, inject, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { IonicModule, ToastController, IonContent } from '@ionic/angular';
 import { LoveApiService } from '../../services/love-api.service';
 import { environment } from '../../../environments/environment';
 import { addIcons } from 'ionicons';
@@ -97,8 +97,8 @@ import { paperPlane, hourglassOutline } from 'ionicons/icons';
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
 })
-export class ChatWidgetComponent implements OnInit, AfterViewChecked {
-  @ViewChild('msgContainer') private msgContainer!: ElementRef;
+export class ChatWidgetComponent implements OnInit, AfterViewInit {
+  @ViewChild('msgContainer', { static: false }) private msgContainer!: IonContent;
   private api = inject(LoveApiService);
   private toastController = inject(ToastController);
   public environment = environment;
@@ -111,20 +111,21 @@ export class ChatWidgetComponent implements OnInit, AfterViewChecked {
     addIcons({ paperPlane, hourglassOutline });
   }
 
+  private viewInitialized = false;
+
   ngOnInit() {
     this.loadMessages();
   }
-  
-  ngAfterViewChecked() {
-    this.scrollToBottom();
+
+  ngAfterViewInit() {
+    this.viewInitialized = true;
+    setTimeout(() => this.scrollToBottom(), 100);
   }
 
   scrollToBottom(): void {
+    if (!this.viewInitialized || !this.msgContainer) return;
     try {
-      if (this.msgContainer && this.msgContainer.nativeElement) {
-        // Ionic's ion-content scrollToBottom method
-        this.msgContainer.nativeElement.scrollToBottom(300).catch(() => {});
-      }
+      this.msgContainer.scrollToBottom(300).catch(() => {});
     } catch(err) { }
   }
 
@@ -139,7 +140,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewChecked {
       const cache = await Preferences.get({ key: 'chat_cache' });
       if (cache.value) {
         this.messages = JSON.parse(cache.value);
-        setTimeout(() => this.scrollToBottom(), 50);
+        setTimeout(() => this.scrollToBottom(), 100);
       }
 
       // 2. Fetch de la red en segundo plano
@@ -148,8 +149,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewChecked {
       // 3. Actualizar la vista solo si hay cambios (evita parpadeos)
       if (JSON.stringify(this.messages) !== JSON.stringify(newMessages)) {
         this.messages = newMessages;
+        setTimeout(() => this.scrollToBottom(), 100);
         await Preferences.set({ key: 'chat_cache', value: JSON.stringify(this.messages) });
-        setTimeout(() => this.scrollToBottom(), 50);
       }
     } catch (e) {
       console.error(e);
