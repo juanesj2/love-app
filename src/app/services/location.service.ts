@@ -51,9 +51,7 @@ export class LocationService {
           backgroundTitle: "Ubicación en segundo plano",
           requestPermissions: true,
           stale: false,
-          distanceFilter: 50, // Actualizar cada 50 metros (balance entre tiempo real y batería)
-          stationaryRadius: 50, // Permite entrar en modo reposo si no se mueve
-          stopOnTerminate: false // Mantiene la actualización viva para el widget aunque se cierre la app
+          distanceFilter: 50 // Actualizar cada 50 metros (balance entre tiempo real y batería)
         },
         async (location: any, error: any) => {
           if (error) {
