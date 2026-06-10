@@ -64,7 +64,7 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
     </div>
   `,
   styles: [`
-    .games-hub-container { padding: 20px; background: #fff0f3; min-height: 100vh; }
+    .games-hub-container { padding: 20px; padding-bottom: 80px; background: #fff0f3; min-height: 100vh; height: 100vh; overflow-y: auto; overflow-x: hidden; }
     .header { text-align: center; margin-bottom: 30px; position: relative; }
     .back-btn { position: absolute; left: 0; top: 0; background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; }
     .header h2 { color: #590D22; margin: 0 0 5px; font-weight: 800; font-size: 1.8rem; padding-top: 5px; }
