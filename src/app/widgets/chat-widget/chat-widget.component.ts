@@ -64,16 +64,16 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
             </div>
           </ion-item>
           
-          <ion-item-options side="end" (ionSwipe)="onSwipeReply(msg, slidingItem)" class="custom-options" [class.hidden-options]="!isMine(msg)">
-            <ion-item-option color="light" class="reply-option" expandable (click)="onSwipeReply(msg, slidingItem)" [disabled]="!isMine(msg)">
+          <ion-item-options side="end" (ionSwipe)="onSwipeReply(msg, slidingItem)" class="custom-options">
+            <ion-item-option *ngIf="isMine(msg)" color="light" class="reply-option" expandable (click)="onSwipeReply(msg, slidingItem)">
               <div class="reply-icon-circle">
                 <ion-icon name="arrow-undo-outline"></ion-icon>
               </div>
             </ion-item-option>
           </ion-item-options>
 
-          <ion-item-options side="start" (ionSwipe)="onSwipeReply(msg, slidingItem)" class="custom-options" [class.hidden-options]="isMine(msg)">
-            <ion-item-option color="light" class="reply-option" expandable (click)="onSwipeReply(msg, slidingItem)" [disabled]="isMine(msg)">
+          <ion-item-options side="start" (ionSwipe)="onSwipeReply(msg, slidingItem)" class="custom-options">
+            <ion-item-option *ngIf="!isMine(msg)" color="light" class="reply-option" expandable (click)="onSwipeReply(msg, slidingItem)">
               <div class="reply-icon-circle">
                 <ion-icon name="arrow-undo-outline"></ion-icon>
               </div>
@@ -150,8 +150,6 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
     @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
     .message-wrapper.mine { justify-content: flex-end; }
     .message-wrapper:not(.mine) { justify-content: flex-start; }
-    
-    .hidden-options { display: none !important; width: 0 !important; }
     
     .bubble { width: fit-content; max-width: 80%; padding: 8px 12px; border-radius: 12px; font-size: 1rem; line-height: 1.4; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
     
