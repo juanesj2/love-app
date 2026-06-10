@@ -158,8 +158,9 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
     .mine .reply-context-name { color: #c9184a; }
     .reply-context-text { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; color: #666; }
     
-    .reactions-popover-host { --width: auto; --border-radius: 24px; --box-shadow: 0 4px 16px rgba(0,0,0,0.15); --background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-    .reactions-popover-content { display: flex; gap: 12px; padding: 12px 16px; font-size: 1.8rem; justify-content: center; align-items: center; border: 1px solid rgba(0,0,0,0.08); border-radius: 24px; }
+    .reactions-popover-host { --width: auto; --box-shadow: none; --background: transparent; }
+    .reactions-popover-host::part(content) { overflow: visible; border-radius: 24px; }
+    .reactions-popover-content { display: flex; gap: 12px; padding: 12px 16px; font-size: 1.8rem; justify-content: center; align-items: center; border: 1px solid rgba(0,0,0,0.08); border-radius: 24px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
     .reactions-popover-content span { cursor: pointer; transition: transform 0.2s; }
     .reactions-popover-content span:active { transform: scale(1.3); }
     .custom-emoji-btn { background: rgba(0,0,0,0.05); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem !important; color: #666; }
