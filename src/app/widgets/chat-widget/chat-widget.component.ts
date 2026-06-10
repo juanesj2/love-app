@@ -39,9 +39,9 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
                     <ion-img [src]="environment.storageUrl + msg.photo.image_path"></ion-img>
                   </div>
 
-                  <p class="text" *ngIf="(chatMeta[msg.id]?.edit?.text || msg.mensaje) && (chatMeta[msg.id]?.edit?.text || msg.mensaje) !== 'null'">
-                    {{chatMeta[msg.id]?.edit?.text || msg.mensaje}}
-                    <span class="edited-label" *ngIf="chatMeta[msg.id]?.edit">(editado)</span>
+                  <p class="text" *ngIf="msg.mensaje && msg.mensaje !== 'null'">
+                    {{msg.mensaje}}
+                    <span class="edited-label" *ngIf="msg.updated_at && msg.updated_at !== msg.created_at">(editado)</span>
                   </p>
                   
                   <div class="reactions-container" *ngIf="hasReactions(msg)">
@@ -321,15 +321,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     
     try {
       if (this.isEditing && this.editingMsgId) {
-        const metaDoc = doc(this.firestore, 'locations', 'chat_meta');
-        await setDoc(metaDoc, {
-          [this.editingMsgId]: {
-            edit: {
-               text: this.newMessage,
-               time: new Date().toISOString()
-            }
-          }
-        }, { merge: true });
+        await this.api.editMessage(this.editingMsgId, this.newMessage);
       } else {
         await this.api.sendMessage(this.newMessage);
       }
@@ -420,7 +412,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     this.closePopover();
     this.isEditing = true;
     this.editingMsgId = msg.id;
-    this.newMessage = this.chatMeta[msg.id]?.edit?.text || msg.mensaje;
+    this.newMessage = msg.mensaje;
     this.replyingTo = null;
     setTimeout(() => {
       const input = document.querySelector('.premium-input') as HTMLInputElement;
