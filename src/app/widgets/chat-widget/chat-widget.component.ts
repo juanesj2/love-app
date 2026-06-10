@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, ViewChild, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { CommonModule } from '@angular/common';
@@ -228,6 +228,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   private api = inject(LoveApiService);
   private toastController = inject(ToastController);
   private firestore = inject(Firestore);
+  private cdr = inject(ChangeDetectorRef);
   public environment = environment;
   
   messages: any[] = [];
@@ -366,12 +367,28 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   pressTimer: any;
 
   startPress(event: any, msg: any) {
+    // Capture coordinates immediately before the event goes stale
+    const touchX = event.touches && event.touches.length > 0 ? event.touches[0].clientX : event.clientX;
+    const touchY = event.touches && event.touches.length > 0 ? event.touches[0].clientY : event.clientY;
+
     this.pressTimer = setTimeout(async () => {
       try {
         await Haptics.impact({ style: ImpactStyle.Heavy });
       } catch (e) {}
       
-      this.onContextMenu(event, msg);
+      // Create a fresh MouseEvent so ion-popover can read valid coordinates
+      const syntheticEvent = new MouseEvent('click', {
+        clientX: touchX,
+        clientY: touchY,
+        bubbles: true,
+        cancelable: true
+      });
+
+      this.popoverEvent = syntheticEvent;
+      this.activeMsg = msg;
+      this.showReactionsMsgId = msg.id;
+      this.showCustomEmojiInput = false;
+      this.cdr.detectChanges();
     }, 400);
   }
 
