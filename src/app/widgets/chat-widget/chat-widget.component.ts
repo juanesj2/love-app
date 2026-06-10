@@ -57,7 +57,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
           <ion-item-options side="start" (ionSwipe)="onSwipeReply(msg, slidingItem)" class="custom-options">
             <ion-item-option color="light" class="reply-option" expandable (click)="onSwipeReply(msg, slidingItem)">
               <div class="reply-icon-circle">
-                <ion-icon name="arrow-undo-outline" color="primary"></ion-icon>
+                <ion-icon name="arrow-undo-outline"></ion-icon>
               </div>
             </ion-item-option>
           </ion-item-options>
