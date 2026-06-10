@@ -18,7 +18,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
         </ion-refresher>
         
         <ion-list class="messages-inner">
-        <ion-item-sliding *ngFor="let msg of messages">
+        <ion-item-sliding *ngFor="let msg of messages" #slidingItem>
           <ion-item class="transparent-item" lines="none" (contextmenu)="onContextMenu($event, msg)">
             <div class="message-wrapper" [class.mine]="isMine(msg)">
               <div class="msg-avatar-container" *ngIf="!isMine(msg)">
@@ -54,9 +54,11 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
             </div>
           </ion-item>
           
-          <ion-item-options side="start">
-            <ion-item-option color="light" class="reply-option" (click)="replyToMessage(msg)">
-              <ion-icon slot="icon-only" name="arrow-undo-outline" color="primary"></ion-icon>
+          <ion-item-options side="start" (ionSwipe)="onSwipeReply(msg, slidingItem)" class="custom-options">
+            <ion-item-option color="light" class="reply-option" expandable (click)="onSwipeReply(msg, slidingItem)">
+              <div class="reply-icon-circle">
+                <ion-icon name="arrow-undo-outline" color="primary"></ion-icon>
+              </div>
             </ion-item-option>
           </ion-item-options>
         </ion-item-sliding>
@@ -167,6 +169,12 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, heart, happy, sa
     
     .reactions-container { position: absolute; bottom: -12px; right: 10px; background: white; padding: 2px 6px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; gap: 2px; border: 1px solid rgba(0,0,0,0.05); z-index: 2; }
     .mine .reactions-container { right: auto; left: 10px; }
+    
+    .custom-options { background: transparent; border: none; }
+    .reply-option { --background: transparent; --color: transparent; }
+    .reply-option::part(native) { background: transparent; padding: 0 20px; }
+    .reply-icon-circle { width: 40px; height: 40px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .reply-icon-circle ion-icon { font-size: 1.5rem; color: #FF4D6D; }
     .reaction { font-size: 0.9rem; }
     
     .reply-preview-container { padding: 10px 15px 0; width: 100%; }
@@ -360,10 +368,19 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     this.closePopover();
   }
 
+  onSwipeReply(msg: any, slidingItem: any) {
+    this.replyToMessage(msg);
+    setTimeout(() => {
+      slidingItem.close();
+    }, 100);
+  }
+
   replyToMessage(msg: any) {
     this.replyingTo = msg;
-    const input = document.querySelector('.premium-input') as HTMLInputElement;
-    if (input) input.focus();
+    setTimeout(() => {
+      const input = document.querySelector('.premium-input') as HTMLInputElement;
+      if (input) input.focus();
+    }, 150);
   }
 
   scrollToMessage(id: number) {
