@@ -120,14 +120,14 @@ import { App } from '@capacitor/app';
   `,
   styles: [`
     ion-toolbar { --background: white; }
-    .custom-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 25px; background: white; }
-    .avatar-container { position: relative; cursor: pointer; }
+    .custom-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 25px; background: white; position: relative; }
+    .avatar-container { position: relative; cursor: pointer; z-index: 2; }
     .avatar { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); object-fit: cover; }
     .my-avatar { background: linear-gradient(135deg, #FF4D6D, #c9184a); }
     .partner-avatar { background: linear-gradient(135deg, #ff8fa3, #ffb3c1); }
     .mood-badge { position: absolute; bottom: -5px; right: -5px; background: white; border-radius: 50%; padding: 2px; font-size: 1.2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     
-    .poke-btn { width: 50px; height: 50px; border-radius: 50%; background: #fff0f3; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: #FF4D6D; cursor: pointer; box-shadow: inset 0 2px 5px rgba(255,77,109,0.1); transition: all 0.2s; }
+    .poke-btn { position: absolute; left: 50%; transform: translateX(-50%); width: 50px; height: 50px; border-radius: 50%; background: #fff0f3; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: #FF4D6D; cursor: pointer; box-shadow: inset 0 2px 5px rgba(255,77,109,0.1); transition: all 0.2s; z-index: 1; }
     .poke-btn:active { transform: scale(0.9); }
     .poke-btn ion-icon.poking { animation: heartbeat 0.8s infinite; color: #c9184a; }
     @keyframes heartbeat { 0% { transform: scale(1); } 25% { transform: scale(1.3); } 50% { transform: scale(1); } 75% { transform: scale(1.3); } 100% { transform: scale(1); } }

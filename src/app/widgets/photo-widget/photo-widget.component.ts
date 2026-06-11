@@ -27,8 +27,15 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 
       <!-- Floating Top Bar -->
       <div class="floating-top-bar">
-        <div class="streak-badge" *ngIf="coupleInfo && !currentAlbum">
-          <span class="streak-icon">🔥</span>
+        <div class="streak-badge" *ngIf="coupleInfo && !currentAlbum" 
+             [ngClass]="{
+               'active': coupleInfo.current_streak > 0 && coupleInfo.my_photo_today && coupleInfo.partner_photo_today,
+               'pending': coupleInfo.current_streak > 0 && (!coupleInfo.my_photo_today || !coupleInfo.partner_photo_today),
+               'zero': coupleInfo.current_streak === 0
+             }">
+          <span class="streak-icon" *ngIf="coupleInfo.current_streak > 0 && coupleInfo.my_photo_today && coupleInfo.partner_photo_today">🔥</span>
+          <span class="streak-icon" *ngIf="coupleInfo.current_streak > 0 && (!coupleInfo.my_photo_today || !coupleInfo.partner_photo_today)">⏳</span>
+          <span class="streak-icon" *ngIf="coupleInfo.current_streak === 0">🤍</span>
           <span class="streak-text">{{ coupleInfo.current_streak }} días</span>
         </div>
         <div class="streak-badge back-badge" *ngIf="currentAlbum" (click)="clearAlbum()" style="background: rgba(255,255,255,0.95); color: #590D22; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.08);">
@@ -262,7 +269,10 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .header-icon-btn { background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); color: #590D22; border: none; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
     .header-icon-btn:active { transform: scale(0.9); }
     
-    .streak-badge { background: linear-gradient(90deg, #FF4D6D, #ff758c); color: white; padding: 6px 14px; border-radius: 25px; font-weight: 700; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4); animation: pulse 2s infinite; }
+    .streak-badge { padding: 6px 14px; border-radius: 25px; font-weight: 700; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); transition: all 0.3s; }
+    .streak-badge.active { background: linear-gradient(90deg, #FF4D6D, #ff758c); color: white; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4); animation: pulse 2s infinite; }
+    .streak-badge.pending { background: linear-gradient(90deg, #FDB813, #F3A183); color: white; box-shadow: 0 4px 15px rgba(253, 184, 19, 0.4); }
+    .streak-badge.zero { background: rgba(255,255,255,0.9); color: #888; }
     .streak-icon { font-size: 1.2rem; }
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     

@@ -60,7 +60,9 @@ export class LoveApiService {
   // --- INFO Y POKE ---
   async getCoupleInfo(): Promise<any> {
     const headers = await this.getHeaders();
-    return firstValueFrom(this.http.get<any>(`${API_BASE_URL}/love-album/info`, { headers }));
+    const date = new Date();
+    const localDate = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+    return firstValueFrom(this.http.get<any>(`${API_BASE_URL}/love-album/info?local_date=${localDate}`, { headers }));
   }
 
   async updateCoupleInfo(data: any): Promise<any> {
@@ -154,6 +156,10 @@ export class LoveApiService {
     formData.append('image', file);
     if (description) formData.append('description', description);
     if (albumId) formData.append('album_id', albumId.toString());
+    
+    const date = new Date();
+    const localDate = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+    formData.append('local_date', localDate);
     
     const headers = await this.getHeaders();
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/photos`, formData, { headers }));
