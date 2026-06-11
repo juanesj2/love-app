@@ -297,7 +297,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .grid-overlay { position: absolute; bottom: 3px; right: 3px; background: rgba(255,255,255,0.85); border-radius: 12px; padding: 1px 4px; font-size: 0.7rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
     .selection-overlay { position: absolute; top: 5px; right: 5px; font-size: 1.5rem; color: #FF4D6D; background: rgba(255,255,255,0.8); border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
     
-    .snap-feed::part(scroll) { scroll-snap-type: y mandatory; scroll-padding-top: 80px; }
+    .snap-feed::part(scroll) { scroll-snap-type: y mandatory; scroll-padding-top: 0px; }
     
     .photo-card { scroll-snap-align: start; scroll-margin-top: 0; scroll-snap-stop: always; width: 100%; margin: 0 0 10px 0; background: rgba(255, 255, 255, 0.95); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column; }
     
