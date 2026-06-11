@@ -8,7 +8,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { LoveApiService } from '../../services/love-api.service';
 import { environment } from '../../../environments/environment';
 import { addIcons } from 'ionicons';
-import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'ionicons/icons';
+import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark } from 'ionicons/icons';
 @Component({
   selector: 'app-chat-widget',
   template: `
@@ -55,10 +55,19 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
                     <img [src]="environment.storageUrl + msg.photo.image_path" loading="lazy" />
                   </div>
 
-                  <p class="text" *ngIf="msg.mensaje && msg.mensaje !== 'null'">
+                  <p class="text" *ngIf="msg.mensaje && msg.mensaje !== 'null' && !msg.mensaje.startsWith('[GIF]')">
                     {{msg.mensaje}}
                     <span class="edited-label" *ngIf="msg.is_edited">(editado)</span>
                   </p>
+                  <div class="gif-reply" *ngIf="msg.mensaje && msg.mensaje.startsWith('[GIF]')">
+                    <img [src]="msg.mensaje.replace('[GIF]', '')" loading="lazy" class="chat-gif" />
+                  </div>
+                  <div class="doodle-reply" *ngIf="msg.mensaje && msg.mensaje.startsWith('[DOODLE]')">
+                    <img [src]="environment.storageUrl + msg.photo?.image_path" loading="lazy" class="chat-doodle" />
+                  </div>
+                  <div class="audio-reply" *ngIf="msg.mensaje && msg.mensaje.startsWith('[AUDIO]')">
+                    <audio controls [src]="environment.storageUrl + msg.photo?.image_path"></audio>
+                  </div>
                   
                   <div class="reactions-container" *ngIf="hasReactions(msg)">
                     <span class="reaction" *ngFor="let r of getReactions(msg)">{{r}}</span>
@@ -110,8 +119,18 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
           </div>
         </div>
 
-        <div class="input-container">
-          <input 
+        <div class="input-container" *ngIf="!isDoodling">
+          <div class="attachments-bar" *ngIf="!isRecording">
+            <button class="attach-btn" (click)="toggleGifModal()"><ion-icon name="image"></ion-icon></button>
+            <button class="attach-btn" (click)="startDoodle()"><ion-icon name="color-palette"></ion-icon></button>
+            <button class="attach-btn" (click)="startAudioRecording()"><ion-icon name="mic"></ion-icon></button>
+          </div>
+          <div class="recording-bar" *ngIf="isRecording">
+            <div class="recording-indicator"><div class="pulse-dot"></div> Grabando... {{recordingTime}}s</div>
+            <button class="stop-record-btn" (click)="stopAudioRecording()"><ion-icon name="stop-circle"></ion-icon></button>
+            <button class="cancel-record-btn" (click)="cancelAudioRecording()"><ion-icon name="close"></ion-icon></button>
+          </div>
+          <input *ngIf="!isRecording"
             type="text" 
             [(ngModel)]="newMessage" 
             placeholder="Dile algo bonito..." 
@@ -126,6 +145,32 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
         </div>
       </div>
     </div>
+
+    <!-- GIF Picker Modal -->
+    <div class="gif-modal-overlay" *ngIf="showGifModal" (click)="toggleGifModal()">
+      <div class="gif-modal" (click)="$event.stopPropagation()">
+        <div class="gif-header">
+          <input type="text" placeholder="Buscar GIFs..." [(ngModel)]="giphyQuery" (keyup.enter)="searchGiphy()" class="gif-search" />
+          <button class="gif-search-btn" (click)="searchGiphy()"><ion-icon name="search"></ion-icon></button>
+        </div>
+        <div class="gif-results" *ngIf="giphyResults.length > 0">
+          <img *ngFor="let gif of giphyResults" [src]="gif.images.fixed_height_small.url" (click)="sendGif(gif)" loading="lazy" />
+        </div>
+        <div class="gif-loading" *ngIf="searchingGiphy">Buscando...</div>
+      </div>
+    </div>
+
+    <!-- Doodle Overlay Canvas -->
+    <div class="doodle-overlay" *ngIf="isDoodling">
+      <div class="doodle-toolbar">
+        <button class="doodle-btn cancel" (click)="cancelDoodle()"><ion-icon name="close"></ion-icon></button>
+        <div class="doodle-colors">
+          <div class="color-dot" *ngFor="let c of doodleColors" [style.background]="c" [class.active]="currentDoodleColor === c" (click)="currentDoodleColor = c"></div>
+        </div>
+        <button class="doodle-btn send" (click)="sendDoodle()"><ion-icon name="checkmark"></ion-icon></button>
+      </div>
+      <canvas #doodleCanvas class="doodle-canvas" (touchstart)="onDoodleStart($event)" (touchmove)="onDoodleMove($event)" (touchend)="onDoodleEnd()"></canvas>
+    </div>
   `,
   styles: [`
     :host {
@@ -133,6 +178,16 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
       height: 100%;
     }
     .chat-wrapper { display: flex; flex-direction: column; height: 100%; background: #fdf5f7; font-family: 'Inter', sans-serif; position: relative; }
+    
+    .chat-gif { max-width: 200px; border-radius: 12px; margin-bottom: 0; display: block; }
+    .gif-reply { padding: 4px; }
+    
+    .chat-doodle { max-width: 250px; display: block; filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.2)); }
+    .doodle-reply { padding: 0; background: transparent !important; box-shadow: none !important; border: none !important; margin-bottom: 0; }
+    .only-photo .doodle-reply { margin: 0; }
+
+    .audio-reply { padding: 8px; }
+    .audio-reply audio { max-width: 200px; height: 40px; outline: none; }
     
     .messages-content { flex: 1; --background: transparent; }
     .messages-inner { padding: 20px 15px; display: flex; flex-direction: column; background: transparent !important; }
@@ -158,7 +213,38 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil } from 'i
     .text { margin: 0; word-break: break-word; white-space: pre-wrap; }
     .edited-label { font-size: 0.7rem; opacity: 0.7; margin-left: 4px; font-style: italic; }
     
-    .msg-avatar-container { width: 28px; height: 28px; flex-shrink: 0; border-radius: 50%; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); background: white; }
+    .attachments-bar { display: flex; gap: 8px; margin-right: 8px; align-items: center; }
+    .attach-btn { background: transparent; border: none; font-size: 1.5rem; color: #a4133c; padding: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+    .attach-btn:active { transform: scale(0.9); }
+
+    .recording-bar { display: flex; flex: 1; align-items: center; justify-content: space-between; padding: 0 10px; background: #fff0f3; border-radius: 20px; }
+    .recording-indicator { display: flex; align-items: center; gap: 8px; color: #FF4D6D; font-weight: bold; font-size: 0.9rem; }
+    .pulse-dot { width: 10px; height: 10px; background: #FF4D6D; border-radius: 50%; animation: pulse 1s infinite; }
+    @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
+    .stop-record-btn { background: transparent; border: none; font-size: 1.8rem; color: #FF4D6D; display: flex; align-items: center; }
+    .cancel-record-btn { background: transparent; border: none; font-size: 1.5rem; color: #666; display: flex; align-items: center; }
+
+    .doodle-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999; background: rgba(255,255,255,0.7); backdrop-filter: blur(2px); display: flex; flex-direction: column; }
+    .doodle-toolbar { position: absolute; bottom: 40px; left: 20px; right: 20px; display: flex; justify-content: space-between; align-items: center; background: white; padding: 10px 20px; border-radius: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); z-index: 10001; }
+    .doodle-colors { display: flex; gap: 10px; }
+    .color-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.2s; }
+    .color-dot.active { transform: scale(1.3); }
+    .doodle-btn { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; border: none; }
+    .doodle-btn.cancel { background: #999; }
+    .doodle-btn.send { background: #FF4D6D; }
+    .doodle-canvas { flex: 1; width: 100%; height: 100%; touch-action: none; position: relative; z-index: 10000; }
+
+    .gif-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10000; background: rgba(0,0,0,0.4); display: flex; align-items: flex-end; }
+    .gif-modal { width: 100%; height: 50vh; background: white; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; padding: 15px; animation: slideUpGif 0.3s ease-out; }
+    @keyframes slideUpGif { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .gif-header { display: flex; gap: 10px; margin-bottom: 15px; }
+    .gif-search { flex: 1; padding: 10px 15px; border-radius: 20px; border: 1px solid #ddd; background: #f5f5f5; outline: none; }
+    .gif-search-btn { background: #FF4D6D; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+    .gif-results { display: flex; flex-wrap: wrap; gap: 5px; overflow-y: auto; flex: 1; align-content: flex-start; justify-content: center; }
+    .gif-results img { height: 100px; border-radius: 8px; cursor: pointer; object-fit: cover; }
+    .gif-loading { text-align: center; color: #666; padding: 20px; }
+
+    .msg-avatar-container { width: 35px; height: 35px; border-radius: 50%; overflow: hidden; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); background: white; }
     .msg-avatar { width: 100%; height: 100%; object-fit: cover; }
     .msg-avatar-fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; font-weight: bold; font-size: 0.8rem; }
     
@@ -243,8 +329,10 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   currentUser: string = '';
   private timeouts: any[] = [];
 
+  @ViewChild('doodleCanvas', { static: false }) doodleCanvas: any;
+  
   constructor() {
-    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, pencil });
+    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark });
   }
 
   private viewInitialized = false;
@@ -355,6 +443,195 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     } catch (e) {
       console.error(e);
       this.showError('Ocurrió un error al enviar tu mensaje. Inténtalo de nuevo.');
+    } finally {
+      this.sending = false;
+    }
+  }
+
+  // --- GIF Logic ---
+  showGifModal = false;
+  giphyQuery = '';
+  giphyResults: any[] = [];
+  searchingGiphy = false;
+
+  toggleGifModal() {
+    this.showGifModal = !this.showGifModal;
+    if (this.showGifModal && this.giphyResults.length === 0) {
+      this.giphyQuery = 'love';
+      this.searchGiphy();
+    }
+  }
+
+  async searchGiphy() {
+    if (!this.giphyQuery.trim()) return;
+    this.searchingGiphy = true;
+    try {
+      const url = `https://api.giphy.com/v1/gifs/search?api_key=${environment.giphyApiKey}&q=${encodeURIComponent(this.giphyQuery)}&limit=24`;
+      const res = await fetch(url);
+      const data = await res.json();
+      this.giphyResults = data.data || [];
+    } catch (e) {
+      console.error('Error fetching GIFs', e);
+      this.showError('Error al buscar GIFs');
+    } finally {
+      this.searchingGiphy = false;
+    }
+  }
+
+  async sendGif(gif: any) {
+    this.showGifModal = false;
+    this.newMessage = `[GIF]${gif.images.fixed_height.url}`;
+    await this.sendMessage();
+  }
+
+  // --- Doodle Logic ---
+  isDoodling = false;
+  ctx: CanvasRenderingContext2D | null = null;
+  doodleColors = ['#FF4D6D', '#000000', '#3a86ff', '#ffbe0b', '#8338ec'];
+  currentDoodleColor = '#FF4D6D';
+  drawing = false;
+
+  startDoodle() {
+    this.isDoodling = true;
+    this.safeTimeout(() => {
+      if (this.doodleCanvas && this.doodleCanvas.nativeElement) {
+        const canvas = this.doodleCanvas.nativeElement;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        this.ctx = canvas.getContext('2d');
+        if (this.ctx) {
+          this.ctx.lineCap = 'round';
+          this.ctx.lineJoin = 'round';
+          this.ctx.lineWidth = 6;
+        }
+      }
+    }, 100);
+  }
+
+  cancelDoodle() {
+    this.isDoodling = false;
+  }
+
+  onDoodleStart(e: any) {
+    if (!this.ctx) return;
+    this.drawing = true;
+    const touch = e.touches[0];
+    const rect = e.target.getBoundingClientRect();
+    this.ctx.beginPath();
+    this.ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+  }
+
+  onDoodleMove(e: any) {
+    if (!this.drawing || !this.ctx) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = e.target.getBoundingClientRect();
+    this.ctx.strokeStyle = this.currentDoodleColor;
+    this.ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+    this.ctx.stroke();
+  }
+
+  onDoodleEnd() {
+    this.drawing = false;
+  }
+
+  async sendDoodle() {
+    if (!this.doodleCanvas || !this.doodleCanvas.nativeElement) return;
+    const canvas = this.doodleCanvas.nativeElement;
+    
+    // Trim empty space could go here, but for now we just upload the whole thing 
+    // or rely on CSS object-fit/max-width to make it look like a sticker.
+    canvas.toBlob(async (blob: Blob) => {
+      if (!blob) return;
+      this.isDoodling = false;
+      this.sending = true;
+      try {
+        const file = new File([blob], 'doodle.png', { type: 'image/png' });
+        const res = await this.api.uploadPhoto(file, '[DOODLE]');
+        if (res && res.photo && res.photo.id) {
+          this.newMessage = '[DOODLE]';
+          const replyPayload = this.replyingTo ? { id: this.replyingTo.id, user: this.replyingTo.user?.name, text: '📷 Foto' } : undefined;
+          await this.api.sendMessage(this.newMessage, res.photo.id, replyPayload);
+          this.replyingTo = null;
+          await this.loadMessages();
+          this.safeTimeout(() => this.scrollToBottom(), 100);
+        }
+      } catch (e) {
+        console.error('Error sending doodle', e);
+        this.showError('Error al enviar garabato');
+      } finally {
+        this.sending = false;
+      }
+    }, 'image/png');
+  }
+
+  // --- Audio Recording Logic ---
+  isRecording = false;
+  mediaRecorder: MediaRecorder | null = null;
+  audioChunks: any[] = [];
+  recordingTime = 0;
+  recordingInterval: any;
+
+  async startAudioRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.mediaRecorder = new MediaRecorder(stream);
+      this.audioChunks = [];
+      
+      this.mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) this.audioChunks.push(e.data);
+      };
+      
+      this.mediaRecorder.onstop = () => this.processAudio();
+      
+      this.mediaRecorder.start();
+      this.isRecording = true;
+      this.recordingTime = 0;
+      this.recordingInterval = setInterval(() => this.recordingTime++, 1000);
+    } catch (e) {
+      console.error('Error starting audio recording:', e);
+      this.showError('No se pudo acceder al micrófono');
+    }
+  }
+
+  stopAudioRecording() {
+    if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+      this.mediaRecorder.stop();
+    }
+  }
+
+  cancelAudioRecording() {
+    this.isRecording = false;
+    clearInterval(this.recordingInterval);
+    if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+      this.mediaRecorder.onstop = null; // Prevent processing
+      this.mediaRecorder.stop();
+    }
+  }
+
+  async processAudio() {
+    this.isRecording = false;
+    clearInterval(this.recordingInterval);
+    const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' }); // Default for MediaRecorder in most browsers
+    if (audioBlob.size === 0) return;
+    
+    this.sending = true;
+    try {
+      const file = new File([audioBlob], 'audio.webm', { type: 'audio/webm' });
+      // We reuse uploadPhoto endpoint which just expects a file. 
+      // The backend saves the file and returns a photo object.
+      const res = await this.api.uploadPhoto(file, '[AUDIO]');
+      if (res && res.photo && res.photo.id) {
+        this.newMessage = '[AUDIO]';
+        const replyPayload = this.replyingTo ? { id: this.replyingTo.id, user: this.replyingTo.user?.name, text: '🎤 Audio' } : undefined;
+        await this.api.sendMessage(this.newMessage, res.photo.id, replyPayload);
+        this.replyingTo = null;
+        await this.loadMessages();
+        this.safeTimeout(() => this.scrollToBottom(), 100);
+      }
+    } catch (e) {
+      console.error('Error sending audio', e);
+      this.showError('Error al enviar audio');
     } finally {
       this.sending = false;
     }
