@@ -263,7 +263,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     
     .scroll-content { flex: 1; --background: transparent; }
-    .photos-list { padding-top: 80px; padding-bottom: 30px; }
+    .photos-list { padding-top: 90px; padding-bottom: 40px; }
     
     .date-header { display: flex; align-items: center; justify-content: center; margin: 15px 0 25px 0; }
     .date-text { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; color: #a4133c; margin: 0 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); text-transform: capitalize; }
@@ -292,28 +292,28 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .grid-overlay { position: absolute; bottom: 3px; right: 3px; background: rgba(255,255,255,0.85); border-radius: 12px; padding: 1px 4px; font-size: 0.7rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
     .selection-overlay { position: absolute; top: 5px; right: 5px; font-size: 1.5rem; color: #FF4D6D; background: rgba(255,255,255,0.8); border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
     
-    .snap-feed::part(scroll) { scroll-snap-type: y mandatory; scroll-padding-top: 70px; }
+    .snap-feed::part(scroll) { scroll-snap-type: y mandatory; scroll-padding-top: 80px; }
     
-    .photo-card { scroll-snap-align: start; scroll-margin-top: 70px; scroll-snap-stop: always; width: calc(100% - 20px); max-width: 500px; margin: 0 auto 20px auto; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 28px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.8); transition: transform 0.3s ease; }
+    .photo-card { scroll-snap-align: start; scroll-margin-top: 80px; scroll-snap-stop: always; width: calc(100% - 20px); max-width: 500px; margin: 0 auto 20px auto; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 28px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.8); transition: transform 0.3s ease; }
     .photo-card:hover { transform: translateY(-5px); }
-    .card-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.03); }
+    .card-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid rgba(0,0,0,0.03); }
     .card-user-info { display: flex; align-items: center; gap: 10px; }
     .card-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid #FF4D6D; }
     .card-avatar-fallback { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; }
     .card-username { font-weight: 700; color: #590D22; font-size: 0.95rem; text-transform: capitalize; }
     .delete-post-btn { background: none; border: none; color: #ffb3c1; font-size: 1.2rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
     .delete-post-btn:hover { color: #FF4D6D; transform: scale(1.1); }
-    .image-wrapper { width: 100%; aspect-ratio: 4/5; max-height: 55vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fdfdfd; }
+    .image-wrapper { width: 100%; aspect-ratio: 1/1; max-height: 48vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fdfdfd; }
     .main-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
     
-    .photo-details { padding: 16px; }
-    .description { margin: 0 0 10px 0; color: #444; font-size: 0.95rem; line-height: 1.4; }
+    .photo-details { padding: 12px 16px; }
+    .description { margin: 0 0 8px 0; color: #444; font-size: 0.95rem; line-height: 1.4; }
     
-    .reactions-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+    .reactions-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
     .reaction-bubble { background: rgba(255, 255, 255, 0.9); padding: 4px 10px; border-radius: 15px; font-size: 1.1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
     
-    .actions { display: flex; justify-content: center; gap: 15px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 15px; margin-bottom: 15px; }
-    .reaction-btn { background: #fff; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.06); transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .actions { display: flex; justify-content: center; gap: 15px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 10px; margin-bottom: 10px; }
+    .reaction-btn { background: #fff; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.06); transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     .reaction-btn:hover { transform: scale(1.2); box-shadow: 0 6px 15px rgba(255, 77, 109, 0.2); }
     .reaction-btn.custom-reaction { font-size: 1.2rem; color: #ffb3c1; border: 1px dashed #ffb3c1; }
     .reaction-btn.download-btn { font-size: 1.2rem; color: #590D22; border: 1px solid rgba(0,0,0,0.1); }
