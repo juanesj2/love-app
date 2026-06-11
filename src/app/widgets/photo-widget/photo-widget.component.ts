@@ -59,10 +59,14 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
         <div class="photos-list" *ngIf="groupedPhotos.length > 0 && viewMode === 'feed'; else noFeedPhotos">
           <div *ngFor="let group of groupedPhotos" class="date-group">
             
-            <div class="date-header">
-              <span class="date-line"></span>
-              <span class="date-text">{{ group.date }}</span>
-              <span class="date-line"></span>
+            <div class="date-card">
+              <div class="date-card-content">
+                <ion-icon name="calendar-outline"></ion-icon>
+                <h2>{{ group.date }}</h2>
+                <p *ngIf="group.date === 'Hoy'">Tus recuerdos de hoy</p>
+                <p *ngIf="group.date === 'Ayer'">Lo que vivisteis ayer</p>
+                <p *ngIf="group.date !== 'Hoy' && group.date !== 'Ayer'">Tus recuerdos</p>
+              </div>
             </div>
 
           <div class="photo-card" *ngFor="let photo of group.photos">
@@ -265,9 +269,13 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .scroll-content { flex: 1; --background: transparent; }
     .photos-list { padding-top: 90px; padding-bottom: 40px; }
     
-    .date-header { display: flex; align-items: center; justify-content: center; margin: 15px 0 25px 0; }
-    .date-text { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; color: #a4133c; margin: 0 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); text-transform: capitalize; }
-    .date-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 77, 109, 0.3), transparent); }
+    .date-card { scroll-snap-align: start; scroll-margin-top: 80px; scroll-snap-stop: always; width: calc(100% - 20px); max-width: 500px; margin: 0 auto 20px auto; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border-radius: 28px; box-shadow: 0 10px 30px rgba(255, 77, 109, 0.4); display: flex; align-items: center; justify-content: center; height: 45vh; min-height: 250px; position: relative; overflow: hidden; }
+    .date-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%); animation: rotate 10s linear infinite; }
+    @keyframes rotate { 100% { transform: rotate(360deg); } }
+    .date-card-content { text-align: center; position: relative; z-index: 2; animation: scaleIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .date-card-content ion-icon { font-size: 4rem; margin-bottom: 10px; opacity: 0.9; }
+    .date-card-content h2 { font-size: 2.5rem; font-weight: 800; margin: 0; text-transform: capitalize; letter-spacing: -1px; }
+    .date-card-content p { font-size: 1.1rem; opacity: 0.85; margin: 10px 0 0 0; font-weight: 600; }
     
     .gallery-month-group { margin-bottom: 25px; }
     .month-header { display: flex; justify-content: space-between; align-items: center; margin: 0 10px 10px 10px; border-bottom: 2px solid rgba(255, 77, 109, 0.2); padding-bottom: 5px; }
@@ -295,7 +303,6 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .snap-feed::part(scroll) { scroll-snap-type: y mandatory; scroll-padding-top: 80px; }
     
     .photo-card { scroll-snap-align: start; scroll-margin-top: 80px; scroll-snap-stop: always; width: calc(100% - 20px); max-width: 500px; margin: 0 auto 20px auto; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 28px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.8); transition: transform 0.3s ease; }
-    .date-header + .photo-card { scroll-margin-top: 140px; }
     
     .photo-card:hover { transform: translateY(-5px); }
     .card-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid rgba(0,0,0,0.03); }
