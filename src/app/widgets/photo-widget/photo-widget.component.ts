@@ -11,12 +11,20 @@ import { addIcons } from 'ionicons';
 import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline } from 'ionicons/icons';
 import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 
-// ... (Resto del decorador y imports no cambian, los saltamos por ahora, inyectaremos el AlertController abajo)
-
 @Component({
   selector: 'app-photo-widget',
   template: `
     <div class="photo-widget-container">
+      
+      <!-- Global Date Overlay -->
+      <div class="global-date-overlay" [class.show]="showingGlobalDate" [class.fade-out]="fadingGlobalDate">
+        <div class="overlay-content">
+          <ion-icon name="calendar-outline"></ion-icon>
+          <h2>{{ globalDateText }}</h2>
+          <p>{{ globalDateSubtext }}</p>
+        </div>
+      </div>
+
       <!-- Floating Top Bar -->
       <div class="floating-top-bar">
         <div class="streak-badge" *ngIf="coupleInfo && !currentAlbum">
@@ -51,7 +59,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
         </div>
       </div>
 
-      <ion-content class="scroll-content" [class.snap-feed]="viewMode === 'feed'">
+      <ion-content class="scroll-content" [class.snap-feed]="viewMode === 'feed'" (ionScroll)="onScroll($event)" [scrollEvents]="true">
         <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
           <ion-refresher-content></ion-refresher-content>
         </ion-refresher>
@@ -59,7 +67,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
         <div class="photos-list" *ngIf="groupedPhotos.length > 0 && viewMode === 'feed'; else noFeedPhotos">
           <div *ngFor="let group of groupedPhotos" class="date-group">
             
-          <div class="photo-card" *ngFor="let photo of group.photos; let i = index" #photoCards>
+          <div class="photo-card" *ngFor="let photo of group.photos; let i = index" [attr.data-date]="group.date" #photoCards>
             <div class="card-header">
               <div class="card-user-info">
                 <img *ngIf="avatars[photo.user?.name]" [src]="avatars[photo.user.name]" class="card-avatar" />
@@ -71,15 +79,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
               </button>
             </div>
             
-            <div class="image-wrapper">
-              <div class="date-cover-overlay" *ngIf="i === 0">
-                <ion-icon name="calendar-outline"></ion-icon>
-                <h2>{{ group.date }}</h2>
-                <p *ngIf="group.date === 'Hoy'">Tus recuerdos de hoy</p>
-                <p *ngIf="group.date === 'Ayer'">Lo que vivisteis ayer</p>
-                <p *ngIf="group.date !== 'Hoy' && group.date !== 'Ayer'">Tus recuerdos</p>
-              </div>
-              
+            <div class="image-wrapper" (dblclick)="toggleReaction(photo, '❤️')">
               <img [src]="environment.storageUrl + photo.image_path" class="main-photo" loading="lazy" />
             </div>
             
@@ -267,13 +267,13 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .scroll-content { flex: 1; --background: transparent; }
     .photos-list { padding-top: 90px; padding-bottom: 40px; }
     
-    .date-cover-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; pointer-events: auto; }
-    .date-cover-overlay ion-icon { font-size: 4rem; margin-bottom: 10px; opacity: 0.9; }
-    .date-cover-overlay h2 { font-size: 2.5rem; font-weight: 800; margin: 0; text-transform: capitalize; letter-spacing: -1px; }
-    .date-cover-overlay p { font-size: 1.1rem; opacity: 0.85; margin: 10px 0 0 0; font-weight: 600; }
-    
-    .date-cover-overlay.start-fade { animation: fadeOutDate 0.8s ease-in-out 1.2s forwards; pointer-events: none; }
-    @keyframes fadeOutDate { to { opacity: 0; visibility: hidden; } }
+    .global-date-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; visibility: hidden; transition: opacity 0.8s ease-in-out, visibility 0.8s; pointer-events: none; border-radius: inherit; }
+    .global-date-overlay.show { opacity: 1; visibility: visible; }
+    .global-date-overlay.fade-out { opacity: 0; visibility: hidden; }
+    .overlay-content { text-align: center; animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .global-date-overlay ion-icon { font-size: 5rem; margin-bottom: 15px; opacity: 0.9; }
+    .global-date-overlay h2 { font-size: 3.5rem; font-weight: 800; margin: 0; text-transform: capitalize; letter-spacing: -1px; }
+    .global-date-overlay p { font-size: 1.2rem; opacity: 0.85; margin: 10px 0 0 0; font-weight: 600; }
     .month-header { display: flex; justify-content: space-between; align-items: center; margin: 0 10px 10px 10px; border-bottom: 2px solid rgba(255, 77, 109, 0.2); padding-bottom: 5px; }
     .gallery-month-title { margin: 0; font-size: 1.1rem; font-weight: 800; color: #590D22; text-transform: capitalize; }
     .select-month-wrapper { font-size: 1.5rem; color: #FF4D6D; cursor: pointer; display: flex; align-items: center; }
@@ -407,6 +407,13 @@ export class PhotoWidgetComponent implements OnInit {
   avatars: { [key: string]: string } = {};
   private firestore = inject(Firestore);
   private observer: IntersectionObserver | null = null;
+  
+  globalDateText = '';
+  globalDateSubtext = '';
+  showingGlobalDate = false;
+  fadingGlobalDate = false;
+  lastShownDate = '';
+  dateOverlayTimeout: any;
 
   constructor() {
     addIcons({ arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline });
@@ -424,16 +431,48 @@ export class PhotoWidgetComponent implements OnInit {
   setupObserver() {
     if (this.observer) this.observer.disconnect();
     this.observer = new IntersectionObserver((entries) => {
+      let bestEntry = null;
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('start-fade');
+          bestEntry = entry;
         }
       });
-    }, { threshold: 0.6 });
+      if (bestEntry) {
+        const date = (bestEntry.target as HTMLElement).getAttribute('data-date');
+        if (date) this.triggerGlobalDateOverlay(date);
+      }
+    }, { threshold: 0.3 });
     
     setTimeout(() => {
-      document.querySelectorAll('.date-cover-overlay').forEach(el => this.observer?.observe(el));
+      document.querySelectorAll('.photo-card[data-date]').forEach(el => this.observer?.observe(el));
     }, 300);
+  }
+
+  triggerGlobalDateOverlay(date: string) {
+    if (this.lastShownDate === date) return;
+    this.lastShownDate = date;
+
+    this.globalDateText = date;
+    if (date === 'Hoy') this.globalDateSubtext = 'Tus recuerdos de hoy';
+    else if (date === 'Ayer') this.globalDateSubtext = 'Lo que vivisteis ayer';
+    else this.globalDateSubtext = 'Tus recuerdos';
+
+    this.showingGlobalDate = true;
+    this.fadingGlobalDate = false;
+    this.cdr.detectChanges();
+
+    if (this.dateOverlayTimeout) clearTimeout(this.dateOverlayTimeout);
+
+    this.dateOverlayTimeout = setTimeout(() => {
+      this.fadingGlobalDate = true;
+      this.cdr.detectChanges();
+      
+      setTimeout(() => {
+        this.showingGlobalDate = false;
+        this.fadingGlobalDate = false;
+        this.cdr.detectChanges();
+      }, 800); // Wait for CSS transition
+    }, 1200);
   }
 
   async loadAvatars() {
