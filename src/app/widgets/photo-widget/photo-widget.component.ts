@@ -298,34 +298,34 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     
     .snap-feed::part(scroll) { scroll-snap-type: y mandatory; scroll-padding-top: 80px; }
     
-    .photo-card { scroll-snap-align: start; scroll-margin-top: 80px; scroll-snap-stop: always; width: calc(100% - 20px); max-width: 500px; margin: 0 auto 20px auto; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 28px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.8); transition: transform 0.3s ease; }
+    .photo-card { scroll-snap-align: start; scroll-margin-top: 75px; scroll-snap-stop: always; width: calc(100% - 20px); max-width: 500px; margin: 0 auto 20px auto; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 28px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.8); transition: transform 0.3s ease; }
     
-    .photo-card:hover { transform: translateY(-5px); }
-    .card-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid rgba(0,0,0,0.03); }
+    .photo-card:hover { transform: translateY(-3px); }
+    .card-header { display: flex; align-items: center; justify-content: space-between; padding: 6px 14px; border-bottom: 1px solid rgba(0,0,0,0.03); }
     .card-user-info { display: flex; align-items: center; gap: 10px; }
     .card-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid #FF4D6D; }
     .card-avatar-fallback { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; }
     .card-username { font-weight: 700; color: #590D22; font-size: 0.95rem; text-transform: capitalize; }
     .delete-post-btn { background: none; border: none; color: #ffb3c1; font-size: 1.2rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
     .delete-post-btn:hover { color: #FF4D6D; transform: scale(1.1); }
-    .image-wrapper { width: 100%; aspect-ratio: 1/1; max-height: 48vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fdfdfd; position: relative; }
+    .image-wrapper { width: 100%; aspect-ratio: 1/1; max-height: 42vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fdfdfd; position: relative; }
     .main-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
     
-    .photo-details { padding: 12px 16px; }
+    .photo-details { padding: 8px 14px; }
     .description { margin: 0 0 8px 0; color: #444; font-size: 0.95rem; line-height: 1.4; }
     
     .reactions-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
     .reaction-bubble { background: rgba(255, 255, 255, 0.9); padding: 4px 10px; border-radius: 15px; font-size: 1.1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
     
-    .actions { display: flex; justify-content: center; gap: 15px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 10px; margin-bottom: 10px; }
-    .reaction-btn { background: #fff; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.06); transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    .reaction-btn:hover { transform: scale(1.2); box-shadow: 0 6px 15px rgba(255, 77, 109, 0.2); }
-    .reaction-btn.custom-reaction { font-size: 1.2rem; color: #ffb3c1; border: 1px dashed #ffb3c1; }
-    .reaction-btn.download-btn { font-size: 1.2rem; color: #590D22; border: 1px solid rgba(0,0,0,0.1); }
+    .actions { display: flex; justify-content: center; gap: 12px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 8px; margin-bottom: 8px; }
+    .reaction-btn { background: #fff; border: none; border-radius: 50%; width: 36px; height: 36px; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.06); transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .reaction-btn:hover { transform: scale(1.15); box-shadow: 0 5px 12px rgba(255, 77, 109, 0.2); }
+    .reaction-btn.custom-reaction { font-size: 1.1rem; color: #ffb3c1; border: 1px dashed #ffb3c1; }
+    .reaction-btn.download-btn { font-size: 1.1rem; color: #590D22; border: 1px solid rgba(0,0,0,0.1); }
     
-    .reply-box { display: flex; gap: 10px; align-items: center; background: rgba(255,255,255,0.8); padding: 8px; border-radius: 20px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.05); }
-    .reply-box input { flex: 1; border: none; background: transparent; padding: 8px 12px; outline: none; font-size: 0.95rem; color: #444; }
-    .send-reply-btn { background: #FF4D6D; color: white; border: none; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; }
+    .reply-box { display: flex; gap: 8px; align-items: center; background: rgba(255,255,255,0.8); padding: 5px 5px 5px 12px; border-radius: 20px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.05); }
+    .reply-box input { flex: 1; border: none; background: transparent; padding: 6px 8px; outline: none; font-size: 0.9rem; color: #444; }
+    .send-reply-btn { background: #FF4D6D; color: white; border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; }
     .send-reply-btn:hover:not(:disabled) { transform: scale(1.1); background: #c9184a; }
     .send-reply-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     
