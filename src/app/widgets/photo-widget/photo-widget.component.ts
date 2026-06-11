@@ -295,6 +295,8 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .snap-feed::part(scroll) { scroll-snap-type: y mandatory; scroll-padding-top: 80px; }
     
     .photo-card { scroll-snap-align: start; scroll-margin-top: 80px; scroll-snap-stop: always; width: calc(100% - 20px); max-width: 500px; margin: 0 auto 20px auto; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 28px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.8); transition: transform 0.3s ease; }
+    .date-header + .photo-card { scroll-margin-top: 140px; }
+    
     .photo-card:hover { transform: translateY(-5px); }
     .card-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid rgba(0,0,0,0.03); }
     .card-user-info { display: flex; align-items: center; gap: 10px; }
