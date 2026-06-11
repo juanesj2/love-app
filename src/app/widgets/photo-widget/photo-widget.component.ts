@@ -88,7 +88,8 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
               <p *ngIf="photo.description" class="description">{{photo.description}}</p>
               
               <div class="reactions-list" *ngIf="photo.reactions?.length">
-                <span class="reaction-bubble" *ngFor="let r of photo.reactions">{{r.content}}</span>
+                <span class="reaction-bubble" *ngFor="let r of photo.reactions | slice:0:3">{{r.content}}</span>
+                <span class="reaction-bubble ellipsis-bubble" *ngIf="photo.reactions.length > 3">...</span>
               </div>
 
               <div class="actions">
@@ -320,7 +321,8 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .description { margin: 0 0 8px 0; color: #444; font-size: 0.95rem; line-height: 1.4; }
     
     .reactions-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
-    .reaction-bubble { background: rgba(255, 255, 255, 0.9); padding: 4px 10px; border-radius: 15px; font-size: 1.1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .reaction-bubble { background: rgba(255, 255, 255, 0.9); padding: 4px 10px; border-radius: 15px; font-size: 1.1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; }
+    .ellipsis-bubble { color: #FF4D6D; font-weight: bold; letter-spacing: 2px; }
     
     .actions { display: flex; justify-content: center; gap: 12px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 8px; margin-bottom: 8px; }
     .reaction-btn { background: #fff; border: none; border-radius: 50%; width: 36px; height: 36px; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.06); transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
