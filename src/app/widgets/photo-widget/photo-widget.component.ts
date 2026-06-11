@@ -17,37 +17,37 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
   selector: 'app-photo-widget',
   template: `
     <div class="photo-widget-container">
-      <div class="header">
+      <!-- Floating Top Bar -->
+      <div class="floating-top-bar">
         <div class="streak-badge" *ngIf="coupleInfo && !currentAlbum">
           <span class="streak-icon">🔥</span>
           <span class="streak-text">{{ coupleInfo.current_streak }} días</span>
         </div>
-        <div class="streak-badge back-badge" *ngIf="currentAlbum" (click)="clearAlbum()" style="background: rgba(0,0,0,0.05); color: #590D22; cursor: pointer;">
+        <div class="streak-badge back-badge" *ngIf="currentAlbum" (click)="clearAlbum()" style="background: rgba(255,255,255,0.95); color: #590D22; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.08);">
           <ion-icon name="arrow-back"></ion-icon>
-          <span class="streak-text">Atrás</span>
         </div>
-        <div class="header-actions">
-          <h2 class="title albums-btn" (click)="openAlbumsModal()">
-            {{ currentAlbum ? currentAlbum.name : 'Nuestros Álbums' }} <ion-icon name="chevron-down-outline" style="font-size: 1.2rem;"></ion-icon>
-          </h2>
-          <button class="header-icon-btn" *ngIf="currentAlbum" (click)="openAlbumOptions()">
-            <ion-icon name="settings-outline"></ion-icon>
-          </button>
-          <button class="header-icon-btn" (click)="activateSelectionMode()" *ngIf="currentAlbum && photos.length > 0">
-            <ion-icon name="checkmark-done-outline"></ion-icon>
-          </button>
-          <button *ngIf="currentAlbum" class="header-upload-btn" (click)="uploadNewPhoto()">
-            <ion-icon name="add"></ion-icon>
-          </button>
-        </div>
-      </div>
 
-      <div class="custom-toggle-container" *ngIf="!currentAlbum">
-        <div class="toggle-pill" [class.active]="viewMode === 'feed'" (click)="viewMode = 'feed'">
-          <ion-icon name="list"></ion-icon> Feed
+        <div class="floating-toggles" *ngIf="!currentAlbum">
+          <button [class.active]="viewMode === 'feed'" (click)="viewMode = 'feed'"><ion-icon name="list"></ion-icon></button>
+          <button [class.active]="viewMode === 'grid'" (click)="viewMode = 'grid'"><ion-icon name="grid"></ion-icon></button>
         </div>
-        <div class="toggle-pill" [class.active]="viewMode === 'grid'" (click)="viewMode = 'grid'">
-          <ion-icon name="grid"></ion-icon> Galería
+        
+        <div class="floating-actions">
+          <button class="albums-btn-small" (click)="openAlbumsModal()">
+            <ion-icon name="images-outline"></ion-icon>
+          </button>
+          
+          <ng-container *ngIf="currentAlbum">
+            <button class="header-icon-btn" (click)="openAlbumOptions()">
+              <ion-icon name="settings-outline"></ion-icon>
+            </button>
+            <button class="header-icon-btn" (click)="activateSelectionMode()" *ngIf="photos.length > 0">
+              <ion-icon name="checkmark-done-outline"></ion-icon>
+            </button>
+            <button class="header-upload-btn" (click)="uploadNewPhoto()">
+              <ion-icon name="add"></ion-icon>
+            </button>
+          </ng-container>
         </div>
       </div>
 
@@ -240,27 +240,30 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
       display: block;
       height: 100%;
     }
-    .photo-widget-container { padding: 15px; height: 100%; display: flex; flex-direction: column; background: linear-gradient(135deg, #fff5f8 0%, #ffe3e9 100%); font-family: 'Inter', sans-serif; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-    .header-actions { display: flex; align-items: center; gap: 10px; }
-    .title { margin: 0; font-size: 1.4rem; font-weight: 800; color: #590D22; letter-spacing: -0.5px; }
-    .header-upload-btn { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; box-shadow: 0 4px 10px rgba(255, 77, 109, 0.4); transition: transform 0.2s; }
-    .header-upload-btn:active { transform: scale(0.9); }
-    .header-icon-btn { background: rgba(0,0,0,0.05); color: #590D22; border: none; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; transition: transform 0.2s; }
-    .header-icon-btn:active { transform: scale(0.9); }
-    .albums-btn { display: flex; align-items: center; gap: 5px; cursor: pointer; background: rgba(255, 77, 109, 0.1); padding: 8px 14px; border-radius: 20px; transition: all 0.2s; }
-    .albums-btn:active { transform: scale(0.95); background: rgba(255, 77, 109, 0.2); }
+    .photo-widget-container { padding: 0; position: relative; height: 100%; display: flex; flex-direction: column; background: linear-gradient(135deg, #fff5f8 0%, #ffe3e9 100%); font-family: 'Inter', sans-serif; }
     
-    .custom-toggle-container { display: flex; background: rgba(255,255,255,0.6); padding: 5px; border-radius: 30px; margin: 0 10px 15px 10px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
-    .toggle-pill { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 0; border-radius: 25px; font-weight: 700; color: #888; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
-    .toggle-pill.active { background: white; color: #FF4D6D; box-shadow: 0 4px 10px rgba(255,77,109,0.15); transform: scale(1.02); }
+    .floating-top-bar { position: absolute; top: 15px; left: 15px; right: 15px; z-index: 50; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
+    .floating-top-bar > * { pointer-events: auto; }
+    
+    .floating-toggles { display: flex; background: rgba(255,255,255,0.85); backdrop-filter: blur(10px); padding: 4px; border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); gap: 5px; }
+    .floating-toggles button { background: transparent; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #888; transition: all 0.2s; cursor: pointer; }
+    .floating-toggles button.active { background: white; color: #FF4D6D; box-shadow: 0 2px 8px rgba(255,77,109,0.2); transform: scale(1.05); }
+    
+    .floating-actions { display: flex; gap: 8px; align-items: center; }
+    .albums-btn-small { background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); color: #FF4D6D; border: none; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: transform 0.2s; }
+    .albums-btn-small:active { transform: scale(0.9); }
+    
+    .header-upload-btn { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; box-shadow: 0 4px 10px rgba(255, 77, 109, 0.4); transition: transform 0.2s; }
+    .header-upload-btn:active { transform: scale(0.9); }
+    .header-icon-btn { background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); color: #590D22; border: none; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+    .header-icon-btn:active { transform: scale(0.9); }
     
     .streak-badge { background: linear-gradient(90deg, #FF4D6D, #ff758c); color: white; padding: 6px 14px; border-radius: 25px; font-weight: 700; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4); animation: pulse 2s infinite; }
     .streak-icon { font-size: 1.2rem; }
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     
     .scroll-content { flex: 1; --background: transparent; }
-    .photos-list { padding-bottom: 10px; }
+    .photos-list { padding-top: 80px; padding-bottom: 30px; }
     
     .date-header { display: flex; align-items: center; justify-content: center; margin: 15px 0 25px 0; }
     .date-text { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px); padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; color: #a4133c; margin: 0 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); text-transform: capitalize; }
@@ -289,9 +292,9 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .grid-overlay { position: absolute; bottom: 3px; right: 3px; background: rgba(255,255,255,0.85); border-radius: 12px; padding: 1px 4px; font-size: 0.7rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
     .selection-overlay { position: absolute; top: 5px; right: 5px; font-size: 1.5rem; color: #FF4D6D; background: rgba(255,255,255,0.8); border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
     
-    .snap-feed::part(scroll) { scroll-snap-type: y mandatory; scroll-padding-top: 15px; }
+    .snap-feed::part(scroll) { scroll-snap-type: y mandatory; scroll-padding-top: 70px; }
     
-    .photo-card { scroll-snap-align: center; scroll-snap-stop: always; width: calc(100% - 30px); max-width: 500px; margin: 0 auto 30px auto; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 28px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.8); transition: transform 0.3s ease; }
+    .photo-card { scroll-snap-align: start; scroll-margin-top: 70px; scroll-snap-stop: always; width: calc(100% - 20px); max-width: 500px; margin: 0 auto 20px auto; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 28px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.8); transition: transform 0.3s ease; }
     .photo-card:hover { transform: translateY(-5px); }
     .card-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.03); }
     .card-user-info { display: flex; align-items: center; gap: 10px; }
@@ -300,7 +303,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .card-username { font-weight: 700; color: #590D22; font-size: 0.95rem; text-transform: capitalize; }
     .delete-post-btn { background: none; border: none; color: #ffb3c1; font-size: 1.2rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
     .delete-post-btn:hover { color: #FF4D6D; transform: scale(1.1); }
-    .image-wrapper { width: 100%; aspect-ratio: 4/5; max-height: 65vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fdfdfd; }
+    .image-wrapper { width: 100%; aspect-ratio: 4/5; max-height: 55vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fdfdfd; }
     .main-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
     
     .photo-details { padding: 16px; }
