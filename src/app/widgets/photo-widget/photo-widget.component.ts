@@ -62,16 +62,16 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
           <div class="photo-card" *ngFor="let photo of group.photos; let i = index" #photoCards>
             <div class="card-header">
               <div class="card-user-info">
-                <img [src]="environment.storageUrl + avatars[photo.username]" class="card-avatar" *ngIf="avatars[photo.username]" />
-                <div class="card-avatar-fallback" *ngIf="!avatars[photo.username]">{{ photo.username.charAt(0).toUpperCase() }}</div>
-                <span class="card-username">{{ photo.username }}</span>
+                <img *ngIf="avatars[photo.user?.name]" [src]="avatars[photo.user.name]" class="card-avatar" />
+                <div *ngIf="!avatars[photo.user?.name]" class="card-avatar-fallback">{{ photo.user?.name?.charAt(0) || 'U' }}</div>
+                <span class="card-username">{{photo.user?.name}}</span>
               </div>
-              <button class="delete-post-btn" *ngIf="currentAlbum" (click)="removePhotoFromAlbum(photo, $event)">
+              <button *ngIf="isMine(photo)" class="delete-post-btn" (click)="deletePhoto(photo)">
                 <ion-icon name="trash-outline"></ion-icon>
               </button>
             </div>
             
-            <div class="image-wrapper" (dblclick)="toggleReaction(photo, '❤️')">
+            <div class="image-wrapper">
               <div class="date-cover-overlay" *ngIf="i === 0">
                 <ion-icon name="calendar-outline"></ion-icon>
                 <h2>{{ group.date }}</h2>
