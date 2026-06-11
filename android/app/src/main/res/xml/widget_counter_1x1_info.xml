@@ -5,4 +5,5 @@
     android:minWidth="40dp"
     android:minHeight="40dp"
     android:updatePeriodMillis="0"
+    android:previewImage="@drawable/widget_tiempo_juntos"
     android:widgetCategory="home_screen" />

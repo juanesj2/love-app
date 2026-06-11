@@ -4,8 +4,9 @@
     <string name="title_activity_main">love-widget</string>
     <string name="package_name">com.juanesj2.lovewidget</string>
     <string name="custom_url_scheme">com.juanesj2.lovewidget</string>
-    <string name="widget_love_label">Widget de Amor (Distancia y Mapa)</string>
-    <string name="widget_counter_1x1_label">Widget Contador (1x1)</string>
-    <string name="widget_counter_photo_label">Widget Contador con Foto (2x2)</string>
-    <string name="widget_daily_photo_label">Widget Foto Diaria Pareja (2x2)</string>
+    <string name="widget_love_label">❤️ Nuestro Amor (Mapa)</string>
+    <string name="widget_counter_1x1_label">⏳ Días Juntos (1x1)</string>
+    <string name="widget_counter_photo_label">🖼️ Nuestra Foto y Días (2x2)</string>
+    <string name="widget_daily_photo_label">📸 Foto del Día Contigo (2x2)</string>
+    <string name="widget_poke_label">👉 Enviar Zumbido de Amor</string>
 </resources>

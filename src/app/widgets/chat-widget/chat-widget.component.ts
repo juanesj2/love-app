@@ -8,7 +8,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { LoveApiService } from '../../services/love-api.service';
 import { environment } from '../../../environments/environment';
 import { addIcons } from 'ionicons';
-import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark } from 'ionicons/icons';
+import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline } from 'ionicons/icons';
 @Component({
   selector: 'app-chat-widget',
   template: `
@@ -19,7 +19,18 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil, image, s
         </ion-refresher>
         
         <div class="messages-inner">
-        <div class="message-row" *ngFor="let msg of messages; trackBy: trackByMsgId" [id]="'msg-' + msg.id">
+        <div class="message-row" *ngFor="let msg of regularMessages; trackBy: trackByMsgId" [id]="'msg-' + msg.id">
+          <!-- Graffitis anclados a este mensaje -->
+          <ng-container *ngIf="graffitisByAnchorId[msg.id]">
+            <img *ngFor="let graf of graffitisByAnchorId[msg.id]" 
+                 [src]="environment.storageUrl + graf.photo?.image_path" 
+                 class="graffiti-overlay" 
+                 [style.left.px]="graf.offsetX" 
+                 [style.top.px]="graf.offsetY" 
+                 [style.width.px]="graf.width" 
+                 [style.height.px]="graf.height" />
+          </ng-container>
+
           <!-- Iconos de swipe -->
           <div class="swipe-icon-left" [id]="'swipe-icon-' + msg.id" *ngIf="isMine(msg)">
             <div class="reply-icon-circle"><ion-icon name="arrow-undo-outline"></ion-icon></div>
@@ -49,13 +60,14 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil, image, s
                   <span class="reply-context-text">{{msg.reply_to.text}}</span>
                 </div>
 
-                <div class="bubble" [class.only-photo]="msg.photo && (!msg.mensaje || msg.mensaje === 'null')">
+                <div class="bubble" [class.only-photo]="msg.photo && (!msg.mensaje || msg.mensaje === 'null')"
+                                    [class.transparent-bubble]="msg.mensaje && msg.mensaje.startsWith('[DOODLE]')">
                   
-                  <div class="photo-reply" *ngIf="msg.photo">
+                  <div class="photo-reply" *ngIf="msg.photo && !msg.mensaje?.startsWith('[DOODLE]') && !msg.mensaje?.startsWith('[AUDIO]')">
                     <img [src]="environment.storageUrl + msg.photo.image_path" loading="lazy" />
                   </div>
 
-                  <p class="text" *ngIf="msg.mensaje && msg.mensaje !== 'null' && !msg.mensaje.startsWith('[GIF]')">
+                  <p class="text" *ngIf="msg.mensaje && msg.mensaje !== 'null' && !msg.mensaje.startsWith('[GIF]') && !msg.mensaje.startsWith('[DOODLE]') && !msg.mensaje.startsWith('[AUDIO]')">
                     {{msg.mensaje}}
                     <span class="edited-label" *ngIf="msg.is_edited">(editado)</span>
                   </p>
@@ -66,7 +78,21 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil, image, s
                     <img [src]="environment.storageUrl + msg.photo?.image_path" loading="lazy" class="chat-doodle" />
                   </div>
                   <div class="audio-reply" *ngIf="msg.mensaje && msg.mensaje.startsWith('[AUDIO]')">
-                    <audio controls [src]="environment.storageUrl + msg.photo?.image_path"></audio>
+                    <div class="custom-audio-player">
+                      <button class="play-btn" (click)="toggleAudio(msg, audioEl)">
+                        <ion-icon [name]="msg.playing ? 'pause' : 'play'"></ion-icon>
+                      </button>
+                      <div class="waveform" [class.animating]="msg.playing">
+                        <div class="bar" *ngFor="let h of getWaveform(msg)" [style.height]="h + '%'"></div>
+                      </div>
+                      <span class="duration" *ngIf="audioEl.duration && audioEl.duration !== Infinity">{{ formatDuration(audioEl.duration) }}</span>
+                    </div>
+                    <audio [src]="environment.storageUrl + msg.photo?.image_path" 
+                           (ended)="msg.playing = false" 
+                           (pause)="msg.playing = false" 
+                           (play)="msg.playing = true" 
+                           (loadedmetadata)="onAudioLoaded(audioEl)"
+                           #audioEl></audio>
                   </div>
                   
                   <div class="reactions-container" *ngIf="hasReactions(msg)">
@@ -120,15 +146,16 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil, image, s
         </div>
 
         <div class="input-container" *ngIf="!isDoodling">
-          <div class="attachments-bar" *ngIf="!isRecording">
-            <button class="attach-btn" (click)="toggleGifModal()"><ion-icon name="image"></ion-icon></button>
-            <button class="attach-btn" (click)="startDoodle()"><ion-icon name="color-palette"></ion-icon></button>
-            <button class="attach-btn" (click)="startAudioRecording()"><ion-icon name="mic"></ion-icon></button>
+          <button class="attach-btn" (click)="showAttachMenu = !showAttachMenu" *ngIf="!isRecording"><ion-icon [name]="showAttachMenu ? 'close' : 'add'"></ion-icon></button>
+
+          <div class="attach-menu" *ngIf="showAttachMenu">
+            <button class="attach-menu-item" (click)="toggleGifModal(); showAttachMenu = false"><ion-icon name="image"></ion-icon></button>
+            <button class="attach-menu-item" (click)="startDoodle(); showAttachMenu = false"><ion-icon name="color-palette"></ion-icon></button>
           </div>
+
           <div class="recording-bar" *ngIf="isRecording">
             <div class="recording-indicator"><div class="pulse-dot"></div> Grabando... {{recordingTime}}s</div>
-            <button class="stop-record-btn" (click)="stopAudioRecording()"><ion-icon name="stop-circle"></ion-icon></button>
-            <button class="cancel-record-btn" (click)="cancelAudioRecording()"><ion-icon name="close"></ion-icon></button>
+            <button class="cancel-record-btn" (click)="cancelAudioRecording()"><ion-icon name="trash-outline"></ion-icon></button>
           </div>
           <input *ngIf="!isRecording"
             type="text" 
@@ -138,8 +165,12 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil, image, s
             class="premium-input"
             [disabled]="sending"
           />
-          <button class="send-btn" (click)="sendMessage()" [disabled]="!newMessage.trim() || sending" [class.active]="newMessage.trim()">
-            <ion-icon name="paper-plane" *ngIf="!sending"></ion-icon>
+          <button class="send-btn" 
+                  [disabled]="sending" 
+                  [class.active]="newMessage.trim() || isRecording"
+                  (click)="onSendBtnClick($event)">
+            <ion-icon name="paper-plane" *ngIf="!sending && (newMessage.trim() || isRecording)"></ion-icon>
+            <ion-icon name="mic" *ngIf="!sending && !newMessage.trim() && !isRecording"></ion-icon>
             <ion-icon name="hourglass-outline" *ngIf="sending"></ion-icon>
           </button>
         </div>
@@ -162,12 +193,35 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil, image, s
 
     <!-- Doodle Overlay Canvas -->
     <div class="doodle-overlay" *ngIf="isDoodling">
-      <div class="doodle-toolbar">
-        <button class="doodle-btn cancel" (click)="cancelDoodle()"><ion-icon name="close"></ion-icon></button>
-        <div class="doodle-colors">
-          <div class="color-dot" *ngFor="let c of doodleColors" [style.background]="c" [class.active]="currentDoodleColor === c" (click)="currentDoodleColor = c"></div>
+      <div class="doodle-topbar">
+        <div style="flex: 1"></div>
+        <div class="doodle-tools">
+          <button class="doodle-btn tool" [class.active]="doodleType === 'normal'" (click)="doodleType = 'normal'"><ion-icon name="pencil"></ion-icon></button>
+          <button class="doodle-btn tool" [class.active]="doodleType === 'neon'" (click)="doodleType = 'neon'"><ion-icon name="color-wand-outline"></ion-icon></button>
         </div>
-        <button class="doodle-btn send" (click)="sendDoodle()"><ion-icon name="checkmark"></ion-icon></button>
+      </div>
+      
+      <div class="doodle-slider-container">
+        <input type="range" min="2" max="30" [(ngModel)]="doodleThickness" class="doodle-slider" orient="vertical" />
+      </div>
+
+      <div class="doodle-toolbar">
+        <div class="doodle-left-actions">
+          <button class="doodle-btn cancel" (click)="cancelDoodle()"><ion-icon name="close"></ion-icon></button>
+          <button class="doodle-btn undo" (click)="undoDoodle()" [disabled]="strokes.length === 0"><ion-icon name="arrow-undo-outline"></ion-icon></button>
+        </div>
+        
+        <div class="doodle-colors-wrapper">
+          <button class="doodle-btn eyedropper" (click)="colorPicker.click()">
+            <ion-icon name="color-palette"></ion-icon>
+            <input #colorPicker type="color" style="display:none" (change)="onCustomColorChange($event)">
+          </button>
+          <div class="doodle-colors">
+            <div class="color-dot" *ngFor="let c of doodleColors" [style.background]="c" [class.active]="currentDoodleColor === c" (click)="currentDoodleColor = c"></div>
+          </div>
+        </div>
+
+        <button class="doodle-btn send" (click)="sendDoodle()"><ion-icon name="paper-plane"></ion-icon></button>
       </div>
       <canvas #doodleCanvas class="doodle-canvas" (touchstart)="onDoodleStart($event)" (touchmove)="onDoodleMove($event)" (touchend)="onDoodleEnd()"></canvas>
     </div>
@@ -186,8 +240,25 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil, image, s
     .doodle-reply { padding: 0; background: transparent !important; box-shadow: none !important; border: none !important; margin-bottom: 0; }
     .only-photo .doodle-reply { margin: 0; }
 
-    .audio-reply { padding: 8px; }
-    .audio-reply audio { max-width: 200px; height: 40px; outline: none; }
+    .custom-audio-player { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 30px; width: fit-content; min-width: 220px; }
+    .mine .custom-audio-player { background: rgba(255,255,255,0.2); }
+    .message-wrapper:not(.mine) .custom-audio-player { background: rgba(0,0,0,0.05); }
+    
+    .play-btn { background: #FF4D6D; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.2s; }
+    .play-btn ion-icon { font-size: 1.4rem; color: inherit; }
+    .play-btn:active { transform: scale(0.9); }
+    .mine .play-btn { background: white; color: #FF4D6D; }
+    
+    .waveform { display: flex; align-items: center; gap: 2px; flex: 1; height: 30px; justify-content: center; }
+    .waveform .bar { width: 3px; background: rgba(0,0,0,0.3); border-radius: 2px; transition: height 0.2s; }
+    .mine .waveform .bar { background: rgba(255,255,255,0.8); }
+    .waveform.animating .bar { animation: wave 0.4s infinite alternate; }
+    @keyframes wave { 0% { transform: scaleY(0.4); } 100% { transform: scaleY(1.4); } }
+    
+    .duration { font-size: 0.75rem; color: rgba(0,0,0,0.6); font-weight: bold; margin-left: 4px; white-space: nowrap; }
+    .mine .duration { color: white; }
+    
+    audio { display: none; }
     
     .messages-content { flex: 1; --background: transparent; }
     .messages-inner { padding: 20px 15px; display: flex; flex-direction: column; background: transparent !important; }
@@ -205,6 +276,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil, image, s
     .message-wrapper:not(.mine) { justify-content: flex-start; }
     
     .bubble { width: fit-content; max-width: 100%; padding: 8px 12px; border-radius: 12px; font-size: 1rem; line-height: 1.4; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+    .transparent-bubble { background: transparent !important; box-shadow: none !important; border: none !important; padding: 0 !important; }
     
     .mine .bubble { background: #FF4D6D; color: white; border-bottom-right-radius: 4px; }
     .message-wrapper:not(.mine) .bubble { background: white; color: #333; border-bottom-left-radius: 4px; border: 1px solid rgba(0,0,0,0.05); }
@@ -213,9 +285,13 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil, image, s
     .text { margin: 0; word-break: break-word; white-space: pre-wrap; }
     .edited-label { font-size: 0.7rem; opacity: 0.7; margin-left: 4px; font-style: italic; }
     
-    .attachments-bar { display: flex; gap: 8px; margin-right: 8px; align-items: center; }
-    .attach-btn { background: transparent; border: none; font-size: 1.5rem; color: #a4133c; padding: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+    .attach-btn { background: transparent; border: none; font-size: 1.5rem; color: #a4133c; padding: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; flex-shrink: 0; }
     .attach-btn:active { transform: scale(0.9); }
+
+    .attach-menu { position: absolute; bottom: 65px; left: 10px; background: white; border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; padding: 5px; animation: scaleIn 0.2s; z-index: 100; }
+    .attach-menu-item { background: transparent; border: none; font-size: 1.5rem; color: #a4133c; padding: 10px; cursor: pointer; transition: background 0.2s; border-radius: 50%; }
+    .attach-menu-item:hover { background: #fff0f3; }
+    @keyframes scaleIn { from { transform: scale(0.8) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
 
     .recording-bar { display: flex; flex: 1; align-items: center; justify-content: space-between; padding: 0 10px; background: #fff0f3; border-radius: 20px; }
     .recording-indicator { display: flex; align-items: center; gap: 8px; color: #FF4D6D; font-weight: bold; font-size: 0.9rem; }
@@ -224,15 +300,28 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, pencil, image, s
     .stop-record-btn { background: transparent; border: none; font-size: 1.8rem; color: #FF4D6D; display: flex; align-items: center; }
     .cancel-record-btn { background: transparent; border: none; font-size: 1.5rem; color: #666; display: flex; align-items: center; }
 
-    .doodle-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999; background: rgba(255,255,255,0.7); backdrop-filter: blur(2px); display: flex; flex-direction: column; }
-    .doodle-toolbar { position: absolute; bottom: 40px; left: 20px; right: 20px; display: flex; justify-content: space-between; align-items: center; background: white; padding: 10px 20px; border-radius: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); z-index: 10001; }
-    .doodle-colors { display: flex; gap: 10px; }
-    .color-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.2s; }
-    .color-dot.active { transform: scale(1.3); }
-    .doodle-btn { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; border: none; }
-    .doodle-btn.cancel { background: #999; }
-    .doodle-btn.send { background: #FF4D6D; }
+    .doodle-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999; display: flex; flex-direction: column; }
+    .doodle-topbar { position: absolute; top: env(safe-area-inset-top, 20px); left: 20px; right: 20px; display: flex; justify-content: space-between; align-items: center; z-index: 10001; }
+    .doodle-tools { display: flex; gap: 15px; background: rgba(0,0,0,0.5); padding: 8px 15px; border-radius: 30px; backdrop-filter: blur(10px); }
+    
+    .doodle-slider-container { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); z-index: 10001; height: 200px; display: flex; flex-direction: column; align-items: center; background: rgba(0,0,0,0.5); border-radius: 20px; padding: 15px 0; backdrop-filter: blur(10px); }
+    .doodle-slider { -webkit-appearance: slider-vertical; width: 8px; height: 100%; outline: none; }
+    
+    .doodle-toolbar { position: absolute; bottom: calc(env(safe-area-inset-bottom, 20px) + 70px); left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: center; background: rgba(80, 80, 80, 0.95); backdrop-filter: blur(10px); padding: 8px 12px; border-radius: 40px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 10001; gap: 8px; }
+    .doodle-left-actions { display: flex; gap: 4px; }
+    .doodle-colors-wrapper { display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden; }
+    .doodle-colors { display: flex; gap: 8px; overflow-x: auto; padding: 5px 0; scrollbar-width: none; }
+    .doodle-colors::-webkit-scrollbar { display: none; }
+    .color-dot { width: 32px; height: 32px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3); transition: transform 0.2s; flex-shrink: 0; }
+    .color-dot.active { transform: scale(1.2); }
+    .doodle-btn { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; border: none; background: transparent; flex-shrink: 0; transition: opacity 0.2s; }
+    .doodle-btn.cancel, .doodle-btn.undo { background: rgba(255,255,255,0.1); }
+    .doodle-btn.eyedropper { background: white; color: black; }
+    .doodle-btn.send { background: #FF1493; font-size: 1.8rem; }
+    .doodle-btn.undo[disabled] { opacity: 0.5; }
+    .doodle-btn.tool.active { background: #FF4D6D; }
     .doodle-canvas { flex: 1; width: 100%; height: 100%; touch-action: none; position: relative; z-index: 10000; }
+    .graffiti-overlay { position: absolute; pointer-events: none; z-index: 5; filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.2)); }
 
     .gif-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10000; background: rgba(0,0,0,0.4); display: flex; align-items: flex-end; }
     .gif-modal { width: 100%; height: 50vh; background: white; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; padding: 15px; animation: slideUpGif 0.3s ease-out; }
@@ -320,6 +409,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   public environment = environment;
   
   messages: any[] = [];
+  regularMessages: any[] = [];
+  graffitisByAnchorId: {[key: number]: any[]} = {};
   newMessage = '';
   sending = false;
   avatars: { [key: string]: string } = {};
@@ -332,7 +423,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   @ViewChild('doodleCanvas', { static: false }) doodleCanvas: any;
   
   constructor() {
-    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark });
+    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline });
   }
 
   private viewInitialized = false;
@@ -393,6 +484,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       const cache = await Preferences.get({ key: 'chat_cache' });
       if (cache.value) {
         this.messages = JSON.parse(cache.value);
+        this.processMessages();
         this.safeTimeout(() => this.scrollToBottom(false), 50);
         this.safeTimeout(() => this.scrollToBottom(false), 300);
       }
@@ -403,6 +495,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       // 3. Actualizar la vista solo si hay cambios (evita parpadeos)
       if (JSON.stringify(this.messages) !== JSON.stringify(newMessages)) {
         this.messages = newMessages;
+        this.processMessages();
         this.safeTimeout(() => this.scrollToBottom(false), 100);
         this.safeTimeout(() => this.scrollToBottom(true), 500);
         await Preferences.set({ key: 'chat_cache', value: JSON.stringify(this.messages) });
@@ -411,6 +504,32 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       console.error(e);
       this.showError('No pudimos cargar los mensajes. ¿Hay conexión?');
     }
+  }
+
+  private processMessages() {
+    this.regularMessages = [];
+    this.graffitisByAnchorId = {};
+
+    this.messages.forEach(msg => {
+      if (msg.mensaje && msg.mensaje.startsWith('[GRAFFITI:')) {
+        const parts = msg.mensaje.split(':');
+        if (parts.length >= 6) {
+          msg.isGraffiti = true;
+          msg.anchorMsgId = parseInt(parts[1], 10);
+          msg.offsetX = parseInt(parts[2], 10);
+          msg.offsetY = parseInt(parts[3], 10);
+          msg.width = parseInt(parts[4], 10);
+          msg.height = parseInt(parts[5].replace(']', ''), 10);
+          
+          if (!this.graffitisByAnchorId[msg.anchorMsgId]) {
+            this.graffitisByAnchorId[msg.anchorMsgId] = [];
+          }
+          this.graffitisByAnchorId[msg.anchorMsgId].push(msg);
+        }
+      } else {
+        this.regularMessages.push(msg);
+      }
+    });
   }
 
   async sendMessage() {
@@ -484,32 +603,50 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     await this.sendMessage();
   }
 
+  showAttachMenu = false;
+
   // --- Doodle Logic ---
   isDoodling = false;
   ctx: CanvasRenderingContext2D | null = null;
-  doodleColors = ['#FF4D6D', '#000000', '#3a86ff', '#ffbe0b', '#8338ec'];
+  doodleColors = ['#FF4D6D', '#ffffff', '#3a86ff', '#ffbe0b', '#8338ec'];
   currentDoodleColor = '#FF4D6D';
   drawing = false;
+  
+  doodleThickness = 10;
+  doodleType = 'neon'; // 'normal' | 'neon'
+  strokes: { points: {x: number, y: number}[], color: string, thickness: number, type: string }[] = [];
+  currentStrokePoints: {x: number, y: number}[] = [];
 
   startDoodle() {
     this.isDoodling = true;
+    this.strokes = [];
     this.safeTimeout(() => {
       if (this.doodleCanvas && this.doodleCanvas.nativeElement) {
         const canvas = this.doodleCanvas.nativeElement;
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         this.ctx = canvas.getContext('2d');
-        if (this.ctx) {
-          this.ctx.lineCap = 'round';
-          this.ctx.lineJoin = 'round';
-          this.ctx.lineWidth = 6;
-        }
       }
     }, 100);
   }
 
   cancelDoodle() {
     this.isDoodling = false;
+    this.strokes = [];
+  }
+
+  onCustomColorChange(e: any) {
+    this.currentDoodleColor = e.target.value;
+    if (!this.doodleColors.includes(this.currentDoodleColor)) {
+      this.doodleColors.unshift(this.currentDoodleColor);
+    }
+  }
+
+  undoDoodle() {
+    if (this.strokes.length > 0) {
+      this.strokes.pop();
+      this.redrawDoodle();
+    }
   }
 
   onDoodleStart(e: any) {
@@ -517,8 +654,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     this.drawing = true;
     const touch = e.touches[0];
     const rect = e.target.getBoundingClientRect();
-    this.ctx.beginPath();
-    this.ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+    this.currentStrokePoints = [{ x: touch.clientX - rect.left, y: touch.clientY - rect.top }];
   }
 
   onDoodleMove(e: any) {
@@ -526,43 +662,167 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     e.preventDefault();
     const touch = e.touches[0];
     const rect = e.target.getBoundingClientRect();
-    this.ctx.strokeStyle = this.currentDoodleColor;
-    this.ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
-    this.ctx.stroke();
+    
+    this.currentStrokePoints.push({ x: touch.clientX - rect.left, y: touch.clientY - rect.top });
+    this.redrawDoodle();
   }
 
   onDoodleEnd() {
+    if (this.drawing && this.currentStrokePoints.length > 0) {
+      this.strokes.push({ 
+        points: [...this.currentStrokePoints], 
+        color: this.currentDoodleColor, 
+        thickness: this.doodleThickness, 
+        type: this.doodleType 
+      });
+    }
+    this.currentStrokePoints = [];
     this.drawing = false;
+  }
+
+  redrawDoodle() {
+    if (!this.ctx || !this.doodleCanvas) return;
+    const canvas = this.doodleCanvas.nativeElement;
+    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    this.ctx.lineCap = 'round';
+    this.ctx.lineJoin = 'round';
+
+    const allStrokes = [...this.strokes];
+    if (this.currentStrokePoints.length > 0) {
+       allStrokes.push({ 
+         points: this.currentStrokePoints, 
+         color: this.currentDoodleColor,
+         thickness: this.doodleThickness,
+         type: this.doodleType
+       });
+    }
+
+    for (const stroke of allStrokes) {
+      if (stroke.points.length === 0) continue;
+      this.ctx.lineWidth = stroke.thickness;
+      
+      this.ctx.beginPath();
+      this.ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+      for (let i = 1; i < stroke.points.length; i++) {
+        this.ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+      }
+      
+      if (stroke.type === 'neon') {
+        this.ctx.shadowBlur = stroke.thickness * 2;
+        this.ctx.shadowColor = stroke.color;
+        this.ctx.strokeStyle = '#ffffff';
+      } else {
+        this.ctx.shadowBlur = 0;
+        this.ctx.strokeStyle = stroke.color;
+      }
+      
+      this.ctx.stroke();
+    }
+  }
+  
+  private cropCanvas(originalCanvas: HTMLCanvasElement): Promise<{blob: Blob, x: number, y: number, w: number, h: number} | null> {
+    return new Promise((resolve) => {
+      const ctx = originalCanvas.getContext('2d');
+      if (!ctx) return resolve(null);
+      const w = originalCanvas.width;
+      const h = originalCanvas.height;
+      const data = ctx.getImageData(0, 0, w, h).data;
+      let minX = w, minY = h, maxX = 0, maxY = 0;
+      
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const alpha = data[(y * w + x) * 4 + 3];
+          if (alpha > 0) {
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+          }
+        }
+      }
+      
+      if (minX > maxX) return resolve(null);
+      
+      minX = Math.max(0, minX - 20);
+      minY = Math.max(0, minY - 20);
+      maxX = Math.min(w, maxX + 20);
+      maxY = Math.min(h, maxY + 20);
+      
+      const cw = maxX - minX;
+      const ch = maxY - minY;
+      
+      const cropCanvas = document.createElement('canvas');
+      cropCanvas.width = cw;
+      cropCanvas.height = ch;
+      const cropCtx = cropCanvas.getContext('2d');
+      if (!cropCtx) return resolve(null);
+      
+      cropCtx.drawImage(originalCanvas, minX, minY, cw, ch, 0, 0, cw, ch);
+      cropCanvas.toBlob(blob => {
+        if (blob) resolve({ blob, x: minX, y: minY, w: cw, h: ch });
+        else resolve(null);
+      }, 'image/png');
+    });
   }
 
   async sendDoodle() {
     if (!this.doodleCanvas || !this.doodleCanvas.nativeElement) return;
     const canvas = this.doodleCanvas.nativeElement;
     
-    // Trim empty space could go here, but for now we just upload the whole thing 
-    // or rely on CSS object-fit/max-width to make it look like a sticker.
-    canvas.toBlob(async (blob: Blob) => {
-      if (!blob) return;
-      this.isDoodling = false;
-      this.sending = true;
-      try {
-        const file = new File([blob], 'doodle.png', { type: 'image/png' });
-        const res = await this.api.uploadPhoto(file, '[DOODLE]');
-        if (res && res.photo && res.photo.id) {
-          this.newMessage = '[DOODLE]';
-          const replyPayload = this.replyingTo ? { id: this.replyingTo.id, user: this.replyingTo.user?.name, text: '📷 Foto' } : undefined;
-          await this.api.sendMessage(this.newMessage, res.photo.id, replyPayload);
-          this.replyingTo = null;
-          await this.loadMessages();
-          this.safeTimeout(() => this.scrollToBottom(), 100);
-        }
-      } catch (e) {
-        console.error('Error sending doodle', e);
-        this.showError('Error al enviar garabato');
-      } finally {
-        this.sending = false;
+    const cropResult = await this.cropCanvas(canvas);
+    if (!cropResult || !cropResult.blob) {
+        this.isDoodling = false;
+        return;
+    }
+    
+    // Find closest message to the doodle's top (cropResult.y)
+    let anchorMsgId = this.messages.length > 0 ? this.messages[this.messages.length - 1].id : 0;
+    let offsetY = cropResult.y;
+    let offsetX = cropResult.x;
+
+    const messageElements = document.querySelectorAll('.message-row');
+    let closestDist = Infinity;
+    let closestEl: HTMLElement | null = null;
+
+    for (let i = 0; i < messageElements.length; i++) {
+      const htmlEl = messageElements[i] as HTMLElement;
+      const rect = htmlEl.getBoundingClientRect();
+      const dist = Math.abs(rect.top - cropResult.y);
+      if (dist < closestDist) {
+        closestDist = dist;
+        closestEl = htmlEl;
       }
-    }, 'image/png');
+    }
+
+    if (closestEl) {
+      const idMatch = closestEl.id.replace('msg-', '');
+      anchorMsgId = parseInt(idMatch, 10);
+      const rect = closestEl.getBoundingClientRect();
+      offsetY = cropResult.y - rect.top;
+      offsetX = cropResult.x - rect.left;
+    }
+    
+    this.isDoodling = false;
+    this.sending = true;
+    try {
+      const file = new File([cropResult.blob], 'doodle.png', { type: 'image/png' });
+      // Upload with graffiti tag
+      const description = `[GRAFFITI:${anchorMsgId}:${Math.round(offsetX)}:${Math.round(offsetY)}:${cropResult.w}:${cropResult.h}]`;
+      const res = await this.api.uploadPhoto(file, description);
+      if (res && res.photo && res.photo.id) {
+        const replyPayload = this.replyingTo ? { id: this.replyingTo.id, user: this.replyingTo.user?.name, text: '🎨 Graffiti' } : undefined;
+        await this.api.sendMessage(description, res.photo.id, replyPayload);
+        this.replyingTo = null;
+        await this.loadMessages();
+        this.safeTimeout(() => this.scrollToBottom(), 100);
+      }
+    } catch (e) {
+      console.error('Error sending doodle', e);
+      this.showError('Error al enviar garabato');
+    } finally {
+      this.sending = false;
+    }
   }
 
   // --- Audio Recording Logic ---
@@ -571,6 +831,16 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   audioChunks: any[] = [];
   recordingTime = 0;
   recordingInterval: any;
+  
+  onSendBtnClick(e: any) {
+    if (this.isRecording) {
+      this.stopAudioRecording();
+    } else if (this.newMessage.trim()) {
+      this.sendMessage();
+    } else {
+      this.startAudioRecording();
+    }
+  }
 
   async startAudioRecording() {
     try {
@@ -622,9 +892,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       // The backend saves the file and returns a photo object.
       const res = await this.api.uploadPhoto(file, '[AUDIO]');
       if (res && res.photo && res.photo.id) {
-        this.newMessage = '[AUDIO]';
         const replyPayload = this.replyingTo ? { id: this.replyingTo.id, user: this.replyingTo.user?.name, text: '🎤 Audio' } : undefined;
-        await this.api.sendMessage(this.newMessage, res.photo.id, replyPayload);
+        await this.api.sendMessage('[AUDIO]', res.photo.id, replyPayload);
         this.replyingTo = null;
         await this.loadMessages();
         this.safeTimeout(() => this.scrollToBottom(), 100);
@@ -634,6 +903,55 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       this.showError('Error al enviar audio');
     } finally {
       this.sending = false;
+    }
+  }
+
+  // --- Audio Player Logic ---
+  Infinity = Infinity;
+
+  getWaveform(msg: any): number[] {
+    if (msg._waveform) return msg._waveform;
+    const length = 30;
+    // Generate deterministic beautiful waveform based on message id
+    let seed = msg.id || Math.random() * 1000;
+    msg._waveform = Array.from({length}, (_, i) => {
+      // Bell curve shape
+      const normalized = i / (length - 1);
+      const bell = Math.sin(normalized * Math.PI);
+      
+      // Pseudo-random noise
+      seed = (seed * 9301 + 49297) % 233280;
+      const rnd = seed / 233280;
+      
+      const noise = rnd * 0.5 + 0.5; // 0.5 to 1.0
+      return Math.floor(bell * noise * 80) + 20; // 20 to 100%
+    });
+    return msg._waveform;
+  }
+
+  toggleAudio(msg: any, audioEl: HTMLAudioElement) {
+    if (msg.playing) {
+      audioEl.pause();
+    } else {
+      audioEl.play().catch(e => console.error("Play failed", e));
+    }
+  }
+
+  formatDuration(seconds: number): string {
+    if (!seconds || isNaN(seconds) || seconds === Infinity) return '0:00';
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  }
+
+  onAudioLoaded(audioEl: HTMLAudioElement) {
+    // Hack to fetch duration for WebM blobs if it's Infinity
+    if (audioEl.duration === Infinity) {
+      audioEl.currentTime = 1e101;
+      audioEl.ontimeupdate = () => {
+        audioEl.ontimeupdate = null;
+        audioEl.currentTime = 0;
+      };
     }
   }
 

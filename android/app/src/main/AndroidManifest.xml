@@ -55,6 +55,14 @@
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_daily_photo_info" />
         </receiver>
+
+        <receiver android:name=".PokeWidgetProvider" android:exported="true" android:label="@string/widget_poke_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.juanesj2.lovewidget.ACTION_POKE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_poke_info" />
+        </receiver>
     </application>
 
     <!-- Permissions -->
