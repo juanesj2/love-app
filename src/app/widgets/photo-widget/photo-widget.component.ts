@@ -88,7 +88,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
               <p *ngIf="photo.description" class="description">{{photo.description}}</p>
               
               <div class="reactions-list" *ngIf="photo.reactions?.length">
-                <span class="reaction-bubble" *ngFor="let r of photo.reactions | slice:0:3">{{r.content}}</span>
+                <span class="reaction-bubble" *ngFor="let r of photo.reactions | slice:0:3">{{$any(r).content}}</span>
                 <span class="reaction-bubble ellipsis-bubble" *ngIf="photo.reactions.length > 3">...</span>
               </div>
 
