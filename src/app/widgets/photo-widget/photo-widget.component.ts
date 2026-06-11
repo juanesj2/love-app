@@ -299,7 +299,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     
     .snap-feed::part(scroll) { scroll-snap-type: y mandatory; scroll-padding-top: 0px; }
     
-    .photo-card { scroll-snap-align: start; scroll-margin-top: 0; scroll-snap-stop: always; width: 100%; margin: 0 0 10px 0; background: rgba(255, 255, 255, 0.95); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column; }
+    .photo-card { scroll-snap-align: start; scroll-margin-top: 0; scroll-snap-stop: always; width: 100%; height: calc(100dvh - 56px - env(safe-area-inset-bottom, 0px)); margin: 0; background: rgba(255, 255, 255, 0.95); overflow: hidden; position: relative; display: flex; flex-direction: column; }
     
     .photo-overlay-bottom { position: absolute; bottom: 0; left: 0; width: 100%; padding: 40px 15px 12px 15px; display: flex; justify-content: space-between; align-items: flex-end; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%); pointer-events: none; }
     .photo-overlay-bottom > * { pointer-events: auto; }
@@ -311,7 +311,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .delete-post-btn { background: rgba(0,0,0,0.3); border: none; color: white; border-radius: 50%; width: 36px; height: 36px; font-size: 1.2rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
     .delete-post-btn:hover { background: #FF4D6D; transform: scale(1.1); }
     
-    .image-wrapper { width: 100%; aspect-ratio: 4/5; max-height: 70vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; position: relative; }
+    .image-wrapper { width: 100%; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; position: relative; }
     .main-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
     
     .photo-details { padding: 8px 14px; }
