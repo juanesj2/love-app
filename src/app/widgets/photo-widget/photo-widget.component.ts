@@ -68,19 +68,20 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
           <div *ngFor="let group of groupedPhotos" class="date-group">
             
           <div class="photo-card" *ngFor="let photo of group.photos; let i = index" [attr.data-date]="group.date" #photoCards>
-            <div class="card-header">
-              <div class="card-user-info">
-                <img *ngIf="avatars[photo.user?.name]" [src]="avatars[photo.user.name]" class="card-avatar" />
-                <div *ngIf="!avatars[photo.user?.name]" class="card-avatar-fallback">{{ photo.user?.name?.charAt(0) || 'U' }}</div>
-                <span class="card-username">{{photo.user?.name}}</span>
-              </div>
-              <button *ngIf="isMine(photo)" class="delete-post-btn" (click)="deletePhoto(photo)">
-                <ion-icon name="trash-outline"></ion-icon>
-              </button>
-            </div>
             
             <div class="image-wrapper">
               <img [src]="environment.storageUrl + photo.image_path" class="main-photo" loading="lazy" />
+              
+              <div class="photo-overlay-bottom">
+                <div class="card-user-info">
+                  <img *ngIf="avatars[photo.user?.name]" [src]="avatars[photo.user.name]" class="card-avatar" />
+                  <div *ngIf="!avatars[photo.user?.name]" class="card-avatar-fallback">{{ photo.user?.name?.charAt(0) || 'U' }}</div>
+                  <span class="card-username">{{photo.user?.name}}</span>
+                </div>
+                <button *ngIf="isMine(photo)" class="delete-post-btn" (click)="deletePhoto(photo)">
+                  <ion-icon name="trash-outline"></ion-icon>
+                </button>
+              </div>
             </div>
             
             <div class="photo-details">
@@ -265,7 +266,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     
     .scroll-content { flex: 1; --background: transparent; }
-    .photos-list { padding-top: 90px; padding-bottom: 40px; }
+    .photos-list { padding-top: 0; padding-bottom: 40px; }
     
     .global-date-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; visibility: hidden; transition: opacity 0.8s ease-in-out, visibility 0.8s; pointer-events: none; border-radius: inherit; }
     .global-date-overlay.show { opacity: 1; visibility: visible; }
@@ -298,17 +299,19 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     
     .snap-feed::part(scroll) { scroll-snap-type: y mandatory; scroll-padding-top: 80px; }
     
-    .photo-card { scroll-snap-align: start; scroll-margin-top: 75px; scroll-snap-stop: always; width: calc(100% - 20px); max-width: 500px; margin: 0 auto 20px auto; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 28px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.8); transition: transform 0.3s ease; }
+    .photo-card { scroll-snap-align: start; scroll-margin-top: 0; scroll-snap-stop: always; width: 100%; margin: 0 0 10px 0; background: rgba(255, 255, 255, 0.95); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column; }
     
-    .photo-card:hover { transform: translateY(-3px); }
-    .card-header { display: flex; align-items: center; justify-content: space-between; padding: 6px 14px; border-bottom: 1px solid rgba(0,0,0,0.03); }
+    .photo-overlay-bottom { position: absolute; bottom: 0; left: 0; width: 100%; padding: 40px 15px 12px 15px; display: flex; justify-content: space-between; align-items: flex-end; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%); pointer-events: none; }
+    .photo-overlay-bottom > * { pointer-events: auto; }
     .card-user-info { display: flex; align-items: center; gap: 10px; }
-    .card-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid #FF4D6D; }
-    .card-avatar-fallback { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; }
-    .card-username { font-weight: 700; color: #590D22; font-size: 0.95rem; text-transform: capitalize; }
-    .delete-post-btn { background: none; border: none; color: #ffb3c1; font-size: 1.2rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
-    .delete-post-btn:hover { color: #FF4D6D; transform: scale(1.1); }
-    .image-wrapper { width: 100%; aspect-ratio: 1/1; max-height: 42vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fdfdfd; position: relative; }
+    .card-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .card-avatar-fallback { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1rem; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .card-username { font-weight: 700; color: white; font-size: 1.05rem; text-transform: capitalize; text-shadow: 0 1px 4px rgba(0,0,0,0.6); }
+    
+    .delete-post-btn { background: rgba(0,0,0,0.3); border: none; color: white; border-radius: 50%; width: 36px; height: 36px; font-size: 1.2rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+    .delete-post-btn:hover { background: #FF4D6D; transform: scale(1.1); }
+    
+    .image-wrapper { width: 100%; aspect-ratio: 4/5; max-height: 70vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; position: relative; }
     .main-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
     
     .photo-details { padding: 8px 14px; }
