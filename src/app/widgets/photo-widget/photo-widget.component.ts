@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -59,29 +59,27 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
         <div class="photos-list" *ngIf="groupedPhotos.length > 0 && viewMode === 'feed'; else noFeedPhotos">
           <div *ngFor="let group of groupedPhotos" class="date-group">
             
-            <div class="date-card">
-              <div class="date-card-content">
+          <div class="photo-card" *ngFor="let photo of group.photos; let i = index" #photoCards>
+            <div class="card-header">
+              <div class="card-user-info">
+                <img [src]="environment.storageUrl + avatars[photo.username]" class="card-avatar" *ngIf="avatars[photo.username]" />
+                <div class="card-avatar-fallback" *ngIf="!avatars[photo.username]">{{ photo.username.charAt(0).toUpperCase() }}</div>
+                <span class="card-username">{{ photo.username }}</span>
+              </div>
+              <button class="delete-post-btn" *ngIf="currentAlbum" (click)="removePhotoFromAlbum(photo, $event)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </button>
+            </div>
+            
+            <div class="image-wrapper" (dblclick)="toggleReaction(photo, '❤️')">
+              <div class="date-cover-overlay" *ngIf="i === 0">
                 <ion-icon name="calendar-outline"></ion-icon>
                 <h2>{{ group.date }}</h2>
                 <p *ngIf="group.date === 'Hoy'">Tus recuerdos de hoy</p>
                 <p *ngIf="group.date === 'Ayer'">Lo que vivisteis ayer</p>
                 <p *ngIf="group.date !== 'Hoy' && group.date !== 'Ayer'">Tus recuerdos</p>
               </div>
-            </div>
-
-          <div class="photo-card" *ngFor="let photo of group.photos">
-            <div class="card-header">
-              <div class="card-user-info">
-                <img *ngIf="avatars[photo.user?.name]" [src]="avatars[photo.user.name]" class="card-avatar" />
-                <div *ngIf="!avatars[photo.user?.name]" class="card-avatar-fallback">{{ photo.user?.name?.charAt(0) || 'U' }}</div>
-                <span class="card-username">{{photo.user?.name}}</span>
-              </div>
-              <button *ngIf="isMine(photo)" class="delete-post-btn" (click)="deletePhoto(photo)">
-                <ion-icon name="trash-outline"></ion-icon>
-              </button>
-            </div>
-            
-            <div class="image-wrapper">
+              
               <img [src]="environment.storageUrl + photo.image_path" class="main-photo" loading="lazy" />
             </div>
             
@@ -269,15 +267,13 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .scroll-content { flex: 1; --background: transparent; }
     .photos-list { padding-top: 90px; padding-bottom: 40px; }
     
-    .date-card { scroll-snap-align: start; scroll-margin-top: 80px; scroll-snap-stop: always; width: calc(100% - 20px); max-width: 500px; margin: 0 auto 20px auto; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border-radius: 28px; box-shadow: 0 10px 30px rgba(255, 77, 109, 0.4); display: flex; align-items: center; justify-content: center; height: 45vh; min-height: 250px; position: relative; overflow: hidden; }
-    .date-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%); animation: rotate 10s linear infinite; }
-    @keyframes rotate { 100% { transform: rotate(360deg); } }
-    .date-card-content { text-align: center; position: relative; z-index: 2; animation: scaleIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    .date-card-content ion-icon { font-size: 4rem; margin-bottom: 10px; opacity: 0.9; }
-    .date-card-content h2 { font-size: 2.5rem; font-weight: 800; margin: 0; text-transform: capitalize; letter-spacing: -1px; }
-    .date-card-content p { font-size: 1.1rem; opacity: 0.85; margin: 10px 0 0 0; font-weight: 600; }
+    .date-cover-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; pointer-events: auto; }
+    .date-cover-overlay ion-icon { font-size: 4rem; margin-bottom: 10px; opacity: 0.9; }
+    .date-cover-overlay h2 { font-size: 2.5rem; font-weight: 800; margin: 0; text-transform: capitalize; letter-spacing: -1px; }
+    .date-cover-overlay p { font-size: 1.1rem; opacity: 0.85; margin: 10px 0 0 0; font-weight: 600; }
     
-    .gallery-month-group { margin-bottom: 25px; }
+    .date-cover-overlay.start-fade { animation: fadeOutDate 0.8s ease-in-out 1.2s forwards; pointer-events: none; }
+    @keyframes fadeOutDate { to { opacity: 0; visibility: hidden; } }
     .month-header { display: flex; justify-content: space-between; align-items: center; margin: 0 10px 10px 10px; border-bottom: 2px solid rgba(255, 77, 109, 0.2); padding-bottom: 5px; }
     .gallery-month-title { margin: 0; font-size: 1.1rem; font-weight: 800; color: #590D22; text-transform: capitalize; }
     .select-month-wrapper { font-size: 1.5rem; color: #FF4D6D; cursor: pointer; display: flex; align-items: center; }
@@ -312,7 +308,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .card-username { font-weight: 700; color: #590D22; font-size: 0.95rem; text-transform: capitalize; }
     .delete-post-btn { background: none; border: none; color: #ffb3c1; font-size: 1.2rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
     .delete-post-btn:hover { color: #FF4D6D; transform: scale(1.1); }
-    .image-wrapper { width: 100%; aspect-ratio: 1/1; max-height: 48vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fdfdfd; }
+    .image-wrapper { width: 100%; aspect-ratio: 1/1; max-height: 48vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fdfdfd; position: relative; }
     .main-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
     
     .photo-details { padding: 12px 16px; }
@@ -410,6 +406,7 @@ export class PhotoWidgetComponent implements OnInit {
   uploading = false;
   avatars: { [key: string]: string } = {};
   private firestore = inject(Firestore);
+  private observer: IntersectionObserver | null = null;
 
   constructor() {
     addIcons({ arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline });
@@ -418,6 +415,25 @@ export class PhotoWidgetComponent implements OnInit {
   ngOnInit() {
     this.loadAvatars();
     this.loadData();
+  }
+  
+  ngOnDestroy() {
+    if (this.observer) this.observer.disconnect();
+  }
+
+  setupObserver() {
+    if (this.observer) this.observer.disconnect();
+    this.observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('start-fade');
+        }
+      });
+    }, { threshold: 0.6 });
+    
+    setTimeout(() => {
+      document.querySelectorAll('.date-cover-overlay').forEach(el => this.observer?.observe(el));
+    }, 300);
   }
 
   async loadAvatars() {
@@ -468,9 +484,13 @@ export class PhotoWidgetComponent implements OnInit {
         this.photos = newPhotos;
         this.groupPhotosByDate();
         this.groupPhotosForGallery();
+        this.setupObserver();
         if (!this.currentAlbum) {
           await Preferences.set({ key: 'feed_photos_cache', value: JSON.stringify(this.photos) });
         }
+      } else {
+        // Asegurarse de enganchar el observer aunque vengan de caché
+        this.setupObserver();
       }
       
       this.albums = await this.api.getAlbums();
@@ -498,6 +518,7 @@ export class PhotoWidgetComponent implements OnInit {
       this.photos = [...this.photos, ...newPhotos];
       this.groupPhotosByDate();
       this.groupPhotosForGallery();
+      this.setupObserver();
       event.target.complete();
     } catch (e) {
       event.target.complete();
