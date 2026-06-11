@@ -432,11 +432,11 @@ export class PhotoWidgetComponent implements OnInit {
     if (this.observer) this.observer.disconnect();
     this.observer = new IntersectionObserver((entries) => {
       let bestEntry: IntersectionObserverEntry | null = null;
-      entries.forEach(entry => {
+      for (const entry of entries) {
         if (entry.isIntersecting) {
           bestEntry = entry;
         }
-      });
+      }
       if (bestEntry) {
         const date = (bestEntry.target as HTMLElement).getAttribute('data-date');
         if (date) this.triggerGlobalDateOverlay(date);
