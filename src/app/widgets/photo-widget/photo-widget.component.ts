@@ -59,7 +59,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
         </div>
       </div>
 
-      <ion-content class="scroll-content" [class.snap-feed]="viewMode === 'feed'" (ionScroll)="onScroll($event)" [scrollEvents]="true">
+      <ion-content class="scroll-content" [class.snap-feed]="viewMode === 'feed'">
         <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
           <ion-refresher-content></ion-refresher-content>
         </ion-refresher>
@@ -79,7 +79,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
               </button>
             </div>
             
-            <div class="image-wrapper" (dblclick)="toggleReaction(photo, '❤️')">
+            <div class="image-wrapper">
               <img [src]="environment.storageUrl + photo.image_path" class="main-photo" loading="lazy" />
             </div>
             
@@ -431,7 +431,7 @@ export class PhotoWidgetComponent implements OnInit {
   setupObserver() {
     if (this.observer) this.observer.disconnect();
     this.observer = new IntersectionObserver((entries) => {
-      let bestEntry = null;
+      let bestEntry: IntersectionObserverEntry | null = null;
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           bestEntry = entry;
