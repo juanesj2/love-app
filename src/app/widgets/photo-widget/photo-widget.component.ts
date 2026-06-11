@@ -51,7 +51,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
         </div>
       </div>
 
-      <ion-content class="scroll-content">
+      <ion-content class="scroll-content" [class.snap-feed]="viewMode === 'feed'">
         <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
           <ion-refresher-content></ion-refresher-content>
         </ion-refresher>
@@ -289,7 +289,9 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .grid-overlay { position: absolute; bottom: 3px; right: 3px; background: rgba(255,255,255,0.85); border-radius: 12px; padding: 1px 4px; font-size: 0.7rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
     .selection-overlay { position: absolute; top: 5px; right: 5px; font-size: 1.5rem; color: #FF4D6D; background: rgba(255,255,255,0.8); border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
     
-    .photo-card { max-width: 500px; margin: 0 auto 25px auto; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border-radius: 24px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.8); transition: transform 0.3s ease; }
+    .snap-feed::part(scroll) { scroll-snap-type: y mandatory; scroll-padding-top: 15px; }
+    
+    .photo-card { scroll-snap-align: center; scroll-snap-stop: always; width: calc(100% - 30px); max-width: 500px; margin: 0 auto 30px auto; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 28px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.8); transition: transform 0.3s ease; }
     .photo-card:hover { transform: translateY(-5px); }
     .card-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.03); }
     .card-user-info { display: flex; align-items: center; gap: 10px; }
@@ -298,8 +300,8 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .card-username { font-weight: 700; color: #590D22; font-size: 0.95rem; text-transform: capitalize; }
     .delete-post-btn { background: none; border: none; color: #ffb3c1; font-size: 1.2rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
     .delete-post-btn:hover { color: #FF4D6D; transform: scale(1.1); }
-    .image-wrapper { width: 100%; max-height: 450px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fff5f8; }
-    .main-photo { width: 100%; height: 100%; max-height: 450px; object-fit: contain; display: block; }
+    .image-wrapper { width: 100%; aspect-ratio: 4/5; max-height: 65vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fdfdfd; }
+    .main-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
     
     .photo-details { padding: 16px; }
     .description { margin: 0 0 10px 0; color: #444; font-size: 0.95rem; line-height: 1.4; }
