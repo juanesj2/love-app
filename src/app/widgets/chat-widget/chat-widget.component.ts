@@ -327,7 +327,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
     .gif-modal { width: 100%; height: 50vh; background: white; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; padding: 15px; animation: slideUpGif 0.3s ease-out; }
     @keyframes slideUpGif { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .gif-header { display: flex; gap: 10px; margin-bottom: 15px; }
-    .gif-search { flex: 1; padding: 10px 15px; border-radius: 20px; border: 1px solid #ddd; background: #f5f5f5; outline: none; }
+    .gif-search { flex: 1; padding: 10px 15px; border-radius: 20px; border: 1px solid #ddd; background: #f5f5f5; color: #333; outline: none; }
     .gif-search-btn { background: #FF4D6D; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
     .gif-results { display: flex; flex-wrap: wrap; gap: 5px; overflow-y: auto; flex: 1; align-content: flex-start; justify-content: center; }
     .gif-results img { height: 100px; border-radius: 8px; cursor: pointer; object-fit: cover; }
