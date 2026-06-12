@@ -469,6 +469,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   replyingTo: any = null;
   showReactionsMsgId: number | null = null;
   currentUser: string = '';
+  myUserId: number = 0;
   private timeouts: any[] = [];
 
   @ViewChild('doodleCanvas', { static: false }) doodleCanvas: any;
@@ -499,6 +500,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     try {
       const info = await this.api.getCoupleInfo();
       if (info) {
+        this.myUserId = info.my_id;
         if (info.my_name && info.my_avatar) {
           this.avatars[info.my_name] = info.my_avatar;
         }
@@ -1246,8 +1248,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   isMine(msg: any): boolean {
-    if (!msg || !msg.user) return false;
-    return msg.user.name === this.currentUser;
+    if (!msg) return false;
+    return msg.user_id === this.myUserId;
   }
 
   trackByMsgId(index: number, msg: any) {
@@ -1259,8 +1261,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       message,
       duration: 3000,
       color: 'danger',
-      position: 'top',
-      icon: 'alert-circle-outline'
+      position: 'bottom'
     });
     await toast.present();
   }
