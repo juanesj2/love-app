@@ -91,29 +91,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             </div>
           </div>
 
-          <!-- Modal for Event Details -->
-          <div class="custom-overlay" *ngIf="isEventModalOpen" (click)="isEventModalOpen = false">
-            <div class="modal-content glass-card" style="margin: 20px; padding: 30px; text-align: center; width: 85%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.85); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15);" (click)="$event.stopPropagation()">
-              <ion-icon [name]="selectedEvent?.icon" style="font-size: 4rem; color: #FF4D6D; margin-bottom: 15px; background: rgba(255,77,109,0.1); padding: 15px; border-radius: 50%;"></ion-icon>
-              <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.5rem;">{{ selectedEvent?.name }}</h2>
-              <p style="color: #a4133c; font-size: 1.1rem; font-weight: 700; margin-bottom: 25px;">
-                {{ selectedEvent?.dateStr }}
-              </p>
-              
-              <div style="background: rgba(255,77,109,0.1); border-radius: 18px; padding: 18px; margin-bottom: 25px;">
-                <h3 *ngIf="selectedEvent?.daysLeft > 0" style="color: #FF4D6D; margin: 0; font-weight: 900; font-size: 1.2rem;">
-                  Faltan {{ selectedEvent?.daysLeft }} días
-                </h3>
-                <h3 *ngIf="selectedEvent?.daysLeft === 0" style="color: #FF4D6D; margin: 0; font-weight: 900; font-size: 1.2rem;">
-                  ¡Es hoy! 🎉
-                </h3>
-              </div>
 
-              <button class="glass-btn" (click)="isEventModalOpen = false" style="width: 100%; padding: 15px; font-size: 1.1rem; border-radius: 14px;">
-                Cerrar
-              </button>
-            </div>
-          </div>
 
           <div class="date-picker-glass" style="margin-top: 15px;">
             <label>Mi cumpleaños</label>
@@ -210,6 +188,30 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
         <button class="logout-btn" (click)="confirmLogout()">
           <ion-icon name="log-out-outline"></ion-icon> Cerrar sesión
         </button>
+      </div>
+
+      <!-- Modal for Event Details -->
+      <div class="custom-overlay" *ngIf="isEventModalOpen" (click)="isEventModalOpen = false">
+        <div class="modal-content glass-card" style="margin: 20px; padding: 30px; text-align: center; width: 85%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.85); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15);" (click)="$event.stopPropagation()">
+          <ion-icon [name]="selectedEvent?.icon" style="font-size: 4rem; color: #FF4D6D; margin-bottom: 15px; background: rgba(255,77,109,0.1); padding: 15px; border-radius: 50%;"></ion-icon>
+          <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.5rem;">{{ selectedEvent?.name }}</h2>
+          <p style="color: #a4133c; font-size: 1.1rem; font-weight: 700; margin-bottom: 25px;">
+            {{ selectedEvent?.dateStr }}
+          </p>
+          
+          <div style="background: rgba(255,77,109,0.1); border-radius: 18px; padding: 18px; margin-bottom: 25px;">
+            <h3 *ngIf="selectedEvent?.daysLeft > 0" style="color: #FF4D6D; margin: 0; font-weight: 900; font-size: 1.2rem;">
+              Faltan {{ selectedEvent?.daysLeft }} días
+            </h3>
+            <h3 *ngIf="selectedEvent?.daysLeft === 0" style="color: #FF4D6D; margin: 0; font-weight: 900; font-size: 1.2rem;">
+              ¡Es hoy! 🎉
+            </h3>
+          </div>
+
+          <button class="glass-btn" (click)="isEventModalOpen = false" style="width: 100%; padding: 15px; font-size: 1.1rem; border-radius: 14px;">
+            Cerrar
+          </button>
+        </div>
       </div>
     </ion-content>
   `,
