@@ -98,6 +98,21 @@ export class LoveApiService {
     return firstValueFrom(this.http.get<any>(`${API_BASE_URL}/love-album/info?local_date=${localDate}`, { headers }));
   }
 
+  async uploadAvatar(base64Image: string): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/avatar`, { avatar: base64Image }, { headers }));
+  }
+
+  async getRouletteOptions(): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.get(`${API_BASE_URL}/roulette`, { headers }));
+  }
+
+  async updateRouletteOptions(options: string[]): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/roulette`, { options }, { headers }));
+  }
+
   async updateCoupleInfo(data: any): Promise<any> {
     const headers = await this.getHeaders();
     return firstValueFrom(this.http.put<any>(`${API_BASE_URL}/love-album/info`, data, { headers }));

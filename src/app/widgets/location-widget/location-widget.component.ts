@@ -140,6 +140,8 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
       this.partnerId = info.partner_id as any;
       this.myMood = info.my_mood || '';
       this.partnerMood = info.partner_mood || '';
+      this.myAvatarUrl = info.my_avatar || '';
+      this.partnerAvatarUrl = info.partner_avatar || '';
 
       const myName = info.my_name || 'Yo';
       this.locationService.updateMyLocation(this.myUserId, myName).catch(err => {
@@ -252,9 +254,6 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
     const partner$ = this.locationService.listenToUserLocation(this.partnerId);
 
     this.locationsSub = combineLatest([me$, partner$]).subscribe(([me, partner]) => {
-      if (me) this.myAvatarUrl = me.avatar || '';
-      if (partner) this.partnerAvatarUrl = partner.avatar || '';
-
       // Fallback si no hay posición en Firebase (ej: Madrid y Barcelona)
       const myPos = me?.position 
         ? L.latLng(me.position.latitude, me.position.longitude)
@@ -277,8 +276,8 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
           this.hasCentered = true;
         }
       } else {
-        this.updateMarker('me', myPos, me?.avatar);
-        this.updateMarker('partner', partnerPos, partner?.avatar);
+        this.updateMarker('me', myPos, this.myAvatarUrl);
+        this.updateMarker('partner', partnerPos, this.partnerAvatarUrl);
         this.drawConnection(myPos, partnerPos);
         
         const midPoint = L.latLng((myPos.lat + partnerPos.lat) / 2, (myPos.lng + partnerPos.lng) / 2);

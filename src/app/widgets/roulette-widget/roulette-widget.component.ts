@@ -6,6 +6,7 @@ import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
 import { addIcons } from 'ionicons';
 import { closeCircle, addCircleOutline, syncOutline, arrowBack } from 'ionicons/icons';
 import { Location } from '@angular/common';
+import { LoveApiService } from '../../services/love-api.service';
 
 @Component({
   selector: 'app-roulette-widget',
@@ -107,6 +108,7 @@ export class RouletteWidgetComponent implements OnInit, OnDestroy {
   private firestore = inject(Firestore);
   private toastCtrl = inject(ToastController);
   private location = inject(Location);
+  private api = inject(LoveApiService);
   
   options: string[] = ['Peli y Manta', 'Cena Fuera', 'Cocinar Juntos', 'Masajes', 'Noche de Juegos', 'Paseo Nocturno'];
   newOption = '';
@@ -141,12 +143,11 @@ export class RouletteWidgetComponent implements OnInit, OnDestroy {
 
   async loadOptions() {
     try {
-      const docRef = doc(this.firestore, 'locations', 'roulette_options');
-      const snap = await getDoc(docRef);
-      if (snap.exists() && snap.data()['list']) {
-        this.options = snap.data()['list'];
-        this.computeSliceData();
+      const res = await this.api.getRouletteOptions();
+      if (res && res.options && res.options.length > 0) {
+        this.options = res.options;
       }
+      this.computeSliceData();
     } catch(e) {
       console.error(e);
     }
@@ -154,8 +155,7 @@ export class RouletteWidgetComponent implements OnInit, OnDestroy {
 
   async saveOptions() {
     try {
-      const docRef = doc(this.firestore, 'locations', 'roulette_options');
-      await setDoc(docRef, { list: this.options }, { merge: true });
+      await this.api.updateRouletteOptions(this.options);
     } catch(e) {
       console.error(e);
     }

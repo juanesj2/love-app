@@ -85,22 +85,4 @@ export class LocationService {
     const userDocRef = doc(this.firestore, `locations/${userId}`);
     return docData(userDocRef) as Observable<UserLocation>;
   }
-
-  /**
-   * Sube la imagen comprimida (base64) DIRECTAMENTE a Firestore
-   * para evitar usar Firebase Storage y que no pida tarjeta.
-   */
-  async uploadAvatar(userId: 'juan' | 'roberta', base64Image: string) {
-    try {
-      // Usamos setDoc con { merge: true } en lugar de updateDoc porque
-      // si el GPS falló y el documento aún no existe, updateDoc daría error.
-      const userDocRef = doc(this.firestore, `locations/${userId}`);
-      await setDoc(userDocRef, { avatar: base64Image }, { merge: true });
-
-      return base64Image;
-    } catch (error) {
-      console.error('Error subiendo avatar a Firestore:', error);
-      throw error;
-    }
-  }
 }

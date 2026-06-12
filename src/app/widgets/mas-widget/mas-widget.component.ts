@@ -524,7 +524,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
         if (image.dataUrl) {
           this.uploadingAvatar = true;
           try {
-            await this.locationService.uploadAvatar(this.myUserId, image.dataUrl);
+            await this.api.uploadAvatar(image.dataUrl);
             this.showToast('Foto de perfil actualizada con éxito', 'success');
           } catch(e) {
             console.error('Error updating avatar:', e);
