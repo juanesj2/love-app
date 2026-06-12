@@ -46,6 +46,15 @@ public class MainActivity extends BridgeActivity {
             }
             intent.removeExtra("open_album_id");
         }
+        
+        if (intent != null && intent.hasExtra("action")) {
+            String action = intent.getStringExtra("action");
+            if (action != null && !action.isEmpty()) {
+                android.content.SharedPreferences capPrefs = getSharedPreferences("CapacitorStorage", android.content.Context.MODE_PRIVATE);
+                capPrefs.edit().putString("widget_action", action).apply();
+            }
+            intent.removeExtra("action");
+        }
     }
 
     private void triggerImmediateWidgetUpdates() {

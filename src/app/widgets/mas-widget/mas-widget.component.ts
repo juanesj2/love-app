@@ -26,7 +26,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
         </div>
 
         <!-- Nuestro Tiempo -->
-        <div class="glass-card">
+        <div class="glass-card" id="nuestro-tiempo">
           <div class="section-title">
             <ion-icon name="time-outline"></ion-icon>
             <h3>Nuestro Tiempo Juntos</h3>
@@ -297,7 +297,24 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
       }
     } catch (e) {
       const dateRes = await Preferences.get({ key: 'relationshipStartDate' });
-      if (dateRes.value) this.startDate = dateRes.value;
+      if (dateRes.value) {
+        this.startDate = dateRes.value;
+      }
+    }
+    
+    // Check intent
+    const actionIntent = await Preferences.get({ key: 'action_intent' });
+    if (actionIntent.value === 'scroll_to_counter') {
+      setTimeout(() => {
+        const el = document.getElementById('nuestro-tiempo');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+          // Optional: Add a brief highlight class
+          el.classList.add('highlight-pulse');
+          setTimeout(() => el.classList.remove('highlight-pulse'), 2000);
+        }
+      }, 500); // Give DOM time to render
+      await Preferences.remove({ key: 'action_intent' });
     }
 
     const albumRes = await Preferences.get({ key: 'widgetAlbumId' });

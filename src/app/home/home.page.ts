@@ -256,6 +256,12 @@ export class HomePage implements OnInit, OnDestroy {
       await Preferences.set({ key: 'open_album_id_intent', value: albumRes.value });
       await Preferences.remove({ key: 'widget_open_album_id' });
     }
+    
+    const actionRes = await Preferences.get({ key: 'widget_action' });
+    if (actionRes.value) {
+      await Preferences.set({ key: 'action_intent', value: actionRes.value });
+      await Preferences.remove({ key: 'widget_action' });
+    }
   }
 
   async ngOnInit() {
