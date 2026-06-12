@@ -82,6 +82,20 @@
     box-shadow: 0 0 0 3px rgba(255, 77, 109, 0.1) !important;
   }
 
+  /* Fix for the password eye icon */
+  .alert-input-wrapper {
+    button, ion-icon, svg {
+      color: #590D22 !important;
+      fill: #590D22 !important;
+    }
+  }
+
+  /* Native browser eye icon fallback */
+  .alert-input::-ms-reveal,
+  .alert-input::-webkit-reveal {
+    filter: brightness(0.2) sepia(1) hue-rotate(300deg) saturate(3);
+  }
+
   .alert-button-group {
     justify-content: space-around !important;
     padding: 10px 10px 15px !important;
