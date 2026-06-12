@@ -217,9 +217,8 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
         </div>
         
         <div class="doodle-colors-wrapper">
-          <button class="doodle-btn eyedropper" (click)="colorPicker.click()">
+          <button class="doodle-btn eyedropper" (click)="openColorPicker()">
             <ion-icon name="color-palette"></ion-icon>
-            <input #colorPicker type="color" style="display:none" (change)="onCustomColorChange($event)">
           </button>
           <div class="doodle-colors">
             <div class="color-dot" *ngFor="let c of doodleColors" [style.background]="c" [class.active]="currentDoodleColor === c" (click)="currentDoodleColor = c"></div>
@@ -229,6 +228,28 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
         <button class="doodle-btn send" (click)="sendDoodle()"><ion-icon name="paper-plane"></ion-icon></button>
       </div>
       <canvas #doodleCanvas class="doodle-canvas" (touchstart)="onDoodleStart($event)" (touchmove)="onDoodleMove($event)" (touchend)="onDoodleEnd()"></canvas>
+    </div>
+
+    <!-- Custom Color Picker Overlay -->
+    <div class="color-picker-overlay" *ngIf="showColorPicker">
+      <div class="color-picker-modal">
+        <h3>Elige un Color</h3>
+        <div class="color-grid">
+          <div class="color-swatch" *ngFor="let color of extendedColors" 
+               [style.background]="color" 
+               [class.selected]="tempColor === color"
+               (click)="tempColor = color">
+          </div>
+        </div>
+        <div class="color-preview-row">
+          <div class="preview-circle" [style.background]="tempColor"></div>
+          <input type="text" class="hex-input" [(ngModel)]="tempColor" />
+        </div>
+        <div class="color-picker-actions">
+          <button class="cp-btn cancel" (click)="showColorPicker = false">Cancelar</button>
+          <button class="cp-btn accept" (click)="acceptCustomColor()">Aceptar</button>
+        </div>
+      </div>
     </div>
   `,
   styles: [`
@@ -410,6 +431,22 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
     .send-btn { width: 44px; height: 44px; border-radius: 50%; border: none; background: #e0d4d7; color: white; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; }
     .send-btn.active { background: linear-gradient(135deg, #FF4D6D 0%, #c9184a 100%); box-shadow: 0 4px 12px rgba(255, 77, 109, 0.4); transform: rotate(-10deg); }
     .send-btn.active:hover { transform: rotate(0deg) scale(1.1); }
+
+    /* Custom Color Picker */
+    .color-picker-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 2000; display: flex; align-items: center; justify-content: center; }
+    .color-picker-modal { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(16px); border-radius: 24px; padding: 25px; width: 90%; max-width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.8); }
+    .color-picker-modal h3 { margin: 0 0 20px 0; font-size: 1.3rem; font-weight: 800; color: #590D22; text-align: center; }
+    .color-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 20px; }
+    .color-swatch { aspect-ratio: 1; border-radius: 50%; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 2px solid transparent; transition: transform 0.2s; }
+    .color-swatch.selected { transform: scale(1.2); border-color: #590D22; }
+    .color-preview-row { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+    .preview-circle { width: 40px; height: 40px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.15); border: 2px solid white; }
+    .hex-input { flex: 1; padding: 10px 15px; border-radius: 12px; border: 1px solid #ddd; outline: none; font-family: monospace; font-size: 1rem; color: #590D22; background: white; text-transform: uppercase; }
+    .color-picker-actions { display: flex; gap: 15px; }
+    .cp-btn { flex: 1; padding: 14px; border-radius: 14px; font-weight: bold; font-size: 1rem; border: none; cursor: pointer; transition: transform 0.2s; }
+    .cp-btn:active { transform: scale(0.95); }
+    .cp-btn.cancel { background: #f0f0f0; color: #666; }
+    .cp-btn.accept { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3); }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
@@ -624,6 +661,16 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   isDoodling = false;
   ctx: CanvasRenderingContext2D | null = null;
   doodleColors = ['#FF4D6D', '#ffffff', '#3a86ff', '#ffbe0b', '#8338ec'];
+  showColorPicker = false;
+  tempColor = '#FF4D6D';
+  extendedColors = [
+    '#FF4D6D', '#c9184a', '#a4133c', '#590D22',
+    '#ff8fa3', '#ffb3c1', '#ffccd5', '#fff0f3',
+    '#ff9f1c', '#ffbf69', '#ffffff', '#000000',
+    '#3a86ff', '#4361ee', '#4cc9f0', '#48cae4',
+    '#2dc653', '#208b3a', '#1a7431', '#10451d',
+    '#7209b7', '#b5179e', '#f72585', '#3f37c9'
+  ];
   currentDoodleColor = '#FF4D6D';
   drawing = false;
   
@@ -650,11 +697,17 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     this.strokes = [];
   }
 
-  onCustomColorChange(e: any) {
-    this.currentDoodleColor = e.target.value;
+  openColorPicker() {
+    this.tempColor = this.currentDoodleColor;
+    this.showColorPicker = true;
+  }
+
+  acceptCustomColor() {
+    this.currentDoodleColor = this.tempColor;
     if (!this.doodleColors.includes(this.currentDoodleColor)) {
       this.doodleColors.unshift(this.currentDoodleColor);
     }
+    this.showColorPicker = false;
   }
 
   undoDoodle() {
