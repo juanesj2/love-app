@@ -71,7 +71,7 @@ import { LoveApiService } from '../../services/love-api.service';
       display: block;
       height: 100%;
     }
-    .location-container { height: 100%; display: flex; flex-direction: column; position: relative; overflow: hidden; background: #fdfbfb; padding-bottom: 75px; box-sizing: border-box; }
+    .location-container { height: 100%; display: flex; flex-direction: column; position: relative; overflow: hidden; }
     .location-container.is-together { background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%); }
     .location-container.is-together .map-wrapper { opacity: 0; pointer-events: none; transition: opacity 1s ease; }
     .map-wrapper { flex: 1; position: relative; transition: opacity 1s ease; }
@@ -84,7 +84,7 @@ import { LoveApiService } from '../../services/love-api.service';
     .center-map-btn { position: absolute; top: 15px; right: 15px; z-index: 2000; width: 44px; height: 44px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.4); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-size: 1.5rem; transition: transform 0.2s; }
     .center-map-btn:active { transform: scale(0.9); }
     
-    .next-milestone-card { position: absolute; bottom: 85px; left: 15px; z-index: 2000; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border-radius: 20px; padding: 10px 18px 10px 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.6); max-width: 65%; cursor: pointer; transition: transform 0.2s; }
+    .next-milestone-card { position: absolute; bottom: 25px; left: 15px; z-index: 2000; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border-radius: 20px; padding: 10px 18px 10px 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.6); max-width: 65%; cursor: pointer; transition: transform 0.2s; }
     .next-milestone-card:active { transform: scale(0.95); }
     .nm-icon { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; box-shadow: 0 4px 10px rgba(255,77,109,0.3); }
     .nm-info { display: flex; flex-direction: column; overflow: hidden; }
