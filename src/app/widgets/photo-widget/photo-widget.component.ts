@@ -497,7 +497,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .send-reply-btn:hover:not(:disabled) { transform: scale(1.1); background: #c9184a; }
     .send-reply-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     
-    .empty-state { text-align: center; color: #a08c92; padding: 40px 20px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .empty-state { text-align: center; color: #a08c92; padding: 100px 20px 40px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     .empty-icon { font-size: 4rem; margin-bottom: 15px; color: #ffb3c1; opacity: 0.8; }
     .empty-upload-btn { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none; padding: 12px 24px; border-radius: 20px; font-weight: bold; margin-top: 15px; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3); }
 

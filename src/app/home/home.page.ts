@@ -253,12 +253,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    this.loadHeaderData();
-
-    // Load avatars from Firebase
-    const { value } = await Preferences.get({ key: 'firebase_user_id' });
-    const myId = value || 'juan';
-    const partnerId = myId === 'juan' ? 'roberta' : 'juan';
+    await this.loadHeaderData();
 
     // Widget Intent listener & Background Polling replacement
     this.appStateListener = await App.addListener('appStateChange', async ({ isActive }) => {
@@ -268,13 +263,6 @@ export class HomePage implements OnInit, OnDestroy {
       }
     });
     this.checkWidgetIntent();
-
-    this.subscriptions.push(this.locationService.listenToUserLocation(myId as 'juan'|'roberta').subscribe((data: any) => {
-      if (data && data.avatar) this.myAvatarUrl = data.avatar;
-    }));
-    this.subscriptions.push(this.locationService.listenToUserLocation(partnerId as 'juan'|'roberta').subscribe((data: any) => {
-      if (data && data.avatar) this.partnerAvatarUrl = data.avatar;
-    }));
   }
 
   ngOnDestroy() {
@@ -333,6 +321,22 @@ export class HomePage implements OnInit, OnDestroy {
       if (data.my_mood) this.myMood = data.my_mood;
       if (data.partner_mood) this.partnerMood = data.partner_mood;
       if (data.partner_name) this.partnerInitial = data.partner_name.charAt(0).toUpperCase();
+
+      const myIdStr = data.my_id?.toString();
+      const partnerIdStr = data.partner_id?.toString();
+
+      if (myIdStr && partnerIdStr) {
+        // Clear previous subscriptions to avoid duplicate listeners
+        this.subscriptions.forEach(s => s.unsubscribe());
+        this.subscriptions = [];
+
+        this.subscriptions.push(this.locationService.listenToUserLocation(myIdStr as any).subscribe((locData: any) => {
+          if (locData && locData.avatar) this.myAvatarUrl = locData.avatar;
+        }));
+        this.subscriptions.push(this.locationService.listenToUserLocation(partnerIdStr as any).subscribe((locData: any) => {
+          if (locData && locData.avatar) this.partnerAvatarUrl = locData.avatar;
+        }));
+      }
     } catch (e: any) {
       console.log('No se pudo cargar la info de la cabecera', e);
       if (e.status === 403 || e.error?.message?.includes('No estás vinculado')) {
