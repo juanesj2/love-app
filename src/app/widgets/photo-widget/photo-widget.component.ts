@@ -716,7 +716,7 @@ export class PhotoWidgetComponent implements OnInit {
   }
 
   applyGalleryFilters() {
-    const me = this.api.currentUser?.id;
+    const me = this.coupleInfo?.my_id;
     const partner = this.coupleInfo?.user1_id === me ? this.coupleInfo?.user2_id : this.coupleInfo?.user1_id;
     
     let filtered = this.photos;
@@ -773,7 +773,7 @@ export class PhotoWidgetComponent implements OnInit {
   // --- Lightbox Inmersivo ---
   openLightbox(photo: any) {
     if (this.selectionMode) {
-      this.togglePhotoSelection(photo);
+      this.toggleSelection(photo);
       return;
     }
     
