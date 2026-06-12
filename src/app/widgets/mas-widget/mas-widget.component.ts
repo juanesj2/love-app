@@ -307,7 +307,8 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Restaurantes y platos que hemos probado</p>
             
             <div class="food-places-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
-              <div class="food-place-item" *ngFor="let place of foodPlaces" (click)="openFoodPlaceModal(place)" style="background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
+              <div class="food-place-item" *ngFor="let place of foodPlaces" (click)="openFoodPlaceModal(place)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
+                <ion-icon name="pencil" style="position: absolute; top: 8px; right: 8px; font-size: 1.1rem; color: #FF4D6D; background: rgba(255,255,255,0.9); border-radius: 50%; padding: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5;" (click)="$event.stopPropagation(); editFoodPlace(place)"></ion-icon>
                 <div class="place-image" [style.backgroundImage]="'url(' + (place.image_url_full || 'assets/default-food.png') + ')'" style="width: 100%; aspect-ratio: 1; border-radius: 10px; background-size: cover; background-position: center; margin: 0 auto 10px;"></div>
                 <span class="p-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ place.name }}</span>
                 <span class="p-rating" style="color: #FFB703; font-size: 0.8rem;">
@@ -330,7 +331,8 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Películas y series que vemos juntos</p>
             
             <div class="movies-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
-              <div class="movie-item" *ngFor="let movie of movies" (click)="openMovieModal(movie)" style="background: rgba(255,255,255,0.8); border-radius: 10px; padding: 8px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
+              <div class="movie-item" *ngFor="let movie of movies" (click)="openMovieModal(movie)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 10px; padding: 8px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
+                <ion-icon name="pencil" style="position: absolute; top: 6px; right: 6px; font-size: 1rem; color: #FF4D6D; background: rgba(255,255,255,0.9); border-radius: 50%; padding: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5;" (click)="$event.stopPropagation(); editMovie(movie)"></ion-icon>
                 <div class="movie-image" [style.backgroundImage]="'url(' + (movie.image_url_full || 'assets/default-movie.png') + ')'" style="width: 100%; aspect-ratio: 0.7; border-radius: 8px; background-size: cover; background-position: center; margin: 0 auto 8px;"></div>
                 <span class="m-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ movie.title }}</span>
                 <span class="p-rating" style="color: #FFB703; font-size: 0.7rem;">
