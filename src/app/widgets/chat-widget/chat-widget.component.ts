@@ -433,7 +433,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
     .send-btn.active:hover { transform: rotate(0deg) scale(1.1); }
 
     /* Custom Color Picker */
-    .color-picker-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 2000; display: flex; align-items: center; justify-content: center; }
+    .color-picker-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 20000; display: flex; align-items: center; justify-content: center; }
     .color-picker-modal { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(16px); border-radius: 24px; padding: 25px; width: 90%; max-width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.8); }
     .color-picker-modal h3 { margin: 0 0 20px 0; font-size: 1.3rem; font-weight: 800; color: #590D22; text-align: center; }
     .color-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 20px; }
