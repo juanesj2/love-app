@@ -17,7 +17,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
   template: `
     <ion-content class="scroll-content">
       <ng-template #staticStars let-rating="rating">
-        <div style="display: flex; gap: 2px;">
+        <div style="display: flex; gap: 2px; justify-content: center;">
           <div class="star" [class.is-active]="s <= rating" *ngFor="let s of [1,2,3,4,5]" style="width: 24px; height: 24px; cursor: default;">
             <div class="svg-container">
               <svg xmlns="http://www.w3.org/2000/svg" class="svg-outline" viewBox="0 0 24 24"><path d="M12 2.5L9.45 8.5L3 9.06L7.725 13.39L6.25 19.82L12 16.5L17.75 19.82L16.275 13.39L21 9.06L14.55 8.5L12 2.5ZM12 4.75L14 9.33L18.7 9.75L15 13.07L16.18 17.75L12 15.16L7.82 17.75L9 13.07L5.3 9.75L10 9.33L12 4.75Z"></path></svg>
@@ -388,7 +388,9 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 
         <!-- View Food Place Modal -->
         <div class="custom-overlay" *ngIf="isFoodPlaceModalOpen" (click)="isFoodPlaceModalOpen = false">
-          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" style="position: relative; margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+            
+            <ion-icon name="pencil" style="position: absolute; top: 15px; right: 15px; font-size: 1.5rem; color: #FF4D6D; cursor: pointer; z-index: 10;" (click)="editFoodPlace(selectedFoodPlace)"></ion-icon>
             
             <div *ngIf="selectedFoodPlace?.image_url_full" class="milestone-cover" style="width: 100%; height: 180px; border-radius: 18px; margin-bottom: 20px; overflow: hidden; position: relative;">
               <img [src]="selectedFoodPlace?.image_url_full" style="width: 100%; height: 100%; object-fit: cover;" />
@@ -453,7 +455,6 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             </div>
 
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-              <button class="glass-btn" style="flex: 1; padding: 12px; font-size: 0.9rem;" (click)="editFoodPlace(selectedFoodPlace)">Editar</button>
               <button class="glass-btn" style="background: rgba(255,0,0,0.1); color: red; flex: 1; padding: 12px; font-size: 0.9rem;" (click)="deleteFoodPlace(selectedFoodPlace.id)">Eliminar</button>
               <button class="glass-btn" style="flex: 1; padding: 12px;" (click)="isFoodPlaceModalOpen = false">Cerrar</button>
             </div>
@@ -502,7 +503,9 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 
         <!-- View Movie Modal -->
         <div class="custom-overlay" *ngIf="isMovieModalOpen" (click)="isMovieModalOpen = false">
-          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" style="position: relative; margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+            
+            <ion-icon name="pencil" style="position: absolute; top: 15px; right: 15px; font-size: 1.5rem; color: #FF4D6D; cursor: pointer; z-index: 10;" (click)="editMovie(selectedMovie)"></ion-icon>
             
             <div *ngIf="selectedMovie?.image_url_full" class="milestone-cover" style="width: 140px; height: 210px; border-radius: 12px; margin: 0 auto 20px; overflow: hidden; position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
               <img [src]="selectedMovie?.image_url_full" style="width: 100%; height: 100%; object-fit: cover;" />
@@ -526,7 +529,6 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             </p>
             
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-              <button class="glass-btn" style="flex: 1; padding: 12px; font-size: 0.9rem;" (click)="editMovie(selectedMovie)">Editar</button>
               <button class="glass-btn" style="background: rgba(255,0,0,0.1); color: red; flex: 1; padding: 12px; font-size: 0.9rem;" (click)="deleteMovie(selectedMovie.id)">Eliminar</button>
               <button class="glass-btn" style="flex: 1; padding: 12px;" (click)="isMovieModalOpen = false">Cerrar</button>
             </div>
