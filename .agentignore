@@ -1,0 +1,12 @@
+# Directorios bloqueados para la IA
+node_modules/
+vendor/
+dist/
+.angular/
+.firebase/
+android/
+ios/
+Enfoca_ProyectoFinal/vendor/
+Enfoca_ProyectoFinal/node_modules/
+Enfoca_ProyectoFinal/public/build/
+.git/

@@ -4,6 +4,7 @@ import { PluginListenerHandle } from '@capacitor/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonRefresher, IonRefresherContent, IonIcon, ToastController, ActionSheetController, AlertController } from '@ionic/angular/standalone';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Router } from '@angular/router';
 import { LoveApiService } from '../../services/love-api.service';
 import { Preferences } from '@capacitor/preferences';
@@ -216,26 +217,57 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 
       <!-- Modal for Milestone Details -->
       <div class="custom-overlay" *ngIf="isMilestoneModalOpen" (click)="isMilestoneModalOpen = false">
-        <div class="modal-content glass-card" style="margin: 20px; padding: 30px; text-align: center; width: 85%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.85); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15);" (click)="$event.stopPropagation()">
-          <ion-icon name="flag" style="font-size: 4rem; color: #FF4D6D; margin-bottom: 15px; background: rgba(255,77,109,0.1); padding: 15px; border-radius: 50%;"></ion-icon>
-          <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.5rem;">{{ selectedMilestone?.title }}</h2>
-          <p style="color: #a4133c; font-size: 1.1rem; font-weight: 700; margin-bottom: 25px;">
+        <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+          
+          <!-- Portada del Hito -->
+          <div *ngIf="selectedMilestone?.image_url_full || selectedMilestone?.newImageBase64" class="milestone-cover" style="width: 100%; height: 180px; border-radius: 18px; margin-bottom: 20px; overflow: hidden; position: relative;">
+            <img [src]="selectedMilestone?.newImageBase64 || selectedMilestone?.image_url_full" style="width: 100%; height: 100%; object-fit: cover;" />
+            <div *ngIf="isEditingMilestone" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="uploadMilestonePhoto()">
+               <ion-icon name="camera-outline" style="color: white; font-size: 3rem;"></ion-icon>
+            </div>
+          </div>
+          
+          <ion-icon *ngIf="!selectedMilestone?.image_url_full && !selectedMilestone?.newImageBase64" name="flag" style="font-size: 4rem; color: #FF4D6D; margin-bottom: 15px; background: rgba(255,77,109,0.1); padding: 15px; border-radius: 50%;"></ion-icon>
+          
+          <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;">{{ selectedMilestone?.title }}</h2>
+          <p style="color: #a4133c; font-size: 1.1rem; font-weight: 700; margin-bottom: 20px;">
             {{ selectedMilestone?.date | date:'longDate' }}
           </p>
           
-          <div style="background: rgba(255,77,109,0.1); border-radius: 18px; padding: 18px; margin-bottom: 25px;">
-            <h3 *ngIf="isPast(selectedMilestone?.date) && calculateDays(selectedMilestone?.date) > 0" style="color: #FF4D6D; margin: 0; font-weight: 900; font-size: 1.2rem;">
-              Hace {{ calculateDays(selectedMilestone?.date) }} días
-            </h3>
-            <h3 *ngIf="!isPast(selectedMilestone?.date) && calculateDays(selectedMilestone?.date) > 0" style="color: #FF4D6D; margin: 0; font-weight: 900; font-size: 1.2rem;">
-              Dentro de {{ calculateDays(selectedMilestone?.date) }} días
-            </h3>
-            <h3 *ngIf="calculateDays(selectedMilestone?.date) === 0" style="color: #FF4D6D; margin: 0; font-weight: 900; font-size: 1.2rem;">
-              ¡Es hoy! 🎉
-            </h3>
+          <div style="background: rgba(255,77,109,0.05); border-radius: 18px; padding: 18px; margin-bottom: 20px; text-align: center;">
+            <p style="color: #800f2f; margin: 0; font-weight: 600; font-size: 1rem; line-height: 1.4; font-style: italic;">
+              {{ getMilestonePhrase(selectedMilestone?.date) }}
+            </p>
           </div>
 
-          <button class="glass-btn" (click)="isMilestoneModalOpen = false" style="width: 100%; padding: 15px; font-size: 1.1rem; border-radius: 14px;">
+          <!-- Mostrar Anécdota -->
+          <div *ngIf="!isEditingMilestone" style="margin-bottom: 25px;">
+            <p *ngIf="selectedMilestone?.story" style="color: #590D22; font-size: 1rem; line-height: 1.5; font-weight: 500; text-align: left; background: rgba(255,255,255,0.8); padding: 15px; border-radius: 14px; border: 1px solid rgba(255,77,109,0.2);">
+              "{{ selectedMilestone.story }}"
+            </p>
+            <button *ngIf="!selectedMilestone?.story && !selectedMilestone?.image_url_full" class="glass-btn" style="background: rgba(255,77,109,0.1); color: #FF4D6D; width: auto; padding: 10px 20px; font-size: 0.9rem;" (click)="isEditingMilestone = true">
+              <ion-icon name="pencil-outline"></ion-icon> Añadir un recuerdo
+            </button>
+            <button *ngIf="selectedMilestone?.story || selectedMilestone?.image_url_full" class="glass-btn" style="background: transparent; color: #a4133c; width: auto; padding: 5px 15px; font-size: 0.9rem; margin-top: 10px; border: none; box-shadow: none;" (click)="isEditingMilestone = true">
+              <ion-icon name="create-outline"></ion-icon> Editar recuerdo
+            </button>
+          </div>
+
+          <!-- Editar Anécdota y Foto -->
+          <div *ngIf="isEditingMilestone" style="margin-bottom: 25px; text-align: left;">
+            <button *ngIf="!selectedMilestone?.image_url_full && !selectedMilestone?.newImageBase64" class="glass-btn" style="width: 100%; margin-bottom: 15px; background: rgba(255,77,109,0.1); color: #FF4D6D;" (click)="uploadMilestonePhoto()">
+              <ion-icon name="camera-outline"></ion-icon> Subir portada
+            </button>
+            <label style="color: #a4133c; font-weight: 700; font-size: 0.9rem; margin-bottom: 5px; display: block;">Nuestra historia</label>
+            <textarea class="glass-input" rows="4" placeholder="Escribe aquí vuestra anécdota, cómo os sentisteis, etc." [(ngModel)]="selectedMilestone.story" style="width: 100%; border-radius: 14px; resize: none; margin-bottom: 15px;"></textarea>
+            
+            <div style="display: flex; gap: 10px;">
+              <button class="glass-btn" style="flex: 1; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="isEditingMilestone = false">Cancelar</button>
+              <button class="glass-btn" style="flex: 1;" (click)="saveMilestoneChanges()">Guardar</button>
+            </div>
+          </div>
+
+          <button *ngIf="!isEditingMilestone" class="glass-btn" (click)="isMilestoneModalOpen = false" style="width: 100%; padding: 15px; font-size: 1.1rem; border-radius: 14px;">
             Cerrar
           </button>
         </div>
@@ -373,6 +405,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
   isMilestoneModalOpen = false;
   selectedMilestone: any = null;
+  isEditingMilestone = false;
 
   myBirthday: string = '';
   partnerBirthday: string = '';
@@ -664,7 +697,70 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
   openMilestoneModal(m: any) {
     this.selectedMilestone = m;
+    this.isEditingMilestone = false;
     this.isMilestoneModalOpen = true;
+  }
+
+  async uploadMilestonePhoto() {
+    try {
+      const image = await Camera.getPhoto({
+        quality: 80,
+        allowEditing: false,
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Prompt
+      });
+      if (image.dataUrl) {
+        this.selectedMilestone.newImageBase64 = image.dataUrl;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async saveMilestoneChanges() {
+    if (!this.selectedMilestone) return;
+    try {
+      const res = await this.api.updateMilestone(this.selectedMilestone.id, this.selectedMilestone.newImageBase64, this.selectedMilestone.story);
+      this.selectedMilestone.image_url_full = res.image_url_full;
+      this.selectedMilestone.newImageBase64 = null;
+      this.isEditingMilestone = false;
+      this.loadMilestones();
+      this.showToast('Recuerdo guardado con éxito');
+    } catch (e) {
+      console.error(e);
+      this.showToast('Error al guardar el recuerdo', 'danger');
+    }
+  }
+
+  getMilestonePhrase(dateStr: string): string {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    const now = new Date();
+    d.setHours(0,0,0,0);
+    now.setHours(0,0,0,0);
+
+    const diffTime = Math.abs(now.getTime() - d.getTime());
+    const totalDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (totalDays === 0) return "¡El momento es ahora! 🎉";
+
+    let years = Math.floor(totalDays / 365);
+    let remainingDays = totalDays % 365;
+    let months = Math.floor(remainingDays / 30);
+    let days = remainingDays % 30;
+
+    let timeParts = [];
+    if (years > 0) timeParts.push(`${years} ${years === 1 ? 'año' : 'años'}`);
+    if (months > 0) timeParts.push(`${months} ${months === 1 ? 'mes' : 'meses'}`);
+    if (days > 0 || timeParts.length === 0) timeParts.push(`${days} ${days === 1 ? 'día' : 'días'}`);
+
+    const joinedTime = timeParts.join(', ').replace(/, ([^,]*)$/, ' y $1');
+
+    if (d.getTime() < now.getTime()) {
+      return `Han pasado ${joinedTime} desde aquel mágico momento.`;
+    } else {
+      return `¡La emoción crece! Faltan ${joinedTime} para este gran momento.`;
+    }
   }
 
   calculateTime() {

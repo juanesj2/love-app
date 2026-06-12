@@ -134,6 +134,33 @@ export class LoveApiService {
     return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/milestones`, { title, date }, { headers }));
   }
 
+  async updateMilestone(id: number, imageBase64?: string, story?: string): Promise<any> {
+    const headers = await this.getHeaders();
+    
+    // Convert base64 to File object if image exists
+    const formData = new FormData();
+    if (imageBase64) {
+      try {
+        const response = await fetch(imageBase64);
+        const blob = await response.blob();
+        formData.append('image', blob, `milestone_${id}.jpg`);
+      } catch (e) {
+        console.error('Error procesando imagen', e);
+      }
+    }
+    
+    if (story !== undefined && story !== null) {
+      formData.append('story', story);
+    }
+    
+    // Remove Content-Type from headers so browser sets multipart boundary automatically
+    const uploadHeaders = new HttpHeaders({
+      'Authorization': headers.get('Authorization') || ''
+    });
+
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/milestones/${id}`, formData, { headers: uploadHeaders }));
+  }
+
   async deleteMilestone(id: number): Promise<any> {
     const headers = await this.getHeaders();
     return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/love-album/milestones/${id}`, { headers }));
