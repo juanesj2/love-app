@@ -73,7 +73,7 @@ export class LoveApiService {
 
   async getMe(): Promise<any> {
     const headers = await this.getHeaders();
-    return firstValueFrom(this.http.get(`${API_BASE_URL}/user`, { headers }));
+    return firstValueFrom(this.http.get(`${API_BASE_URL}/usuario`, { headers }));
   }
 
   async pair(pairingCode: string): Promise<any> {

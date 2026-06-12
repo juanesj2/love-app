@@ -33,7 +33,8 @@ export class PairingPage implements OnInit {
 
   async loadMyCode() {
     try {
-      const user = await this.loveApi.getMe();
+      const res = await this.loveApi.getMe();
+      const user = res.data ? res.data : res;
       if (user && user.pairing_code) {
         this.myCode = user.pairing_code;
       }
