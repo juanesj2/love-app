@@ -66,7 +66,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
         </div>
       </div>
 
-      <ion-content class="scroll-content" [class.snap-feed]="viewMode === 'feed'">
+      <ion-content class="scroll-content" [class.snap-feed]="viewMode === 'feed'" [scrollEvents]="true" (ionScroll)="onContentScroll($event)">
         <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
           <ion-refresher-content></ion-refresher-content>
         </ion-refresher>
@@ -150,7 +150,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
             </div>
           </div>
 
-          <div *ngFor="let group of galleryGroups" class="gallery-month-group">
+          <div *ngFor="let group of galleryGroups; let i = index" class="gallery-month-group" [id]="'group-' + i">
             <div class="month-header">
               <h3 class="gallery-month-title">{{ group.monthYear }}</h3>
               <div class="select-month-wrapper" *ngIf="selectionMode" (click)="toggleSelectMonth(group)">
@@ -177,6 +177,26 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
             </div>
           </div>
           </div>
+          <!-- Fast Scroller Timeline -->
+          <div class="timeline-track" 
+               [class.visible]="isTimelineVisible || isDraggingTimeline"
+               (touchstart)="onTimelineTouchStart($event)"
+               (touchmove)="onTimelineTouchMove($event)"
+               (touchend)="onTimelineTouchEnd($event)">
+            
+            <div class="timeline-thumb" [style.top.%]="timelineThumbY">
+              <ion-icon name="chevron-expand"></ion-icon>
+            </div>
+            
+            <div class="timeline-bubble" *ngIf="isDraggingTimeline" [style.top.%]="timelineThumbY">
+              {{ timelineActiveLabel }}
+            </div>
+
+            <div class="timeline-years">
+              <span *ngFor="let y of timelineYears">{{ y.year }}</span>
+            </div>
+          </div>
+
         </ng-container>
 
         <ion-infinite-scroll (ionInfinite)="loadMore($event)">
@@ -543,6 +563,23 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .streak-remind-btn { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none; padding: 12px 20px; border-radius: 20px; font-weight: bold; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4); transition: transform 0.2s; }
     .streak-remind-btn:active { transform: scale(0.95); }
     @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+    /* Timeline Fast Scroller */
+    .timeline-track { position: absolute; top: 80px; bottom: 80px; right: 5px; width: 30px; z-index: 1500; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 20px 0; opacity: 0; transition: opacity 0.3s, background 0.3s; pointer-events: none; }
+    .timeline-track.visible { opacity: 1; pointer-events: auto; }
+    .timeline-track:active { background: rgba(0,0,0,0.05); border-radius: 15px; }
+    
+    .timeline-years { position: absolute; top: 0; bottom: 0; right: 0; width: 100%; display: flex; flex-direction: column; justify-content: space-between; align-items: center; pointer-events: none; padding: 20px 0; }
+    .timeline-years span { font-size: 0.7rem; font-weight: bold; color: #a08c92; writing-mode: vertical-rl; text-orientation: mixed; user-select: none; }
+
+    .timeline-thumb { position: absolute; left: -10px; width: 36px; height: 36px; background: white; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; transform: translateY(-50%); z-index: 2; transition: background 0.2s; }
+    .timeline-thumb ion-icon { font-size: 1.2rem; color: #FF4D6D; }
+    .timeline-track:active .timeline-thumb { background: #FF4D6D; }
+    .timeline-track:active .timeline-thumb ion-icon { color: white; }
+
+    .timeline-bubble { position: absolute; right: 45px; transform: translateY(-50%); background: #FF4D6D; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4); white-space: nowrap; pointer-events: none; z-index: 3; animation: fadeInBubble 0.2s; }
+    .timeline-bubble::after { content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); border-width: 6px 0 6px 6px; border-style: solid; border-color: transparent transparent transparent #FF4D6D; }
+    @keyframes fadeInBubble { from { opacity: 0; transform: translate(-10px, -50%); } to { opacity: 1; transform: translate(0, -50%); } }
     
     .prompt-actions { display: flex; gap: 10px; }
     .prompt-btn { flex: 1; padding: 14px; border-radius: 20px; font-weight: bold; font-size: 1.1rem; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
@@ -566,6 +603,8 @@ export class PhotoWidgetComponent implements OnInit {
   pendingPhotoText: string = '';
 
   viewMode: 'feed' | 'grid' = 'feed';
+  @ViewChild(IonContent, { static: false }) content!: IonContent;
+
   photos: any[] = [];
   groupedPhotos: any[] = [];
   galleryGroups: any[] = [];
@@ -622,8 +661,16 @@ export class PhotoWidgetComponent implements OnInit {
   isPinchingLightbox = false;
   initialLightboxPinchDist = 0;
 
+  // Timeline Fast Scroller
+  timelineYears: { year: string, index: number }[] = [];
+  timelineActiveLabel = '';
+  isTimelineVisible = false;
+  isDraggingTimeline = false;
+  timelineThumbY = 0; // Porcentaje de 0 a 100
+  timelineHideTimeout: any;
+
   constructor() {
-    addIcons({ arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline });
+    addIcons({ arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline, calendarOutline: 'calendar-outline', chevronExpand: 'chevron-expand' });
   }
 
   ngOnInit() {
@@ -821,6 +868,18 @@ export class PhotoWidgetComponent implements OnInit {
     
     // Sort array descending if needed, currently API returns new to old
     this.galleryGroups = Object.keys(groups).map(k => ({ monthYear: k, photos: groups[k] }));
+    this.generateTimelineYears();
+  }
+
+  generateTimelineYears() {
+    const yearsMap = new Map<string, number>();
+    this.galleryGroups.forEach((group, index) => {
+      const year = group.monthYear.split(' ').pop();
+      if (year && !yearsMap.has(year)) {
+        yearsMap.set(year, index);
+      }
+    });
+    this.timelineYears = Array.from(yearsMap.keys()).map(y => ({ year: y, index: yearsMap.get(y)! }));
   }
 
   // --- Filtros de Galería ---
@@ -866,6 +925,7 @@ export class PhotoWidgetComponent implements OnInit {
     }
     
     this.galleryGroups = Object.keys(groups).map(k => ({ monthYear: k, photos: groups[k] }));
+    this.generateTimelineYears();
   }
 
   // --- Recuerdo Destacado ---
@@ -972,6 +1032,77 @@ export class PhotoWidgetComponent implements OnInit {
 
   getDistance(t1: Touch, t2: Touch) {
     return Math.hypot(t1.pageX - t2.pageX, t1.pageY - t2.pageY);
+  }
+
+  // --- Fast Scroller Timeline ---
+  onContentScroll(e: any) {
+    if (this.viewMode !== 'grid') return;
+    
+    this.isTimelineVisible = true;
+    clearTimeout(this.timelineHideTimeout);
+    
+    if (!this.isDraggingTimeline) {
+      // Actualizar thumb Y basado en el scroll
+      const scrollTop = e.detail.scrollTop;
+      const scrollHeight = e.detail.scrollTarget.scrollHeight - e.detail.scrollTarget.clientHeight;
+      if (scrollHeight > 0) {
+        this.timelineThumbY = (scrollTop / scrollHeight) * 100;
+        this.timelineThumbY = Math.max(0, Math.min(100, this.timelineThumbY));
+      }
+    }
+
+    this.timelineHideTimeout = setTimeout(() => {
+      this.isTimelineVisible = false;
+    }, 1500);
+  }
+
+  onTimelineTouchStart(e: TouchEvent) {
+    e.preventDefault(); // Evita scroll nativo
+    this.isDraggingTimeline = true;
+    this.isTimelineVisible = true;
+    clearTimeout(this.timelineHideTimeout);
+    this.handleTimelineDrag(e.touches[0]);
+  }
+
+  onTimelineTouchMove(e: TouchEvent) {
+    e.preventDefault();
+    if (this.isDraggingTimeline) {
+      this.handleTimelineDrag(e.touches[0]);
+    }
+  }
+
+  onTimelineTouchEnd(e: TouchEvent) {
+    this.isDraggingTimeline = false;
+    this.timelineHideTimeout = setTimeout(() => {
+      this.isTimelineVisible = false;
+    }, 1500);
+  }
+
+  handleTimelineDrag(touch: Touch) {
+    const track = (touch.target as HTMLElement).closest('.timeline-track');
+    if (!track) return;
+    
+    const rect = track.getBoundingClientRect();
+    let y = touch.clientY - rect.top;
+    y = Math.max(0, Math.min(y, rect.height));
+    
+    // Calcular porcentaje (0 a 100)
+    this.timelineThumbY = (y / rect.height) * 100;
+    
+    // Mapear el porcentaje al índice del grupo de fotos
+    if (this.galleryGroups.length === 0) return;
+    
+    const index = Math.floor((y / rect.height) * this.galleryGroups.length);
+    const safeIndex = Math.max(0, Math.min(index, this.galleryGroups.length - 1));
+    
+    const targetGroup = this.galleryGroups[safeIndex];
+    if (targetGroup) {
+      this.timelineActiveLabel = targetGroup.monthYear;
+      const el = document.getElementById('group-' + safeIndex);
+      if (el) {
+        this.content.scrollToPoint(0, el.offsetTop, 10);
+      }
+    }
   }
 
   // --- Grid Pinch-to-Zoom ---
