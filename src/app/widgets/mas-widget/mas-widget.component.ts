@@ -93,7 +93,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 
           <!-- Modal for Event Details -->
           <div class="custom-overlay" *ngIf="isEventModalOpen" (click)="isEventModalOpen = false">
-            <div class="modal-content glass-card" style="margin: 20px; padding: 30px; text-align: center; width: 85%; max-width: 400px; box-sizing: border-box;" (click)="$event.stopPropagation()">
+            <div class="modal-content glass-card" style="margin: 20px; padding: 30px; text-align: center; width: 85%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.85); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15);" (click)="$event.stopPropagation()">
               <ion-icon [name]="selectedEvent?.icon" style="font-size: 4rem; color: #FF4D6D; margin-bottom: 15px; background: rgba(255,77,109,0.1); padding: 15px; border-radius: 50%;"></ion-icon>
               <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.5rem;">{{ selectedEvent?.name }}</h2>
               <p style="color: #a4133c; font-size: 1.1rem; font-weight: 700; margin-bottom: 25px;">
@@ -303,9 +303,9 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.4);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
+        background: rgba(0, 0, 0, 0.15);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
         display: flex;
         align-items: center;
         justify-content: center;
