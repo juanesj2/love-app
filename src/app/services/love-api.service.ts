@@ -81,6 +81,10 @@ export class LoveApiService {
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/pair`, { pairing_code: pairingCode }, { headers }));
   }
 
+  async forgotPassword(email: string): Promise<any> {
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/forgot-password`, { email }));
+  }
+
   async logout(): Promise<void> {
     await Preferences.remove({ key: 'auth_token' });
     this.token$.next(null);

@@ -138,8 +138,45 @@ export class LoginPage implements OnInit {
   }
 
   async forgotPassword() {
-    // Abre el navegador interno con la URL del backend
-    await Browser.open({ url: 'https://enfoca.alwaysdata.net/forgot-password' });
+    const alert = await this.alertCtrl.create({
+      header: 'Recuperar Contraseña',
+      subHeader: 'Introduce tu correo',
+      message: 'Te enviaremos un enlace para restaurar tu contraseña.',
+      cssClass: 'glass-alert',
+      inputs: [
+        {
+          name: 'email',
+          type: 'email',
+          placeholder: 'tu@correo.com',
+          value: this.loginData.email
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'glass-alert-cancel'
+        },
+        {
+          text: 'Enviar',
+          cssClass: 'glass-alert-confirm',
+          handler: async (data) => {
+            if (data.email) {
+              try {
+                this.isLoading = true;
+                await this.loveApi.forgotPassword(data.email);
+                this.showToast('Correo enviado. Revisa tu bandeja de entrada.', 'success');
+              } catch (e: any) {
+                this.showToast(e.error?.message || 'Error al enviar el correo.', 'danger');
+              } finally {
+                this.isLoading = false;
+              }
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 
   private async showToast(message: string, color: string) {
