@@ -177,32 +177,32 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
             </div>
           </div>
           </div>
-          <!-- Fast Scroller Timeline -->
-          <div class="timeline-track" 
-               [class.visible]="isTimelineVisible || isDraggingTimeline"
-               (touchstart)="onTimelineTouchStart($event)"
-               (touchmove)="onTimelineTouchMove($event)"
-               (touchend)="onTimelineTouchEnd($event)">
-            
-            <div class="timeline-thumb" [style.top.%]="timelineThumbY">
-              <ion-icon name="chevron-expand"></ion-icon>
-            </div>
-            
-            <div class="timeline-bubble" *ngIf="isDraggingTimeline" [style.top.%]="timelineThumbY">
-              {{ timelineActiveLabel }}
-            </div>
-
-            <div class="timeline-years">
-              <span *ngFor="let y of timelineYears">{{ y.year }}</span>
-            </div>
-          </div>
-
-        </ng-container>
+          </ng-container>
 
         <ion-infinite-scroll (ionInfinite)="loadMore($event)">
           <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Cargando más fotos..."></ion-infinite-scroll-content>
         </ion-infinite-scroll>
       </ion-content>
+
+      <!-- Fast Scroller Timeline (fuera del ion-content para que no se desplace) -->
+      <div class="timeline-track" *ngIf="viewMode === 'grid'"
+           [class.visible]="isTimelineVisible || isDraggingTimeline"
+           (touchstart)="onTimelineTouchStart($event)"
+           (touchmove)="onTimelineTouchMove($event)"
+           (touchend)="onTimelineTouchEnd($event)">
+        
+        <div class="timeline-thumb" [style.top.%]="timelineThumbY">
+          <div class="thumb-lines"></div>
+        </div>
+        
+        <div class="timeline-bubble" *ngIf="isDraggingTimeline" [style.top.%]="timelineThumbY">
+          {{ timelineActiveLabel }}
+        </div>
+
+        <div class="timeline-years">
+          <span *ngFor="let y of timelineYears">{{ y.year }}</span>
+        </div>
+      </div>
 
       <!-- Lightbox Inmersivo -->
       <div class="lightbox-modal" *ngIf="lightboxActive && lightboxPhotos.length > 0">
@@ -573,9 +573,12 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .timeline-years span { font-size: 0.7rem; font-weight: bold; color: #a08c92; writing-mode: vertical-rl; text-orientation: mixed; user-select: none; }
 
     .timeline-thumb { position: absolute; left: -10px; width: 36px; height: 36px; background: white; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; transform: translateY(-50%); z-index: 2; transition: background 0.2s; }
-    .timeline-thumb ion-icon { font-size: 1.2rem; color: #FF4D6D; }
+    .thumb-lines { width: 14px; height: 2px; background: #FF4D6D; position: relative; border-radius: 2px; }
+    .thumb-lines::before, .thumb-lines::after { content: ''; position: absolute; width: 14px; height: 2px; background: #FF4D6D; left: 0; border-radius: 2px; }
+    .thumb-lines::before { top: -5px; }
+    .thumb-lines::after { top: 5px; }
     .timeline-track:active .timeline-thumb { background: #FF4D6D; }
-    .timeline-track:active .timeline-thumb ion-icon { color: white; }
+    .timeline-track:active .thumb-lines, .timeline-track:active .thumb-lines::before, .timeline-track:active .thumb-lines::after { background: white; }
 
     .timeline-bubble { position: absolute; right: 45px; transform: translateY(-50%); background: #FF4D6D; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4); white-space: nowrap; pointer-events: none; z-index: 3; animation: fadeInBubble 0.2s; }
     .timeline-bubble::after { content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); border-width: 6px 0 6px 6px; border-style: solid; border-color: transparent transparent transparent #FF4D6D; }
@@ -872,14 +875,12 @@ export class PhotoWidgetComponent implements OnInit {
   }
 
   generateTimelineYears() {
-    const yearsMap = new Map<string, number>();
-    this.galleryGroups.forEach((group, index) => {
-      const year = group.monthYear.split(' ').pop();
-      if (year && !yearsMap.has(year)) {
-        yearsMap.set(year, index);
-      }
+    this.timelineYears = this.galleryGroups.map((group, index) => {
+      const parts = group.monthYear.split(' ');
+      const shortMonth = parts[0].substring(0, 3).toUpperCase();
+      const shortYear = parts[1] ? parts[1].substring(2) : '';
+      return { year: `${shortMonth} '${shortYear}`, index: index };
     });
-    this.timelineYears = Array.from(yearsMap.keys()).map(y => ({ year: y, index: yearsMap.get(y)! }));
   }
 
   // --- Filtros de Galería ---
