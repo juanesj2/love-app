@@ -1035,20 +1035,22 @@ export class PhotoWidgetComponent implements OnInit {
   }
 
   // --- Fast Scroller Timeline ---
-  onContentScroll(e: any) {
+  async onContentScroll(e: any) {
     if (this.viewMode !== 'grid') return;
     
     this.isTimelineVisible = true;
     clearTimeout(this.timelineHideTimeout);
     
-    if (!this.isDraggingTimeline) {
-      // Actualizar thumb Y basado en el scroll
-      const scrollTop = e.detail.scrollTop;
-      const scrollHeight = e.detail.scrollTarget.scrollHeight - e.detail.scrollTarget.clientHeight;
-      if (scrollHeight > 0) {
-        this.timelineThumbY = (scrollTop / scrollHeight) * 100;
-        this.timelineThumbY = Math.max(0, Math.min(100, this.timelineThumbY));
-      }
+    if (!this.isDraggingTimeline && this.content) {
+      try {
+        const scrollEl = await this.content.getScrollElement();
+        const scrollTop = e.detail.scrollTop;
+        const scrollHeight = scrollEl.scrollHeight - scrollEl.clientHeight;
+        if (scrollHeight > 0) {
+          this.timelineThumbY = (scrollTop / scrollHeight) * 100;
+          this.timelineThumbY = Math.max(0, Math.min(100, this.timelineThumbY));
+        }
+      } catch (err) {}
     }
 
     this.timelineHideTimeout = setTimeout(() => {
