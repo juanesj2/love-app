@@ -139,6 +139,27 @@ export class LoveApiService {
     return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/love-album/milestones/${id}`, { headers }));
   }
 
+  // --- WISHES (CUBO DE DESEOS) ---
+  async getWishes(): Promise<any[]> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/wishes`, { headers }));
+  }
+
+  async addWish(title: string): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/wishes`, { title }, { headers }));
+  }
+
+  async updateWish(id: number, completed: boolean): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.put<any>(`${API_BASE_URL}/love-album/wishes/${id}`, { completed }, { headers }));
+  }
+
+  async deleteWish(id: number): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/love-album/wishes/${id}`, { headers }));
+  }
+
   // --- PREGUNTAS MINIJUEGO ---
   async getQuestions(): Promise<any[]> {
     const headers = await this.getHeaders();
