@@ -1075,6 +1075,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     const alert = await this.alertCtrl.create({
       header: '¿Seguro?',
       message: '¿Estás seguro de que deseas eliminar este garabato de forma permanente?',
+      cssClass: 'custom-love-alert',
       buttons: [
         {
           text: 'Cancelar',
