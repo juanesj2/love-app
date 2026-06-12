@@ -26,7 +26,7 @@ import { App } from '@capacitor/app';
   template: `
     <ion-header class="ion-no-border">
       <ion-toolbar>
-        <div class="custom-header" *ngIf="selectedWidget !== 'location'" [class.hidden]="selectedWidget === 'location'">
+        <div class="custom-header" *ngIf="selectedWidget !== 'location'">
           <div class="avatar-container" (click)="openMoodSelector()">
             <img *ngIf="myAvatarUrl" [src]="myAvatarUrl" class="avatar" />
             <div *ngIf="!myAvatarUrl" class="avatar my-avatar">TÚ</div>
