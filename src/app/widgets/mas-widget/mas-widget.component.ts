@@ -320,6 +320,15 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
       // Usar IDs reales
       this.myUserId = info.my_id as any;
 
+      if (info.my_birth_date) {
+        this.myBirthday = info.my_birth_date;
+        await Preferences.set({ key: 'myBirthday', value: this.myBirthday });
+      }
+      if (info.partner_birth_date) {
+        this.partnerBirthday = info.partner_birth_date;
+        await Preferences.set({ key: 'partnerBirthday', value: this.partnerBirthday });
+      }
+
       if (info.couple) {
         if (info.couple.relationship_start_date) {
           const d = new Date(info.couple.relationship_start_date);
@@ -338,11 +347,15 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
       }
     }
     
-    // Load birthdays
-    const myB = await Preferences.get({ key: 'myBirthday' });
-    if (myB.value) this.myBirthday = myB.value;
-    const pB = await Preferences.get({ key: 'partnerBirthday' });
-    if (pB.value) this.partnerBirthday = pB.value;
+    // Load birthdays as fallback if API fails or empty
+    if (!this.myBirthday) {
+      const myB = await Preferences.get({ key: 'myBirthday' });
+      if (myB.value) this.myBirthday = myB.value;
+    }
+    if (!this.partnerBirthday) {
+      const pB = await Preferences.get({ key: 'partnerBirthday' });
+      if (pB.value) this.partnerBirthday = pB.value;
+    }
 
     this.updateAnnualEvents();
 
@@ -425,6 +438,20 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   async saveBirthdays() {
     await Preferences.set({ key: 'myBirthday', value: this.myBirthday });
     await Preferences.set({ key: 'partnerBirthday', value: this.partnerBirthday });
+    
+    // Sync with backend
+    try {
+      const payload: any = {};
+      if (this.myBirthday) payload.birth_date = this.myBirthday;
+      if (this.partnerBirthday) payload.partner_birth_date = this.partnerBirthday;
+      
+      if (Object.keys(payload).length > 0) {
+        await this.api.updateCoupleInfo(payload);
+      }
+    } catch (e) {
+      console.error('Error syncing birthdays with backend', e);
+    }
+
     this.updateAnnualEvents();
     this.showToast('Cumpleaños guardados', 'success');
   }
