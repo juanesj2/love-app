@@ -398,7 +398,8 @@ export class LoveApiService {
     
     // Removing Content-Type header so the browser sets it automatically with the boundary for multipart/form-data
     let reqHeaders = new HttpHeaders();
-    const currentToken = await this.getToken();
+    const tokenData = await Preferences.get({ key: 'auth_token' });
+    const currentToken = tokenData.value;
     if (currentToken) {
       reqHeaders = reqHeaders.set('Authorization', `Bearer ${currentToken}`);
     }
@@ -430,7 +431,8 @@ export class LoveApiService {
     }
     
     let reqHeaders = new HttpHeaders();
-    const currentToken = await this.getToken();
+    const tokenData = await Preferences.get({ key: 'auth_token' });
+    const currentToken = tokenData.value;
     if (currentToken) {
       reqHeaders = reqHeaders.set('Authorization', `Bearer ${currentToken}`);
     }
@@ -468,7 +470,8 @@ export class LoveApiService {
     }
     
     let reqHeaders = new HttpHeaders();
-    const currentToken = await this.getToken();
+    const tokenData = await Preferences.get({ key: 'auth_token' });
+    const currentToken = tokenData.value;
     if (currentToken) {
       reqHeaders = reqHeaders.set('Authorization', `Bearer ${currentToken}`);
     }
