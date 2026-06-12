@@ -10,7 +10,7 @@ import { Preferences } from '@capacitor/preferences';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { LocationService } from '../../services/location.service';
 import { addIcons } from 'ionicons';
-import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendarOutline } from 'ionicons/icons';
+import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar } from 'ionicons/icons';
 
 @Component({
   selector: 'app-mas-widget',
@@ -75,7 +75,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
         <!-- Próximos Eventos -->
         <div class="glass-card">
           <div class="section-title">
-            <ion-icon name="calendar-outline"></ion-icon>
+            <ion-icon name="calendar"></ion-icon>
             <h3>Próximos Eventos Especiales</h3>
           </div>
           
@@ -309,7 +309,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   myUserId: 'juan' | 'roberta' = 'juan';
 
   constructor() {
-    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendarOutline });
+    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar });
   }
 
   async ngOnInit() {
