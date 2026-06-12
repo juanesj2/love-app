@@ -156,7 +156,7 @@ import { App } from '@capacitor/app';
     .mood-badge { position: absolute; bottom: -5px; right: -5px; background: white; border-radius: 50%; padding: 2px; font-size: 1.2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     
     .poke-btn { position: absolute; left: 50%; transform: translateX(-50%); width: 50px; height: 50px; border-radius: 50%; background: #fff0f3; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: #FF4D6D; cursor: pointer; box-shadow: inset 0 2px 5px rgba(255,77,109,0.1); transition: all 0.2s; z-index: 1; }
-    .poke-btn:active { transform: scale(0.9); }
+    .poke-btn:active { transform: translateX(-50%) scale(0.9); }
     .poke-btn ion-icon.poking { animation: heartbeat 0.8s infinite; color: #c9184a; }
     @keyframes heartbeat { 0% { transform: scale(1); } 25% { transform: scale(1.3); } 50% { transform: scale(1); } 75% { transform: scale(1.3); } 100% { transform: scale(1); } }
 
