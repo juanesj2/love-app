@@ -100,17 +100,17 @@ export class LoveApiService {
 
   async uploadAvatar(base64Image: string): Promise<any> {
     const headers = await this.getHeaders();
-    return firstValueFrom(this.http.post(`${API_BASE_URL}/avatar`, { avatar: base64Image }, { headers }));
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/avatar`, { avatar: base64Image }, { headers }));
   }
 
   async getRouletteOptions(): Promise<any> {
     const headers = await this.getHeaders();
-    return firstValueFrom(this.http.get(`${API_BASE_URL}/roulette`, { headers }));
+    return firstValueFrom(this.http.get(`${API_BASE_URL}/love-album/roulette`, { headers }));
   }
 
   async updateRouletteOptions(options: string[]): Promise<any> {
     const headers = await this.getHeaders();
-    return firstValueFrom(this.http.post(`${API_BASE_URL}/roulette`, { options }, { headers }));
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/roulette`, { options }, { headers }));
   }
 
   async updateCoupleInfo(data: any): Promise<any> {
