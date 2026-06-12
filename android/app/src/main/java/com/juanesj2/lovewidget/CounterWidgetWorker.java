@@ -202,7 +202,15 @@ public class CounterWidgetWorker extends Worker {
             in.close();
             conn.disconnect();
             
-            JSONArray photos = new JSONArray(content.toString());
+            String jsonStr = content.toString();
+            JSONArray photos;
+            if (jsonStr.trim().startsWith("{")) {
+                JSONObject obj = new JSONObject(jsonStr);
+                photos = obj.optJSONArray("data") != null ? obj.optJSONArray("data") : new JSONArray();
+            } else {
+                photos = new JSONArray(jsonStr);
+            }
+            
             if (photos.length() > 0) {
                 int currentIndex = prefs.getInt("counterWidgetPhotoIndex", 0);
                 

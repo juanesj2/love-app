@@ -434,7 +434,14 @@ public class DailyPhotoWidgetWorker extends Worker {
                 String line;
                 while ((line = in.readLine()) != null) content.append(line);
                 in.close();
-                return new JSONArray(content.toString());
+                
+                String jsonStr = content.toString();
+                if (jsonStr.trim().startsWith("{")) {
+                    JSONObject obj = new JSONObject(jsonStr);
+                    return obj.optJSONArray("data") != null ? obj.optJSONArray("data") : new JSONArray();
+                } else {
+                    return new JSONArray(jsonStr);
+                }
             }
             conn.disconnect();
         } catch (Exception e) {}
