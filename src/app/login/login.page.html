@@ -10,15 +10,23 @@
       <div class="icon-wrapper">
         <ion-icon name="heart" class="heart-icon"></ion-icon>
       </div>
-      <h1>{{ isLoginMode ? 'Bienvenido de nuevo' : 'Crea tu cuenta' }}</h1>
-      <p>{{ isLoginMode ? 'Inicia sesión para continuar' : 'Únete y empieza a conectar' }}</p>
+      <h1>
+        {{ authMode === 'login' ? 'Bienvenido de nuevo' : 
+           authMode === 'register' ? 'Crea tu cuenta' : 
+           'Recuperar Contraseña' }}
+      </h1>
+      <p>
+        {{ authMode === 'login' ? 'Inicia sesión para continuar' : 
+           authMode === 'register' ? 'Únete y empieza a conectar' : 
+           'Te enviaremos un enlace' }}
+      </p>
     </div>
 
     <!-- Contenedor Glassmorphism -->
     <div class="glass-form-container">
       
       <!-- Formulario Login -->
-      <form *ngIf="isLoginMode" (submit)="onLogin($event)" class="auth-form">
+      <form *ngIf="authMode === 'login'" (submit)="onLogin($event)" class="auth-form">
         <div class="input-group">
           <ion-icon name="mail-outline"></ion-icon>
           <input type="email" name="email" [(ngModel)]="loginData.email" placeholder="Correo electrónico" required />
@@ -29,7 +37,7 @@
           <input type="password" name="password" [(ngModel)]="loginData.password" placeholder="Contraseña" required />
         </div>
 
-        <div class="forgot-password" (click)="forgotPassword()">
+        <div class="forgot-password" (click)="showForgotPassword()">
           <span>¿Olvidaste tu contraseña?</span>
         </div>
 
@@ -40,7 +48,7 @@
       </form>
 
       <!-- Formulario Registro -->
-      <form *ngIf="!isLoginMode" (submit)="onRegister($event)" class="auth-form">
+      <form *ngIf="authMode === 'register'" (submit)="onRegister($event)" class="auth-form">
         <div class="input-group">
           <ion-icon name="person-outline"></ion-icon>
           <input type="text" name="name" [(ngModel)]="registerData.name" placeholder="Tu Nombre" required />
@@ -67,10 +75,27 @@
         </button>
       </form>
 
+      <!-- Formulario Forgot Password -->
+      <form *ngIf="authMode === 'forgot'" (submit)="sendForgotPassword($event)" class="auth-form">
+        <div class="input-group">
+          <ion-icon name="mail-outline"></ion-icon>
+          <input type="email" name="email" [(ngModel)]="forgotData.email" placeholder="Tu correo electrónico" required />
+        </div>
+
+        <button type="submit" class="glass-btn primary" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Enviar Enlace</span>
+          <div class="spinner" *ngIf="isLoading"></div>
+        </button>
+      </form>
+
     </div>
 
     <div class="switch-mode glass-footer" (click)="toggleMode()">
-      <span>{{ isLoginMode ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión' }}</span>
+      <span>
+        {{ authMode === 'login' ? '¿No tienes cuenta? Regístrate' : 
+           authMode === 'register' ? '¿Ya tienes cuenta? Inicia sesión' : 
+           'Volver a Iniciar Sesión' }}
+      </span>
     </div>
 
   </div>

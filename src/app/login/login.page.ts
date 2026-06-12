@@ -26,7 +26,7 @@ export class LoginPage implements OnInit {
   private alertCtrl = inject(AlertController);
   private toastCtrl = inject(ToastController);
 
-  public isLoginMode = true;
+  public authMode: 'login' | 'register' | 'forgot' = 'login';
   public isLoading = false;
 
   public loginData = {
@@ -39,6 +39,10 @@ export class LoginPage implements OnInit {
     email: '',
     password: '',
     password_confirmation: ''
+  };
+
+  public forgotData = {
+    email: ''
   };
 
   constructor() {
@@ -63,8 +67,32 @@ export class LoginPage implements OnInit {
     }
   }
 
+  showForgotPassword() {
+    this.authMode = 'forgot';
+  }
+
+  async sendForgotPassword(event: Event) {
+    event.preventDefault();
+    if (!this.forgotData.email) return;
+
+    try {
+      this.isLoading = true;
+      await this.loveApi.forgotPassword(this.forgotData.email);
+      this.showToast('Correo enviado. Revisa tu bandeja de entrada.', 'success');
+      this.authMode = 'login';
+    } catch (e: any) {
+      this.showToast(e.error?.message || 'Error al enviar el correo.', 'danger');
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
   toggleMode() {
-    this.isLoginMode = !this.isLoginMode;
+    if (this.authMode === 'forgot') {
+      this.authMode = 'login';
+    } else {
+      this.authMode = this.authMode === 'login' ? 'register' : 'login';
+    }
   }
 
   async onLogin(event: Event) {
@@ -135,48 +163,6 @@ export class LoginPage implements OnInit {
         this.router.navigate(['/home'], { replaceUrl: true });
       }
     }
-  }
-
-  async forgotPassword() {
-    const alert = await this.alertCtrl.create({
-      header: 'Recuperar Contraseña',
-      subHeader: 'Introduce tu correo',
-      message: 'Te enviaremos un enlace para restaurar tu contraseña.',
-      cssClass: 'glass-alert',
-      inputs: [
-        {
-          name: 'email',
-          type: 'email',
-          placeholder: 'tu@correo.com',
-          value: this.loginData.email
-        }
-      ],
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          cssClass: 'glass-alert-cancel'
-        },
-        {
-          text: 'Enviar',
-          cssClass: 'glass-alert-confirm',
-          handler: async (data) => {
-            if (data.email) {
-              try {
-                this.isLoading = true;
-                await this.loveApi.forgotPassword(data.email);
-                this.showToast('Correo enviado. Revisa tu bandeja de entrada.', 'success');
-              } catch (e: any) {
-                this.showToast(e.error?.message || 'Error al enviar el correo.', 'danger');
-              } finally {
-                this.isLoading = false;
-              }
-            }
-          }
-        }
-      ]
-    });
-    await alert.present();
   }
 
   private async showToast(message: string, color: string) {
