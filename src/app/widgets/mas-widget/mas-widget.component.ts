@@ -317,7 +317,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   selectedAlbumId: string = 'feed';
   albums: any[] = [];
   milestones: any[] = [];
-  bucketList: { title: string, completed: boolean }[] = [];
+  bucketList: any[] = [];
 
   newMilestoneTitle = '';
   newMilestoneDate = '';
