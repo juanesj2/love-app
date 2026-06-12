@@ -833,6 +833,8 @@ export class PhotoWidgetComponent implements OnInit {
     } catch (e) {
       console.error(e);
       this.showError('No se pudo cargar la galería. Comprueba tu conexión.');
+    } finally {
+      this.cdr.detectChanges();
     }
   }
 
@@ -1550,7 +1552,7 @@ export class PhotoWidgetComponent implements OnInit {
     try {
       await this.api.uploadPhoto(this.pendingPhotoFile, this.pendingPhotoText, this.currentAlbum?.id);
       this.cancelUpload();
-      this.loadData();
+      await this.loadData();
       this.showSuccess('¡Recuerdo subido con éxito!');
     } catch (e: any) {
       console.error(e);
