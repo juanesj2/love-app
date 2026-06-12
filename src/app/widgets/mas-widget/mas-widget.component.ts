@@ -555,29 +555,37 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   calculateTime() {
     if (!this.startDate) return;
     
-    const start = new Date(this.startDate).getTime();
-    const now = new Date().getTime();
+    const start = new Date(this.startDate);
+    const now = new Date();
     
-    if (start > now) return; // Future date
+    if (start.getTime() > now.getTime()) return; // Future date
 
-    let diff = Math.floor((now - start) / 1000);
+    let years = now.getFullYear() - start.getFullYear();
+    let months = now.getMonth() - start.getMonth();
+    let days = now.getDate() - start.getDate();
 
-    const years = Math.floor(diff / (365 * 24 * 60 * 60));
-    diff -= years * 365 * 24 * 60 * 60;
+    const startHour = start.getHours() + start.getMinutes() / 60 + start.getSeconds() / 3600;
+    const nowHour = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
 
-    const months = Math.floor(diff / (30 * 24 * 60 * 60));
-    diff -= months * 30 * 24 * 60 * 60;
+    if (nowHour < startHour) {
+      days--;
+    }
 
-    const days = Math.floor(diff / (24 * 60 * 60));
-    diff -= days * 24 * 60 * 60;
+    if (days < 0) {
+      months--;
+      const previousMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+      days += previousMonth.getDate();
+    }
 
-    const hours = Math.floor(diff / (60 * 60));
-    diff -= hours * 60 * 60;
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
 
-    const minutes = Math.floor(diff / 60);
-    diff -= minutes * 60;
-
-    const seconds = diff;
+    let diff = Math.floor((now.getTime() - start.getTime()) / 1000);
+    const hours = Math.floor(diff / 3600) % 24;
+    const minutes = Math.floor(diff / 60) % 60;
+    const seconds = diff % 60;
 
     this.timeTogether = { years, months, days, hours, minutes, seconds };
   }
@@ -586,15 +594,20 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     this.annualEvents = [];
     const now = new Date();
     const currentYear = now.getFullYear();
+    const nowUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
 
     const addEvent = (name: string, month: number, day: number, icon: string, birthYear?: number) => {
       let d = new Date(currentYear, month, day);
       let eventYear = currentYear;
-      if (d.getTime() < now.getTime() && !(d.getDate() === now.getDate() && d.getMonth() === now.getMonth())) {
+      let dUTC = Date.UTC(currentYear, month, day);
+
+      if (dUTC < nowUTC) {
         d.setFullYear(currentYear + 1);
         eventYear = currentYear + 1;
+        dUTC = Date.UTC(currentYear + 1, month, day);
       }
-      const daysLeft = Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      
+      const daysLeft = Math.floor((dUTC - nowUTC) / (1000 * 60 * 60 * 24));
       // Formato DD/MM
       const dateStr = d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
       
@@ -615,8 +628,8 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
       const start = new Date(this.startDate);
       // Optional: calculate anniversary years!
       let eventYear = currentYear;
-      let d = new Date(currentYear, start.getMonth(), start.getDate());
-      if (d.getTime() < now.getTime() && !(d.getDate() === now.getDate() && d.getMonth() === now.getMonth())) {
+      let dUTC = Date.UTC(currentYear, start.getMonth(), start.getDate());
+      if (dUTC < nowUTC) {
         eventYear = currentYear + 1;
       }
       const years = eventYear - start.getFullYear();
