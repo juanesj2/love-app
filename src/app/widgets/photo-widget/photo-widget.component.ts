@@ -924,15 +924,15 @@ export class PhotoWidgetComponent implements OnInit {
   }
 
   applyGalleryFilters() {
-    const me = this.coupleInfo?.my_id;
-    const partner = this.coupleInfo?.couple?.user1_id === me ? this.coupleInfo?.couple?.user2_id : this.coupleInfo?.couple?.user1_id;
+    const me = String(this.coupleInfo?.my_id);
+    const partner = String(this.coupleInfo?.partner_id);
     
     let filtered = this.photos;
     
     if (this.currentGalleryFilter === 'solo_yo') {
-      filtered = this.photos.filter(p => p.user_id === me);
+      filtered = this.photos.filter(p => String(p.user_id) === me);
     } else if (this.currentGalleryFilter === 'solo_pareja') {
-      filtered = this.photos.filter(p => p.user_id === partner);
+      filtered = this.photos.filter(p => String(p.user_id) === partner);
     } else if (this.currentGalleryFilter === 'ultimas') {
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);

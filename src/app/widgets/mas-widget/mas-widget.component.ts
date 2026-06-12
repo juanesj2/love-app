@@ -10,7 +10,7 @@ import { Preferences } from '@capacitor/preferences';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { LocationService } from '../../services/location.service';
 import { addIcons } from 'ionicons';
-import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle } from 'ionicons/icons';
+import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendarOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-mas-widget',
@@ -68,6 +68,37 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
                 <span class="value">{{ timeTogether.seconds }}</span>
                 <span class="label">Seg</span>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Próximos Eventos -->
+        <div class="glass-card">
+          <div class="section-title">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <h3>Próximos Eventos Especiales</h3>
+          </div>
+          
+          <div class="milestone-list">
+            <div class="milestone-item" *ngFor="let ev of annualEvents">
+              <ion-icon [name]="ev.icon" class="event-icon text-pink"></ion-icon>
+              <div class="milestone-info" style="margin-left: 10px;">
+                <span class="m-title">{{ ev.name }}</span>
+                <span class="m-date">{{ ev.dateStr }}</span>
+              </div>
+              <div class="m-days" *ngIf="ev.daysLeft > 0">Faltan {{ ev.daysLeft }} d</div>
+              <div class="m-days" *ngIf="ev.daysLeft === 0">¡Hoy!</div>
+            </div>
+          </div>
+
+          <div class="date-picker-glass" style="margin-top: 15px;">
+            <label>Mi cumpleaños</label>
+            <div class="date-input-wrapper">
+              <input type="date" class="glass-input" [(ngModel)]="myBirthday" (change)="saveBirthdays()" />
+            </div>
+            <label style="margin-top: 10px;">Cumple de mi pareja</label>
+            <div class="date-input-wrapper">
+              <input type="date" class="glass-input" [(ngModel)]="partnerBirthday" (change)="saveBirthdays()" />
             </div>
           </div>
         </div>
@@ -267,13 +298,18 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   newBucketTitle = '';
 
   timeTogether = { years: 0, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
+  
+  annualEvents: { name: string, daysLeft: number, dateStr: string, icon: string }[] = [];
+  myBirthday: string = '';
+  partnerBirthday: string = '';
+
   private timer: any;
   private appStateListener?: PluginListenerHandle;
   uploadingAvatar = false;
   myUserId: 'juan' | 'roberta' = 'juan';
 
   constructor() {
-    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle });
+    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendarOutline });
   }
 
   async ngOnInit() {
@@ -302,6 +338,14 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
       }
     }
     
+    // Load birthdays
+    const myB = await Preferences.get({ key: 'myBirthday' });
+    if (myB.value) this.myBirthday = myB.value;
+    const pB = await Preferences.get({ key: 'partnerBirthday' });
+    if (pB.value) this.partnerBirthday = pB.value;
+
+    this.updateAnnualEvents();
+
     // Check intent
     const actionIntent = await Preferences.get({ key: 'action_intent' });
     if (actionIntent.value === 'scroll_to_counter') {
@@ -376,6 +420,13 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
       console.error(e);
       this.showToast('Error al guardar la fecha', 'danger');
     }
+  }
+
+  async saveBirthdays() {
+    await Preferences.set({ key: 'myBirthday', value: this.myBirthday });
+    await Preferences.set({ key: 'partnerBirthday', value: this.partnerBirthday });
+    this.updateAnnualEvents();
+    this.showToast('Cumpleaños guardados', 'success');
   }
 
   async loadMilestones() {
@@ -502,6 +553,44 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     const seconds = diff;
 
     this.timeTogether = { years, months, days, hours, minutes, seconds };
+  }
+
+  updateAnnualEvents() {
+    this.annualEvents = [];
+    const now = new Date();
+    const currentYear = now.getFullYear();
+
+    const addEvent = (name: string, month: number, day: number, icon: string) => {
+      let d = new Date(currentYear, month, day);
+      if (d.getTime() < now.getTime() && !(d.getDate() === now.getDate() && d.getMonth() === now.getMonth())) {
+        d.setFullYear(currentYear + 1);
+      }
+      const daysLeft = Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      // Formato DD/MM
+      const dateStr = d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+      this.annualEvents.push({ name, daysLeft, dateStr, icon });
+    };
+
+    addEvent('San Valentín', 1, 14, 'heart'); // 1 is February (0-indexed)
+    addEvent('Halloween', 9, 31, 'moon-outline'); // 9 is October
+    addEvent('Navidad', 11, 25, 'star-outline'); // 11 is December
+
+    if (this.startDate) {
+      const start = new Date(this.startDate);
+      addEvent('Aniversario', start.getMonth(), start.getDate(), 'time-outline');
+    }
+
+    if (this.myBirthday) {
+      const b = new Date(this.myBirthday);
+      addEvent('Mi Cumpleaños', b.getMonth(), b.getDate(), 'person-circle-outline');
+    }
+
+    if (this.partnerBirthday) {
+      const b = new Date(this.partnerBirthday);
+      addEvent('Cumple de Pareja', b.getMonth(), b.getDate(), 'person-circle-outline');
+    }
+
+    this.annualEvents.sort((a, b) => a.daysLeft - b.daysLeft);
   }
 
   async presentPhotoOptions(callback: (source: CameraSource) => void) {

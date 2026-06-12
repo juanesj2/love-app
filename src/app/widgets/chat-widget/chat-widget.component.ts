@@ -3,7 +3,7 @@ import { Preferences } from '@capacitor/preferences';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, ToastController, IonContent } from '@ionic/angular';
+import { IonicModule, ToastController, ActionSheetController, AlertController, IonContent } from '@ionic/angular';
 import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { LoveApiService } from '../../services/love-api.service';
 import { environment } from '../../../environments/environment';
@@ -25,6 +25,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
             <img *ngFor="let graf of graffitisByAnchorId[msg.id]" 
                  [src]="environment.storageUrl + graf.photo?.image_path" 
                  class="graffiti-overlay" 
+                 (click)="openGraffitiOptions(graf)"
                  [style.left.px]="graf.offsetX" 
                  [style.top.px]="graf.offsetY" 
                  [style.width.px]="graf.width" 
@@ -378,7 +379,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
     .doodle-btn.undo[disabled] { opacity: 0.5; }
     .doodle-btn.tool.active { background: #FF4D6D; }
     .doodle-canvas { flex: 1; width: 100%; height: 100%; touch-action: none; position: relative; z-index: 10000; }
-    .graffiti-overlay { position: absolute; pointer-events: none; z-index: 5; filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.2)); }
+    .graffiti-overlay { position: absolute; pointer-events: auto; z-index: 5; filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.2)); }
 
     .gif-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10000; background: rgba(0,0,0,0.4); display: flex; align-items: flex-end; }
     .gif-modal { width: 100%; height: 50vh; background: white; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; padding: 15px; animation: slideUpGif 0.3s ease-out; }
@@ -479,6 +480,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   private toastController = inject(ToastController);
   private firestore = inject(Firestore);
   private cdr = inject(ChangeDetectorRef);
+  private actionSheetCtrl = inject(ActionSheetController);
+  private alertCtrl = inject(AlertController);
   public environment = environment;
   
   messages: any[] = [];
@@ -913,11 +916,70 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       console.error('Error sending doodle', e);
       this.showError('Error al enviar garabato');
     } finally {
-      this.sending = false;
-    }
+    this.sending = false;
+  }
+}
+
+  async openGraffitiOptions(graf: any) {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: `Garabato de ${graf.user?.name || 'Usuario'}`,
+      cssClass: 'premium-action-sheet',
+      buttons: [
+        {
+          text: 'Eliminar para ti',
+          role: 'destructive',
+          icon: 'trash-outline',
+          handler: () => {
+            this.confirmDeleteGraffiti(graf);
+          }
+        },
+        {
+          text: 'Ocultar todo',
+          icon: 'eye-off-outline',
+          handler: () => {
+            // Placeholder
+          }
+        },
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          icon: 'close-outline'
+        }
+      ]
+    });
+    await actionSheet.present();
   }
 
-  // --- Audio Recording Logic ---
+  async confirmDeleteGraffiti(graf: any) {
+    const alert = await this.alertCtrl.create({
+      header: '¿Seguro?',
+      message: '¿Estás seguro de que deseas eliminar este garabato de forma permanente?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Borrar',
+          role: 'destructive',
+          handler: async () => {
+            try {
+              await this.api.deleteMessage(graf.id);
+              if (graf.photo?.id) {
+                await this.api.deletePhoto(graf.photo.id);
+              }
+              this.loadMessages();
+            } catch (e) {
+              this.showError('Error al borrar garabato');
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+// --- Audio Recording Logic ---
   isRecording = false;
   mediaRecorder: MediaRecorder | null = null;
   audioChunks: any[] = [];

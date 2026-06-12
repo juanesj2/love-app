@@ -235,17 +235,27 @@ export class LoveApiService {
   }
 
   async sendMessage(mensaje: string, photoId?: number, replyTo?: any): Promise<any> {
-    const body: any = { mensaje };
-    if (photoId) body.love_photo_id = photoId;
-    if (replyTo) body.reply_to = replyTo;
-    
     const headers = await this.getHeaders();
-    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/chat`, body, { headers }));
+    const payload: any = { mensaje };
+    if (photoId) payload.love_photo_id = photoId;
+    if (replyTo) payload.reply_to = replyTo;
+    
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/chat`, payload, { headers }));
   }
 
   async editMessage(id: number, mensaje: string): Promise<any> {
     const headers = await this.getHeaders();
     return firstValueFrom(this.http.put(`${API_BASE_URL}/love-album/chat/${id}`, { mensaje }, { headers }));
+  }
+
+  async reactToMessage(msgId: number, emoji: string): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/chat/${msgId}/react`, { content: emoji }, { headers }));
+  }
+
+  async deleteMessage(msgId: number): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.delete(`${API_BASE_URL}/love-album/chat/${msgId}`, { headers }));
   }
 
   async reactToChatMessage(id: number, reaction: string): Promise<any> {
