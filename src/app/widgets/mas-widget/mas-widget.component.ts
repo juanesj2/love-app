@@ -4,7 +4,6 @@ import { PluginListenerHandle } from '@capacitor/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonRefresher, IonRefresherContent, IonIcon, ToastController, ActionSheetController, AlertController } from '@ionic/angular/standalone';
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Router } from '@angular/router';
 import { LoveApiService } from '../../services/love-api.service';
 import { Preferences } from '@capacitor/preferences';
@@ -725,7 +724,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
       this.selectedMilestone.newImageBase64 = null;
       this.isEditingMilestone = false;
       this.loadMilestones();
-      this.showToast('Recuerdo guardado con éxito');
+      this.showToast('Recuerdo guardado con éxito', 'success');
     } catch (e) {
       console.error(e);
       this.showToast('Error al guardar el recuerdo', 'danger');
