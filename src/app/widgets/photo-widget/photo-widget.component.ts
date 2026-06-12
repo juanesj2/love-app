@@ -9,7 +9,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Capacitor } from '@capacitor/core';
 import { addIcons } from 'ionicons';
 import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline } from 'ionicons/icons';
-import { Firestore, doc, getDoc } from '@angular/fire/firestore';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-photo-widget',
@@ -654,7 +654,7 @@ export class PhotoWidgetComponent implements OnInit {
     }
     return true;
   }
-  private firestore = inject(Firestore);
+
   private observer: IntersectionObserver | null = null;
   
   globalDateText = '';
@@ -760,13 +760,14 @@ export class PhotoWidgetComponent implements OnInit {
 
   async loadAvatars() {
     try {
-      const juanDoc = await getDoc(doc(this.firestore, 'locations', 'juan'));
-      if (juanDoc.exists() && juanDoc.data()?.['avatar']) {
-        this.avatars['Juan'] = juanDoc.data()['avatar'];
-      }
-      const robertaDoc = await getDoc(doc(this.firestore, 'locations', 'roberta'));
-      if (robertaDoc.exists() && robertaDoc.data()?.['avatar']) {
-        this.avatars['Roberta'] = robertaDoc.data()['avatar'];
+      const info = await this.api.getCoupleInfo();
+      if (info) {
+        if (info.my_name && info.my_avatar) {
+          this.avatars[info.my_name] = info.my_avatar;
+        }
+        if (info.partner_name && info.partner_avatar) {
+          this.avatars[info.partner_name] = info.partner_avatar;
+        }
       }
     } catch (e) {
       console.error('Error loading avatars', e);
