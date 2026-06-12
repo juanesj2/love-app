@@ -375,7 +375,7 @@ export class LoveApiService {
   // Food Places
   async getFoodPlaces(): Promise<any[]> {
     const headers = await this.getHeaders();
-    return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/widget/food-places`, { headers }));
+    return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/widget/food-places`, { headers }));
   }
 
   async addFoodPlace(name: string, location?: string, rating?: number, description?: string, imageBase64?: string): Promise<any> {
@@ -404,12 +404,12 @@ export class LoveApiService {
       reqHeaders = reqHeaders.set('Authorization', `Bearer ${currentToken}`);
     }
 
-    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/widget/food-places`, formData, { headers: reqHeaders }));
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/widget/food-places`, formData, { headers: reqHeaders }));
   }
 
   async deleteFoodPlace(id: number): Promise<any> {
     const headers = await this.getHeaders();
-    return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/widget/food-places/${id}`, { headers }));
+    return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/love-album/widget/food-places/${id}`, { headers }));
   }
 
   // Food Dishes
@@ -437,18 +437,18 @@ export class LoveApiService {
       reqHeaders = reqHeaders.set('Authorization', `Bearer ${currentToken}`);
     }
 
-    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/widget/food-places/${placeId}/dishes`, formData, { headers: reqHeaders }));
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/widget/food-places/${placeId}/dishes`, formData, { headers: reqHeaders }));
   }
 
   async deleteFoodDish(placeId: number, dishId: number): Promise<any> {
     const headers = await this.getHeaders();
-    return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/widget/food-places/${placeId}/dishes/${dishId}`, { headers }));
+    return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/love-album/widget/food-places/${placeId}/dishes/${dishId}`, { headers }));
   }
 
   // Movies
   async getMovies(): Promise<any[]> {
     const headers = await this.getHeaders();
-    return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/widget/movies`, { headers }));
+    return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/widget/movies`, { headers }));
   }
 
   async addMovie(title: string, rating?: number, who_fell_asleep?: string, favorite_quote?: string, imageBase64?: string): Promise<any> {
@@ -476,11 +476,11 @@ export class LoveApiService {
       reqHeaders = reqHeaders.set('Authorization', `Bearer ${currentToken}`);
     }
 
-    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/widget/movies`, formData, { headers: reqHeaders }));
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/widget/movies`, formData, { headers: reqHeaders }));
   }
 
   async deleteMovie(id: number): Promise<any> {
     const headers = await this.getHeaders();
-    return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/widget/movies/${id}`, { headers }));
+    return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/love-album/widget/movies/${id}`, { headers }));
   }
 }
