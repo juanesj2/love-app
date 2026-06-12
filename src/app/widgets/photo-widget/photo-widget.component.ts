@@ -1550,9 +1550,19 @@ export class PhotoWidgetComponent implements OnInit {
     this.uploading = true;
     this.cdr.detectChanges();
     try {
-      await this.api.uploadPhoto(this.pendingPhotoFile, this.pendingPhotoText, this.currentAlbum?.id);
+      const res = await this.api.uploadPhoto(this.pendingPhotoFile, this.pendingPhotoText, this.currentAlbum?.id);
+      
+      // Inyectar inmediatamente para que aparezca sin recargar
+      if (res && res.photo) {
+        this.photos.unshift(res.photo);
+        this.groupPhotosByDate();
+        this.applyGalleryFilters();
+        this.generateHighlightMemory();
+      } else {
+        await this.loadData();
+      }
+
       this.cancelUpload();
-      await this.loadData();
       this.showSuccess('¡Recuerdo subido con éxito!');
     } catch (e: any) {
       console.error(e);
