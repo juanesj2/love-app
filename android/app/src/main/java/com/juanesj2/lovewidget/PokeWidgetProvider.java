@@ -23,7 +23,7 @@ public class PokeWidgetProvider extends AppWidgetProvider {
             intent.setAction(ACTION_POKE);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             
-            views.setOnClickPendingIntent(R.id.widget_poke_icon, pendingIntent);
+            views.setOnClickPendingIntent(R.id.widget_poke_root, pendingIntent);
             
             appWidgetManager.updateAppWidget(appWidgetId, views);
         }

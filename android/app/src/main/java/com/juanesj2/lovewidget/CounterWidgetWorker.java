@@ -111,7 +111,7 @@ public class CounterWidgetWorker extends Worker {
                 views.setTextViewText(R.id.widget_counter_text, counterText);
                 
                 android.content.Intent intent = new android.content.Intent(context, MainActivity.class);
-                intent.putExtra("open_tab", "mas");
+                intent.putExtra("open_tab", "photo");
                 android.app.PendingIntent pendingIntent = android.app.PendingIntent.getActivity(
                     context, id, intent, android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE
                 );
@@ -138,7 +138,7 @@ public class CounterWidgetWorker extends Worker {
                 }
                 
                 android.content.Intent intent = new android.content.Intent(context, MainActivity.class);
-                intent.putExtra("open_tab", "mas");
+                intent.putExtra("open_tab", "photo");
                 android.app.PendingIntent pendingIntent = android.app.PendingIntent.getActivity(
                     context, id + 1000, intent, android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE
                 );
