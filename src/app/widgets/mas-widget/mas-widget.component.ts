@@ -10,7 +10,7 @@ import { Preferences } from '@capacitor/preferences';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { LocationService } from '../../services/location.service';
 import { addIcons } from 'ionicons';
-import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar } from 'ionicons/icons';
+import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-mas-widget',
@@ -153,6 +153,50 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
           </div>
         </div>
 
+        <!-- Nuestro Tour Gastronómico -->
+        <div class="glass-card">
+          <div class="section-title">
+            <ion-icon name="restaurant-outline"></ion-icon>
+            <h3>Tour Gastronómico</h3>
+          </div>
+          <p class="desc">Restaurantes y platos que hemos probado.</p>
+          
+          <div class="food-places-list" style="display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px;">
+            <div class="food-place-item" *ngFor="let place of foodPlaces" (click)="openFoodPlaceModal(place)" style="min-width: 120px; background: rgba(255,255,255,0.5); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+              <div class="place-image" [style.backgroundImage]="'url(' + (place.image_url_full || 'assets/default-food.png') + ')'" style="width: 100px; height: 100px; border-radius: 10px; background-size: cover; background-position: center; margin: 0 auto 10px;"></div>
+              <span class="p-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ place.name }}</span>
+              <span class="p-rating" style="color: #FFB703; font-size: 0.8rem;">
+                <ion-icon name="star" *ngFor="let s of [1,2,3,4,5]" [style.opacity]="s <= place.rating ? 1 : 0.3"></ion-icon>
+              </span>
+            </div>
+          </div>
+          <button class="glass-btn" style="width: 100%; margin-top: 10px;" (click)="isFoodPlaceModalOpen = true">
+            <ion-icon name="add-circle-outline"></ion-icon> Añadir Restaurante
+          </button>
+        </div>
+
+        <!-- Cine en Pareja -->
+        <div class="glass-card">
+          <div class="section-title">
+            <ion-icon name="film-outline"></ion-icon>
+            <h3>Cine en Pareja</h3>
+          </div>
+          <p class="desc">Películas y series que vemos juntos.</p>
+          
+          <div class="movies-list" style="display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px;">
+            <div class="movie-item" *ngFor="let movie of movies" (click)="openMovieModal(movie)" style="min-width: 100px; background: rgba(255,255,255,0.5); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+              <div class="movie-image" [style.backgroundImage]="'url(' + (movie.image_url_full || 'assets/default-movie.png') + ')'" style="width: 80px; height: 120px; border-radius: 10px; background-size: cover; background-position: center; margin: 0 auto 10px;"></div>
+              <span class="m-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ movie.title }}</span>
+              <span class="p-rating" style="color: #FFB703; font-size: 0.8rem;">
+                <ion-icon name="star" *ngFor="let s of [1,2,3,4,5]" [style.opacity]="s <= movie.rating ? 1 : 0.3"></ion-icon>
+              </span>
+            </div>
+          </div>
+          <button class="glass-btn" style="width: 100%; margin-top: 10px;" (click)="isMovieModalOpen = true">
+            <ion-icon name="add-circle-outline"></ion-icon> Añadir Película/Serie
+          </button>
+        </div>
+
         <!-- Quick Actions Grid -->
         <div class="quick-actions-grid">
           <!-- Widget Config (Spans full width) -->
@@ -271,6 +315,174 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
           </button>
         </div>
       </div>
+
+        <!-- Add Food Place Modal -->
+        <div class="custom-overlay" *ngIf="isAddingFoodPlace" (click)="isAddingFoodPlace = false">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+            <h2 style="color: #590D22; margin-bottom: 20px; font-weight: 900;">Nuevo Restaurante 🍔</h2>
+            
+            <div *ngIf="newFoodPlace.imageBase64" class="milestone-cover" style="width: 100%; height: 150px; border-radius: 18px; margin-bottom: 20px; overflow: hidden; position: relative;">
+              <img [src]="newFoodPlace.imageBase64" style="width: 100%; height: 100%; object-fit: cover;" />
+              <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="uploadNewFoodPlacePhoto()">
+                 <ion-icon name="camera-outline" style="color: white; font-size: 3rem;"></ion-icon>
+              </div>
+            </div>
+            
+            <button *ngIf="!newFoodPlace.imageBase64" class="glass-btn" style="margin-bottom: 15px;" (click)="uploadNewFoodPlacePhoto()">
+              <ion-icon name="camera-outline"></ion-icon> Añadir Foto
+            </button>
+            
+            <input type="text" placeholder="Nombre del sitio" [(ngModel)]="newFoodPlace.name" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
+            <input type="text" placeholder="Ubicación (ej: Madrid)" [(ngModel)]="newFoodPlace.location" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
+            <textarea placeholder="¿Qué tal estaba? Plato estrella, etc." [(ngModel)]="newFoodPlace.description" class="glass-input" style="width: 100%; min-height: 80px; margin-bottom: 10px; resize: vertical;"></textarea>
+            
+            <div style="margin-bottom: 20px;">
+              <p style="margin: 0 0 5px; color: #a4133c; font-weight: 600;">Puntuación:</p>
+              <div style="display: flex; justify-content: center; gap: 5px;">
+                <ion-icon name="star" *ngFor="let s of [1,2,3,4,5]" [style.color]="s <= newFoodPlace.rating ? '#FFB703' : '#ccc'" [style.opacity]="s <= newFoodPlace.rating ? 1 : 0.5" style="font-size: 2rem;" (click)="newFoodPlace.rating = s"></ion-icon>
+              </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+              <button class="glass-btn" style="flex: 1; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="isAddingFoodPlace = false">Cancelar</button>
+              <button class="glass-btn" style="flex: 1;" (click)="saveFoodPlace()">Guardar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- View Food Place Modal -->
+        <div class="custom-overlay" *ngIf="isFoodPlaceModalOpen" (click)="isFoodPlaceModalOpen = false">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+            
+            <div *ngIf="selectedFoodPlace?.image_url_full" class="milestone-cover" style="width: 100%; height: 180px; border-radius: 18px; margin-bottom: 20px; overflow: hidden; position: relative;">
+              <img [src]="selectedFoodPlace?.image_url_full" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            
+            <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;">{{ selectedFoodPlace?.name }}</h2>
+            <p style="color: #a4133c; font-size: 1.1rem; font-weight: 700; margin-bottom: 10px;">
+              {{ selectedFoodPlace?.location }}
+            </p>
+            <div style="color: #FFB703; font-size: 1.5rem; margin-bottom: 15px;">
+                <ion-icon name="star" *ngFor="let s of [1,2,3,4,5]" [style.opacity]="s <= selectedFoodPlace?.rating ? 1 : 0.3"></ion-icon>
+            </div>
+            
+            <p *ngIf="selectedFoodPlace?.description" style="color: #590D22; font-size: 1rem; line-height: 1.5; font-weight: 500; text-align: left; background: rgba(255,255,255,0.8); padding: 15px; border-radius: 14px; border: 1px solid rgba(255,77,109,0.2); margin-bottom: 20px;">
+              "{{ selectedFoodPlace.description }}"
+            </p>
+            
+            <div class="dishes-section" style="text-align: left; margin-bottom: 20px;">
+              <h4 style="color: #800f2f; font-weight: 800; border-bottom: 2px solid rgba(255,77,109,0.2); padding-bottom: 5px; margin-bottom: 15px;">Platos</h4>
+              
+              <div class="dish-item" *ngFor="let dish of selectedFoodPlace?.dishes" style="display: flex; gap: 10px; background: rgba(255,255,255,0.6); padding: 10px; border-radius: 12px; margin-bottom: 10px; align-items: center;">
+                <div *ngIf="dish.image_url_full" style="width: 60px; height: 60px; border-radius: 8px; background-size: cover; background-position: center;" [style.backgroundImage]="'url(' + dish.image_url_full + ')'"></div>
+                <div style="flex: 1;">
+                  <span style="display: block; font-weight: 700; color: #590D22;">{{ dish.name }}</span>
+                  <span style="color: #FFB703; font-size: 0.8rem;">
+                    <ion-icon name="star" *ngFor="let s of [1,2,3,4,5]" [style.opacity]="s <= dish.rating ? 1 : 0.3"></ion-icon>
+                  </span>
+                  <p *ngIf="dish.description" style="margin: 5px 0 0; font-size: 0.85rem; color: #a4133c;">{{ dish.description }}</p>
+                </div>
+                <ion-icon name="close-circle" style="color: rgba(255,77,109,0.5); font-size: 1.5rem;" (click)="deleteFoodDish(dish.id)"></ion-icon>
+              </div>
+              
+              <!-- Add dish mini-form -->
+              <div style="margin-top: 15px; border-top: 1px dashed rgba(255,77,109,0.3); padding-top: 15px;" *ngIf="isAddingDish">
+                 <input type="text" placeholder="Nombre del plato" [(ngModel)]="newDish.name" class="glass-input" style="width: 100%; margin-bottom: 10px; padding: 10px;" />
+                 <input type="text" placeholder="Comentario..." [(ngModel)]="newDish.description" class="glass-input" style="width: 100%; margin-bottom: 10px; padding: 10px;" />
+                 
+                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <div style="display: flex; gap: 5px;">
+                      <ion-icon name="star" *ngFor="let s of [1,2,3,4,5]" [style.color]="s <= newDish.rating ? '#FFB703' : '#ccc'" style="font-size: 1.5rem;" (click)="newDish.rating = s"></ion-icon>
+                    </div>
+                    <ion-icon name="camera" style="font-size: 1.8rem; color: #FF4D6D;" (click)="uploadNewDishPhoto()"></ion-icon>
+                 </div>
+                 
+                 <div *ngIf="newDish.imageBase64" style="height: 100px; border-radius: 8px; background-size: cover; background-position: center; margin-bottom: 10px;" [style.backgroundImage]="'url(' + newDish.imageBase64 + ')'"></div>
+                 
+                 <div style="display: flex; gap: 10px;">
+                    <button class="glass-btn" style="flex: 1; padding: 10px; font-size: 0.9rem;" (click)="isAddingDish = false">Cancelar</button>
+                    <button class="glass-btn" style="flex: 1; padding: 10px; font-size: 0.9rem;" (click)="saveFoodDish()">Guardar Plato</button>
+                 </div>
+              </div>
+              
+              <button *ngIf="!isAddingDish" class="glass-btn" style="width: 100%; padding: 10px; font-size: 0.9rem; margin-top: 10px;" (click)="isAddingDish = true">
+                <ion-icon name="add"></ion-icon> Añadir Plato
+              </button>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+              <button class="glass-btn" style="background: rgba(255,0,0,0.1); color: red; flex: 1; padding: 12px;" (click)="deleteFoodPlace(selectedFoodPlace.id)">Eliminar Restaurante</button>
+              <button class="glass-btn" style="flex: 1; padding: 12px;" (click)="isFoodPlaceModalOpen = false">Cerrar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Movie Modal -->
+        <div class="custom-overlay" *ngIf="isAddingMovie" (click)="isAddingMovie = false">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+            <h2 style="color: #590D22; margin-bottom: 20px; font-weight: 900;">Nueva Peli/Serie 🎬</h2>
+            
+            <div *ngIf="newMovie.imageBase64" class="milestone-cover" style="width: 120px; height: 180px; border-radius: 12px; margin: 0 auto 20px; overflow: hidden; position: relative;">
+              <img [src]="newMovie.imageBase64" style="width: 100%; height: 100%; object-fit: cover;" />
+              <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="uploadNewMoviePhoto()">
+                 <ion-icon name="camera-outline" style="color: white; font-size: 3rem;"></ion-icon>
+              </div>
+            </div>
+            
+            <button *ngIf="!newMovie.imageBase64" class="glass-btn" style="margin-bottom: 15px;" (click)="uploadNewMoviePhoto()">
+              <ion-icon name="camera-outline"></ion-icon> Cartel / Foto
+            </button>
+            
+            <input type="text" placeholder="Título" [(ngModel)]="newMovie.title" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
+            <input type="text" placeholder="¿Quién se quedó dormido primero?" [(ngModel)]="newMovie.who_fell_asleep" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
+            <textarea placeholder="Nuestra frase favorita / Momento top" [(ngModel)]="newMovie.favorite_quote" class="glass-input" style="width: 100%; min-height: 80px; margin-bottom: 10px; resize: vertical;"></textarea>
+            
+            <div style="margin-bottom: 20px;">
+              <p style="margin: 0 0 5px; color: #a4133c; font-weight: 600;">Puntuación:</p>
+              <div style="display: flex; justify-content: center; gap: 5px;">
+                <ion-icon name="star" *ngFor="let s of [1,2,3,4,5]" [style.color]="s <= newMovie.rating ? '#FFB703' : '#ccc'" [style.opacity]="s <= newMovie.rating ? 1 : 0.5" style="font-size: 2rem;" (click)="newMovie.rating = s"></ion-icon>
+              </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+              <button class="glass-btn" style="flex: 1; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="isAddingMovie = false">Cancelar</button>
+              <button class="glass-btn" style="flex: 1;" (click)="saveMovie()">Guardar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- View Movie Modal -->
+        <div class="custom-overlay" *ngIf="isMovieModalOpen" (click)="isMovieModalOpen = false">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+            
+            <div *ngIf="selectedMovie?.image_url_full" class="milestone-cover" style="width: 140px; height: 210px; border-radius: 12px; margin: 0 auto 20px; overflow: hidden; position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
+              <img [src]="selectedMovie?.image_url_full" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            
+            <h2 style="color: #590D22; margin-bottom: 10px; font-weight: 900; font-size: 1.6rem;">{{ selectedMovie?.title }}</h2>
+            
+            <div style="color: #FFB703; font-size: 1.8rem; margin-bottom: 20px;">
+                <ion-icon name="star" *ngFor="let s of [1,2,3,4,5]" [style.opacity]="s <= selectedMovie?.rating ? 1 : 0.3"></ion-icon>
+            </div>
+            
+            <div *ngIf="selectedMovie?.who_fell_asleep" style="background: rgba(255,77,109,0.05); border-radius: 14px; padding: 15px; margin-bottom: 15px; text-align: center;">
+              <p style="margin: 0; color: #a4133c; font-size: 0.95rem;">
+                <ion-icon name="moon-outline" style="vertical-align: middle; margin-right: 5px;"></ion-icon>
+                <strong>Se durmió:</strong> {{ selectedMovie.who_fell_asleep }}
+              </p>
+            </div>
+            
+            <p *ngIf="selectedMovie?.favorite_quote" style="color: #590D22; font-size: 1.05rem; line-height: 1.5; font-style: italic; font-weight: 500; text-align: center; background: rgba(255,255,255,0.8); padding: 15px; border-radius: 14px; border: 1px solid rgba(255,77,109,0.2); margin-bottom: 20px;">
+              "{{ selectedMovie.favorite_quote }}"
+            </p>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+              <button class="glass-btn" style="background: rgba(255,0,0,0.1); color: red; flex: 1; padding: 12px;" (click)="deleteMovie(selectedMovie.id)">Eliminar Peli</button>
+              <button class="glass-btn" style="flex: 1; padding: 12px;" (click)="isMovieModalOpen = false">Cerrar</button>
+            </div>
+          </div>
+        </div>
+
     </ion-content>
   `,
   styles: [`
@@ -386,7 +598,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   private locationService = inject(LocationService);
 
   startDate: string = '';
-  selectedAlbumId: string = 'feed';
+  selectedAlbumId: number | string = 'feed';
   albums: any[] = [];
   milestones: any[] = [];
   bucketList: any[] = [];
@@ -414,8 +626,25 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   uploadingAvatar = false;
   myUserId: 'juan' | 'roberta' = 'juan';
 
+  // --- Food Places & Movies ---
+  foodPlaces: any[] = [];
+  movies: any[] = [];
+  
+  isAddingFoodPlace = false;
+  newFoodPlace: any = { name: '', location: '', description: '', rating: 5, imageBase64: null };
+  isFoodPlaceModalOpen = false;
+  selectedFoodPlace: any = null;
+  
+  isAddingDish = false;
+  newDish: any = { name: '', description: '', rating: 5, imageBase64: null };
+  
+  isAddingMovie = false;
+  newMovie: any = { title: '', who_fell_asleep: '', favorite_quote: '', rating: 5, imageBase64: null };
+  isMovieModalOpen = false;
+  selectedMovie: any = null;
+
   constructor() {
-    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar });
+    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar, add });
   }
 
   async ngOnInit() {
@@ -493,6 +722,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     
     // Load bucket list from backend
     this.loadBucketList();
+    this.loadFoodAndMovies();
 
     this.startTimer();
 
@@ -660,7 +890,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   }
 
   async saveSelectedAlbum() {
-    await Preferences.set({ key: 'widgetAlbumId', value: this.selectedAlbumId });
+    await Preferences.set({ key: 'widgetAlbumId', value: this.selectedAlbumId.toString() });
     
     let albumName = "Feed General";
     if (this.selectedAlbumId !== 'feed') {
@@ -919,22 +1149,145 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     });
   }
 
-
   async confirmLogout() {
     const alert = await this.alertCtrl.create({
-      header: '¿Cerrar Sesión?',
-      message: '¿Seguro que quieres cerrar sesión? Acuérdate de tu contraseña.',
-      cssClass: 'premium-login-alert',
+      header: 'Cerrar Sesión',
+      message: '¿Estás seguro de que quieres salir?',
+      cssClass: 'premium-alert',
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { text: 'Cerrar Sesión', handler: () => this.logout(), cssClass: 'alert-button-danger' }
+        { text: 'Cancelar', role: 'cancel', cssClass: 'alert-btn-cancel' },
+        { 
+          text: 'Salir', 
+          role: 'destructive',
+          cssClass: 'alert-btn-confirm',
+          handler: () => {
+            this.api.logout();
+            this.router.navigate(['/login']);
+          }
+        }
       ]
     });
     await alert.present();
   }
 
-  logout() {
-    this.api.logout();
-    this.router.navigate(['/login']);
+  // --- FOOD PLACES & MOVIES API LOGIC ---
+  async loadFoodAndMovies() {
+    try {
+      this.foodPlaces = await this.api.getFoodPlaces();
+      this.movies = await this.api.getMovies();
+    } catch (e) {
+      console.error('Error loading food and movies', e);
+    }
+  }
+
+  // Food Places
+  openFoodPlaceModal(place: any) {
+    this.selectedFoodPlace = place;
+    this.isFoodPlaceModalOpen = true;
+    this.isAddingDish = false;
+  }
+
+  async uploadNewFoodPlacePhoto() {
+    this.presentPhotoOptions(async (source) => {
+      try {
+        const image = await Camera.getPhoto({ quality: 80, allowEditing: true, resultType: CameraResultType.DataUrl, source });
+        if (image.dataUrl) this.newFoodPlace.imageBase64 = image.dataUrl;
+      } catch (e) { console.log(e); }
+    });
+  }
+
+  async saveFoodPlace() {
+    if (!this.newFoodPlace.name) return this.showToast('Ponle nombre al sitio', 'warning');
+    try {
+      await this.api.addFoodPlace(this.newFoodPlace.name, this.newFoodPlace.location, this.newFoodPlace.rating, this.newFoodPlace.description, this.newFoodPlace.imageBase64);
+      this.isAddingFoodPlace = false;
+      this.newFoodPlace = { name: '', location: '', description: '', rating: 5, imageBase64: null };
+      this.loadFoodAndMovies();
+      this.showToast('Restaurante añadido', 'success');
+    } catch (e) {
+      this.showToast('Error al añadir restaurante', 'danger');
+    }
+  }
+
+  async deleteFoodPlace(id: number) {
+    if(!confirm('¿Eliminar este restaurante?')) return;
+    try {
+      await this.api.deleteFoodPlace(id);
+      this.isFoodPlaceModalOpen = false;
+      this.loadFoodAndMovies();
+      this.showToast('Eliminado', 'success');
+    } catch (e) {}
+  }
+
+  // Food Dishes
+  async uploadNewDishPhoto() {
+    this.presentPhotoOptions(async (source) => {
+      try {
+        const image = await Camera.getPhoto({ quality: 80, allowEditing: true, resultType: CameraResultType.DataUrl, source });
+        if (image.dataUrl) this.newDish.imageBase64 = image.dataUrl;
+      } catch (e) { console.log(e); }
+    });
+  }
+
+  async saveFoodDish() {
+    if (!this.newDish.name) return this.showToast('Ponle nombre al plato', 'warning');
+    try {
+      const dish = await this.api.addFoodDish(this.selectedFoodPlace.id, this.newDish.name, this.newDish.rating, this.newDish.description, this.newDish.imageBase64);
+      if(!this.selectedFoodPlace.dishes) this.selectedFoodPlace.dishes = [];
+      this.selectedFoodPlace.dishes.push(dish);
+      this.isAddingDish = false;
+      this.newDish = { name: '', description: '', rating: 5, imageBase64: null };
+      this.loadFoodAndMovies();
+      this.showToast('Plato añadido', 'success');
+    } catch (e) {
+      this.showToast('Error al añadir plato', 'danger');
+    }
+  }
+
+  async deleteFoodDish(dishId: number) {
+    if(!confirm('¿Eliminar este plato?')) return;
+    try {
+      await this.api.deleteFoodDish(this.selectedFoodPlace.id, dishId);
+      this.selectedFoodPlace.dishes = this.selectedFoodPlace.dishes.filter((d:any) => d.id !== dishId);
+      this.loadFoodAndMovies();
+    } catch (e) {}
+  }
+
+  // Movies
+  openMovieModal(movie: any) {
+    this.selectedMovie = movie;
+    this.isMovieModalOpen = true;
+  }
+
+  async uploadNewMoviePhoto() {
+    this.presentPhotoOptions(async (source) => {
+      try {
+        const image = await Camera.getPhoto({ quality: 80, allowEditing: true, resultType: CameraResultType.DataUrl, source });
+        if (image.dataUrl) this.newMovie.imageBase64 = image.dataUrl;
+      } catch (e) { console.log(e); }
+    });
+  }
+
+  async saveMovie() {
+    if (!this.newMovie.title) return this.showToast('Ponle título', 'warning');
+    try {
+      await this.api.addMovie(this.newMovie.title, this.newMovie.rating, this.newMovie.who_fell_asleep, this.newMovie.favorite_quote, this.newMovie.imageBase64);
+      this.isAddingMovie = false;
+      this.newMovie = { title: '', who_fell_asleep: '', favorite_quote: '', rating: 5, imageBase64: null };
+      this.loadFoodAndMovies();
+      this.showToast('Peli añadida', 'success');
+    } catch (e) {
+      this.showToast('Error al añadir', 'danger');
+    }
+  }
+
+  async deleteMovie(id: number) {
+    if(!confirm('¿Eliminar esta peli?')) return;
+    try {
+      await this.api.deleteMovie(id);
+      this.isMovieModalOpen = false;
+      this.loadFoodAndMovies();
+      this.showToast('Eliminada', 'success');
+    } catch (e) {}
   }
 }

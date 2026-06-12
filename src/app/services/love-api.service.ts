@@ -370,4 +370,114 @@ export class LoveApiService {
     const headers = await this.getHeaders();
     return firstValueFrom(this.http.get(`${API_BASE_URL}/love-album/games/drawing/${promptId}/result`, { headers }));
   }
+
+  // --- WIDGET EXTRAS ---
+  // Food Places
+  async getFoodPlaces(): Promise<any[]> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/widget/food-places`, { headers }));
+  }
+
+  async addFoodPlace(name: string, location?: string, rating?: number, description?: string, imageBase64?: string): Promise<any> {
+    const headers = await this.getHeaders();
+    const formData = new FormData();
+    formData.append('name', name);
+    if (location) formData.append('location', location);
+    if (rating) formData.append('rating', rating.toString());
+    if (description) formData.append('description', description);
+    
+    if (imageBase64) {
+      try {
+        const response = await fetch(imageBase64);
+        const blob = await response.blob();
+        formData.append('image', blob, `place_${Date.now()}.jpg`);
+      } catch (e) {
+        console.error('Error attaching image', e);
+      }
+    }
+    
+    // Removing Content-Type header so the browser sets it automatically with the boundary for multipart/form-data
+    let reqHeaders = new HttpHeaders();
+    const currentToken = await this.getToken();
+    if (currentToken) {
+      reqHeaders = reqHeaders.set('Authorization', `Bearer ${currentToken}`);
+    }
+
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/widget/food-places`, formData, { headers: reqHeaders }));
+  }
+
+  async deleteFoodPlace(id: number): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/widget/food-places/${id}`, { headers }));
+  }
+
+  // Food Dishes
+  async addFoodDish(placeId: number, name: string, rating?: number, description?: string, imageBase64?: string): Promise<any> {
+    const headers = await this.getHeaders();
+    const formData = new FormData();
+    formData.append('name', name);
+    if (rating) formData.append('rating', rating.toString());
+    if (description) formData.append('description', description);
+    
+    if (imageBase64) {
+      try {
+        const response = await fetch(imageBase64);
+        const blob = await response.blob();
+        formData.append('image', blob, `dish_${Date.now()}.jpg`);
+      } catch (e) {
+        console.error('Error attaching image', e);
+      }
+    }
+    
+    let reqHeaders = new HttpHeaders();
+    const currentToken = await this.getToken();
+    if (currentToken) {
+      reqHeaders = reqHeaders.set('Authorization', `Bearer ${currentToken}`);
+    }
+
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/widget/food-places/${placeId}/dishes`, formData, { headers: reqHeaders }));
+  }
+
+  async deleteFoodDish(placeId: number, dishId: number): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/widget/food-places/${placeId}/dishes/${dishId}`, { headers }));
+  }
+
+  // Movies
+  async getMovies(): Promise<any[]> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/widget/movies`, { headers }));
+  }
+
+  async addMovie(title: string, rating?: number, who_fell_asleep?: string, favorite_quote?: string, imageBase64?: string): Promise<any> {
+    const headers = await this.getHeaders();
+    const formData = new FormData();
+    formData.append('title', title);
+    if (rating) formData.append('rating', rating.toString());
+    if (who_fell_asleep) formData.append('who_fell_asleep', who_fell_asleep);
+    if (favorite_quote) formData.append('favorite_quote', favorite_quote);
+    
+    if (imageBase64) {
+      try {
+        const response = await fetch(imageBase64);
+        const blob = await response.blob();
+        formData.append('image', blob, `movie_${Date.now()}.jpg`);
+      } catch (e) {
+        console.error('Error attaching image', e);
+      }
+    }
+    
+    let reqHeaders = new HttpHeaders();
+    const currentToken = await this.getToken();
+    if (currentToken) {
+      reqHeaders = reqHeaders.set('Authorization', `Bearer ${currentToken}`);
+    }
+
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/widget/movies`, formData, { headers: reqHeaders }));
+  }
+
+  async deleteMovie(id: number): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/widget/movies/${id}`, { headers }));
+  }
 }
