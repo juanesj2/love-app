@@ -321,6 +321,8 @@ export class HomePage implements OnInit, OnDestroy {
       if (data.my_mood) this.myMood = data.my_mood;
       if (data.partner_mood) this.partnerMood = data.partner_mood;
       if (data.partner_name) this.partnerInitial = data.partner_name.charAt(0).toUpperCase();
+      if (data.my_avatar) this.myAvatarUrl = data.my_avatar;
+      if (data.partner_avatar) this.partnerAvatarUrl = data.partner_avatar;
 
       const myIdStr = data.my_id?.toString();
       const partnerIdStr = data.partner_id?.toString();
@@ -330,12 +332,7 @@ export class HomePage implements OnInit, OnDestroy {
         this.subscriptions.forEach(s => s.unsubscribe());
         this.subscriptions = [];
 
-        this.subscriptions.push(this.locationService.listenToUserLocation(myIdStr as any).subscribe((locData: any) => {
-          if (locData && locData.avatar) this.myAvatarUrl = locData.avatar;
-        }));
-        this.subscriptions.push(this.locationService.listenToUserLocation(partnerIdStr as any).subscribe((locData: any) => {
-          if (locData && locData.avatar) this.partnerAvatarUrl = locData.avatar;
-        }));
+        // No need to listen to locations here just for the avatars anymore
       }
     } catch (e: any) {
       console.log('No se pudo cargar la info de la cabecera', e);
