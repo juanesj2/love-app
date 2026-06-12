@@ -19,7 +19,11 @@ export interface UserLocation {
 export class LocationService {
   private firestore = inject(Firestore);
 
-  async updateMyLocation(userId: 'juan' | 'roberta', name: string) {
+  async updateMyLocation(userId: string, name: string) {
+    // Map backend integer IDs to Firebase string IDs
+    if (userId === '1') userId = 'juan';
+    else if (userId === '2') userId = 'roberta';
+
     try {
       // 1. Pedir permisos explícitamente (evita bloqueos silenciosos)
       const permissions = await Geolocation.checkPermissions();
@@ -51,37 +55,40 @@ export class LocationService {
           backgroundTitle: "Ubicación en segundo plano",
           requestPermissions: true,
           stale: false,
-          distanceFilter: 50 // Actualizar cada 50 metros (balance entre tiempo real y batería)
+          distanceFilter: 10
         },
-        async (location: any, error: any) => {
+        async (location, error) => {
           if (error) {
-            console.error("Background Geolocation Error:", error);
-            return;
+            if (error.code === 'NOT_AUTHORIZED') {
+              if (window.confirm(
+                "La aplicación necesita acceso a la ubicación en segundo plano. ¿Ir a ajustes?"
+              )) {
+                BackgroundGeolocation.openSettings();
+              }
+            }
+            return console.error(error);
           }
           if (location) {
             const bgGeoPoint = new GeoPoint(location.latitude, location.longitude);
-            try {
-              await setDoc(userDocRef, {
-                name: name,
-                position: bgGeoPoint
-              }, { merge: true });
-              console.log('Ubicación en segundo plano actualizada:', userId);
-            } catch (err) {
-              console.error('Error guardando ubicación en segundo plano:', err);
-            }
+            await setDoc(userDocRef, { position: bgGeoPoint }, { merge: true });
+            console.log('Fondo actualizado:', location);
           }
         }
-      ).then((watcher_id: string) => {
-        console.log("Background watcher started with id:", watcher_id);
+      ).then(watcherId => {
+        // Guardar watcher_id si es necesario (para detenerlo luego)
+        // localStorage.setItem('bg_watcher_id', watcherId);
       });
 
     } catch (error) {
-      console.error('Error obteniendo ubicación:', error);
+      console.error('Error actualizando ubicación:', error);
       throw error; // Lanzamos el error para que la UI lo pueda mostrar
     }
   }
 
-  listenToUserLocation(userId: 'juan' | 'roberta'): Observable<UserLocation> {
+  listenToUserLocation(userId: string): Observable<UserLocation> {
+    if (userId === '1') userId = 'juan';
+    else if (userId === '2') userId = 'roberta';
+    
     const userDocRef = doc(this.firestore, `locations/${userId}`);
     return docData(userDocRef) as Observable<UserLocation>;
   }

@@ -48,6 +48,11 @@ public class LoveWidgetWorker extends Worker {
         if (myUserId == null || myUserId.isEmpty()) {
             myUserId = prefs.getString("myUserId", "juan");
         }
+        
+        // Map integer IDs to names
+        if (myUserId.equals("1")) myUserId = "juan";
+        else if (myUserId.equals("2")) myUserId = "roberta";
+        
         String partnerId = myUserId.equals("juan") ? "roberta" : "juan";
         
         String token = readToken(context);
@@ -79,23 +84,21 @@ public class LoveWidgetWorker extends Worker {
                 double centerLon = (myLoc.getLongitude() + partnerLoc.getLongitude()) / 2.0;
                 int zoom = calculateZoom(distance);
                 
-                // Center point calculation
                 double exactTileX = (centerLon + 180.0) / 360.0 * (1 << zoom);
                 double exactTileY = (1 - Math.log(Math.tan(Math.toRadians(centerLat)) + 1 / Math.cos(Math.toRadians(centerLat))) / Math.PI) / 2 * (1 << zoom);
-                
-                // We want exactTileX and exactTileY to be precisely at pixel (256, 256) of our 512x512 output
-                Bitmap mapBitmap = Bitmap.createBitmap(512, 512, Bitmap.Config.ARGB_8888);
-                Canvas mapCanvas = new Canvas(mapBitmap);
                 
                 int startTileX = (int) Math.floor(exactTileX - 0.5);
                 int startTileY = (int) Math.floor(exactTileY - 0.5);
                 
+                Bitmap mapBitmap = Bitmap.createBitmap(512, 512, Bitmap.Config.ARGB_8888);
+                Canvas mapCanvas = new Canvas(mapBitmap);
                 boolean hasAnyTile = false;
+                
                 for (int dx = 0; dx <= 1; dx++) {
                     for (int dy = 0; dy <= 1; dy++) {
                         int tx = startTileX + dx;
                         int ty = startTileY + dy;
-                        String tUrl = String.format(Locale.US, "https://a.basemaps.cartocdn.com/dark_all/%d/%d/%d@2x.png", zoom, tx, ty);
+                        String tUrl = String.format(Locale.US, "https://a.basemaps.cartocdn.com/rastertiles/voyager/%d/%d/%d@2x.png", zoom, tx, ty);
                         Bitmap tBmp = fetchBitmap(tUrl);
                         if (tBmp != null) {
                             hasAnyTile = true;
@@ -112,28 +115,30 @@ public class LoveWidgetWorker extends Worker {
                     Bitmap mutableBitmap = mapBitmap;
                     Canvas canvas = new Canvas(mutableBitmap);
 
-                    // Fetch avatars
-                    String partnerAvatarUrl = fetchAvatar(partnerId);
-                    String myAvatarUrl = fetchAvatar(myUserId);
-                    Bitmap myAvatarBitmap = null;
-                    Bitmap partnerAvatarBitmap = null;
-                    
-                    if (myAvatarUrl != null) {
-                        myAvatarBitmap = myAvatarUrl.startsWith("data:") ? decodeBase64Bitmap(myAvatarUrl) : fetchBitmap(myAvatarUrl);
-                    }
-                    if (partnerAvatarUrl != null) {
-                        partnerAvatarBitmap = partnerAvatarUrl.startsWith("data:") ? decodeBase64Bitmap(partnerAvatarUrl) : fetchBitmap(partnerAvatarUrl);
-                    }
-
-                    // Fetch moods
+                    // Fetch moods and avatars
                     String myMood = "";
                     String partnerMood = "";
+                    String myAvatarUrl = null;
+                    String partnerAvatarUrl = null;
+                    
                     if (token != null && !token.isEmpty()) {
                         JSONObject info = fetchCoupleInfo(token);
                         if (info != null) {
                             myMood = info.optString("my_mood", "");
                             partnerMood = info.optString("partner_mood", "");
+                            myAvatarUrl = info.optString("my_avatar", null);
+                            partnerAvatarUrl = info.optString("partner_avatar", null);
                         }
+                    }
+                    
+                    Bitmap myAvatarBitmap = null;
+                    Bitmap partnerAvatarBitmap = null;
+                    
+                    if (myAvatarUrl != null && !myAvatarUrl.isEmpty()) {
+                        myAvatarBitmap = myAvatarUrl.startsWith("data:") ? decodeBase64Bitmap(myAvatarUrl) : fetchBitmap(myAvatarUrl);
+                    }
+                    if (partnerAvatarUrl != null && !partnerAvatarUrl.isEmpty()) {
+                        partnerAvatarBitmap = partnerAvatarUrl.startsWith("data:") ? decodeBase64Bitmap(partnerAvatarUrl) : fetchBitmap(partnerAvatarUrl);
                     }
                 
                 // The avatars are drawn based on their offset from the center (which is now exactly at 256, 256)
@@ -433,29 +438,6 @@ public class LoveWidgetWorker extends Worker {
         loc.setLatitude(lat);
         loc.setLongitude(lng);
         return loc;
-    }
-    
-    private String fetchAvatar(String userId) {
-        try {
-            URL url = new URL("https://firestore.googleapis.com/v1/projects/love-widget-app-ec037/databases/(default)/documents/locations/" + userId);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setConnectTimeout(5000);
-            
-            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String inputLine;
-            StringBuilder content = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) content.append(inputLine);
-            in.close();
-            conn.disconnect();
-            
-            JSONObject json = new JSONObject(content.toString());
-            JSONObject fields = json.optJSONObject("fields");
-            if (fields != null && fields.has("avatar")) {
-                return fields.getJSONObject("avatar").optString("stringValue", "");
-            }
-        } catch (Exception e) {}
-        return null;
     }
     
     private Bitmap fetchBitmap(String urlString) {
