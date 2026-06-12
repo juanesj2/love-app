@@ -574,6 +574,17 @@ export class PhotoWidgetComponent implements OnInit {
   isAlbumsModalOpen = false;
   currentAlbum: any = null;
 
+  selectionMode = false;
+  selectedPhotos = new Set<number>();
+  addingToAlbumId: number | null = null;
+  
+  longPressTimeout: any;
+
+  coupleInfo: any = null;
+  uploading = false;
+  
+  showStreakModal = false;
+
   avatars: { [key: string]: string } = {};
   private firestore = inject(Firestore);
   private observer: IntersectionObserver | null = null;
