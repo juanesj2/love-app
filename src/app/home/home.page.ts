@@ -37,7 +37,7 @@ import { App } from '@capacitor/app';
             <ion-icon name="heart" [class.poking]="pokeAnimation"></ion-icon>
           </div>
 
-          <div class="avatar-container"
+          <div class="avatar-container partner-container"
                (mousedown)="startSurprisePress()" (mouseup)="endSurprisePress()" (mouseleave)="endSurprisePress()"
                (touchstart)="startSurprisePress()" (touchend)="endSurprisePress()">
             <img *ngIf="partnerAvatarUrl" [src]="partnerAvatarUrl" class="avatar" />
@@ -147,33 +147,41 @@ import { App } from '@capacitor/app';
     </div>
   `,
   styles: [`
-    ion-toolbar { --background: white; }
-    .custom-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 25px; background: white; position: relative; }
-    .avatar-container { position: relative; cursor: pointer; z-index: 2; }
-    .avatar { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); object-fit: cover; }
-    .my-avatar { background: linear-gradient(135deg, #FF4D6D, #c9184a); }
-    .partner-avatar { background: linear-gradient(135deg, #ff8fa3, #ffb3c1); }
-    .mood-badge { position: absolute; bottom: -5px; right: -5px; background: white; border-radius: 50%; padding: 2px; font-size: 1.2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    
-    .poke-btn { position: absolute; left: 50%; transform: translateX(-50%); width: 50px; height: 50px; border-radius: 50%; background: #fff0f3; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: #FF4D6D; cursor: pointer; box-shadow: inset 0 2px 5px rgba(255,77,109,0.1); transition: all 0.2s; z-index: 1; }
-    .poke-btn:active { transform: translateX(-50%) scale(0.9); }
-    .poke-btn ion-icon.poking { animation: heartbeat 0.8s infinite; color: #c9184a; }
-    @keyframes heartbeat { 0% { transform: scale(1); } 25% { transform: scale(1.3); } 50% { transform: scale(1); } 75% { transform: scale(1.3); } 100% { transform: scale(1); } }
-
-    .custom-footer { background: white; border-top: 1px solid #eee; padding-bottom: env(safe-area-inset-bottom); }
-    .custom-tab-bar { display: flex; justify-content: space-between; align-items: center; padding: 5px 15px; height: 65px; position: relative; }
-    .tab-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #888; width: 55px; font-size: 0.75rem; gap: 4px; transition: color 0.2s; cursor: pointer; }
-    .tab-btn.active { color: #FF4D6D; font-weight: bold; }
-    
-    .tab-btn ion-icon { font-size: 1.5rem; transition: transform 0.2s; }
-    .tab-btn.active ion-icon { transform: scale(1.1); }
-    
-    .center-btn { position: relative; width: 60px; height: 60px; }
-    .plus-circle { position: absolute; top: -14px; width: 55px; height: 55px; border-radius: 50%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4); border: 4px solid white; transition: transform 0.2s; z-index: 10; cursor: pointer; }
-    .plus-circle:active { transform: scale(0.9); }
-    .plus-circle.uploading { animation: pulse 1.5s infinite; }
-    
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+      ion-toolbar { --background: transparent; position: absolute; top: 0; width: 100%; }
+      .custom-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); border-radius: 0 0 25px 25px; margin-bottom: 10px; }
+      .avatar-container { position: relative; cursor: pointer; z-index: 2; }
+      .avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.15); object-fit: cover; border: 2px solid white; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+      .avatar-container:active .avatar { transform: scale(0.9); }
+      .my-avatar { background: linear-gradient(135deg, #FF4D6D, #c9184a); }
+      .partner-avatar { background: linear-gradient(135deg, #ff8fa3, #ffb3c1); }
+      .partner-container .avatar { animation: avatarHeartbeat 2.5s infinite ease-in-out; }
+      
+      @keyframes avatarHeartbeat { 0% { transform: scale(1); box-shadow: 0 4px 15px rgba(255,77,109,0.15); } 15% { transform: scale(1.05); box-shadow: 0 4px 20px rgba(255,77,109,0.4); } 30% { transform: scale(1); box-shadow: 0 4px 15px rgba(255,77,109,0.15); } 100% { transform: scale(1); } }
+      
+      .mood-badge { position: absolute; bottom: -5px; right: -5px; background: white; border-radius: 50%; padding: 2px; font-size: 1.2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.3s; }
+      
+      .poke-btn { position: absolute; left: 50%; transform: translateX(-50%); width: 55px; height: 55px; border-radius: 50%; background: linear-gradient(135deg, #fff0f3, #ffe5ec); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #FF4D6D; cursor: pointer; box-shadow: 0 8px 20px rgba(255,77,109,0.2), inset 0 2px 5px rgba(255,255,255,0.8); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 10; border: 2px solid white; }
+      .poke-btn:active { transform: translateX(-50%) scale(0.85); box-shadow: 0 4px 10px rgba(255,77,109,0.2); }
+      .poke-btn ion-icon { filter: drop-shadow(0 2px 4px rgba(255,77,109,0.3)); transition: transform 0.3s; }
+      .poke-btn ion-icon.poking { animation: heartbeat 0.8s infinite; color: #c9184a; filter: drop-shadow(0 4px 8px rgba(201,24,74,0.5)); }
+      @keyframes heartbeat { 0% { transform: scale(1); } 25% { transform: scale(1.3); } 50% { transform: scale(1); } 75% { transform: scale(1.3); } 100% { transform: scale(1); } }
+  
+      .custom-footer { background: transparent; border: none; padding: 0 15px calc(env(safe-area-inset-bottom) + 15px) 15px; position: absolute; bottom: 0; width: 100%; pointer-events: none; z-index: 1000; }
+      .custom-tab-bar { pointer-events: auto; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; padding: 5px 15px; height: 70px; border-radius: 35px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.5); position: relative; margin-bottom: 5px; }
+      .tab-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #a08c92; width: 55px; font-size: 0.75rem; gap: 4px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; }
+      .tab-btn.active { color: #FF4D6D; font-weight: 800; transform: translateY(-3px); }
+      
+      .tab-btn ion-icon { font-size: 1.6rem; transition: transform 0.3s; }
+      .tab-btn.active ion-icon { transform: scale(1.15); filter: drop-shadow(0 4px 8px rgba(255,77,109,0.3)); }
+      .tab-btn.active::after { content: ''; position: absolute; bottom: -8px; width: 6px; height: 6px; background: #FF4D6D; border-radius: 50%; box-shadow: 0 2px 5px rgba(255,77,109,0.4); }
+      
+      .center-btn { position: relative; width: 60px; height: 60px; }
+      .plus-circle { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; box-shadow: 0 10px 25px rgba(255, 77, 109, 0.5); border: 4px solid rgba(255, 255, 255, 0.9); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 10; cursor: pointer; }
+      .plus-circle::before { content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; border-radius: 50%; background: linear-gradient(135deg, #ff8fa3, #ffb3c1); z-index: -1; opacity: 0; transition: opacity 0.3s; }
+      .plus-circle:active { transform: translateX(-50%) scale(0.9); box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4); }
+      .plus-circle.uploading { animation: pulse 1.5s infinite; }
+      
+      @keyframes pulse { 0% { opacity: 1; transform: translateX(-50%) scale(1); box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.7); } 50% { opacity: 0.8; transform: translateX(-50%) scale(0.95); box-shadow: 0 0 0 15px rgba(255, 77, 109, 0); } 100% { opacity: 1; transform: translateX(-50%) scale(1); box-shadow: 0 0 0 0 rgba(255, 77, 109, 0); } }
 
     /* Custom Upload Prompt */
     .home-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 1000; display: flex; align-items: flex-end; }
