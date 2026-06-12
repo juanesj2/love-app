@@ -3,7 +3,7 @@ import { App } from '@capacitor/app';
 import { PluginListenerHandle } from '@capacitor/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonRefresher, IonRefresherContent, IonIcon, IonModal, ToastController, ActionSheetController, AlertController } from '@ionic/angular/standalone';
+import { IonContent, IonRefresher, IonRefresherContent, IonIcon, ToastController, ActionSheetController, AlertController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { LoveApiService } from '../../services/love-api.service';
 import { Preferences } from '@capacitor/preferences';
@@ -92,30 +92,28 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
           </div>
 
           <!-- Modal for Event Details -->
-          <ion-modal [isOpen]="isEventModalOpen" (didDismiss)="isEventModalOpen = false" class="custom-modal">
-            <ng-template>
-              <div class="modal-content glass-card" style="margin: 20px; padding: 20px; text-align: center;">
-                <ion-icon [name]="selectedEvent?.icon" style="font-size: 4rem; color: #FF4D6D; margin-bottom: 10px;"></ion-icon>
-                <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 800;">{{ selectedEvent?.name }}</h2>
-                <p style="color: #a4133c; font-size: 1.1rem; font-weight: 600; margin-bottom: 20px;">
-                  {{ selectedEvent?.dateStr }}
-                </p>
-                
-                <div style="background: rgba(255,77,109,0.1); border-radius: 15px; padding: 15px; margin-bottom: 20px;">
-                  <h3 *ngIf="selectedEvent?.daysLeft > 0" style="color: #FF4D6D; margin: 0; font-weight: 900;">
-                    Faltan {{ selectedEvent?.daysLeft }} días
-                  </h3>
-                  <h3 *ngIf="selectedEvent?.daysLeft === 0" style="color: #FF4D6D; margin: 0; font-weight: 900;">
-                    ¡Es hoy! 🎉
-                  </h3>
-                </div>
-
-                <button class="glass-btn" (click)="isEventModalOpen = false" style="width: 100%;">
-                  Cerrar
-                </button>
+          <div class="custom-overlay" *ngIf="isEventModalOpen" (click)="isEventModalOpen = false">
+            <div class="modal-content glass-card" style="margin: 20px; padding: 30px; text-align: center; width: 85%; max-width: 400px; box-sizing: border-box;" (click)="$event.stopPropagation()">
+              <ion-icon [name]="selectedEvent?.icon" style="font-size: 4rem; color: #FF4D6D; margin-bottom: 15px; background: rgba(255,77,109,0.1); padding: 15px; border-radius: 50%;"></ion-icon>
+              <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.5rem;">{{ selectedEvent?.name }}</h2>
+              <p style="color: #a4133c; font-size: 1.1rem; font-weight: 700; margin-bottom: 25px;">
+                {{ selectedEvent?.dateStr }}
+              </p>
+              
+              <div style="background: rgba(255,77,109,0.1); border-radius: 18px; padding: 18px; margin-bottom: 25px;">
+                <h3 *ngIf="selectedEvent?.daysLeft > 0" style="color: #FF4D6D; margin: 0; font-weight: 900; font-size: 1.2rem;">
+                  Faltan {{ selectedEvent?.daysLeft }} días
+                </h3>
+                <h3 *ngIf="selectedEvent?.daysLeft === 0" style="color: #FF4D6D; margin: 0; font-weight: 900; font-size: 1.2rem;">
+                  ¡Es hoy! 🎉
+                </h3>
               </div>
-            </ng-template>
-          </ion-modal>
+
+              <button class="glass-btn" (click)="isEventModalOpen = false" style="width: 100%; padding: 15px; font-size: 1.1rem; border-radius: 14px;">
+                Cerrar
+              </button>
+            </div>
+          </div>
 
           <div class="date-picker-glass" style="margin-top: 15px;">
             <label>Mi cumpleaños</label>
@@ -299,9 +297,23 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
     .logout-btn { width: 100%; background: rgba(208, 0, 0, 0.1); color: #d00000; border: 2px solid rgba(208, 0, 0, 0.2); padding: 16px; border-radius: 20px; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(10px); }
     .logout-btn:active { background: rgba(208, 0, 0, 0.2); transform: scale(0.98); }
     .logout-btn ion-icon { font-size: 1.4rem; }
+      .custom-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 99999;
+      }
   `],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonIcon, IonModal, IonContent, IonRefresher, IonRefresherContent]
+  imports: [CommonModule, FormsModule, IonIcon, IonContent, IonRefresher, IonRefresherContent]
 })
 export class MasWidgetComponent implements OnInit, OnDestroy {
   @Output() openGameEvent = new EventEmitter<void>();
