@@ -27,7 +27,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 
       <!-- Floating Top Bar -->
       <div class="floating-top-bar">
-        <div class="streak-badge" *ngIf="coupleInfo && !currentAlbum" 
+        <div class="streak-badge" *ngIf="coupleInfo && !currentAlbum" (click)="openStreakModal()"
              [ngClass]="{
                'active': coupleInfo.current_streak > 0 && coupleInfo.my_photo_today && coupleInfo.partner_photo_today,
                'pending': coupleInfo.current_streak > 0 && (!coupleInfo.my_photo_today || !coupleInfo.partner_photo_today),
@@ -119,7 +119,10 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 
         <!-- VISTA GRID (GALERÍA) -->
         <ng-container *ngIf="viewMode === 'grid'">
-          <div class="grid-wrapper">
+          <div class="grid-wrapper" 
+               (touchstart)="onGridTouchStart($event)" 
+               (touchmove)="onGridTouchMove($event)" 
+               (touchend)="onGridTouchEnd($event)">
           <div class="selection-top-bar" *ngIf="selectionMode">
              <div class="select-all-wrapper" (click)="toggleSelectAll()">
                <ion-icon name="checkmark-circle" *ngIf="isAllSelected()" color="primary"></ion-icon>
@@ -155,7 +158,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
                 <ion-icon name="ellipse-outline" *ngIf="!isMonthSelected(group)"></ion-icon>
               </div>
             </div>
-            <div class="grid-view">
+            <div class="grid-view" [ngStyle]="{'grid-template-columns': 'repeat(' + gridColumns + ', 1fr)'}">
               <div class="grid-photo-container" *ngFor="let photo of group.photos" 
                    (mousedown)="startPress(photo)" (mouseup)="endPress()" (mouseleave)="endPress()"
                    (touchstart)="startPress(photo)" (touchend)="endPress()"
@@ -192,10 +195,13 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
         <div class="lightbox-content"
              style="align-items: center; padding: 20px;"
              (touchstart)="onLightboxTouchStart($event)"
+             (touchmove)="onLightboxTouchMove($event)"
              (touchend)="onLightboxTouchEnd($event)">
           
           <ng-container *ngIf="lightboxPhotos[currentLightboxIndex] as photo">
-            <div class="photo-card lightbox-card" [ngClass]="lightboxAnimationClass" style="margin: auto; width: 100%; max-height: 90vh;">
+            <div class="photo-card lightbox-card" [ngClass]="lightboxAnimationClass" 
+                 [ngStyle]="{'transform': 'scale(' + lightboxScale + ') translateY(' + lightboxTranslateY + 'px)'}"
+                 style="margin: auto; width: 100%; max-height: 90vh;">
               
               <div class="image-wrapper">
                 <img [src]="environment.storageUrl + photo.image_path" class="main-photo" loading="lazy" />
@@ -320,6 +326,35 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
               <span *ngIf="uploading">⏳</span>
             </button>
           </div>
+        </div>
+      </div>
+
+      <!-- Streak Modal -->
+      <div class="streak-modal-overlay" *ngIf="showStreakModal" (click)="showStreakModal = false">
+        <div class="streak-modal-content" (click)="$event.stopPropagation()">
+          <button class="streak-close-btn" (click)="showStreakModal = false"><ion-icon name="close"></ion-icon></button>
+          
+          <div class="streak-modal-icon">🔥</div>
+          <h3>Racha de {{coupleInfo?.current_streak || 0}} días</h3>
+          
+          <div class="streak-status">
+            <p *ngIf="coupleInfo?.my_photo_today && coupleInfo?.partner_photo_today">
+              ¡Ambos habéis subido foto hoy! 🎉
+            </p>
+            <p *ngIf="!coupleInfo?.my_photo_today && coupleInfo?.partner_photo_today">
+              A tu pareja solo le faltas tú para no perder la racha. ¡Sube tu foto! 📸
+            </p>
+            <p *ngIf="coupleInfo?.my_photo_today && !coupleInfo?.partner_photo_today">
+              Tú ya has cumplido. Falta la foto de tu pareja. ⏳
+            </p>
+            <p *ngIf="!coupleInfo?.my_photo_today && !coupleInfo?.partner_photo_today">
+              Ninguno ha subido foto hoy. ¡La racha está en peligro! 🚨
+            </p>
+          </div>
+
+          <button class="streak-remind-btn" *ngIf="!coupleInfo?.partner_photo_today" (click)="sendStreakReminder()">
+            <ion-icon name="notifications"></ion-icon> Recordar a mi pareja
+          </button>
         </div>
       </div>
 
@@ -481,9 +516,9 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .lightbox-footer { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px 20px 40px 20px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); color: white; font-size: 1rem; line-height: 1.4; text-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 2002; }
 
     /* Lightbox Animations */
-    .lightbox-card { transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1); transform: translateY(0); opacity: 1; }
-    .slide-out-up { transform: translateY(-100px); opacity: 0; }
-    .slide-out-down { transform: translateY(100px); opacity: 0; }
+    .lightbox-card { transition: transform 0.1s ease-out, opacity 0.25s; opacity: 1; transform-origin: center; }
+    .slide-out-up { opacity: 0; }
+    .slide-out-down { opacity: 0; }
     .slide-in-up { animation: slideInUp 0.3s forwards; }
     .slide-in-down { animation: slideInDown 0.3s forwards; }
     @keyframes slideInUp { 0% { transform: translateY(100px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
@@ -497,6 +532,17 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .premium-textarea { width: 100%; min-height: 100px; border: 2px solid rgba(255, 77, 109, 0.2); border-radius: 15px; padding: 15px; font-size: 1rem; color: #590D22; background: rgba(255, 255, 255, 0.8); resize: none; outline: none; transition: border-color 0.3s; }
     .premium-textarea:focus { border-color: #FF4D6D; }
     .premium-textarea::placeholder { color: #a08c92; }
+
+    /* Streak Modal */
+    .streak-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 3000; display: flex; align-items: center; justify-content: center; }
+    .streak-modal-content { background: white; border-radius: 25px; padding: 30px; width: 90%; max-width: 350px; text-align: center; position: relative; box-shadow: 0 15px 35px rgba(0,0,0,0.2); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .streak-close-btn { position: absolute; top: 15px; right: 15px; background: #f1f3f5; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; color: #555; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .streak-modal-icon { font-size: 4rem; margin-bottom: 10px; }
+    .streak-modal-content h3 { font-size: 1.5rem; font-weight: 800; color: #590D22; margin-top: 0; margin-bottom: 15px; }
+    .streak-status p { font-size: 1rem; color: #555; line-height: 1.5; margin-bottom: 20px; }
+    .streak-remind-btn { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none; padding: 12px 20px; border-radius: 20px; font-weight: bold; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4); transition: transform 0.2s; }
+    .streak-remind-btn:active { transform: scale(0.95); }
+    @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     
     .prompt-actions { display: flex; gap: 10px; }
     .prompt-btn { flex: 1; padding: 14px; border-radius: 20px; font-weight: bold; font-size: 1.1rem; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
@@ -528,14 +574,6 @@ export class PhotoWidgetComponent implements OnInit {
   isAlbumsModalOpen = false;
   currentAlbum: any = null;
 
-  selectionMode = false;
-  selectedPhotos = new Set<number>();
-  addingToAlbumId: number | null = null;
-  
-  longPressTimeout: any;
-
-  coupleInfo: any = null;
-  uploading = false;
   avatars: { [key: string]: string } = {};
   private firestore = inject(Firestore);
   private observer: IntersectionObserver | null = null;
@@ -561,6 +599,17 @@ export class PhotoWidgetComponent implements OnInit {
   touchEndY = 0;
   isLightboxAnimating = false;
   lightboxAnimationClass = '';
+  lightboxTranslateY = 0;
+
+  // Pinch to Zoom
+  gridColumns = 3;
+  lastGridColumns = 3;
+  isPinchingGrid = false;
+  initialGridPinchDist = 0;
+
+  lightboxScale = 1;
+  isPinchingLightbox = false;
+  initialLightboxPinchDist = 0;
 
   constructor() {
     addIcons({ arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline });
@@ -825,6 +874,33 @@ export class PhotoWidgetComponent implements OnInit {
   }
 
   // --- Lightbox Inmersivo ---
+  openStreakModal() {
+    this.showStreakModal = true;
+  }
+
+  async sendStreakReminder() {
+    try {
+      await this.api.sendStreakReminder();
+      this.showStreakModal = false;
+      const toast = await this.toastController.create({
+        message: '¡Recordatorio enviado con éxito! 🔔',
+        duration: 2000,
+        position: 'top',
+        color: 'success'
+      });
+      toast.present();
+    } catch (e) {
+      console.error(e);
+      const toast = await this.toastController.create({
+        message: 'Error al enviar el recordatorio',
+        duration: 2000,
+        position: 'top',
+        color: 'danger'
+      });
+      toast.present();
+    }
+  }
+
   openLightbox(photo: any) {
     if (this.selectionMode) {
       this.toggleSelection(photo);
@@ -883,13 +959,83 @@ export class PhotoWidgetComponent implements OnInit {
     }
   }
 
+  getDistance(t1: Touch, t2: Touch) {
+    return Math.hypot(t1.pageX - t2.pageX, t1.pageY - t2.pageY);
+  }
+
+  // --- Grid Pinch-to-Zoom ---
+  onGridTouchStart(e: TouchEvent) {
+    if (e.touches.length === 2) {
+      this.isPinchingGrid = true;
+      this.initialGridPinchDist = this.getDistance(e.touches[0], e.touches[1]);
+      this.lastGridColumns = this.gridColumns;
+    }
+  }
+
+  onGridTouchMove(e: TouchEvent) {
+    if (!this.isPinchingGrid || e.touches.length !== 2) return;
+    
+    const dist = this.getDistance(e.touches[0], e.touches[1]);
+    const ratio = dist / this.initialGridPinchDist;
+
+    // ratio > 1 means fingers moving apart (zoom in -> fewer columns)
+    // ratio < 1 means fingers moving together (zoom out -> more columns)
+    if (ratio > 1.3 && this.lastGridColumns > 2) {
+      this.gridColumns = this.lastGridColumns - 1;
+      this.lastGridColumns = this.gridColumns;
+      this.initialGridPinchDist = dist; 
+    } else if (ratio < 0.7 && this.lastGridColumns < 4) {
+      this.gridColumns = this.lastGridColumns + 1;
+      this.lastGridColumns = this.gridColumns;
+      this.initialGridPinchDist = dist;
+    }
+  }
+
+  onGridTouchEnd(e: TouchEvent) {
+    if (e.touches.length < 2) {
+      this.isPinchingGrid = false;
+    }
+  }
+
+  // --- Lightbox Pinch-to-Zoom & Swipe ---
   onLightboxTouchStart(e: TouchEvent) {
-    this.touchStartY = e.changedTouches[0].screenY;
+    if (e.touches.length === 2) {
+      this.isPinchingLightbox = true;
+      this.initialLightboxPinchDist = this.getDistance(e.touches[0], e.touches[1]);
+    } else if (e.touches.length === 1 && !this.isPinchingLightbox) {
+      this.touchStartY = e.changedTouches[0].screenY;
+      this.lightboxTranslateY = 0;
+    }
+  }
+
+  onLightboxTouchMove(e: TouchEvent) {
+    if (this.isPinchingLightbox && e.touches.length === 2) {
+      if (e.cancelable) e.preventDefault();
+      const dist = this.getDistance(e.touches[0], e.touches[1]);
+      const ratio = dist / this.initialLightboxPinchDist;
+      this.lightboxScale = Math.max(1, Math.min(3, ratio));
+    } else if (e.touches.length === 1 && !this.isPinchingLightbox && this.lightboxScale === 1) {
+      // Opcional: mover un poco la tarjeta al deslizar para feedback visual
+      const currentY = e.changedTouches[0].screenY;
+      const diff = currentY - this.touchStartY;
+      if (Math.abs(diff) < 150) {
+        this.lightboxTranslateY = diff;
+      }
+    }
   }
 
   onLightboxTouchEnd(e: TouchEvent) {
-    this.touchEndY = e.changedTouches[0].screenY;
-    this.handleLightboxSwipe();
+    if (this.isPinchingLightbox) {
+      if (e.touches.length < 2) {
+        this.isPinchingLightbox = false;
+        // Restaurar scale original
+        this.lightboxScale = 1;
+      }
+    } else if (this.lightboxScale === 1) {
+      this.touchEndY = e.changedTouches[0].screenY;
+      this.handleLightboxSwipe();
+      this.lightboxTranslateY = 0;
+    }
   }
 
   handleLightboxSwipe() {

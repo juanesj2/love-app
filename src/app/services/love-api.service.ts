@@ -42,6 +42,11 @@ export class LoveApiService {
     return headers;
   }
 
+  async sendStreakReminder(): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/couple/remind-streak`, {}, { headers }));
+  }
+
   // --- AUTH ---
   async login(email: string, password: string): Promise<any> {
     const res: any = await firstValueFrom(this.http.post(`${API_BASE_URL}/login`, { email, password }));
