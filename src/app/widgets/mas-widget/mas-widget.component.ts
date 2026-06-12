@@ -200,7 +200,6 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             <span class="sub" *ngIf="!uploadingAvatar">Cambiar foto</span>
             <span class="sub" *ngIf="uploadingAvatar">Actualizando...</span>
           </div>
-          </div>
         </div>
 
         <!-- Logout -->
