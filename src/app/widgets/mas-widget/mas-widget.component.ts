@@ -3,7 +3,7 @@ import { App } from '@capacitor/app';
 import { PluginListenerHandle } from '@capacitor/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonRefresher, IonRefresherContent, IonIcon, ToastController, ActionSheetController } from '@ionic/angular/standalone';
+import { IonContent, IonRefresher, IonRefresherContent, IonIcon, ToastController, ActionSheetController, AlertController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { LoveApiService } from '../../services/love-api.service';
 import { Preferences } from '@capacitor/preferences';
@@ -20,214 +20,226 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
       <div class="mas-container">
-      <div class="header">
-        <h2 class="title">Más opciones</h2>
-      </div>
-
-      <!-- Sección 1: Contador de Tiempo -->
-      <div class="section-card counter-card">
-        <div class="section-title">
-          <ion-icon name="time-outline"></ion-icon>
-          <h3>Nuestro Tiempo Juntos</h3>
-        </div>
-        
-        <div class="date-picker-container">
-          <label>¿Cuándo empezó nuestra historia?</label>
-          <input type="datetime-local" class="custom-datetime" [(ngModel)]="startDate" (change)="saveStartDate()" />
+        <div class="header">
+          <h2 class="title">Panel de Control ✨</h2>
+          <p class="subtitle">Gestiona tu experiencia</p>
         </div>
 
-        <div class="live-counter" *ngIf="startDate">
-          <div class="heart-pulse">
-            <ion-icon name="heart"></ion-icon>
+        <!-- Nuestro Tiempo -->
+        <div class="glass-card">
+          <div class="section-title">
+            <ion-icon name="time-outline"></ion-icon>
+            <h3>Nuestro Tiempo Juntos</h3>
           </div>
-          <div class="time-blocks">
-            <div class="time-block" *ngIf="timeTogether.years > 0">
-              <span class="value">{{ timeTogether.years }}</span>
-              <span class="label">Años</span>
-            </div>
-            <div class="time-block" *ngIf="timeTogether.months > 0 || timeTogether.years > 0">
-              <span class="value">{{ timeTogether.months }}</span>
-              <span class="label">Meses</span>
-            </div>
-            <div class="time-block">
-              <span class="value">{{ timeTogether.days }}</span>
-              <span class="label">Días</span>
-            </div>
-            <div class="time-block">
-              <span class="value">{{ timeTogether.hours }}</span>
-              <span class="label">Horas</span>
-            </div>
-            <div class="time-block">
-              <span class="value">{{ timeTogether.minutes }}</span>
-              <span class="label">Min</span>
-            </div>
-            <div class="time-block highlight">
-              <span class="value">{{ timeTogether.seconds }}</span>
-              <span class="label">Seg</span>
+          
+          <div class="date-picker-glass">
+            <label>¿Cuándo empezó nuestra historia?</label>
+            <div class="date-input-wrapper">
+              <input type="datetime-local" class="glass-input" [(ngModel)]="startDate" (change)="saveStartDate()" />
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Sección 2: Hitos y Fechas Importantes -->
-      <div class="section-card milestones-card">
-        <div class="section-title">
-          <ion-icon name="flag-outline"></ion-icon>
-          <h3>Hitos Importantes</h3>
-        </div>
-        
-        <div class="milestone-list">
-          <div class="milestone-item" *ngFor="let m of milestones">
-            <div class="milestone-info">
-              <span class="m-title">{{ m.title }}</span>
-              <span class="m-date">{{ m.date | date:'longDate' }}</span>
+          <div class="live-counter" *ngIf="startDate">
+            <div class="heart-pulse">
+              <ion-icon name="heart"></ion-icon>
             </div>
-            <div class="m-days">{{ calculateDays(m.date) }} días</div>
-            <ion-icon name="close-circle" class="delete-m" (click)="deleteMilestone(m.id)"></ion-icon>
+            <div class="time-grid">
+              <div class="time-block" *ngIf="timeTogether.years > 0">
+                <span class="value">{{ timeTogether.years }}</span>
+                <span class="label">Años</span>
+              </div>
+              <div class="time-block" *ngIf="timeTogether.months > 0 || timeTogether.years > 0">
+                <span class="value">{{ timeTogether.months }}</span>
+                <span class="label">Meses</span>
+              </div>
+              <div class="time-block">
+                <span class="value">{{ timeTogether.days }}</span>
+                <span class="label">Días</span>
+              </div>
+              <div class="time-block">
+                <span class="value">{{ timeTogether.hours }}</span>
+                <span class="label">Horas</span>
+              </div>
+              <div class="time-block">
+                <span class="value">{{ timeTogether.minutes }}</span>
+                <span class="label">Min</span>
+              </div>
+              <div class="time-block highlight">
+                <span class="value">{{ timeTogether.seconds }}</span>
+                <span class="label">Seg</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="add-milestone">
-          <input type="text" placeholder="Ej: Viaje a París" [(ngModel)]="newMilestoneTitle" />
-          <input type="date" [(ngModel)]="newMilestoneDate" />
-          <button (click)="addMilestone()"><ion-icon name="add-circle-outline"></ion-icon> Añadir</button>
-        </div>
-      </div> <!-- Close milestones-card properly -->
+        <!-- Hitos -->
+        <div class="glass-card">
+          <div class="section-title">
+            <ion-icon name="flag-outline"></ion-icon>
+            <h3>Hitos Importantes</h3>
+          </div>
+          
+          <div class="milestone-list">
+            <div class="milestone-item" *ngFor="let m of milestones">
+              <div class="milestone-indicator"></div>
+              <div class="milestone-info">
+                <span class="m-title">{{ m.title }}</span>
+                <span class="m-date">{{ m.date | date:'longDate' }}</span>
+              </div>
+              <div class="m-days">{{ calculateDays(m.date) }} d</div>
+              <ion-icon name="close-circle" class="delete-icon" (click)="deleteMilestone(m.id)"></ion-icon>
+            </div>
+          </div>
 
-      <!-- Sección 2.5: Cubo de Deseos (Bucket List) -->
-      <div class="section-card bucket-card">
-        <div class="section-title">
-          <ion-icon name="star-outline"></ion-icon>
-          <h3>Cubo de Deseos</h3>
-        </div>
-        <p class="desc">Planes de futuro y cosas que queréis hacer juntos.</p>
-        
-        <div class="bucket-list">
-          <div class="bucket-item" *ngFor="let item of bucketList; let i = index" (click)="toggleBucketItem(i)">
-            <ion-icon [name]="item.completed ? 'checkmark-circle' : 'ellipseOutline'" [class.completed]="item.completed"></ion-icon>
-            <span [class.strike]="item.completed">{{ item.title }}</span>
-            <ion-icon name="close-circle" class="delete-b" (click)="deleteBucketItem(i, $event)"></ion-icon>
+          <div class="add-glass">
+            <input type="text" placeholder="Ej: Viaje a París" [(ngModel)]="newMilestoneTitle" class="glass-input" />
+            <input type="date" [(ngModel)]="newMilestoneDate" class="glass-input" />
+            <button class="glass-btn" (click)="addMilestone()"><ion-icon name="add-circle-outline"></ion-icon> Añadir Hito</button>
           </div>
         </div>
 
-        <div class="add-milestone">
-          <input type="text" placeholder="Ej: Viajar a Japón..." [(ngModel)]="newBucketTitle" (keyup.enter)="addBucketItem()" />
-          <button (click)="addBucketItem()"><ion-icon name="add-circle-outline"></ion-icon> Añadir Deseo</button>
-        </div>
-      </div>
+        <!-- Cubo de Deseos -->
+        <div class="glass-card">
+          <div class="section-title">
+            <ion-icon name="star-outline"></ion-icon>
+            <h3>Cubo de Deseos</h3>
+          </div>
+          <p class="desc">Planes de futuro y cosas que queréis hacer juntos.</p>
+          
+          <div class="bucket-list">
+            <div class="bucket-item" *ngFor="let item of bucketList; let i = index" (click)="toggleBucketItem(i)" [class.is-done]="item.completed">
+              <ion-icon [name]="item.completed ? 'checkmark-circle' : 'ellipse-outline'" class="check-icon"></ion-icon>
+              <span class="b-text">{{ item.title }}</span>
+              <ion-icon name="close-circle" class="delete-icon" (click)="deleteBucketItem(i, $event)"></ion-icon>
+            </div>
+          </div>
 
-      <!-- Sección 3: Configuración de Widgets -->
-      <div class="section-card config-card">
-        <div class="section-title">
-          <ion-icon name="settings-outline"></ion-icon>
-          <h3>Configuración de Widgets</h3>
+          <div class="add-glass">
+            <input type="text" placeholder="Ej: Viajar a Japón..." [(ngModel)]="newBucketTitle" (keyup.enter)="addBucketItem()" class="glass-input" />
+            <button class="glass-btn" (click)="addBucketItem()"><ion-icon name="add-circle-outline"></ion-icon> Añadir Deseo</button>
+          </div>
         </div>
-        <p class="desc">Elige qué colección de fotos quieres que aparezca en el widget de Android de gran tamaño.</p>
-        
-        <div class="select-container">
-          <select [(ngModel)]="selectedAlbumId" (change)="saveSelectedAlbum()" class="custom-select">
-            <option value="feed">Feed General (Todas las fotos)</option>
-            <option *ngFor="let album of albums" [value]="album.id">{{ album.name }}</option>
-          </select>
-        </div>
-      </div>
 
-      <!-- Sección 4: Minijuego -->
-      <div class="section-card game-card" (click)="openGame()">
-        <ion-icon name="game-controller-outline" class="game-icon"></ion-icon>
-        <div class="game-texts">
-          <h3>Test de Pareja</h3>
-          <p>Descubre cuánto os conocéis respondiendo a ciegas.</p>
-        </div>
-      </div>
+        <!-- Quick Actions Grid -->
+        <div class="quick-actions-grid">
+          <!-- Widget Config (Spans full width) -->
+          <div class="grid-card full-width">
+            <h4><ion-icon name="settings-outline" class="text-pink"></ion-icon> Colección del Widget</h4>
+            <select [(ngModel)]="selectedAlbumId" (change)="saveSelectedAlbum()" class="glass-select">
+              <option value="feed">Todas las fotos</option>
+              <option *ngFor="let album of albums" [value]="album.id">{{ album.name }}</option>
+            </select>
+          </div>
 
-      <!-- Sección 5: Perfil -->
-      <div class="section-card profile-card" (click)="changeProfilePicture()">
-        <ion-icon name="person-circle-outline" class="profile-icon"></ion-icon>
-        <div class="profile-texts">
-          <span>Cambiar foto de perfil</span>
-          <div class="spinner" *ngIf="uploadingAvatar">⏳</div>
-        </div>
-      </div>
+          <!-- Minijuego -->
+          <div class="grid-card interactive" (click)="openGame()">
+            <div class="icon-circle bg-purple">
+              <ion-icon name="game-controller-outline"></ion-icon>
+            </div>
+            <h4>Test Pareja</h4>
+            <span class="sub">Jugar a ciegas</span>
+          </div>
 
-      <!-- Sección 6: Cuenta -->
-      <div class="section-card logout-card" (click)="logout()">
-        <ion-icon name="log-out-outline" class="logout-icon"></ion-icon>
-        <span>Cerrar sesión</span>
-      </div>
+          <!-- Perfil -->
+          <div class="grid-card interactive" (click)="changeProfilePicture()">
+            <div class="icon-circle bg-blue">
+              <ion-icon name="person-circle-outline"></ion-icon>
+            </div>
+            <h4>Mi Avatar</h4>
+            <span class="sub" *ngIf="!uploadingAvatar">Cambiar foto</span>
+            <span class="sub" *ngIf="uploadingAvatar">Actualizando...</span>
+          </div>
+        </div>
+
+        <!-- Logout -->
+        <button class="logout-btn" (click)="confirmLogout()">
+          <ion-icon name="log-out-outline"></ion-icon> Cerrar sesión
+        </button>
       </div>
     </ion-content>
   `,
   styles: [`
-    :host {
-      display: block;
-      height: 100%;
-    }
+    :host { display: block; height: 100%; }
     .scroll-content { --background: transparent; }
-    .mas-container { padding: 20px; font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #fff5f8 0%, #ffe3e9 100%); min-height: 100%; padding-bottom: 40px; }
-    .header { margin-bottom: 20px; }
-    .title { margin: 0; font-size: 1.6rem; font-weight: 800; color: #590D22; letter-spacing: -0.5px; }
-
-    .section-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.04); border: 1px solid rgba(255,255,255,0.9); }
-    .section-title { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; }
-    .section-title ion-icon { font-size: 1.4rem; color: #FF4D6D; }
-    .section-title h3 { margin: 0; font-size: 1.1rem; font-weight: 700; color: #590D22; }
-
-    .date-picker-container label { display: block; font-size: 0.9rem; color: #666; margin-bottom: 8px; font-weight: 500; }
-    .custom-datetime { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid rgba(255, 77, 109, 0.2); background: rgba(255,255,255,0.9); font-family: 'Inter', sans-serif; font-size: 1rem; color: #590D22; outline: none; }
-    .custom-datetime:focus { border-color: #FF4D6D; box-shadow: 0 0 0 3px rgba(255, 77, 109, 0.1); }
-
-    .live-counter { margin-top: 25px; text-align: center; }
-    .heart-pulse ion-icon { font-size: 3rem; color: #FF4D6D; filter: drop-shadow(0 0 10px rgba(255, 77, 109, 0.5)); animation: pulse 1s infinite alternate; margin-bottom: 15px; }
-    @keyframes pulse { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
-
-    .time-blocks { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
-    .time-block { background: #fff5f8; padding: 10px; border-radius: 12px; min-width: 55px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid rgba(255, 77, 109, 0.1); }
-    .time-block.highlight { background: linear-gradient(135deg, #FF4D6D, #ff758c); color: white; border: none; }
-    .time-block.highlight .value, .time-block.highlight .label { color: white; }
+    .mas-container { padding: 20px; font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #fff0f3 0%, #ffccd5 100%); min-height: 100%; padding-bottom: 50px; }
     
-    .value { display: block; font-size: 1.4rem; font-weight: 800; color: #590D22; }
-    .label { display: block; font-size: 0.7rem; font-weight: 600; color: #a4133c; text-transform: uppercase; margin-top: 2px; }
+    .header { margin-bottom: 25px; text-align: center; }
+    .title { margin: 0; font-size: 1.8rem; font-weight: 900; color: #590D22; letter-spacing: -0.5px; text-shadow: 0 2px 10px rgba(255,255,255,0.8); }
+    .subtitle { margin: 5px 0 0; color: #a4133c; font-weight: 500; font-size: 0.95rem; }
 
-    .milestone-item { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,240,243,0.7)); border-radius: 14px; margin-bottom: 10px; border: 1px solid rgba(255,77,109,0.15); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    /* Glassmorphism Cards */
+    .glass-card { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 24px; padding: 22px; margin-bottom: 20px; box-shadow: 0 8px 32px rgba(255, 77, 109, 0.08); border: 1px solid rgba(255, 255, 255, 0.6); }
+    
+    .section-title { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .section-title ion-icon { font-size: 1.6rem; color: #FF4D6D; background: rgba(255,77,109,0.1); padding: 8px; border-radius: 12px; }
+    .section-title h3 { margin: 0; font-size: 1.2rem; font-weight: 800; color: #590D22; }
+    .desc { font-size: 0.9rem; color: #800f2f; margin-bottom: 15px; line-height: 1.4; font-weight: 500; }
+
+    /* Inputs */
+    .glass-input { width: 100%; padding: 14px 16px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); font-family: 'Inter', sans-serif; font-size: 0.95rem; color: #590D22; outline: none; transition: all 0.3s; font-weight: 600; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02); }
+    .glass-input:focus { border-color: #FF4D6D; background: #fff; box-shadow: 0 4px 15px rgba(255,77,109,0.1); }
+    .glass-input::placeholder { color: #b08a96; font-weight: normal; }
+    
+    .glass-select { width: 100%; padding: 14px 16px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); font-family: 'Inter', sans-serif; font-size: 1rem; color: #590D22; font-weight: 700; outline: none; appearance: none; cursor: pointer; }
+    .glass-select:focus { border-color: #FF4D6D; background: #fff; }
+
+    .glass-btn { width: 100%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none; padding: 14px; border-radius: 14px; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3); }
+    .glass-btn:active { transform: scale(0.98); box-shadow: 0 2px 8px rgba(255, 77, 109, 0.2); }
+
+    .date-picker-glass label { display: block; font-size: 0.9rem; color: #800f2f; margin-bottom: 8px; font-weight: 600; }
+    
+    /* Time Grid */
+    .live-counter { margin-top: 20px; text-align: center; }
+    .heart-pulse ion-icon { font-size: 3.5rem; color: #FF4D6D; filter: drop-shadow(0 0 15px rgba(255, 77, 109, 0.6)); animation: pulse 1s infinite alternate cubic-bezier(0.4, 0, 0.2, 1); margin-bottom: 20px; }
+    @keyframes pulse { 0% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(255,77,109,0.4)); } 100% { transform: scale(1.2); filter: drop-shadow(0 0 25px rgba(255,77,109,0.8)); } }
+    
+    .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .time-block { background: rgba(255,255,255,0.7); padding: 15px 5px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid rgba(255,255,255,0.9); transition: transform 0.3s; }
+    .time-block:hover { transform: translateY(-3px); }
+    .time-block.highlight { background: linear-gradient(135deg, #FF4D6D, #ff758c); border: none; box-shadow: 0 6px 20px rgba(255,77,109,0.3); }
+    .time-block.highlight .value, .time-block.highlight .label { color: white; }
+    .value { display: block; font-size: 1.5rem; font-weight: 900; color: #590D22; }
+    .label { display: block; font-size: 0.75rem; font-weight: 700; color: #a4133c; text-transform: uppercase; margin-top: 2px; letter-spacing: 0.5px; }
+
+    /* Lists (Milestones & Bucket) */
+    .milestone-item, .bucket-item { display: flex; align-items: center; gap: 12px; padding: 14px; background: rgba(255,255,255,0.8); border-radius: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,1); box-shadow: 0 4px 10px rgba(0,0,0,0.02); transition: all 0.3s; }
+    
+    .milestone-indicator { width: 8px; height: 35px; background: #FF4D6D; border-radius: 4px; }
     .milestone-info { flex: 1; overflow: hidden; }
-    .m-title { display: block; font-weight: 700; color: #590D22; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .m-date { font-size: 0.75rem; color: #a4133c; font-weight: 500; margin-top: 2px; display: block; }
-    .m-days { font-weight: 900; color: white; background: linear-gradient(135deg, #FF4D6D, #c9184a); padding: 5px 10px; border-radius: 10px; font-size: 0.8rem; white-space: nowrap; box-shadow: 0 2px 6px rgba(255,77,109,0.3); }
-    .delete-m { color: #ffb3c1; font-size: 1.3rem; cursor: pointer; flex-shrink: 0; transition: color 0.2s; }
-    .delete-m:active { color: #FF4D6D; }
-    .add-milestone { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
-    .add-milestone input { padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 77, 109, 0.2); background: rgba(255,255,255,0.9); color: #590D22; font-family: 'Inter', sans-serif; outline: none; }
-    .add-milestone input::placeholder { color: #aaa; }
-    .add-milestone input:focus { border-color: #FF4D6D; box-shadow: 0 0 0 3px rgba(255, 77, 109, 0.1); }
-    .add-milestone button { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer; }
+    .m-title { display: block; font-weight: 800; color: #590D22; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .m-date { font-size: 0.8rem; color: #a4133c; font-weight: 600; margin-top: 2px; display: block; }
+    .m-days { font-weight: 900; color: #FF4D6D; background: rgba(255,77,109,0.1); padding: 6px 12px; border-radius: 12px; font-size: 0.85rem; }
+    
+    .bucket-item.is-done { opacity: 0.6; background: rgba(255,255,255,0.4); }
+    .bucket-item.is-done .b-text { text-decoration: line-through; color: #a4133c; }
+    .check-icon { font-size: 1.8rem; color: #d3d3d3; transition: color 0.3s; }
+    .bucket-item.is-done .check-icon { color: #FF4D6D; }
+    .b-text { flex: 1; font-weight: 700; color: #590D22; font-size: 1rem; transition: color 0.3s; }
+    
+    .delete-icon { color: #ffccd5; font-size: 1.5rem; cursor: pointer; transition: color 0.2s; padding: 4px; }
+    .delete-icon:active { color: #FF4D6D; }
+    
+    .add-glass { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
 
-    .game-card { display: flex; align-items: center; gap: 15px; cursor: pointer; background: linear-gradient(135deg, #a4133c, #590D22); color: white; }
-    .game-icon { font-size: 2.5rem; color: #ffb3c1; }
-    .game-texts h3 { margin: 0; font-size: 1.1rem; color: white; }
-    .game-texts p { margin: 4px 0 0; font-size: 0.85rem; color: rgba(255,255,255,0.8); }
+    /* Quick Actions Grid */
+    .quick-actions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
+    .grid-card { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(16px); border-radius: 24px; padding: 20px 15px; box-shadow: 0 6px 20px rgba(0,0,0,0.04); border: 1px solid rgba(255,255,255,0.7); display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: center; transition: transform 0.2s, background 0.2s; }
+    .grid-card.full-width { grid-column: span 2; align-items: flex-start; text-align: left; padding: 20px; }
+    .grid-card.full-width h4 { margin: 0 0 10px 0; font-size: 1.1rem; color: #590D22; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .grid-card.interactive:active { transform: scale(0.95); background: rgba(255,255,255,0.8); }
+    
+    .icon-circle { width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 1.8rem; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .bg-purple { background: linear-gradient(135deg, #7209b7, #b5179e); box-shadow: 0 4px 15px rgba(114, 9, 183, 0.3); }
+    .bg-blue { background: linear-gradient(135deg, #4361ee, #4cc9f0); box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3); }
+    .text-pink { color: #FF4D6D; font-size: 1.4rem; }
+    
+    .grid-card h4 { margin: 0; font-size: 1rem; font-weight: 800; color: #590D22; }
+    .grid-card .sub { font-size: 0.8rem; color: #a4133c; font-weight: 600; margin-top: 4px; }
 
-    .desc { font-size: 0.9rem; color: #666; margin-bottom: 12px; line-height: 1.4; }
-    .custom-select { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid rgba(255, 77, 109, 0.2); background: rgba(255,255,255,0.9); font-family: 'Inter', sans-serif; font-size: 1rem; color: #590D22; outline: none; appearance: none; }
-
-    .bucket-item { display: flex; align-items: center; gap: 10px; padding: 12px; background: rgba(255,255,255,0.6); border-radius: 12px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,77,109,0.1); }
-    .bucket-item:active { transform: scale(0.98); }
-    .bucket-item ion-icon { font-size: 1.5rem; color: #ccc; transition: color 0.3s; }
-    .bucket-item ion-icon.completed { color: #FF4D6D; }
-    .bucket-item span { flex: 1; font-weight: 600; color: #590D22; font-size: 0.95rem; transition: color 0.3s; }
-    .bucket-item span.strike { text-decoration: line-through; color: #888; }
-    .delete-b { color: #ccc; font-size: 1.3rem; margin-left: auto; padding: 5px; }
-
-    .profile-card { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 15px; background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(255,255,255,0.8); cursor: pointer; transition: all 0.2s; margin-bottom: 15px; }
-    .profile-card:active { transform: scale(0.98); background: rgba(255, 77, 109, 0.1); }
-    .profile-card span { font-weight: 700; color: #590D22; font-size: 1rem; }
-    .profile-icon { font-size: 1.4rem; color: #FF4D6D; }
-    .profile-texts { display: flex; align-items: center; gap: 10px; }
-
-    .logout-card { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 15px; background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(255,255,255,0.8); cursor: pointer; transition: all 0.2s; }
-    .logout-card:active { transform: scale(0.98); background: rgba(255, 77, 109, 0.1); }
-    .logout-card span { font-weight: 700; color: #a4133c; font-size: 1rem; }
-    .logout-icon { font-size: 1.4rem; color: #a4133c; }
+    /* Logout */
+    .logout-btn { width: 100%; background: rgba(208, 0, 0, 0.1); color: #d00000; border: 2px solid rgba(208, 0, 0, 0.2); padding: 16px; border-radius: 20px; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(10px); }
+    .logout-btn:active { background: rgba(208, 0, 0, 0.2); transform: scale(0.98); }
+    .logout-btn ion-icon { font-size: 1.4rem; }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonIcon, IonContent, IonRefresher, IonRefresherContent]
@@ -239,6 +251,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   private toastCtrl = inject(ToastController);
   private actionSheetCtrl = inject(ActionSheetController);
   private router = inject(Router);
+  private alertCtrl = inject(AlertController);
   private locationService = inject(LocationService);
 
   startDate: string = '';
@@ -529,6 +542,20 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
         console.log('User cancelled camera or error', e);
       }
     });
+  }
+
+
+  async confirmLogout() {
+    const alert = await this.alertCtrl.create({
+      header: '¿Cerrar Sesión?',
+      message: '¿Seguro que quieres cerrar sesión? Acuérdate de tu contraseña.',
+      cssClass: 'premium-login-alert',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        { text: 'Cerrar Sesión', handler: () => this.logout(), cssClass: 'alert-button-danger' }
+      ]
+    });
+    await alert.present();
   }
 
   logout() {
