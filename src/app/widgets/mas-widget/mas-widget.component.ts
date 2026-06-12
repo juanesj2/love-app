@@ -193,13 +193,13 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
     .heart-pulse ion-icon { font-size: 3.5rem; color: #FF4D6D; filter: drop-shadow(0 0 15px rgba(255, 77, 109, 0.6)); animation: pulse 1s infinite alternate cubic-bezier(0.4, 0, 0.2, 1); margin-bottom: 20px; }
     @keyframes pulse { 0% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(255,77,109,0.4)); } 100% { transform: scale(1.2); filter: drop-shadow(0 0 25px rgba(255,77,109,0.8)); } }
     
-    .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .time-block { background: rgba(255,255,255,0.7); padding: 15px 5px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid rgba(255,255,255,0.9); transition: transform 0.3s; }
+    .time-grid { display: flex; flex-wrap: nowrap; justify-content: space-between; gap: 6px; overflow: hidden; }
+    .time-block { flex: 1; min-width: 0; background: rgba(255,255,255,0.7); padding: 12px 2px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid rgba(255,255,255,0.9); transition: transform 0.3s; }
     .time-block:hover { transform: translateY(-3px); }
     .time-block.highlight { background: linear-gradient(135deg, #FF4D6D, #ff758c); border: none; box-shadow: 0 6px 20px rgba(255,77,109,0.3); }
     .time-block.highlight .value, .time-block.highlight .label { color: white; }
-    .value { display: block; font-size: 1.5rem; font-weight: 900; color: #590D22; }
-    .label { display: block; font-size: 0.75rem; font-weight: 700; color: #a4133c; text-transform: uppercase; margin-top: 2px; letter-spacing: 0.5px; }
+    .value { display: block; font-size: 1.15rem; font-weight: 900; color: #590D22; white-space: nowrap; }
+    .label { display: block; font-size: 0.65rem; font-weight: 700; color: #a4133c; text-transform: uppercase; margin-top: 2px; letter-spacing: -0.2px; white-space: nowrap; overflow: hidden; text-overflow: clip; }
 
     /* Lists (Milestones & Bucket) */
     .milestone-item, .bucket-item { display: flex; align-items: center; gap: 12px; padding: 14px; background: rgba(255,255,255,0.8); border-radius: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,1); box-shadow: 0 4px 10px rgba(0,0,0,0.02); transition: all 0.3s; }
