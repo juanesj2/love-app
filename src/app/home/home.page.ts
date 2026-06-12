@@ -1,6 +1,7 @@
 import { Component, inject, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { PluginListenerHandle } from '@capacitor/core';
 import { IonContent, IonFooter, IonHeader, IonToolbar, AlertController, ActionSheetController } from '@ionic/angular/standalone';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -228,6 +229,7 @@ export class HomePage implements OnInit, OnDestroy {
   private toastController = inject(ToastController);
   private alertController = inject(AlertController);
   private actionSheetCtrl = inject(ActionSheetController);
+  private router = inject(Router);
 
   @ViewChild('photoWidget') photoWidgetComp?: PhotoWidgetComponent;
   @ViewChild('chatWidget') chatWidgetComp?: ChatWidgetComponent;
@@ -331,8 +333,11 @@ export class HomePage implements OnInit, OnDestroy {
       if (data.my_mood) this.myMood = data.my_mood;
       if (data.partner_mood) this.partnerMood = data.partner_mood;
       if (data.partner_name) this.partnerInitial = data.partner_name.charAt(0).toUpperCase();
-    } catch (e) {
-      console.log('No se pudo cargar la info de la cabecera');
+    } catch (e: any) {
+      console.log('No se pudo cargar la info de la cabecera', e);
+      if (e.status === 403 || e.error?.message?.includes('No estás vinculado')) {
+        this.router.navigate(['/pairing'], { replaceUrl: true });
+      }
     }
   }
 

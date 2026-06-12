@@ -71,6 +71,16 @@ export class LoveApiService {
     return res;
   }
 
+  async getMe(): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.get(`${API_BASE_URL}/user`, { headers }));
+  }
+
+  async pair(pairingCode: string): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/pair`, { pairing_code: pairingCode }, { headers }));
+  }
+
   async logout(): Promise<void> {
     await Preferences.remove({ key: 'auth_token' });
     this.token$.next(null);

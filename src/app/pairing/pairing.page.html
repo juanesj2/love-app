@@ -1,0 +1,58 @@
+<ion-content [fullscreen]="true" class="pairing-content">
+  <div class="background-bubbles">
+    <div class="bubble bubble-1"></div>
+    <div class="bubble bubble-2"></div>
+    <div class="bubble bubble-3"></div>
+  </div>
+
+  <div class="pairing-container">
+    <div class="header-text glass-header">
+      <div class="icon-wrapper">
+        <ion-icon name="link-outline"></ion-icon>
+      </div>
+      <h1>Encuentra a tu Pareja</h1>
+      <p>Conéctate para compartir momentos únicos</p>
+    </div>
+
+    <!-- Contenedor Glassmorphism -->
+    <div class="glass-form-container">
+      
+      <!-- Mi Código -->
+      <div class="my-code-section">
+        <h3>Tu código de vinculación</h3>
+        <p>Pásale este código a tu pareja para que pueda conectar contigo.</p>
+        
+        <div class="code-box" *ngIf="myCode; else loadingCode">
+          <span class="code-text">{{ myCode }}</span>
+          <ion-icon name="copy-outline" (click)="copyCode()" class="copy-icon"></ion-icon>
+        </div>
+        <ng-template #loadingCode>
+          <div class="spinner-small"></div>
+        </ng-template>
+      </div>
+
+      <div class="divider"><span>O</span></div>
+
+      <!-- Vincular a alguien -->
+      <form (submit)="onPair($event)" class="auth-form">
+        <p class="subtitle">Introduce el código de tu pareja</p>
+        
+        <div class="input-group">
+          <ion-icon name="key-outline"></ion-icon>
+          <input type="text" name="partnerCode" [(ngModel)]="partnerCode" placeholder="Ej: A7X9K2" required maxlength="8" style="text-transform: uppercase;" />
+        </div>
+
+        <button type="submit" class="glass-btn primary" [disabled]="isLoading || !partnerCode">
+          <span *ngIf="!isLoading">Vincular</span>
+          <div class="spinner" *ngIf="isLoading"></div>
+        </button>
+      </form>
+
+    </div>
+
+    <div class="switch-mode glass-footer" (click)="logout()">
+      <span>Cerrar Sesión</span>
+    </div>
+
+  </div>
+</ion-content>

@@ -50,12 +50,16 @@ export class LoginPage implements OnInit {
     const storedUser = localStorage.getItem('love_widget_user');
     const { value: token } = await Preferences.get({ key: 'auth_token' });
     if (storedUser && token) {
-      this.notificationService.init();
-      // Si el login fue con el modo antiguo, lo mantenemos temporalmente
-      // idealmente habría que buscar el perfil en base al usuario autenticado,
-      // pero por compatibilidad con el widget lo dejamos.
-      this.locationService.updateMyLocation(storedUser as 'juan' | 'roberta', storedUser);
-      this.router.navigate(['/home'], { replaceUrl: true });
+      try {
+        await this.loveApi.getCoupleInfo();
+        this.notificationService.init();
+        this.locationService.updateMyLocation(storedUser as 'juan' | 'roberta', storedUser);
+        this.router.navigate(['/home'], { replaceUrl: true });
+      } catch (e: any) {
+        if (e.status === 403 || e.error?.message?.includes('No estás vinculado')) {
+          this.router.navigate(['/pairing'], { replaceUrl: true });
+        }
+      }
     }
   }
 
@@ -105,20 +109,32 @@ export class LoginPage implements OnInit {
   }
 
   private async handleSuccessfulAuth(email: string) {
-    // Determinar temporalmente el userId basado en el correo para no romper la app actual
-    // (A futuro esto debería venir del backend /user endpoint)
-    let userId = 'juan'; // default temporal
-    if (email.toLowerCase().includes('roberta')) {
-      userId = 'roberta';
-    }
+    // Check if the user is paired
+    try {
+      await this.loveApi.getCoupleInfo();
+      // If we are here, we are paired.
+      
+      let userId = 'juan'; // default temporal
+      if (email.toLowerCase().includes('roberta')) {
+        userId = 'roberta';
+      }
 
-    localStorage.setItem('love_widget_user', userId);
-    await Preferences.set({ key: 'myUserId', value: userId });
-    
-    this.notificationService.init();
-    this.locationService.updateMyLocation(userId as 'juan' | 'roberta', userId);
-    
-    this.router.navigate(['/home'], { replaceUrl: true });
+      localStorage.setItem('love_widget_user', userId);
+      await Preferences.set({ key: 'myUserId', value: userId });
+      
+      this.notificationService.init();
+      this.locationService.updateMyLocation(userId as 'juan' | 'roberta', userId);
+      
+      this.router.navigate(['/home'], { replaceUrl: true });
+    } catch (e: any) {
+      if (e.status === 403 || e.error?.message?.includes('No estás vinculado')) {
+        // Not paired yet, redirect to pairing page
+        this.router.navigate(['/pairing'], { replaceUrl: true });
+      } else {
+        // Other errors, probably token issues, but we'll try home just in case
+        this.router.navigate(['/home'], { replaceUrl: true });
+      }
+    }
   }
 
   async forgotPassword() {
