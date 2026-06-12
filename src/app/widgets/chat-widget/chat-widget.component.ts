@@ -1224,20 +1224,19 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       // Fallback just in case the observer fails to trigger (e.g. if it's a very tall message)
       this.safeTimeout(() => observer.disconnect(), 2000);
     } else {
-      console.log('Message not found on current page:', id);
-    }
-  }
+  pressTimer: any;
 
-  hasReactions(msg: any): boolean {
-    return msg.reactions && msg.reactions.length > 0;
-  }
-
-  getReactions(msg: any): string[] {
-    if (!this.hasReactions(msg)) return [];
-    return msg.reactions.map((r: any) => r.reaction);
-  }
-
-  async addReaction(msg: any, emoji: string) {
+  startPress(event: any, msg: any) {
+    this.pressTimer = setTimeout(async () => {
+      try {
+        await Haptics.impact({ style: ImpactStyle.Heavy });
+      } catch (e) {}
+      
+      this.activeMsg = msg;
+      this.showReactionsMsgId = msg.id;
+      this.showCustomEmojiInput = false;
+      this.cdr.detectChanges();
+    }, 400);
   }
 
   endPress() {
@@ -1457,6 +1456,10 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       duration: 3000,
       color: 'danger',
       position: 'bottom'
+    });
+    await toast.present();
+  }
+}ition: 'bottom'
     });
     await toast.present();
   }
