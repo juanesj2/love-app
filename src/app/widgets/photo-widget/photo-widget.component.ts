@@ -720,7 +720,7 @@ export class PhotoWidgetComponent implements OnInit {
 
   applyGalleryFilters() {
     const me = this.coupleInfo?.my_id;
-    const partner = this.coupleInfo?.user1_id === me ? this.coupleInfo?.user2_id : this.coupleInfo?.user1_id;
+    const partner = this.coupleInfo?.couple?.user1_id === me ? this.coupleInfo?.couple?.user2_id : this.coupleInfo?.couple?.user1_id;
     
     let filtered = this.photos;
     
