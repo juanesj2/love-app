@@ -71,7 +71,7 @@ import { LoveApiService } from '../../services/love-api.service';
       display: block;
       height: 100%;
     }
-    .location-container { height: 100%; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+    .location-container { height: 100%; display: flex; flex-direction: column; position: relative; overflow: hidden; background: #fdfbfb; padding-bottom: 75px; box-sizing: border-box; }
     .location-container.is-together { background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%); }
     .location-container.is-together .map-wrapper { opacity: 0; pointer-events: none; transition: opacity 1s ease; }
     .map-wrapper { flex: 1; position: relative; transition: opacity 1s ease; }
@@ -404,7 +404,7 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
   private updateDistanceMarker(latLng: L.LatLng, text: string) {
     const htmlIcon = L.divIcon({
       className: 'distance-pill-icon',
-      html: `<div style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); color: #590D22; font-weight: 800; border-radius: 24px; font-size: 1.1rem; box-shadow: 0 8px 25px rgba(255,77,109,0.25); border: 1px solid rgba(255,255,255,0.8); white-space: nowrap; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; box-sizing: border-box; font-family: 'Inter', sans-serif; letter-spacing: -0.5px;">${text}</div>`,
+      html: `<div style="background: #FF4D6D; color: white; font-weight: 800; border-radius: 24px; font-size: 1.1rem; box-shadow: 0 6px 20px rgba(255,77,109,0.4); border: 2px solid white; white-space: nowrap; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; box-sizing: border-box; font-family: 'Inter', sans-serif; letter-spacing: -0.5px;">${text}</div>`,
       iconSize: [120, 40],
       iconAnchor: [60, 20]
     });
