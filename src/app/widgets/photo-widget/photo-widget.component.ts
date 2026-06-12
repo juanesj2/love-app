@@ -127,6 +127,25 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
              </div>
           </div>
 
+          <!-- Filtros de Galería -->
+          <div class="filter-chips-container" *ngIf="!selectionMode">
+            <button class="filter-chip" [class.active]="currentGalleryFilter === 'todas'" (click)="setGalleryFilter('todas')">Todas</button>
+            <button class="filter-chip" [class.active]="currentGalleryFilter === 'ultimas'" (click)="setGalleryFilter('ultimas')">Último mes</button>
+            <button class="filter-chip" [class.active]="currentGalleryFilter === 'solo_yo'" (click)="setGalleryFilter('solo_yo')">Tus fotos</button>
+            <button class="filter-chip" [class.active]="currentGalleryFilter === 'solo_pareja'" (click)="setGalleryFilter('solo_pareja')">Sus fotos</button>
+          </div>
+
+          <!-- Recuerdo Destacado -->
+          <div class="memory-highlight-container" *ngIf="highlightedMemory && !selectionMode && currentGalleryFilter === 'todas'" (click)="openLightbox(highlightedMemory)">
+            <div class="memory-highlight">
+              <img [src]="environment.storageUrl + highlightedMemory.image_path" class="memory-bg" />
+              <div class="memory-overlay">
+                <span class="memory-title">Recuerdo destacado</span>
+                <span class="memory-subtitle">{{ highlightedMemory.created_at | date:'longDate':'':'es-ES' }}</span>
+              </div>
+            </div>
+          </div>
+
           <div *ngFor="let group of galleryGroups" class="gallery-month-group">
             <div class="month-header">
               <h3 class="gallery-month-title">{{ group.monthYear }}</h3>
@@ -139,8 +158,9 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
               <div class="grid-photo-container" *ngFor="let photo of group.photos" 
                    (mousedown)="startPress(photo)" (mouseup)="endPress()" (mouseleave)="endPress()"
                    (touchstart)="startPress(photo)" (touchend)="endPress()"
-                   (click)="onPhotoClick(photo)"
-                   [class.selected]="selectedPhotos.has(photo.id)">
+                   (click)="openLightbox(photo)"
+                   [class.selected]="selectedPhotos.has(photo.id)"
+                   [class.large]="photo.isLarge">
                 <img [src]="environment.storageUrl + photo.image_path" class="grid-photo" loading="lazy" />
                 <div class="selection-overlay" *ngIf="selectionMode">
                   <ion-icon name="checkmark-circle" *ngIf="selectedPhotos.has(photo.id)"></ion-icon>
@@ -158,6 +178,23 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
           <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Cargando más fotos..."></ion-infinite-scroll-content>
         </ion-infinite-scroll>
       </ion-content>
+
+      <!-- Lightbox Inmersivo -->
+      <div class="lightbox-modal" *ngIf="lightboxActive && lightboxPhotos.length > 0">
+        <div class="lightbox-backdrop" (click)="closeLightbox()"></div>
+        <div class="lightbox-content"
+             (touchstart)="onLightboxTouchStart($event)"
+             (touchend)="onLightboxTouchEnd($event)">
+          <div class="lightbox-header">
+            <div class="lightbox-date">{{ lightboxPhotos[currentLightboxIndex].created_at | date:'longDate':'':'es-ES' }}</div>
+            <button class="lightbox-close" (click)="closeLightbox()"><ion-icon name="close"></ion-icon></button>
+          </div>
+          <img [src]="environment.storageUrl + lightboxPhotos[currentLightboxIndex].image_path" class="lightbox-image" />
+          <div class="lightbox-footer" *ngIf="lightboxPhotos[currentLightboxIndex].description">
+            <p>{{ lightboxPhotos[currentLightboxIndex].description }}</p>
+          </div>
+        </div>
+      </div>
 
       <ng-template #noFeedPhotos>
         <div class="empty-state" *ngIf="viewMode === 'feed'">
@@ -294,7 +331,8 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .select-all-wrapper { display: flex; align-items: center; gap: 8px; font-weight: 600; color: #FF4D6D; cursor: pointer; font-size: 1.1rem; }
     .select-all-wrapper ion-icon { font-size: 1.5rem; }
 
-    .grid-view { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 0 10px; }
+    .grid-view { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-flow: dense; gap: 4px; padding: 0 10px; }
+    .grid-photo-container.large { grid-column: span 2; grid-row: span 2; }
     .grid-photo-container { position: relative; width: 100%; aspect-ratio: 1; cursor: pointer; overflow: hidden; border-radius: 8px; transition: all 0.2s; animation: scaleIn 0.4s ease-out forwards; opacity: 0; transform: scale(0.9); }
     @keyframes scaleIn { to { opacity: 1; transform: scale(1); } }
     
@@ -374,6 +412,31 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .album-name { font-size: 0.85rem; font-weight: 700; color: #590D22; text-align: center; }
     .change-cover-btn { position: absolute; bottom: 5px; right: 5px; background: rgba(255,255,255,0.8); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #FF4D6D; font-size: 1.1rem; }
 
+    /* Filter Chips */
+    .filter-chips-container { display: flex; overflow-x: auto; padding: 5px 10px 15px 10px; gap: 8px; scrollbar-width: none; }
+    .filter-chips-container::-webkit-scrollbar { display: none; }
+    .filter-chip { padding: 6px 16px; border-radius: 20px; background: rgba(255,255,255,0.7); color: #590D22; border: 1px solid rgba(255,77,109,0.2); white-space: nowrap; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(5px); }
+    .filter-chip.active { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none; box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3); }
+
+    /* Memory Highlight */
+    .memory-highlight-container { padding: 0 10px 15px 10px; }
+    .memory-highlight { position: relative; width: 100%; height: 200px; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); cursor: pointer; }
+    .memory-bg { width: 100%; height: 100%; object-fit: cover; }
+    .memory-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 30px 15px 15px 15px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); display: flex; flex-direction: column; }
+    .memory-title { color: white; font-size: 1.2rem; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    .memory-subtitle { color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-top: 2px; }
+
+    /* Lightbox Modal */
+    .lightbox-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2000; display: flex; flex-direction: column; justify-content: center; }
+    .lightbox-backdrop { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); }
+    .lightbox-content { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; z-index: 2001; }
+    .lightbox-header { position: absolute; top: 0; left: 0; width: 100%; padding: 40px 20px 20px 20px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent); z-index: 2002; }
+    .lightbox-date { color: white; font-weight: 600; font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    .lightbox-close { background: rgba(255,255,255,0.2); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(5px); transition: background 0.2s; }
+    .lightbox-close:active { background: rgba(255,255,255,0.4); }
+    .lightbox-image { flex: 1; width: 100%; height: 100%; object-fit: contain; }
+    .lightbox-footer { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px 20px 40px 20px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); color: white; font-size: 1rem; line-height: 1.4; text-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 2002; }
+
     /* Custom Upload Prompt */
     .prompt-sheet { padding-bottom: 30px; }
     .prompt-body { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
@@ -431,6 +494,19 @@ export class PhotoWidgetComponent implements OnInit {
   fadingGlobalDate = false;
   lastShownDate = '';
   dateOverlayTimeout: any;
+
+  // --- Galería Premium ---
+  currentGalleryFilter: 'todas' | 'solo_yo' | 'solo_pareja' | 'ultimas' = 'todas';
+  highlightedMemory: any = null;
+  
+  // Lightbox
+  lightboxActive = false;
+  lightboxPhotos: any[] = [];
+  currentLightboxIndex = 0;
+  
+  // Swipe logic para lightbox
+  touchStartY = 0;
+  touchEndY = 0;
 
   constructor() {
     addIcons({ arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline });
@@ -539,7 +615,8 @@ export class PhotoWidgetComponent implements OnInit {
       if (JSON.stringify(this.photos) !== JSON.stringify(newPhotos)) {
         this.photos = newPhotos;
         this.groupPhotosByDate();
-        this.groupPhotosForGallery();
+        this.generateHighlightMemory();
+        this.applyGalleryFilters();
         this.setupObserver();
         if (!this.currentAlbum) {
           await Preferences.set({ key: 'feed_photos_cache', value: JSON.stringify(this.photos) });
@@ -573,7 +650,8 @@ export class PhotoWidgetComponent implements OnInit {
       const newPhotos = response.data || [];
       this.photos = [...this.photos, ...newPhotos];
       this.groupPhotosByDate();
-      this.groupPhotosForGallery();
+      this.generateHighlightMemory();
+      this.applyGalleryFilters();
       this.setupObserver();
       event.target.complete();
     } catch (e) {
@@ -629,6 +707,126 @@ export class PhotoWidgetComponent implements OnInit {
     
     // Sort array descending if needed, currently API returns new to old
     this.galleryGroups = Object.keys(groups).map(k => ({ monthYear: k, photos: groups[k] }));
+  }
+
+  // --- Filtros de Galería ---
+  setGalleryFilter(filter: 'todas' | 'solo_yo' | 'solo_pareja' | 'ultimas') {
+    this.currentGalleryFilter = filter;
+    this.applyGalleryFilters();
+  }
+
+  applyGalleryFilters() {
+    const me = this.api.currentUser?.id;
+    const partner = this.coupleInfo?.user1_id === me ? this.coupleInfo?.user2_id : this.coupleInfo?.user1_id;
+    
+    let filtered = this.photos;
+    
+    if (this.currentGalleryFilter === 'solo_yo') {
+      filtered = this.photos.filter(p => p.user_id === me);
+    } else if (this.currentGalleryFilter === 'solo_pareja') {
+      filtered = this.photos.filter(p => p.user_id === partner);
+    } else if (this.currentGalleryFilter === 'ultimas') {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      filtered = this.photos.filter(p => new Date(p.created_at) >= thirtyDaysAgo);
+    }
+    
+    // Agrupar con las filtradas
+    this.groupFilteredPhotosForGallery(filtered);
+  }
+
+  groupFilteredPhotosForGallery(filteredPhotos: any[]) {
+    const groups: { [key: string]: any[] } = {};
+    for (const p of filteredPhotos) {
+      const dateObj = new Date(p.created_at);
+      let monthYear = dateObj.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+      monthYear = monthYear.charAt(0).toUpperCase() + monthYear.slice(1);
+      
+      // Lógica de tamaño dinámico (Grid 2x2 algorítmico)
+      p.isLarge = (p.id % 7 === 0);
+      
+      if (!groups[monthYear]) {
+        groups[monthYear] = [];
+      }
+      groups[monthYear].push(p);
+    }
+    
+    this.galleryGroups = Object.keys(groups).map(k => ({ monthYear: k, photos: groups[k] }));
+  }
+
+  // --- Recuerdo Destacado ---
+  generateHighlightMemory() {
+    if (this.photos.length < 5) return;
+    const oldPhotos = this.photos.filter(p => {
+      const ageInDays = (new Date().getTime() - new Date(p.created_at).getTime()) / (1000 * 3600 * 24);
+      return ageInDays > 14; // Más de 2 semanas
+    });
+    
+    if (oldPhotos.length > 0) {
+      // Elegir aleatoria usando un seed del día (para que no cambie cada vez que recarga hoy)
+      const daySeed = new Date().getDate();
+      const index = (daySeed * 7) % oldPhotos.length;
+      this.highlightedMemory = oldPhotos[index];
+    }
+  }
+
+  // --- Lightbox Inmersivo ---
+  openLightbox(photo: any) {
+    if (this.selectionMode) {
+      this.togglePhotoSelection(photo);
+      return;
+    }
+    
+    // Extraer todas las fotos filtradas actualmente
+    this.lightboxPhotos = [];
+    for (const group of this.galleryGroups) {
+      this.lightboxPhotos.push(...group.photos);
+    }
+    
+    this.currentLightboxIndex = this.lightboxPhotos.findIndex(p => p.id === photo.id);
+    if (this.currentLightboxIndex === -1) {
+       this.lightboxPhotos = [photo];
+       this.currentLightboxIndex = 0;
+    }
+    
+    this.lightboxActive = true;
+  }
+
+  closeLightbox() {
+    this.lightboxActive = false;
+  }
+
+  nextLightboxPhoto() {
+    if (this.currentLightboxIndex < this.lightboxPhotos.length - 1) {
+      this.currentLightboxIndex++;
+    }
+  }
+
+  prevLightboxPhoto() {
+    if (this.currentLightboxIndex > 0) {
+      this.currentLightboxIndex--;
+    }
+  }
+
+  onLightboxTouchStart(e: TouchEvent) {
+    this.touchStartY = e.changedTouches[0].screenY;
+  }
+
+  onLightboxTouchEnd(e: TouchEvent) {
+    this.touchEndY = e.changedTouches[0].screenY;
+    this.handleLightboxSwipe();
+  }
+
+  handleLightboxSwipe() {
+    const swipeDist = this.touchStartY - this.touchEndY;
+    // Swipe UP (scroll down) -> Next photo
+    if (swipeDist > 50) {
+      this.nextLightboxPhoto();
+    } 
+    // Swipe DOWN (scroll up) -> Prev photo
+    else if (swipeDist < -50) {
+      this.prevLightboxPhoto();
+    }
   }
 
   async createNewAlbum() {
