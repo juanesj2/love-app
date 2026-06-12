@@ -1,8 +1,8 @@
-import { Component, inject, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, OnDestroy, ViewChild } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, ToastController, AlertController, ActionSheetController, ModalController } from '@ionic/angular';
+import { IonicModule, ToastController, AlertController, ActionSheetController, ModalController, IonContent } from '@ionic/angular';
 import { LoveApiService } from '../../services/love-api.service';
 import { environment } from '../../../environments/environment';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
