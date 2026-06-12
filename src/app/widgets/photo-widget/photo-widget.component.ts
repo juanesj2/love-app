@@ -513,7 +513,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
     
     /* Modals & Overlays */
     .albums-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 1000; display: flex; align-items: flex-end; }
-    .albums-sheet { background: #fff; width: 100%; border-radius: 25px 25px 0 0; padding: 20px; box-shadow: 0 -10px 20px rgba(0,0,0,0.1); max-height: 80vh; overflow-y: auto; }
+    .albums-sheet { background: #fff; width: 100%; border-radius: 25px 25px 0 0; padding: 20px 20px calc(env(safe-area-inset-bottom) + 95px) 20px; box-shadow: 0 -10px 20px rgba(0,0,0,0.1); max-height: 80vh; overflow-y: auto; }
     
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .modal-header h2 { margin: 0; font-size: 1.3rem; font-weight: 800; color: #590D22; }
@@ -561,7 +561,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
     @keyframes slideInDown { 0% { transform: translateY(-100px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
 
     /* Custom Upload Prompt */
-    .prompt-sheet { padding-bottom: 30px; }
+    .prompt-sheet { padding-bottom: calc(env(safe-area-inset-bottom) + 95px); }
     .prompt-body { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
     .prompt-preview-container { width: 100%; display: flex; justify-content: center; background: #fff5f8; border-radius: 15px; overflow: hidden; max-height: 250px; }
     .prompt-preview { max-width: 100%; max-height: 250px; object-fit: contain; }
