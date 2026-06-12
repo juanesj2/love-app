@@ -57,7 +57,7 @@ import { LoveApiService } from '../../services/love-api.service';
       display: block;
       height: 100%;
     }
-    .location-container { height: 100%; display: flex; flex-direction: column; position: relative; }
+    .location-container { height: 100%; display: flex; flex-direction: column; position: relative; padding-bottom: 80px; box-sizing: border-box; }
     .map-wrapper { flex: 1; position: relative; }
     #map { width: 100%; height: 100%; background: #1a1a1a; }
     ::ng-deep .leaflet-tile-pane { /* Removed invert filter */ }
