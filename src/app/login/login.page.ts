@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonIcon, AlertController, ToastController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { heart, mailOutline, lockClosedOutline, personOutline, shieldCheckmarkOutline } from 'ionicons/icons';
+import { eyeOutline, eyeOffOutline, heart, mailOutline, lockClosedOutline, personOutline, shieldCheckmarkOutline } from 'ionicons/icons';
 import { LocationService } from '../services/location.service';
 import { LoveApiService } from '../services/love-api.service';
 import { NotificationService } from '../services/notification.service';
@@ -28,6 +28,9 @@ export class LoginPage implements OnInit {
 
   public authMode: 'login' | 'register' | 'forgot' = 'login';
   public isLoading = false;
+  
+  public showPassword = false;
+  public showConfirmPassword = false;
 
   public loginData = {
     email: '',
@@ -46,7 +49,7 @@ export class LoginPage implements OnInit {
   };
 
   constructor() {
-    addIcons({ heart, mailOutline, lockClosedOutline, personOutline, shieldCheckmarkOutline });
+    addIcons({ eyeOutline, eyeOffOutline, heart, mailOutline, lockClosedOutline, personOutline, shieldCheckmarkOutline });
   }
 
   async ngOnInit() {

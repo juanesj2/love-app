@@ -149,6 +149,19 @@ ion-content.login-content {
         transition: background-color 5000s ease-in-out 0s;
       }
     }
+
+    .eye-icon {
+      color: rgba(89, 13, 34, 0.6);
+      font-size: 20px;
+      margin-left: 10px;
+      margin-right: 0;
+      cursor: pointer;
+      transition: color 0.3s;
+
+      &:hover {
+        color: #FF4D6D;
+      }
+    }
   }
 
   .forgot-password {

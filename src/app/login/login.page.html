@@ -34,7 +34,8 @@
 
         <div class="input-group">
           <ion-icon name="lock-closed-outline"></ion-icon>
-          <input type="password" name="password" [(ngModel)]="loginData.password" placeholder="Contraseña" required />
+          <input [type]="showPassword ? 'text' : 'password'" name="password" [(ngModel)]="loginData.password" placeholder="Contraseña" required />
+          <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'" class="eye-icon" (click)="showPassword = !showPassword"></ion-icon>
         </div>
 
         <div class="forgot-password" (click)="showForgotPassword()">
@@ -61,12 +62,14 @@
 
         <div class="input-group">
           <ion-icon name="lock-closed-outline"></ion-icon>
-          <input type="password" name="password" [(ngModel)]="registerData.password" placeholder="Contraseña" required />
+          <input [type]="showPassword ? 'text' : 'password'" name="password" [(ngModel)]="registerData.password" placeholder="Contraseña" required />
+          <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'" class="eye-icon" (click)="showPassword = !showPassword"></ion-icon>
         </div>
 
         <div class="input-group">
           <ion-icon name="shield-checkmark-outline"></ion-icon>
-          <input type="password" name="password_confirmation" [(ngModel)]="registerData.password_confirmation" placeholder="Confirmar Contraseña" required />
+          <input [type]="showConfirmPassword ? 'text' : 'password'" name="password_confirmation" [(ngModel)]="registerData.password_confirmation" placeholder="Confirmar Contraseña" required />
+          <ion-icon [name]="showConfirmPassword ? 'eye-off-outline' : 'eye-outline'" class="eye-icon" (click)="showConfirmPassword = !showConfirmPassword"></ion-icon>
         </div>
 
         <button type="submit" class="glass-btn primary" [disabled]="isLoading">
