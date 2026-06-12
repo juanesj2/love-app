@@ -21,19 +21,21 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
         <div class="messages-inner">
         <div class="message-row" *ngFor="let msg of regularMessages; trackBy: trackByMsgId" [id]="'msg-' + msg.id">
           <!-- Graffitis anclados a este mensaje -->
-          <ng-container *ngIf="graffitisByAnchorId[msg.id] && !hiddenGraffitisByMsg[msg.id]">
-            <img *ngFor="let graf of graffitisByAnchorId[msg.id]" 
-                 [src]="environment.storageUrl + graf.photo?.image_path" 
-                 class="graffiti-overlay" 
-                 (touchstart)="startGraffitiPress(graf, $event)"
-                 (mousedown)="startGraffitiPress(graf, $event)"
-                 (touchend)="endGraffitiPress()"
-                 (mouseup)="endGraffitiPress()"
-                 (mouseleave)="endGraffitiPress()"
-                 [style.left.px]="graf.offsetX" 
-                 [style.top.px]="graf.offsetY" 
-                 [style.width.px]="graf.width" 
-                 [style.height.px]="graf.height" />
+          <ng-container *ngIf="graffitisByAnchorId[msg.id]">
+            <ng-container *ngFor="let graf of graffitisByAnchorId[msg.id]">
+              <img *ngIf="!hiddenGraffitis[graf.id]"
+                   [src]="environment.storageUrl + graf.photo?.image_path" 
+                   class="graffiti-overlay" 
+                   (touchstart)="startGraffitiPress(graf, $event)"
+                   (mousedown)="startGraffitiPress(graf, $event)"
+                   (touchend)="endGraffitiPress()"
+                   (mouseup)="endGraffitiPress()"
+                   (mouseleave)="endGraffitiPress()"
+                   [style.left.px]="graf.offsetX" 
+                   [style.top.px]="graf.offsetY" 
+                   [style.width.px]="graf.width" 
+                   [style.height.px]="graf.height" />
+            </ng-container>
           </ng-container>
 
           <!-- Iconos de swipe -->
@@ -68,7 +70,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
                 <div class="bubble" [class.only-photo]="msg.photo && (!msg.mensaje || msg.mensaje === 'null')"
                                     [class.transparent-bubble]="msg.mensaje && msg.mensaje.startsWith('[DOODLE]')">
                   
-                  <div class="restore-graffitis-btn" *ngIf="hiddenGraffitisByMsg[msg.id]" (click)="showGraffitis(msg.id)">
+                  <div class="restore-graffitis-btn" *ngIf="hasHiddenGraffitis(msg.id)" (click)="showGraffitis(msg.id)">
                     <ion-icon name="eye"></ion-icon> Mostrar grafitis
                   </div>
                   
@@ -316,7 +318,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
         </div>
         <div class="menu-action" (click)="hideGraffiti(selectedGraffiti); closeGraffitiOptions()">
           <ion-icon name="eye-off-outline"></ion-icon>
-          <span>Ocultar todo</span>
+          <span>Ocultar este</span>
         </div>
       </div>
     </div>
@@ -991,7 +993,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   graffitiPressTimer: any;
   graffitiRect = { left: 0, top: 0, width: 0, height: 0 };
   menuRect = { left: 0, top: 0 };
-  hiddenGraffitisByMsg: { [msgId: number]: boolean } = {};
+  hiddenGraffitis: { [grafId: number]: boolean } = {};
 
   formatTime(dateString: string) {
     if (!dateString) return '';
@@ -1051,13 +1053,22 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   hideGraffiti(graf: any) {
-    if (graf && graf.anchorMsgId) {
-      this.hiddenGraffitisByMsg[graf.anchorMsgId] = true;
+    if (graf && graf.id) {
+      this.hiddenGraffitis[graf.id] = true;
     }
   }
 
+  hasHiddenGraffitis(msgId: number): boolean {
+    if (!this.graffitisByAnchorId[msgId]) return false;
+    return this.graffitisByAnchorId[msgId].some((g: any) => this.hiddenGraffitis[g.id]);
+  }
+
   showGraffitis(msgId: number) {
-    this.hiddenGraffitisByMsg[msgId] = false;
+    if (this.graffitisByAnchorId[msgId]) {
+      this.graffitisByAnchorId[msgId].forEach((g: any) => {
+        this.hiddenGraffitis[g.id] = false;
+      });
+    }
   }
 
   async confirmDeleteGraffiti(graf: any) {
