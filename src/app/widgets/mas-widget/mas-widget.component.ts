@@ -224,8 +224,14 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
           </p>
           
           <div style="background: rgba(255,77,109,0.1); border-radius: 18px; padding: 18px; margin-bottom: 25px;">
-            <h3 style="color: #FF4D6D; margin: 0; font-weight: 900; font-size: 1.2rem;">
+            <h3 *ngIf="isPast(selectedMilestone?.date) && calculateDays(selectedMilestone?.date) > 0" style="color: #FF4D6D; margin: 0; font-weight: 900; font-size: 1.2rem;">
               Hace {{ calculateDays(selectedMilestone?.date) }} días
+            </h3>
+            <h3 *ngIf="!isPast(selectedMilestone?.date) && calculateDays(selectedMilestone?.date) > 0" style="color: #FF4D6D; margin: 0; font-weight: 900; font-size: 1.2rem;">
+              Dentro de {{ calculateDays(selectedMilestone?.date) }} días
+            </h3>
+            <h3 *ngIf="calculateDays(selectedMilestone?.date) === 0" style="color: #FF4D6D; margin: 0; font-weight: 900; font-size: 1.2rem;">
+              ¡Es hoy! 🎉
             </h3>
           </div>
 
@@ -601,9 +607,20 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   }
 
   calculateDays(dateStr: string): number {
+    if (!dateStr) return 0;
     const d = new Date(dateStr).getTime();
     const now = new Date().getTime();
     return Math.floor(Math.abs(now - d) / (1000 * 60 * 60 * 24));
+  }
+
+  isPast(dateStr: string): boolean {
+    if (!dateStr) return true;
+    const d = new Date(dateStr);
+    const now = new Date();
+    // Compare dates ignoring time
+    d.setHours(0,0,0,0);
+    now.setHours(0,0,0,0);
+    return d.getTime() < now.getTime();
   }
 
   openGame() {
