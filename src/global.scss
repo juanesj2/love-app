@@ -39,62 +39,8 @@
 /* Leaflet CSS */
 @import 'leaflet/dist/leaflet.css';
 
-/* Premium Login Alert Styling */
-.premium-login-alert {
-  --backdrop-opacity: 0.6;
-  --background: rgba(40, 40, 40, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-
-  .alert-wrapper {
-    border-radius: 24px !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
-  }
-  
-  .alert-title {
-    font-weight: 700 !important;
-    color: #ffb3c1 !important;
-    font-size: 1.5rem !important;
-    text-align: center !important;
-  }
-
-  .alert-message {
-    color: rgba(255, 255, 255, 0.8) !important;
-    text-align: center !important;
-    font-size: 1rem !important;
-  }
-
-  .alert-input {
-    background: rgba(0, 0, 0, 0.2) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 12px !important;
-    color: #fff !important;
-    padding: 12px 16px !important;
-    margin-top: 16px !important;
-  }
-
-  .alert-input:focus {
-    border-color: #ffb3c1 !important;
-  }
-
-  .alert-button-group {
-    justify-content: space-around !important;
-    padding-top: 16px !important;
-  }
-
-  .alert-button {
-    font-weight: 600 !important;
-    color: #ffb3c1 !important;
-  }
-
-  .alert-button.alert-button-role-cancel {
-    color: rgba(255, 255, 255, 0.6) !important;
-  }
-}
-
-/* Custom Pink Love Alert Styling */
-.custom-love-alert {
+/* Custom Pink Love & Premium Alert Styling */
+.custom-love-alert, .premium-login-alert {
   --backdrop-opacity: 0.5;
   --background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(12px);
