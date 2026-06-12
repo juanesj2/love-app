@@ -560,15 +560,24 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     const now = new Date();
     const currentYear = now.getFullYear();
 
-    const addEvent = (name: string, month: number, day: number, icon: string) => {
+    const addEvent = (name: string, month: number, day: number, icon: string, birthYear?: number) => {
       let d = new Date(currentYear, month, day);
+      let eventYear = currentYear;
       if (d.getTime() < now.getTime() && !(d.getDate() === now.getDate() && d.getMonth() === now.getMonth())) {
         d.setFullYear(currentYear + 1);
+        eventYear = currentYear + 1;
       }
       const daysLeft = Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
       // Formato DD/MM
       const dateStr = d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
-      this.annualEvents.push({ name, daysLeft, dateStr, icon });
+      
+      let displayName = name;
+      if (birthYear) {
+        const age = eventYear - birthYear;
+        displayName = `${name} (${age} años)`;
+      }
+
+      this.annualEvents.push({ name: displayName, daysLeft, dateStr, icon });
     };
 
     addEvent('San Valentín', 1, 14, 'heart'); // 1 is February (0-indexed)
@@ -577,17 +586,28 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
     if (this.startDate) {
       const start = new Date(this.startDate);
-      addEvent('Aniversario', start.getMonth(), start.getDate(), 'time-outline');
+      // Optional: calculate anniversary years!
+      let eventYear = currentYear;
+      let d = new Date(currentYear, start.getMonth(), start.getDate());
+      if (d.getTime() < now.getTime() && !(d.getDate() === now.getDate() && d.getMonth() === now.getMonth())) {
+        eventYear = currentYear + 1;
+      }
+      const years = eventYear - start.getFullYear();
+      addEvent(`Aniversario (${years} años)`, start.getMonth(), start.getDate(), 'time-outline');
     }
 
     if (this.myBirthday) {
-      const b = new Date(this.myBirthday);
-      addEvent('Mi Cumpleaños', b.getMonth(), b.getDate(), 'person-circle-outline');
+      const parts = this.myBirthday.split('-');
+      if (parts.length === 3) {
+        addEvent('Mi Cumpleaños', parseInt(parts[1]) - 1, parseInt(parts[2]), 'person-circle-outline', parseInt(parts[0]));
+      }
     }
 
     if (this.partnerBirthday) {
-      const b = new Date(this.partnerBirthday);
-      addEvent('Cumple de Pareja', b.getMonth(), b.getDate(), 'person-circle-outline');
+      const parts = this.partnerBirthday.split('-');
+      if (parts.length === 3) {
+        addEvent('Cumple de Pareja', parseInt(parts[1]) - 1, parseInt(parts[2]), 'person-circle-outline', parseInt(parts[0]));
+      }
     }
 
     this.annualEvents.sort((a, b) => a.daysLeft - b.daysLeft);
