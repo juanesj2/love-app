@@ -623,9 +623,9 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
       }
       .star { --star-color: #FF4D6D; position: relative; width: 44px; height: 44px; transition: transform 0.3s ease; cursor: pointer; }
       .star .svg-container { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
-      .star .svg-outline, .star .svg-filled { fill: var(--star-color); position: absolute; width: 100%; height: 100%; transition: all 0.3s ease; }
+      .star .svg-outline, .star .svg-filled { fill: var(--star-color); position: absolute; left: 0; top: 0; width: 100%; height: 100%; transition: all 0.3s ease; }
       .star .svg-filled { opacity: 0; transform: scale(0); }
-      .star .svg-celebrate { position: absolute; display: none; stroke: var(--star-color); fill: var(--star-color); stroke-width: 2px; }
+      .star .svg-celebrate { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: none; stroke: var(--star-color); fill: var(--star-color); stroke-width: 2px; pointer-events: none; }
       .star .particle { position: absolute; animation-fill-mode: forwards; display: none; }
       .star.is-active .svg-outline { opacity: 0; }
       .star.is-active .svg-filled { opacity: 1; transform: scale(1); animation: keyframes-svg-filled 1s; }
