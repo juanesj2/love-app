@@ -279,25 +279,19 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     try {
       const info = await this.api.getCoupleInfo();
       
-      // Determinar quién soy para el avatar
-      if (info.my_mood !== undefined) { 
-        if (info.partner_name && info.partner_name.toLowerCase() === 'roberta') {
-          this.myUserId = 'juan';
-        } else if (info.partner_name && info.partner_name.toLowerCase() === 'juan') {
-          this.myUserId = 'roberta';
-        } else {
-          this.myUserId = 'juan';
-        }
-      }
+      // Usar IDs reales
+      this.myUserId = info.my_id as any;
 
-      if (info.couple && info.couple.relationship_start_date) {
-        const d = new Date(info.couple.relationship_start_date);
-        d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-        this.startDate = d.toISOString().slice(0, 16);
-        await Preferences.set({ key: 'relationshipStartDate', value: this.startDate });
-      } else {
-        const dateRes = await Preferences.get({ key: 'relationshipStartDate' });
-        if (dateRes.value) this.startDate = dateRes.value;
+      if (info.couple) {
+        if (info.couple.relationship_start_date) {
+          const d = new Date(info.couple.relationship_start_date);
+          d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+          this.startDate = d.toISOString().slice(0, 16);
+          await Preferences.set({ key: 'relationshipStartDate', value: this.startDate });
+        } else {
+          this.startDate = '';
+          await Preferences.remove({ key: 'relationshipStartDate' });
+        }
       }
     } catch (e) {
       const dateRes = await Preferences.get({ key: 'relationshipStartDate' });

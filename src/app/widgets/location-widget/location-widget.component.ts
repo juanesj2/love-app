@@ -125,11 +125,6 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
 
   constructor() {
     addIcons({ locateOutline, flagOutline, camera, image, close });
-    const storedUser = localStorage.getItem('love_widget_user') as 'juan' | 'roberta';
-    if (storedUser) {
-      this.myUserId = storedUser;
-      this.partnerId = storedUser === 'juan' ? 'roberta' : 'juan';
-    }
   }
 
   private appStateListener?: PluginListenerHandle;
@@ -137,18 +132,26 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     setTimeout(() => {
       this.initMap();
-      this.loadMoods();
-      this.startTracking();
-      this.loadNextMilestone();
     }, 100);
 
-    const myName = this.myUserId === 'juan' ? 'Juan' : 'Roberta';
-    this.locationService.updateMyLocation(this.myUserId, myName).catch(err => {
-      console.error('Error GPS', err);
-    });
+    try {
+      const info = await this.api.getCoupleInfo();
+      this.myUserId = info.my_id as any;
+      this.partnerId = info.partner_id as any;
+      this.myMood = info.my_mood || '';
+      this.partnerMood = info.partner_mood || '';
 
-    // Start interval
-    this.startMoodInterval();
+      const myName = info.my_name || 'Yo';
+      this.locationService.updateMyLocation(this.myUserId, myName).catch(err => {
+        console.error('Error GPS', err);
+      });
+
+      this.startTracking();
+      this.loadNextMilestone();
+      this.startMoodInterval();
+    } catch(e) {
+      console.error('Error in location init', e);
+    }
 
     this.appStateListener = await App.addListener('appStateChange', ({ isActive }) => {
       if (isActive) {
@@ -252,14 +255,14 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
       if (me) this.myAvatarUrl = me.avatar || '';
       if (partner) this.partnerAvatarUrl = partner.avatar || '';
 
-      // Fallback a Cuenca y Albacete si no hay posición en Firestore
+      // Fallback si no hay posición en Firebase (ej: Madrid y Barcelona)
       const myPos = me?.position 
         ? L.latLng(me.position.latitude, me.position.longitude)
-        : (this.myUserId === 'juan' ? L.latLng(40.0708, -2.1374) : L.latLng(38.9942, -1.8585));
+        : L.latLng(40.4168, -3.7038); // Madrid
 
       const partnerPos = partner?.position
         ? L.latLng(partner.position.latitude, partner.position.longitude)
-        : (this.partnerId === 'juan' ? L.latLng(40.0708, -2.1374) : L.latLng(38.9942, -1.8585));
+        : L.latLng(41.3851, 2.1734); // Barcelona
 
       this.myLastPos = myPos;
       this.partnerLastPos = partnerPos;

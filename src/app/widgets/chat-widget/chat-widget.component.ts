@@ -108,7 +108,12 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
             </div>
           </div>
         </div>
-        </div>t>
+          <div class="empty-state" *ngIf="regularMessages.length === 0">
+            <ion-icon name="chatbubbles-outline" class="empty-icon"></ion-icon>
+            <p>No hay mensajes aún.</p>
+            <p>¡Dile algo bonito para empezar!</p>
+          </div>
+        </div>
       </ion-content>
 
       <!-- Custom emoji overlay (replaces ion-popover for Capacitor compatibility) -->
@@ -269,6 +274,15 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
     .swipe-icon-left, .swipe-icon-right { position: absolute; top: 50%; transform: translateY(-50%) scale(0); z-index: 1; opacity: 0; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
     .swipe-icon-left { right: 10px; }
     .swipe-icon-right { left: 10px; }
+    .reactions-container { position: absolute; bottom: -15px; left: 10px; display: flex; gap: 2px; background: rgba(255,255,255,0.9); padding: 3px 6px; border-radius: 12px; font-size: 0.9rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 10; white-space: nowrap; }
+    .message-wrapper.mine .reactions-container { left: auto; right: 10px; }
+    .reaction { display: inline-block; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    
+    .empty-state { text-align: center; color: #a08c92; padding: 100px 20px 40px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .empty-icon { font-size: 4rem; margin-bottom: 15px; color: #ffb3c1; opacity: 0.8; }
+
+    /* Custom Input Mode Styling */
+    .custom-input-mode { display: flex; width: 100%; gap: 10px; }
     
     .message-wrapper { display: flex; width: 100%; animation: slideUp 0.3s ease-out forwards; opacity: 0; transform: translateY(10px); gap: 8px; align-items: flex-end; }
     @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
