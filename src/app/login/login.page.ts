@@ -4,12 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, AlertController, ToastController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { person, heart } from 'ionicons/icons';
+import { heart, mailOutline, lockClosedOutline, personOutline, shieldCheckmarkOutline } from 'ionicons/icons';
 import { LocationService } from '../services/location.service';
 import { LoveApiService } from '../services/love-api.service';
 import { NotificationService } from '../services/notification.service';
-import { environment } from '../../environments/environment';
-
+import { Browser } from '@capacitor/browser';
 import { Preferences } from '@capacitor/preferences';
 
 @Component({
@@ -27,80 +26,113 @@ export class LoginPage implements OnInit {
   private alertCtrl = inject(AlertController);
   private toastCtrl = inject(ToastController);
 
-  public juanAvatarUrl = '';
-  public robertaAvatarUrl = '';
-  public defaultAvatar = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffb3c1"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+  public isLoginMode = true;
+  public isLoading = false;
+
+  public loginData = {
+    email: '',
+    password: ''
+  };
+
+  public registerData = {
+    name: '',
+    email: '',
+    password: '',
+    password_confirmation: ''
+  };
 
   constructor() {
-    addIcons({ person, heart });
+    addIcons({ heart, mailOutline, lockClosedOutline, personOutline, shieldCheckmarkOutline });
   }
 
   async ngOnInit() {
-    this.locationService.listenToUserLocation('juan').subscribe(data => {
-      if (data && data.avatar) this.juanAvatarUrl = data.avatar;
-    });
-    this.locationService.listenToUserLocation('roberta').subscribe(data => {
-      if (data && data.avatar) this.robertaAvatarUrl = data.avatar;
-    });
-
     // Auto-login si ya hay token y usuario
     const storedUser = localStorage.getItem('love_widget_user');
     const { value: token } = await Preferences.get({ key: 'auth_token' });
     if (storedUser && token) {
       this.notificationService.init();
+      // Si el login fue con el modo antiguo, lo mantenemos temporalmente
+      // idealmente habría que buscar el perfil en base al usuario autenticado,
+      // pero por compatibilidad con el widget lo dejamos.
       this.locationService.updateMyLocation(storedUser as 'juan' | 'roberta', storedUser);
       this.router.navigate(['/home'], { replaceUrl: true });
     }
   }
 
-  async selectProfile(userId: 'juan' | 'roberta') {
-    const alert = await this.alertCtrl.create({
-      cssClass: 'premium-login-alert',
-      header: 'Contraseña',
-      message: `Ingresa la contraseña para ${userId}`,
-      inputs: [
-        {
-          name: 'password',
-          type: 'password',
-          placeholder: 'Contraseña'
-        }
-      ],
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Entrar',
-          handler: async (data) => {
-            const email = userId === 'juan' ? environment.apiCredentials.juanEmail : environment.apiCredentials.robertaEmail;
-            const password = data.password; 
-            try {
-              await this.loveApi.login(email, password);
-              // Guardar el usuario localmente
-              localStorage.setItem('love_widget_user', userId);
-              // Guardar nativamente para el Widget de Android
-              await Preferences.set({ key: 'myUserId', value: userId });
-              // Pedir notificaciones y guardar token ahora que estamos logueados
-              this.notificationService.init();
-              this.locationService.updateMyLocation(userId, userId);
-              // Redirigir a home
-              this.router.navigate(['/home'], { replaceUrl: true });
-            } catch (e) {
-              console.log('Error login API Laravel (¿El usuario no existe o mala contraseña?):', e);
-              const toast = await this.toastCtrl.create({
-                message: 'Contraseña incorrecta. Por favor, inténtalo de nuevo.',
-                duration: 3000,
-                color: 'danger',
-                position: 'bottom'
-              });
-              await toast.present();
-            }
-          }
-        }
-      ]
-    });
+  toggleMode() {
+    this.isLoginMode = !this.isLoginMode;
+  }
+
+  async onLogin(event: Event) {
+    event.preventDefault();
+    if (!this.loginData.email || !this.loginData.password) return;
+
+    this.isLoading = true;
+    try {
+      await this.loveApi.login(this.loginData.email, this.loginData.password);
+      await this.handleSuccessfulAuth(this.loginData.email);
+    } catch (e: any) {
+      console.log('Error login:', e);
+      this.showToast('Credenciales incorrectas o error en el servidor.', 'danger');
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  async onRegister(event: Event) {
+    event.preventDefault();
+    if (!this.registerData.name || !this.registerData.email || !this.registerData.password) return;
+
+    if (this.registerData.password !== this.registerData.password_confirmation) {
+      this.showToast('Las contraseñas no coinciden', 'warning');
+      return;
+    }
+
+    this.isLoading = true;
+    try {
+      await this.loveApi.register({
+        ...this.registerData,
+        app: 'love_widget'
+      });
+      await this.handleSuccessfulAuth(this.registerData.email);
+    } catch (e: any) {
+      console.log('Error registro:', e);
+      const msg = e.error?.message || 'Error al crear la cuenta. Inténtalo de nuevo.';
+      this.showToast(msg, 'danger');
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  private async handleSuccessfulAuth(email: string) {
+    // Determinar temporalmente el userId basado en el correo para no romper la app actual
+    // (A futuro esto debería venir del backend /user endpoint)
+    let userId = 'juan'; // default temporal
+    if (email.toLowerCase().includes('roberta')) {
+      userId = 'roberta';
+    }
+
+    localStorage.setItem('love_widget_user', userId);
+    await Preferences.set({ key: 'myUserId', value: userId });
     
-    await alert.present();
+    this.notificationService.init();
+    this.locationService.updateMyLocation(userId as 'juan' | 'roberta', userId);
+    
+    this.router.navigate(['/home'], { replaceUrl: true });
+  }
+
+  async forgotPassword() {
+    // Abre el navegador interno con la URL del backend
+    await Browser.open({ url: 'https://enfoca.alwaysdata.net/forgot-password' });
+  }
+
+  private async showToast(message: string, color: string) {
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 3000,
+      color,
+      position: 'bottom'
+    });
+    await toast.present();
   }
 }

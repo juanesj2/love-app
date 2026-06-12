@@ -1,79 +1,211 @@
 ion-content.login-content {
-  --background: #FFF0F3; // El rosa pastel propuesto
+  --background: #FFF0F3; // Base pink
+  position: relative;
+}
+
+/* Burbujas de fondo para efecto Glassmorphism */
+.background-bubbles {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  overflow: hidden;
+  z-index: 0;
+
+  .bubble {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.6;
+    animation: float 10s infinite ease-in-out alternate;
+  }
+
+  .bubble-1 {
+    width: 200px; height: 200px;
+    background: #FF4D6D;
+    top: -50px; left: -50px;
+  }
+  .bubble-2 {
+    width: 250px; height: 250px;
+    background: #FF8FA3;
+    bottom: -50px; right: -50px;
+    animation-delay: -3s;
+  }
+  .bubble-3 {
+    width: 150px; height: 150px;
+    background: #c9184a;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    animation-delay: -5s;
+  }
+}
+
+@keyframes float {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-20px) scale(1.05); }
 }
 
 .login-container {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100%;
+  min-height: 100%;
   padding: 24px;
 }
 
 .header-text {
   text-align: center;
-  margin-bottom: 48px;
+  margin-bottom: 30px;
+  
+  .icon-wrapper {
+    background: linear-gradient(135deg, #FF4D6D, #c9184a);
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    box-shadow: 0 8px 20px rgba(255, 77, 109, 0.4);
+
+    ion-icon {
+      color: white;
+      font-size: 32px;
+    }
+  }
 
   h1 {
     color: #590D22;
-    font-size: 32px;
-    font-weight: 700;
+    font-size: 28px;
+    font-weight: 800;
     margin-bottom: 8px;
   }
 
   p {
     color: #A4133C;
-    font-size: 16px;
+    font-size: 15px;
   }
 }
 
-.cards-container {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+.glass-form-container {
   width: 100%;
-  max-width: 320px;
+  max-width: 350px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 24px;
+  padding: 30px 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
 }
 
-.profile-card {
-  background: #FFFFFF;
-  border-radius: 24px;
-  padding: 24px;
+.auth-form {
   display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  .input-group {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 16px;
+    padding: 5px 15px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+
+    &:focus-within {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: #FF4D6D;
+      box-shadow: 0 0 0 3px rgba(255, 77, 109, 0.1);
+    }
+
+    ion-icon {
+      color: #A4133C;
+      font-size: 20px;
+      margin-right: 10px;
+    }
+
+    input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 12px 0;
+      color: #590D22;
+      font-size: 16px;
+      outline: none;
+
+      &::placeholder {
+        color: rgba(89, 13, 34, 0.5);
+      }
+    }
+  }
+
+  .forgot-password {
+    text-align: right;
+    margin-top: -5px;
+    margin-bottom: 10px;
+
+    span {
+      color: #FF4D6D;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  }
+}
+
+.glass-btn {
+  background: linear-gradient(135deg, #FF4D6D, #c9184a);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  width: 100%;
+  box-shadow: 0 8px 20px rgba(255, 77, 109, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 20px;
-  box-shadow: 0 8px 32px rgba(255, 77, 109, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:active {
     transform: scale(0.96);
   }
 
-    .avatar-container {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      border: 2px solid white;
-      overflow: hidden;
-      background: #FFF0F3;
-
-      .avatar-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-    }
-
-  h2 {
-    color: #590D22;
-    font-size: 24px;
-    font-weight: 600;
-    margin: 0;
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
   }
+}
+
+.switch-mode {
+  margin-top: 25px;
+  text-align: center;
+  cursor: pointer;
+
+  span {
+    color: #A4133C;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+  }
+}
+
+/* Spinner */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

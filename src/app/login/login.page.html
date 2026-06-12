@@ -1,26 +1,77 @@
 <ion-content [fullscreen]="true" class="login-content">
+  <div class="background-bubbles">
+    <div class="bubble bubble-1"></div>
+    <div class="bubble bubble-2"></div>
+    <div class="bubble bubble-3"></div>
+  </div>
+
   <div class="login-container">
-    <div class="header-text">
-      <h1>¿Quién eres hoy?</h1>
-      <p>Selecciona tu perfil para conectar</p>
+    <div class="header-text glass-header">
+      <div class="icon-wrapper">
+        <ion-icon name="heart" class="heart-icon"></ion-icon>
+      </div>
+      <h1>{{ isLoginMode ? 'Bienvenido de nuevo' : 'Crea tu cuenta' }}</h1>
+      <p>{{ isLoginMode ? 'Inicia sesión para continuar' : 'Únete y empieza a conectar' }}</p>
     </div>
 
-    <div class="cards-container">
-      <!-- Tarjeta Juan -->
-      <div class="profile-card" (click)="selectProfile('juan')">
-        <div class="avatar-container juan">
-          <img [src]="juanAvatarUrl || defaultAvatar" class="avatar-img" />
+    <!-- Contenedor Glassmorphism -->
+    <div class="glass-form-container">
+      
+      <!-- Formulario Login -->
+      <form *ngIf="isLoginMode" (submit)="onLogin($event)" class="auth-form">
+        <div class="input-group">
+          <ion-icon name="mail-outline"></ion-icon>
+          <input type="email" name="email" [(ngModel)]="loginData.email" placeholder="Correo electrónico" required />
         </div>
-        <h2>Juan</h2>
-      </div>
 
-      <!-- Tarjeta Roberta -->
-      <div class="profile-card" (click)="selectProfile('roberta')">
-        <div class="avatar-container roberta">
-          <img [src]="robertaAvatarUrl || defaultAvatar" class="avatar-img" />
+        <div class="input-group">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+          <input type="password" name="password" [(ngModel)]="loginData.password" placeholder="Contraseña" required />
         </div>
-        <h2>Roberta</h2>
-      </div>
+
+        <div class="forgot-password" (click)="forgotPassword()">
+          <span>¿Olvidaste tu contraseña?</span>
+        </div>
+
+        <button type="submit" class="glass-btn primary" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Iniciar Sesión</span>
+          <div class="spinner" *ngIf="isLoading"></div>
+        </button>
+      </form>
+
+      <!-- Formulario Registro -->
+      <form *ngIf="!isLoginMode" (submit)="onRegister($event)" class="auth-form">
+        <div class="input-group">
+          <ion-icon name="person-outline"></ion-icon>
+          <input type="text" name="name" [(ngModel)]="registerData.name" placeholder="Tu Nombre" required />
+        </div>
+
+        <div class="input-group">
+          <ion-icon name="mail-outline"></ion-icon>
+          <input type="email" name="email" [(ngModel)]="registerData.email" placeholder="Correo electrónico" required />
+        </div>
+
+        <div class="input-group">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+          <input type="password" name="password" [(ngModel)]="registerData.password" placeholder="Contraseña" required />
+        </div>
+
+        <div class="input-group">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+          <input type="password" name="password_confirmation" [(ngModel)]="registerData.password_confirmation" placeholder="Confirmar Contraseña" required />
+        </div>
+
+        <button type="submit" class="glass-btn primary" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Registrarse</span>
+          <div class="spinner" *ngIf="isLoading"></div>
+        </button>
+      </form>
+
     </div>
+
+    <div class="switch-mode glass-footer" (click)="toggleMode()">
+      <span>{{ isLoginMode ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión' }}</span>
+    </div>
+
   </div>
 </ion-content>
