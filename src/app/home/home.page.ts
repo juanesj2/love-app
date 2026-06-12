@@ -98,23 +98,48 @@ import { App } from '@capacitor/app';
       </div>
     </ion-footer>
 
-    <!-- Custom Upload Prompt Overlay -->
+    <!-- Upload Photo Modal -->
     <div class="home-overlay" *ngIf="pendingPhotoFile" (click)="cancelUpload()">
       <div class="prompt-sheet" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h2>Añadir descripción</h2>
+          <h2>Nueva Foto ❤️</h2>
         </div>
+        
         <div class="prompt-body">
           <div class="prompt-preview-container">
             <img [src]="pendingPhotoPreview" class="prompt-preview" />
           </div>
-          <textarea class="premium-textarea" placeholder="Escribe algo bonito (opcional)..." [(ngModel)]="pendingPhotoText"></textarea>
+          <textarea class="premium-textarea" placeholder="Escribe algo bonito... (opcional)" [(ngModel)]="pendingPhotoText"></textarea>
         </div>
+        
         <div class="prompt-actions">
           <button class="prompt-btn cancel" (click)="cancelUpload()" [disabled]="uploading">Cancelar</button>
           <button class="prompt-btn confirm" (click)="confirmUpload()" [disabled]="uploading">
             <span *ngIf="!uploading">Subir</span>
-            <span *ngIf="uploading">⏳</span>
+            <ion-spinner name="crescent" *ngIf="uploading"></ion-spinner>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Surprise Modal -->
+    <div class="home-overlay" *ngIf="showSurpriseModal" (click)="showSurpriseModal = false">
+      <div class="prompt-sheet surprise-sheet" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>¡Notificación Sorpresa! 🎁</h2>
+          <p style="color: #a08c92; font-size: 0.9rem; margin-top: 5px;">Mándale un aviso push al instante.</p>
+        </div>
+        
+        <div class="prompt-body">
+          <input type="text" class="premium-input" placeholder="Título (ej. Ábreme)" [(ngModel)]="surpriseTitle" />
+          <textarea class="premium-textarea" placeholder="Mensaje..." [(ngModel)]="surpriseBody"></textarea>
+        </div>
+        
+        <div class="prompt-actions">
+          <button class="prompt-btn cancel" (click)="showSurpriseModal = false" [disabled]="sendingSurprise">Cancelar</button>
+          <button class="prompt-btn confirm" (click)="sendSurprise()" [disabled]="sendingSurprise || !surpriseTitle || !surpriseBody">
+            <span *ngIf="!sendingSurprise">Enviar 🔥</span>
+            <ion-spinner name="crescent" *ngIf="sendingSurprise"></ion-spinner>
           </button>
         </div>
       </div>
@@ -160,6 +185,10 @@ import { App } from '@capacitor/app';
     .premium-textarea { width: 100%; min-height: 100px; border: 2px solid rgba(255, 77, 109, 0.2); border-radius: 15px; padding: 15px; font-size: 1rem; color: #590D22; background: rgba(255, 255, 255, 0.8); resize: none; outline: none; transition: border-color 0.3s; }
     .premium-textarea:focus { border-color: #FF4D6D; }
     .premium-textarea::placeholder { color: #a08c92; }
+    .premium-input { width: 100%; border: 2px solid rgba(255, 77, 109, 0.2); border-radius: 15px; padding: 15px; font-size: 1.1rem; color: #590D22; background: rgba(255, 255, 255, 0.8); outline: none; transition: border-color 0.3s; font-weight: bold; }
+    .premium-input:focus { border-color: #FF4D6D; }
+    .premium-input::placeholder { color: #a08c92; font-weight: normal; }
+    .surprise-sheet { background: linear-gradient(to bottom, #ffffff, #fff5f8); }
     
     .prompt-actions { display: flex; gap: 10px; }
     .prompt-btn { flex: 1; padding: 14px; border-radius: 20px; font-weight: bold; font-size: 1.1rem; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
@@ -189,6 +218,10 @@ export class HomePage implements OnInit, OnDestroy {
   pendingPhotoText: string = '';
   
   surpriseTimeout: any;
+  showSurpriseModal = false;
+  surpriseTitle = '';
+  surpriseBody = '';
+  sendingSurprise = false;
 
   private api = inject(LoveApiService);
   private locationService = inject(LocationService);
@@ -261,56 +294,35 @@ export class HomePage implements OnInit, OnDestroy {
 
   async openSurpriseModal() {
     try { navigator.vibrate?.(50); } catch(e){}
+    this.surpriseTitle = '';
+    this.surpriseBody = '';
+    this.showSurpriseModal = true;
+  }
 
-    const alert = await this.alertController.create({
-      header: '¡Notificación Sorpresa! 🎁',
-      message: 'Manda un aviso push a tu pareja al instante (ej: "Baja, estoy en la puerta").',
-      cssClass: 'premium-login-alert',
-      inputs: [
-        {
-          name: 'title',
-          type: 'text',
-          placeholder: 'Título (ej. Ábreme)'
-        },
-        {
-          name: 'body',
-          type: 'textarea',
-          placeholder: 'Mensaje...'
-        }
-      ],
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Enviar 🔥',
-          handler: async (data) => {
-            if (data.title && data.body) {
-              try {
-                await this.api.sendCustomNotification(data.title, data.body);
-                const toast = await this.toastController.create({
-                  message: '¡Sorpresa enviada!',
-                  duration: 2000,
-                  color: 'success',
-                  position: 'top'
-                });
-                toast.present();
-              } catch (e) {
-                const toast = await this.toastController.create({
-                  message: 'Error al enviar notificación',
-                  duration: 2000,
-                  color: 'danger',
-                  position: 'top'
-                });
-                toast.present();
-              }
-            }
-          }
-        }
-      ]
-    });
-    await alert.present();
+  async sendSurprise() {
+    if (!this.surpriseTitle || !this.surpriseBody) return;
+    this.sendingSurprise = true;
+    try {
+      await this.api.sendCustomNotification(this.surpriseTitle, this.surpriseBody);
+      const toast = await this.toastController.create({
+        message: '¡Sorpresa enviada!',
+        duration: 2000,
+        color: 'success',
+        position: 'top'
+      });
+      toast.present();
+      this.showSurpriseModal = false;
+    } catch (e) {
+      const toast = await this.toastController.create({
+        message: 'Error al enviar notificación',
+        duration: 2000,
+        color: 'danger',
+        position: 'top'
+      });
+      toast.present();
+    } finally {
+      this.sendingSurprise = false;
+    }
   }
 
   async loadHeaderData() {
