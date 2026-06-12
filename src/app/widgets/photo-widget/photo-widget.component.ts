@@ -184,17 +184,57 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
       <!-- Lightbox Inmersivo -->
       <div class="lightbox-modal" *ngIf="lightboxActive && lightboxPhotos.length > 0">
         <div class="lightbox-backdrop" (click)="closeLightbox()"></div>
+        
+        <button class="lightbox-close" style="position: absolute; top: 15px; right: 15px; z-index: 2003;" (click)="closeLightbox()">
+          <ion-icon name="close"></ion-icon>
+        </button>
+
         <div class="lightbox-content"
+             style="align-items: center; padding: 20px;"
              (touchstart)="onLightboxTouchStart($event)"
              (touchend)="onLightboxTouchEnd($event)">
-          <div class="lightbox-header">
-            <div class="lightbox-date">{{ lightboxPhotos[currentLightboxIndex].created_at | date:'longDate':'':'es-ES' }}</div>
-            <button class="lightbox-close" (click)="closeLightbox()"><ion-icon name="close"></ion-icon></button>
-          </div>
-          <img [src]="environment.storageUrl + lightboxPhotos[currentLightboxIndex].image_path" class="lightbox-image" />
-          <div class="lightbox-footer" *ngIf="lightboxPhotos[currentLightboxIndex].description">
-            <p>{{ lightboxPhotos[currentLightboxIndex].description }}</p>
-          </div>
+          
+          <ng-container *ngIf="lightboxPhotos[currentLightboxIndex] as photo">
+            <div class="photo-card" style="margin: auto; width: 100%; max-height: 90vh;">
+              
+              <div class="image-wrapper">
+                <img [src]="environment.storageUrl + photo.image_path" class="main-photo" loading="lazy" />
+                
+                <div class="photo-overlay-bottom">
+                  <div class="card-user-info">
+                    <img *ngIf="avatars[photo.user?.name]" [src]="avatars[photo.user.name]" class="card-avatar" />
+                    <div *ngIf="!avatars[photo.user?.name]" class="card-avatar-fallback">{{ photo.user?.name?.charAt(0) || 'U' }}</div>
+                    <span class="card-username">{{photo.user?.name}}</span>
+                  </div>
+                  <button *ngIf="isMine(photo)" class="delete-post-btn" (click)="deletePhoto(photo)">
+                    <ion-icon name="trash-outline"></ion-icon>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="photo-details">
+                <p *ngIf="photo.description" class="description">{{photo.description}}</p>
+                
+                <div class="reactions-list" *ngIf="photo.reactions?.length">
+                  <span class="reaction-bubble" *ngFor="let r of photo.reactions | slice:0:3">{{$any(r).content}}</span>
+                  <span class="reaction-bubble ellipsis-bubble" *ngIf="photo.reactions.length > 3">...</span>
+                </div>
+
+                <div class="actions">
+                  <button class="reaction-btn" (click)="react(photo.id, '❤️')">❤️</button>
+                  <button class="reaction-btn" (click)="react(photo.id, '😍')">😍</button>
+                  <button class="reaction-btn" (click)="react(photo.id, '😂')">😂</button>
+                  <button class="reaction-btn custom-reaction" (click)="reactCustom(photo.id)"><ion-icon name="add"></ion-icon></button>
+                  <button class="reaction-btn download-btn" (click)="downloadPhoto(photo)"><ion-icon name="download-outline"></ion-icon></button>
+                </div>
+
+                <div class="reply-box">
+                  <input type="text" [(ngModel)]="replyTexts[photo.id]" placeholder="Escribe un mensaje para el chat..." (keyup.enter)="replyWithText(photo.id)" />
+                  <button class="send-reply-btn" (click)="replyWithText(photo.id)" [disabled]="!replyTexts[photo.id]"><ion-icon name="send"></ion-icon></button>
+                </div>
+              </div>
+            </div>
+          </ng-container>
         </div>
       </div>
 
