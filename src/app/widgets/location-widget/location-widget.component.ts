@@ -375,14 +375,12 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
     const htmlIcon = L.divIcon({
       className: 'custom-div-icon',
       html: `
-        <div style="position: relative; width: 0; height: 0; display: flex; align-items: center; justify-content: center;">
-          <div class="pulse-marker" style="${backgroundStyle} position: absolute; width:54px; height:54px; border-radius:50%; border:3px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.15); box-sizing: border-box; transform: translate(-50%, -50%); z-index: 2;">
-            ${moodHtml}
-          </div>
+        <div class="pulse-marker" style="position: relative; ${backgroundStyle} width:100%; height:100%; border-radius:50%; border:3px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.15); box-sizing: border-box; z-index: 2;">
+          ${moodHtml}
         </div>
       `,
-      iconSize: [0, 0],
-      iconAnchor: [0, 0]
+      iconSize: [54, 54],
+      iconAnchor: [27, 27]
     });
 
     if (type === 'me') {
