@@ -151,53 +151,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             <input type="text" placeholder="Ej: Viajar a Japón..." [(ngModel)]="newBucketTitle" (keyup.enter)="addBucketItem()" class="glass-input" />
             <button class="glass-btn" (click)="addBucketItem()"><ion-icon name="add-circle-outline"></ion-icon> Añadir Deseo</button>
           </div>
-        </div>
-
-        <!-- Nuestro Tour Gastronómico -->
-        <div class="glass-card">
-          <div class="section-title">
-            <ion-icon name="restaurant-outline"></ion-icon>
-            <h3>Tour Gastronómico</h3>
-          </div>
-          <p class="desc">Restaurantes y platos que hemos probado.</p>
-          
-          <div class="food-places-list" style="display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px;">
-            <div class="food-place-item" *ngFor="let place of foodPlaces" (click)="openFoodPlaceModal(place)" style="min-width: 120px; background: rgba(255,255,255,0.5); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-              <div class="place-image" [style.backgroundImage]="'url(' + (place.image_url_full || 'assets/default-food.png') + ')'" style="width: 100px; height: 100px; border-radius: 10px; background-size: cover; background-position: center; margin: 0 auto 10px;"></div>
-              <span class="p-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ place.name }}</span>
-              <span class="p-rating" style="color: #FFB703; font-size: 0.8rem;">
-                <ion-icon name="star" *ngFor="let s of [1,2,3,4,5]" [style.opacity]="s <= place.rating ? 1 : 0.3"></ion-icon>
-              </span>
-            </div>
-          </div>
-          <button class="glass-btn" style="width: 100%; margin-top: 10px;" (click)="isFoodPlaceModalOpen = true">
-            <ion-icon name="add-circle-outline"></ion-icon> Añadir Restaurante
-          </button>
-        </div>
-
-        <!-- Cine en Pareja -->
-        <div class="glass-card">
-          <div class="section-title">
-            <ion-icon name="film-outline"></ion-icon>
-            <h3>Cine en Pareja</h3>
-          </div>
-          <p class="desc">Películas y series que vemos juntos.</p>
-          
-          <div class="movies-list" style="display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px;">
-            <div class="movie-item" *ngFor="let movie of movies" (click)="openMovieModal(movie)" style="min-width: 100px; background: rgba(255,255,255,0.5); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-              <div class="movie-image" [style.backgroundImage]="'url(' + (movie.image_url_full || 'assets/default-movie.png') + ')'" style="width: 80px; height: 120px; border-radius: 10px; background-size: cover; background-position: center; margin: 0 auto 10px;"></div>
-              <span class="m-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ movie.title }}</span>
-              <span class="p-rating" style="color: #FFB703; font-size: 0.8rem;">
-                <ion-icon name="star" *ngFor="let s of [1,2,3,4,5]" [style.opacity]="s <= movie.rating ? 1 : 0.3"></ion-icon>
-              </span>
-            </div>
-          </div>
-          <button class="glass-btn" style="width: 100%; margin-top: 10px;" (click)="isMovieModalOpen = true">
-            <ion-icon name="add-circle-outline"></ion-icon> Añadir Película/Serie
-          </button>
-        </div>
-
-        <!-- Quick Actions Grid -->
+          <!-- Quick Actions Grid -->
         <div class="quick-actions-grid">
           <!-- Widget Config (Spans full width) -->
           <div class="grid-card full-width">
@@ -206,6 +160,24 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
               <option value="feed">Todas las fotos</option>
               <option *ngFor="let album of albums" [value]="album.id">{{ album.name }}</option>
             </select>
+          </div>
+
+          <!-- Tour Gastronómico -->
+          <div class="grid-card interactive" (click)="isFoodListModalOpen = true">
+            <div class="icon-circle" style="background: linear-gradient(135deg, #FF9A9E, #FECFEF); box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3); color: #c9184a;">
+              <ion-icon name="restaurant-outline"></ion-icon>
+            </div>
+            <h4>Tour Gastro</h4>
+            <span class="sub">Platos y sitios</span>
+          </div>
+
+          <!-- Cine en Pareja -->
+          <div class="grid-card interactive" (click)="isMovieListModalOpen = true">
+            <div class="icon-circle" style="background: linear-gradient(135deg, #a2d2ff, #bde0fe); box-shadow: 0 4px 15px rgba(162, 210, 255, 0.3); color: #023e8a;">
+              <ion-icon name="film-outline"></ion-icon>
+            </div>
+            <h4>Cine Pareja</h4>
+            <span class="sub">Pelis y series</span>
           </div>
 
           <!-- Minijuego -->
@@ -225,6 +197,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             <h4>Mi Avatar</h4>
             <span class="sub" *ngIf="!uploadingAvatar">Cambiar foto</span>
             <span class="sub" *ngIf="uploadingAvatar">Actualizando...</span>
+          </div>
           </div>
         </div>
 
@@ -315,6 +288,52 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
           </button>
         </div>
       </div>
+
+        <!-- Food List Modal -->
+        <div class="custom-overlay" *ngIf="isFoodListModalOpen" (click)="isFoodListModalOpen = false">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+            <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="restaurant-outline"></ion-icon> Tour Gastronómico</h2>
+            <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Restaurantes y platos que hemos probado</p>
+            
+            <div class="food-places-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
+              <div class="food-place-item" *ngFor="let place of foodPlaces" (click)="openFoodPlaceModal(place)" style="background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
+                <div class="place-image" [style.backgroundImage]="'url(' + (place.image_url_full || 'assets/default-food.png') + ')'" style="width: 100%; aspect-ratio: 1; border-radius: 10px; background-size: cover; background-position: center; margin: 0 auto 10px;"></div>
+                <span class="p-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ place.name }}</span>
+                <span class="p-rating" style="color: #FFB703; font-size: 0.8rem;">
+                  <ion-icon name="star" *ngFor="let s of [1,2,3,4,5]" [style.opacity]="s <= place.rating ? 1 : 0.3"></ion-icon>
+                </span>
+              </div>
+            </div>
+            
+            <button class="glass-btn" style="width: 100%; margin-bottom: 10px;" (click)="isAddingFoodPlace = true">
+              <ion-icon name="add-circle-outline"></ion-icon> Añadir Restaurante
+            </button>
+            <button class="glass-btn" style="width: 100%; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="isFoodListModalOpen = false">Cerrar</button>
+          </div>
+        </div>
+
+        <!-- Movies List Modal -->
+        <div class="custom-overlay" *ngIf="isMovieListModalOpen" (click)="isMovieListModalOpen = false">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+            <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="film-outline"></ion-icon> Cine en Pareja</h2>
+            <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Películas y series que vemos juntos</p>
+            
+            <div class="movies-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
+              <div class="movie-item" *ngFor="let movie of movies" (click)="openMovieModal(movie)" style="background: rgba(255,255,255,0.8); border-radius: 10px; padding: 8px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
+                <div class="movie-image" [style.backgroundImage]="'url(' + (movie.image_url_full || 'assets/default-movie.png') + ')'" style="width: 100%; aspect-ratio: 0.7; border-radius: 8px; background-size: cover; background-position: center; margin: 0 auto 8px;"></div>
+                <span class="m-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ movie.title }}</span>
+                <span class="p-rating" style="color: #FFB703; font-size: 0.7rem;">
+                  <ion-icon name="star" *ngFor="let s of [1,2,3,4,5]" [style.opacity]="s <= movie.rating ? 1 : 0.3"></ion-icon>
+                </span>
+              </div>
+            </div>
+            
+            <button class="glass-btn" style="width: 100%; margin-bottom: 10px;" (click)="isAddingMovie = true">
+              <ion-icon name="add-circle-outline"></ion-icon> Añadir Película/Serie
+            </button>
+            <button class="glass-btn" style="width: 100%; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="isMovieListModalOpen = false">Cerrar</button>
+          </div>
+        </div>
 
         <!-- Add Food Place Modal -->
         <div class="custom-overlay" *ngIf="isAddingFoodPlace" (click)="isAddingFoodPlace = false">
@@ -630,6 +649,9 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   foodPlaces: any[] = [];
   movies: any[] = [];
   
+  isFoodListModalOpen = false;
+  isMovieListModalOpen = false;
+
   isAddingFoodPlace = false;
   newFoodPlace: any = { name: '', location: '', description: '', rating: 5, imageBase64: null };
   isFoodPlaceModalOpen = false;
