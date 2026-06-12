@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, Output, EventEmitter } from '@angular/core';
 import { App } from '@capacitor/app';
 import { PluginListenerHandle } from '@capacitor/core';
 import { CommonModule } from '@angular/common';
@@ -24,10 +24,15 @@ import { LoveApiService } from '../../services/love-api.service';
       </div>
       
       <!-- Partner Location Card -->
-      <div class="partner-location-card" *ngIf="partnerCity && !areTogether">
-        <ion-icon name="location-outline"></ion-icon>
-        <span>{{ partnerName }} está en <strong>{{ partnerCity }}</strong></span>
-      </div>
+        <div class="partner-location-card" *ngIf="!areTogether" (click)="centerOnPartner()">
+          <div class="poke-btn-mini" (click)="triggerPoke($event)">
+            <ion-icon name="heart"></ion-icon>
+          </div>
+          <div class="avatar-container-mini">
+            <img [src]="partnerAvatarUrl || defaultAvatar" class="avatar-mini" />
+            <div class="mood-badge-mini" *ngIf="partnerMood">{{ partnerMood }}</div>
+          </div>
+        </div>
       
       <!-- Floating Next Milestone -->
       <div class="next-milestone-card" *ngIf="nextMilestone" (click)="loadNextMilestone()">
@@ -78,10 +83,12 @@ import { LoveApiService } from '../../services/love-api.service';
     #map { width: 100%; height: 100%; background: #fdfbfb; }
     ::ng-deep .leaflet-tile-pane { filter: brightness(1.02) saturate(1.2) hue-rotate(345deg); }
     ::ng-deep .leaflet-control-attribution { display: none !important; }
-    
-    .partner-location-card { position: absolute; top: calc(env(safe-area-inset-top) + 85px); left: 50%; transform: translateX(-50%); z-index: 2000; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border-radius: 20px; padding: 10px 20px; display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 25px rgba(255,77,109,0.2); border: 1px solid rgba(255,255,255,0.8); color: #590D22; font-size: 0.95rem; white-space: nowrap; }
-    .partner-location-card ion-icon { color: #FF4D6D; font-size: 1.3rem; }
-    .center-map-btn { position: absolute; top: calc(env(safe-area-inset-top) + 85px); right: 15px; z-index: 2000; width: 44px; height: 44px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.4); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-size: 1.5rem; transition: transform 0.2s; }
+        .partner-location-card { position: absolute; top: calc(env(safe-area-inset-top) + 15px); left: 50%; transform: translateX(-50%); z-index: 2000; background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); border-radius: 30px; padding: 8px 12px 8px 8px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 30px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.4); }
+      .poke-btn-mini { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(255,77,109,0.4); }
+      .avatar-container-mini { position: relative; width: 48px; height: 48px; }
+      .avatar-mini { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+      .mood-badge-mini { position: absolute; bottom: -5px; right: -5px; background: white; border-radius: 50%; padding: 2px; font-size: 1.2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+      .center-map-btn { position: absolute; top: calc(env(safe-area-inset-top) + 15px); right: 15px; z-index: 2000; width: 44px; height: 44px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.4); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-size: 1.5rem; transition: transform 0.2s; }
     .center-map-btn:active { transform: scale(0.9); }
     
     .next-milestone-card { position: absolute; bottom: calc(env(safe-area-inset-bottom) + 95px); left: 15px; z-index: 2000; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border-radius: 20px; padding: 10px 18px 10px 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.6); max-width: 65%; cursor: pointer; transition: transform 0.2s; }
@@ -123,6 +130,7 @@ import { LoveApiService } from '../../services/love-api.service';
   imports: [CommonModule, IonIcon]
 })
 export class LocationWidgetComponent implements OnInit, OnDestroy {
+  @Output() poke = new EventEmitter<void>();
   private locationService = inject(LocationService);
   private api = inject(LoveApiService);
   private actionSheetCtrl = inject(ActionSheetController);
@@ -353,6 +361,17 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
     } else if (this.myLastPos) {
       this.map.setView(this.myLastPos, 14);
     }
+  }
+
+  public centerOnPartner() {
+    if (this.partnerLastPos) {
+      this.map.setView(this.partnerLastPos, 16);
+    }
+  }
+
+  public triggerPoke(event: Event) {
+    event.stopPropagation();
+    this.poke.emit();
   }
 
   private clearMapElements() {

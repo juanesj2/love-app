@@ -26,7 +26,7 @@ import { App } from '@capacitor/app';
   template: `
     <ion-header class="ion-no-border">
       <ion-toolbar>
-        <div class="custom-header">
+        <div class="custom-header" *ngIf="selectedWidget !== 'location'" [class.hidden]="selectedWidget === 'location'">
           <div class="avatar-container" (click)="openMoodSelector()">
             <img *ngIf="myAvatarUrl" [src]="myAvatarUrl" class="avatar" />
             <div *ngIf="!myAvatarUrl" class="avatar my-avatar">TÚ</div>
@@ -52,7 +52,7 @@ import { App } from '@capacitor/app';
 
       <app-photo-widget *ngIf="selectedWidget === 'photo'" #photoWidget></app-photo-widget>
       <app-chat-widget *ngIf="selectedWidget === 'chat'" #chatWidget></app-chat-widget>
-      <app-location-widget *ngIf="selectedWidget === 'location'" #locationWidget></app-location-widget>
+      <app-location-widget *ngIf="selectedWidget === 'location'" (poke)="sendPoke()" #locationWidget></app-location-widget>
       <app-mas-widget *ngIf="selectedWidget === 'mas'" (openGameEvent)="selectedWidget = 'game'" #masWidget></app-mas-widget>
       <app-questions-widget *ngIf="selectedWidget === 'game'" #gameWidget></app-questions-widget>
     </ion-content>
