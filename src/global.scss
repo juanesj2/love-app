@@ -269,11 +269,12 @@
     margin: 15px auto 20px !important;
     border: none !important;
     justify-content: center !important;
-    padding-left: 0 !important;
+    padding: 15px !important; /* Proper internal margin/padding */
     box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3) !important;
 
     .action-sheet-icon {
       color: white !important;
+      margin-right: 10px !important; /* slightly tighter margin for centered items */
     }
   }
 }
