@@ -20,10 +20,6 @@ export class LocationService {
   private firestore = inject(Firestore);
 
   async updateMyLocation(userId: string, name: string) {
-    // Map backend integer IDs to Firebase string IDs
-    if (userId === '1') userId = 'juan';
-    else if (userId === '2') userId = 'roberta';
-
     try {
       // 1. Pedir permisos explícitamente (evita bloqueos silenciosos)
       const permissions = await Geolocation.checkPermissions();
@@ -86,9 +82,6 @@ export class LocationService {
   }
 
   listenToUserLocation(userId: string): Observable<UserLocation> {
-    if (userId === '1') userId = 'juan';
-    else if (userId === '2') userId = 'roberta';
-    
     const userDocRef = doc(this.firestore, `locations/${userId}`);
     return docData(userDocRef) as Observable<UserLocation>;
   }

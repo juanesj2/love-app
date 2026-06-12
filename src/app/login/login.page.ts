@@ -60,7 +60,7 @@ export class LoginPage implements OnInit {
       try {
         await this.loveApi.getCoupleInfo();
         this.notificationService.init();
-        this.locationService.updateMyLocation(storedUser as 'juan' | 'roberta', storedUser);
+        this.locationService.updateMyLocation(storedUser, storedUser);
         this.router.navigate(['/home'], { replaceUrl: true });
       } catch (e: any) {
         if (e.status === 403 || e.error?.message?.includes('No estás vinculado')) {
@@ -142,19 +142,16 @@ export class LoginPage implements OnInit {
   private async handleSuccessfulAuth(email: string) {
     // Check if the user is paired
     try {
-      await this.loveApi.getCoupleInfo();
+      const info = await this.loveApi.getCoupleInfo();
       // If we are here, we are paired.
       
-      let userId = 'juan'; // default temporal
-      if (email.toLowerCase().includes('roberta')) {
-        userId = 'roberta';
-      }
+      const userId = info.my_id.toString();
 
       localStorage.setItem('love_widget_user', userId);
       await Preferences.set({ key: 'myUserId', value: userId });
       
       this.notificationService.init();
-      this.locationService.updateMyLocation(userId as 'juan' | 'roberta', userId);
+      this.locationService.updateMyLocation(userId, info.my_name || userId);
       
       this.router.navigate(['/home'], { replaceUrl: true });
     } catch (e: any) {

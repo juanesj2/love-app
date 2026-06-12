@@ -131,8 +131,8 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
   public daysRemaining: number = 0;
 
   private map!: L.Map;
-  public myUserId!: 'juan' | 'roberta';
-  public partnerId!: 'juan' | 'roberta';
+  public myUserId!: string;
+  public partnerId!: string;
 
   public uploadingAvatar = false;
   public areTogether = false;

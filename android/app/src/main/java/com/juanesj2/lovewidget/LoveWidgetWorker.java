@@ -46,16 +46,32 @@ public class LoveWidgetWorker extends Worker {
         
         String myUserId = prefs.getString("_cap_myUserId", "");
         if (myUserId == null || myUserId.isEmpty()) {
-            myUserId = prefs.getString("myUserId", "juan");
+            myUserId = prefs.getString("myUserId", "");
         }
         
-        // Map integer IDs to names
-        if (myUserId.equals("1")) myUserId = "juan";
-        else if (myUserId.equals("2")) myUserId = "roberta";
-        
-        String partnerId = myUserId.equals("juan") ? "roberta" : "juan";
-        
         String token = readToken(context);
+        
+        // Fetch couple info to get partner_id, moods, and avatars
+        String partnerId = "";
+        String myMood = "";
+        String partnerMood = "";
+        String myAvatarUrl = null;
+        String partnerAvatarUrl = null;
+        
+        if (token != null && !token.isEmpty()) {
+            JSONObject info = fetchCoupleInfo(token);
+            if (info != null) {
+                myMood = info.optString("my_mood", "");
+                partnerMood = info.optString("partner_mood", "");
+                myAvatarUrl = info.optString("my_avatar", null);
+                partnerAvatarUrl = info.optString("partner_avatar", null);
+                partnerId = info.optString("partner_id", "");
+            }
+        }
+        
+        if (partnerId.isEmpty() || myUserId.isEmpty()) {
+            return Result.failure();
+        }
 
         try {
             Location myLoc = fetchLocation(myUserId);
@@ -115,22 +131,7 @@ public class LoveWidgetWorker extends Worker {
                     Bitmap mutableBitmap = mapBitmap;
                     Canvas canvas = new Canvas(mutableBitmap);
 
-                    // Fetch moods and avatars
-                    String myMood = "";
-                    String partnerMood = "";
-                    String myAvatarUrl = null;
-                    String partnerAvatarUrl = null;
-                    
-                    if (token != null && !token.isEmpty()) {
-                        JSONObject info = fetchCoupleInfo(token);
-                        if (info != null) {
-                            myMood = info.optString("my_mood", "");
-                            partnerMood = info.optString("partner_mood", "");
-                            myAvatarUrl = info.optString("my_avatar", null);
-                            partnerAvatarUrl = info.optString("partner_avatar", null);
-                        }
-                    }
-                    
+
                     Bitmap myAvatarBitmap = null;
                     Bitmap partnerAvatarBitmap = null;
                     
