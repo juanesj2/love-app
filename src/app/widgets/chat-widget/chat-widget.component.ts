@@ -480,10 +480,10 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   private viewInitialized = false;
 
-  ngOnInit() {
+  async ngOnInit() {
     this.currentUser = localStorage.getItem('love_widget_user') === 'juan' ? 'Juan' : 'Roberta';
-    this.loadAvatars();
-    this.loadMessages();
+    await this.loadAvatars();
+    await this.loadMessages();
   }
 
   ngOnDestroy() {
@@ -1238,6 +1238,201 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   async addReaction(msg: any, emoji: string) {
+  }
+
+  endPress() {
+    clearTimeout(this.pressTimer);
+  }
+
+  onContextMenu(event: any, msg: any) {
+    if (event && event.preventDefault) event.preventDefault();
+    this.activeMsg = msg;
+    this.showReactionsMsgId = msg.id;
+    this.showCustomEmojiInput = false;
+    this.cdr.detectChanges();
+  }
+
+  closePopover() {
+    this.showReactionsMsgId = null;
+    this.showCustomEmojiInput = false;
+  }
+
+  openCustomEmoji() {
+    this.showCustomEmojiInput = true;
+    this.safeTimeout(() => {
+      const input = document.getElementById('customEmojiInput');
+      if (input) input.focus();
+    }, 100);
+  }
+
+  addCustomReaction(emoji: string) {
+    if (!emoji || !emoji.trim()) return;
+    this.addReaction(this.activeMsg, emoji.trim());
+    this.closePopover();
+  }
+
+  isEditing = false;
+  editingMsgId: number | null = null;
+
+  canEditMessage(msg: any): boolean {
+    if (!msg || !msg.created_at) return false;
+    if (msg.user?.name !== this.currentUser) return false;
+    
+    // Check if within 2 minutes
+    const msgDate = new Date(msg.created_at);
+    const now = new Date();
+    const diffMs = now.getTime() - msgDate.getTime();
+    return diffMs <= 120000; // 120000 ms = 2 minutes
+  }
+
+  startEditingMessage(msg: any) {
+    this.closePopover();
+    this.isEditing = true;
+    this.editingMsgId = msg.id;
+    this.newMessage = msg.mensaje;
+    this.replyingTo = null;
+    this.safeTimeout(() => {
+      const input = document.querySelector('.premium-input') as HTMLInputElement;
+      if (input) input.focus();
+    }, 150);
+  }
+
+  cancelReplyOrEdit() {
+    this.replyingTo = null;
+    this.isEditing = false;
+    this.editingMsgId = null;
+    this.newMessage = '';
+  }
+
+  // --- Custom Swipe Logic ---
+  swipeStartX = 0;
+  swipeStartY = 0;
+  swipingMsgId: number | null = null;
+
+  ts(event: any, msg: any) {
+    if (event.touches && event.touches.length > 0) {
+      this.swipeStartX = event.touches[0].clientX;
+      this.swipeStartY = event.touches[0].clientY;
+      this.swipingMsgId = msg.id;
+    }
+    this.startPress(event, msg);
+  }
+
+  tm(event: any, msg: any) {
+    if (this.swipingMsgId !== msg.id || !event.touches) return;
+    
+    const x = event.touches[0].clientX;
+    const y = event.touches[0].clientY;
+    const deltaX = x - this.swipeStartX;
+    const deltaY = y - this.swipeStartY;
+    
+    if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) {
+      this.endPress();
+    }
+
+    const isMine = this.isMine(msg);
+    if (isMine && deltaX > 0) return;
+    if (!isMine && deltaX < 0) return;
+
+    let move = deltaX;
+    if (move > 60) move = 60 + (move - 60) * 0.2;
+    if (move < -60) move = -60 + (move + 60) * 0.2;
+
+    const el = document.getElementById('slide-el-' + msg.id);
+    const iconEl = document.getElementById('swipe-icon-' + msg.id);
+
+    if (el) {
+      el.style.transform = `translateX(${move}px)`;
+      el.style.transition = 'none';
+    }
+
+    if (iconEl) {
+      const progress = Math.min(Math.abs(move) / 60, 1);
+      iconEl.style.opacity = progress.toString();
+      iconEl.style.transform = `translateY(-50%) scale(${progress})`;
+      iconEl.style.transition = 'none';
+      if (progress >= 1) {
+        iconEl.style.transform = `translateY(-50%) scale(1.1)`;
+      }
+    }
+  }
+
+  te(event: any, msg: any) {
+    this.endPress();
+    if (this.swipingMsgId !== msg.id) return;
+    this.swipingMsgId = null;
+
+    const el = document.getElementById('slide-el-' + msg.id);
+    const iconEl = document.getElementById('swipe-icon-' + msg.id);
+
+    let move = 0;
+    if (el && el.style.transform.includes('translateX')) {
+      const match = el.style.transform.match(/translateX\(([-\d\.]+)px\)/);
+      if (match) move = parseFloat(match[1]);
+    }
+
+    if (el) {
+      el.style.transform = 'translateX(0)';
+      el.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
+    }
+
+    if (iconEl) {
+      iconEl.style.opacity = '0';
+      iconEl.style.transform = 'translateY(-50%) scale(0)';
+      iconEl.style.transition = 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
+    }
+
+    const isMine = this.isMine(msg);
+    if (isMine && move <= -50) {
+      this.replyToMessage(msg);
+      Haptics.impact({ style: ImpactStyle.Light }).catch(()=>{});
+    } else if (!isMine && move >= 50) {
+      this.replyToMessage(msg);
+      Haptics.impact({ style: ImpactStyle.Light }).catch(()=>{});
+    }
+  }
+
+  replyToMessage(msg: any) {
+    this.replyingTo = msg;
+    this.safeTimeout(() => {
+      const input = document.querySelector('.premium-input') as HTMLInputElement;
+      if (input) input.focus();
+    }, 150);
+  }
+
+  scrollToMessage(id: number) {
+    const el = document.getElementById(`msg-${id}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      
+      // Use IntersectionObserver to wait until the message is visible before animating
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          el.classList.add('highlight-msg');
+          this.safeTimeout(() => el.classList.remove('highlight-msg'), 1500);
+          observer.disconnect();
+        }
+      }, { threshold: 0.5 });
+      
+      observer.observe(el);
+      
+      // Fallback just in case the observer fails to trigger (e.g. if it's a very tall message)
+      this.safeTimeout(() => observer.disconnect(), 2000);
+    } else {
+      console.log('Message not found on current page:', id);
+    }
+  }
+
+  hasReactions(msg: any): boolean {
+    return msg.reactions && msg.reactions.length > 0;
+  }
+
+  getReactions(msg: any): string[] {
+    if (!this.hasReactions(msg)) return [];
+    return msg.reactions.map((r: any) => r.reaction);
+  }
+
+  async addReaction(msg: any, emoji: string) {
     this.showReactionsMsgId = null;
     try {
       await this.api.reactToChatMessage(msg.id, emoji);
@@ -1248,8 +1443,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   isMine(msg: any): boolean {
-    if (!msg) return false;
-    return msg.user_id === this.myUserId;
+    if (!msg || !msg.user_id) return false;
+    return Number(msg.user_id) === Number(this.myUserId);
   }
 
   trackByMsgId(index: number, msg: any) {
