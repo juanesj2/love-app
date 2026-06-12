@@ -119,6 +119,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 
         <!-- VISTA GRID (GALERÍA) -->
         <ng-container *ngIf="viewMode === 'grid'">
+          <div class="grid-wrapper">
           <div class="selection-top-bar" *ngIf="selectionMode">
              <div class="select-all-wrapper" (click)="toggleSelectAll()">
                <ion-icon name="checkmark-circle" *ngIf="isAllSelected()" color="primary"></ion-icon>
@@ -171,6 +172,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
                 </div>
               </div>
             </div>
+          </div>
           </div>
         </ng-container>
 
@@ -315,6 +317,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     
     .scroll-content { flex: 1; --background: transparent; }
     .photos-list { padding-top: 85px; padding-bottom: 40px; }
+    .grid-wrapper { padding-top: 85px; padding-bottom: 40px; }
     
     .global-date-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; visibility: hidden; transition: opacity 0.8s ease-in-out, visibility 0.8s; pointer-events: none; border-radius: inherit; }
     .global-date-overlay.show { opacity: 1; visibility: visible; }
