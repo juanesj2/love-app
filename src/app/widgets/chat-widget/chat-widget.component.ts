@@ -25,7 +25,11 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
             <img *ngFor="let graf of graffitisByAnchorId[msg.id]" 
                  [src]="environment.storageUrl + graf.photo?.image_path" 
                  class="graffiti-overlay" 
-                 (click)="openGraffitiOptions(graf)"
+                 (touchstart)="startGraffitiPress(graf, $event)"
+                 (mousedown)="startGraffitiPress(graf, $event)"
+                 (touchend)="endGraffitiPress()"
+                 (mouseup)="endGraffitiPress()"
+                 (mouseleave)="endGraffitiPress()"
                  [style.left.px]="graf.offsetX" 
                  [style.top.px]="graf.offsetY" 
                  [style.width.px]="graf.width" 
@@ -274,6 +278,44 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
         </div>
       </div>
     </div>
+
+    <!-- Graffiti Context Menu Overlay -->
+    <div class="graffiti-context-overlay" *ngIf="selectedGraffiti" (click)="closeGraffitiOptions()">
+      <!-- Resaltar el graffiti seleccionado -->
+      <img [src]="environment.storageUrl + selectedGraffiti.photo?.image_path" 
+           class="highlighted-graffiti"
+           [style.left.px]="graffitiRect.left"
+           [style.top.px]="graffitiRect.top"
+           [style.width.px]="graffitiRect.width"
+           [style.height.px]="graffitiRect.height"
+           [style.position]="'absolute'"
+           [style.zIndex]="10001" />
+
+      <!-- El menú contextual estilo Instagram -->
+      <div class="insta-context-menu" 
+           (click)="$event.stopPropagation()"
+           [style.left.px]="menuRect.left"
+           [style.top.px]="menuRect.top">
+        
+        <div class="menu-header">
+          <img *ngIf="avatars[selectedGraffiti.user?.name]" [src]="avatars[selectedGraffiti.user?.name]" class="menu-avatar" />
+          <div *ngIf="!avatars[selectedGraffiti.user?.name]" class="menu-avatar-fallback">{{ selectedGraffiti.user?.name?.charAt(0) || 'U' }}</div>
+          <div class="menu-user-info">
+            <span class="menu-username">{{ selectedGraffiti.user?.name || 'Usuario' }}</span>
+            <span class="menu-time">{{ formatTime(selectedGraffiti.created_at) }}</span>
+          </div>
+        </div>
+
+        <div class="menu-action" (click)="confirmDeleteGraffiti(selectedGraffiti); closeGraffitiOptions()">
+          <ion-icon name="trash-outline" style="color: #ff4d4d;"></ion-icon>
+          <span>Eliminar para ti</span>
+        </div>
+        <div class="menu-action" (click)="hideGraffiti(selectedGraffiti); closeGraffitiOptions()">
+          <ion-icon name="eye-off-outline"></ion-icon>
+          <span>Ocultar todo</span>
+        </div>
+      </div>
+    </div>
   `,
   styles: [`
     :host {
@@ -470,6 +512,21 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
     .cp-btn:active { transform: scale(0.95); }
     .cp-btn.cancel { background: #f0f0f0; color: #666; }
     .cp-btn.accept { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3); }
+
+    /* Graffiti Context Menu */
+    .graffiti-context-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10000; background: rgba(0,0,0,0.6); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); animation: fadeIn 0.2s ease; }
+    .highlighted-graffiti { pointer-events: none; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.5)); transform: scale(1.02); transition: transform 0.2s; }
+    
+    .insta-context-menu { position: absolute; background: rgba(30, 30, 30, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-radius: 16px; width: 240px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); padding: 5px 0; border: 1px solid rgba(255,255,255,0.1); z-index: 10002; animation: popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .menu-header { display: flex; align-items: center; padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); gap: 10px; }
+    .menu-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+    .menu-avatar-fallback { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; font-weight: bold; font-size: 0.8rem; }
+    .menu-user-info { display: flex; flex-direction: column; }
+    .menu-username { color: white; font-weight: 600; font-size: 0.9rem; }
+    .menu-time { color: rgba(255,255,255,0.5); font-size: 0.75rem; }
+    .menu-action { display: flex; align-items: center; gap: 12px; padding: 14px 15px; color: white; font-size: 1rem; cursor: pointer; transition: background 0.2s; }
+    .menu-action:active { background: rgba(255,255,255,0.1); }
+    .menu-action ion-icon { font-size: 1.3rem; }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
@@ -920,34 +977,60 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 }
 
-  async openGraffitiOptions(graf: any) {
-    const actionSheet = await this.actionSheetCtrl.create({
-      header: `Garabato de ${graf.user?.name || 'Usuario'}`,
-      cssClass: 'premium-action-sheet',
-      buttons: [
-        {
-          text: 'Eliminar para ti',
-          role: 'destructive',
-          icon: 'trash-outline',
-          handler: () => {
-            this.confirmDeleteGraffiti(graf);
-          }
-        },
-        {
-          text: 'Ocultar todo',
-          icon: 'eye-off-outline',
-          handler: () => {
-            // Placeholder
-          }
-        },
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          icon: 'close-outline'
-        }
-      ]
-    });
-    await actionSheet.present();
+// --- Graffiti Long Press Menu ---
+  selectedGraffiti: any = null;
+  graffitiPressTimer: any;
+  graffitiRect = { left: 0, top: 0, width: 0, height: 0 };
+  menuRect = { left: 0, top: 0 };
+
+  formatTime(dateString: string) {
+    if (!dateString) return '';
+    const d = new Date(dateString);
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  startGraffitiPress(graf: any, event: any) {
+    this.graffitiPressTimer = setTimeout(async () => {
+      try { await Haptics.impact({ style: ImpactStyle.Heavy }); } catch (e) {}
+      
+      this.selectedGraffiti = graf;
+      const target = event.target as HTMLElement;
+      const rect = target.getBoundingClientRect();
+      
+      this.graffitiRect = {
+        left: rect.left,
+        top: rect.top,
+        width: rect.width,
+        height: rect.height
+      };
+
+      let menuTop = rect.bottom + 10;
+      let menuLeft = rect.left + (rect.width / 2) - 120; // width is 240
+      
+      if (menuLeft < 10) menuLeft = 10;
+      if (menuLeft + 240 > window.innerWidth - 10) menuLeft = window.innerWidth - 250;
+      
+      if (menuTop + 160 > window.innerHeight) {
+        menuTop = rect.top - 170;
+      }
+      
+      this.menuRect = { left: menuLeft, top: menuTop };
+      this.cdr.detectChanges();
+    }, 400);
+  }
+
+  endGraffitiPress() {
+    clearTimeout(this.graffitiPressTimer);
+  }
+
+  closeGraffitiOptions() {
+    this.selectedGraffiti = null;
+  }
+
+  hideGraffiti(graf: any) {
+    if (this.graffitisByAnchorId[graf.anchorMsgId]) {
+      this.graffitisByAnchorId[graf.anchorMsgId] = this.graffitisByAnchorId[graf.anchorMsgId].filter((g: any) => g.id !== graf.id);
+    }
   }
 
   async confirmDeleteGraffiti(graf: any) {
