@@ -195,7 +195,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
              (touchend)="onLightboxTouchEnd($event)">
           
           <ng-container *ngIf="lightboxPhotos[currentLightboxIndex] as photo">
-            <div class="photo-card" style="margin: auto; width: 100%; max-height: 90vh;">
+            <div class="photo-card lightbox-card" [ngClass]="lightboxAnimationClass" style="margin: auto; width: 100%; max-height: 90vh;">
               
               <div class="image-wrapper">
                 <img [src]="environment.storageUrl + photo.image_path" class="main-photo" loading="lazy" />
@@ -480,6 +480,15 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .lightbox-image { flex: 1; width: 100%; height: 100%; object-fit: contain; }
     .lightbox-footer { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px 20px 40px 20px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); color: white; font-size: 1rem; line-height: 1.4; text-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 2002; }
 
+    /* Lightbox Animations */
+    .lightbox-card { transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1); transform: translateY(0); opacity: 1; }
+    .slide-out-up { transform: translateY(-100px); opacity: 0; }
+    .slide-out-down { transform: translateY(100px); opacity: 0; }
+    .slide-in-up { animation: slideInUp 0.3s forwards; }
+    .slide-in-down { animation: slideInDown 0.3s forwards; }
+    @keyframes slideInUp { 0% { transform: translateY(100px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+    @keyframes slideInDown { 0% { transform: translateY(-100px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+
     /* Custom Upload Prompt */
     .prompt-sheet { padding-bottom: 30px; }
     .prompt-body { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
@@ -550,6 +559,8 @@ export class PhotoWidgetComponent implements OnInit {
   // Swipe logic para lightbox
   touchStartY = 0;
   touchEndY = 0;
+  isLightboxAnimating = false;
+  lightboxAnimationClass = '';
 
   constructor() {
     addIcons({ arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline });
@@ -839,15 +850,36 @@ export class PhotoWidgetComponent implements OnInit {
     this.lightboxActive = false;
   }
 
+  animateLightboxTo(direction: 'up' | 'down', callback: () => void) {
+    if (this.isLightboxAnimating) return;
+    this.isLightboxAnimating = true;
+    
+    this.lightboxAnimationClass = direction === 'up' ? 'slide-out-up' : 'slide-out-down';
+    
+    setTimeout(() => {
+      callback();
+      this.lightboxAnimationClass = direction === 'up' ? 'slide-in-up' : 'slide-in-down';
+      
+      setTimeout(() => {
+        this.lightboxAnimationClass = '';
+        this.isLightboxAnimating = false;
+      }, 300);
+    }, 250);
+  }
+
   nextLightboxPhoto() {
     if (this.currentLightboxIndex < this.lightboxPhotos.length - 1) {
-      this.currentLightboxIndex++;
+      this.animateLightboxTo('up', () => {
+        this.currentLightboxIndex++;
+      });
     }
   }
 
   prevLightboxPhoto() {
     if (this.currentLightboxIndex > 0) {
-      this.currentLightboxIndex--;
+      this.animateLightboxTo('down', () => {
+        this.currentLightboxIndex--;
+      });
     }
   }
 
