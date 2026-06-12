@@ -151,7 +151,9 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             <input type="text" placeholder="Ej: Viajar a Japón..." [(ngModel)]="newBucketTitle" (keyup.enter)="addBucketItem()" class="glass-input" />
             <button class="glass-btn" (click)="addBucketItem()"><ion-icon name="add-circle-outline"></ion-icon> Añadir Deseo</button>
           </div>
-          <!-- Quick Actions Grid -->
+        </div>
+
+        <!-- Quick Actions Grid -->
         <div class="quick-actions-grid">
           <!-- Widget Config (Spans full width) -->
           <div class="grid-card full-width">
