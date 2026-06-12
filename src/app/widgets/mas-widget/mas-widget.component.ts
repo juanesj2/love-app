@@ -3,7 +3,7 @@ import { App } from '@capacitor/app';
 import { PluginListenerHandle } from '@capacitor/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonRefresher, IonRefresherContent, IonIcon, ToastController, ActionSheetController, AlertController } from '@ionic/angular/standalone';
+import { IonContent, IonRefresher, IonRefresherContent, IonIcon, IonModal, ToastController, ActionSheetController, AlertController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { LoveApiService } from '../../services/love-api.service';
 import { Preferences } from '@capacitor/preferences';
@@ -301,7 +301,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
     .logout-btn ion-icon { font-size: 1.4rem; }
   `],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonIcon, IonContent, IonRefresher, IonRefresherContent]
+  imports: [CommonModule, FormsModule, IonIcon, IonModal, IonContent, IonRefresher, IonRefresherContent]
 })
 export class MasWidgetComponent implements OnInit, OnDestroy {
   @Output() openGameEvent = new EventEmitter<void>();
