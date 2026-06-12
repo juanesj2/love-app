@@ -494,6 +494,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   async presentPhotoOptions(callback: (source: CameraSource) => void) {
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Seleccionar Imagen',
+      cssClass: 'premium-action-sheet',
       buttons: [
         {
           text: 'Tomar Foto',

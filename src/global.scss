@@ -257,3 +257,62 @@
     text-transform: uppercase !important;
   }
 }
+
+/* Premium Action Sheet Styling */
+.premium-action-sheet {
+  --background: rgba(255, 255, 255, 0.9);
+  --backdrop-opacity: 0.5;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  .action-sheet-wrapper {
+    border-top-left-radius: 24px !important;
+    border-top-right-radius: 24px !important;
+    box-shadow: 0 -8px 32px rgba(255, 77, 109, 0.15) !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+  }
+
+  .action-sheet-title {
+    font-weight: 800 !important;
+    color: #590D22 !important;
+    font-size: 1.3rem !important;
+    text-align: center !important;
+    padding: 20px 10px 10px !important;
+  }
+
+  .action-sheet-button {
+    font-weight: 600 !important;
+    color: #a4133c !important;
+    font-size: 1.1rem !important;
+    margin: 5px 15px !important;
+    border-radius: 14px !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.8) !important;
+    padding: 15px !important;
+    justify-content: flex-start !important;
+    padding-left: 20px !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03) !important;
+
+    .action-sheet-icon {
+      color: #FF4D6D !important;
+      margin-right: 15px !important;
+      font-size: 1.5rem !important;
+    }
+  }
+
+  .action-sheet-button.action-sheet-cancel {
+    background: linear-gradient(135deg, #FF4D6D, #c9184a) !important;
+    color: white !important;
+    font-weight: 700 !important;
+    margin-top: 15px !important;
+    margin-bottom: 20px !important;
+    border: none !important;
+    justify-content: center !important;
+    padding-left: 0 !important;
+    box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3) !important;
+
+    .action-sheet-icon {
+      color: white !important;
+    }
+  }
+}
