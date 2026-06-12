@@ -701,19 +701,21 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   }
 
   async uploadMilestonePhoto() {
-    try {
-      const image = await Camera.getPhoto({
-        quality: 80,
-        allowEditing: false,
-        resultType: CameraResultType.DataUrl,
-        source: CameraSource.Prompt
-      });
-      if (image.dataUrl) {
-        this.selectedMilestone.newImageBase64 = image.dataUrl;
+    this.presentPhotoOptions(async (source) => {
+      try {
+        const image = await Camera.getPhoto({
+          quality: 80,
+          allowEditing: true, // Matching typical app behavior to allow crop
+          resultType: CameraResultType.DataUrl,
+          source: source
+        });
+        if (image.dataUrl) {
+          this.selectedMilestone.newImageBase64 = image.dataUrl;
+        }
+      } catch (e) {
+        console.log('User cancelled camera or error', e);
       }
-    } catch (e) {
-      console.error(e);
-    }
+    });
   }
 
   async saveMilestoneChanges() {
