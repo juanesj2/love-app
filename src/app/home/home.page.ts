@@ -36,7 +36,9 @@ import { App } from '@capacitor/app';
             <ion-icon name="heart" [class.poking]="pokeAnimation"></ion-icon>
           </div>
 
-          <div class="avatar-container">
+          <div class="avatar-container"
+               (mousedown)="startSurprisePress()" (mouseup)="endSurprisePress()" (mouseleave)="endSurprisePress()"
+               (touchstart)="startSurprisePress()" (touchend)="endSurprisePress()">
             <img *ngIf="partnerAvatarUrl" [src]="partnerAvatarUrl" class="avatar" />
             <div *ngIf="!partnerAvatarUrl" class="avatar partner-avatar">{{ partnerInitial }}</div>
             <div class="mood-badge" *ngIf="partnerMood">{{ partnerMood }}</div>
@@ -185,6 +187,8 @@ export class HomePage implements OnInit, OnDestroy {
   pendingPhotoFile: File | null = null;
   pendingPhotoPreview: string = '';
   pendingPhotoText: string = '';
+  
+  surpriseTimeout: any;
 
   private api = inject(LoveApiService);
   private locationService = inject(LocationService);
@@ -243,6 +247,70 @@ export class HomePage implements OnInit, OnDestroy {
       this.appStateListener.remove();
     }
     this.subscriptions.forEach(s => s.unsubscribe());
+  }
+
+  startSurprisePress() {
+    this.surpriseTimeout = setTimeout(() => {
+      this.openSurpriseModal();
+    }, 800); // 800ms para considerarlo long press
+  }
+
+  endSurprisePress() {
+    clearTimeout(this.surpriseTimeout);
+  }
+
+  async openSurpriseModal() {
+    try { navigator.vibrate?.(50); } catch(e){}
+
+    const alert = await this.alertController.create({
+      header: '¡Notificación Sorpresa! 🎁',
+      message: 'Manda un aviso push a tu pareja al instante (ej: "Baja, estoy en la puerta").',
+      cssClass: 'premium-login-alert',
+      inputs: [
+        {
+          name: 'title',
+          type: 'text',
+          placeholder: 'Título (ej. Ábreme)'
+        },
+        {
+          name: 'body',
+          type: 'textarea',
+          placeholder: 'Mensaje...'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Enviar 🔥',
+          handler: async (data) => {
+            if (data.title && data.body) {
+              try {
+                await this.api.sendCustomNotification(data.title, data.body);
+                const toast = await this.toastController.create({
+                  message: '¡Sorpresa enviada!',
+                  duration: 2000,
+                  color: 'success',
+                  position: 'top'
+                });
+                toast.present();
+              } catch (e) {
+                const toast = await this.toastController.create({
+                  message: 'Error al enviar notificación',
+                  duration: 2000,
+                  color: 'danger',
+                  position: 'top'
+                });
+                toast.present();
+              }
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 
   async loadHeaderData() {

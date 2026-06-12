@@ -49,7 +49,7 @@ export class LoginPage implements OnInit {
     if (storedUser && token) {
       this.notificationService.init();
       this.locationService.updateMyLocation(storedUser as 'juan' | 'roberta', storedUser);
-      this.router.navigate(['/home']);
+      this.router.navigate(['/home'], { replaceUrl: true });
     }
   }
 
@@ -85,7 +85,7 @@ export class LoginPage implements OnInit {
               this.notificationService.init();
               this.locationService.updateMyLocation(userId, userId);
               // Redirigir a home
-              this.router.navigate(['/home']);
+              this.router.navigate(['/home'], { replaceUrl: true });
             } catch (e) {
               console.log('Error login API Laravel (¿El usuario no existe o mala contraseña?):', e);
               const toast = await this.toastCtrl.create({

@@ -298,7 +298,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
         </button>
         
         <!-- Botón para eliminar fotos seleccionadas (tanto en general como de álbum) -->
-        <button class="selection-btn delete" *ngIf="!addingToAlbumId" (click)="deleteSelectedPhotos()" [disabled]="selectedPhotos.size === 0" style="color: #FF4D6D; background: rgba(255, 77, 109, 0.1);">
+        <button class="selection-btn delete" *ngIf="!addingToAlbumId" (click)="deleteSelectedPhotos()" [disabled]="!canDeleteSelected" style="color: #FF4D6D; background: rgba(255, 77, 109, 0.1);">
           <ion-icon name="trash-outline"></ion-icon>
         </button>
       </div>
@@ -382,9 +382,14 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
             </p>
           </div>
 
-          <button class="streak-remind-btn" *ngIf="!coupleInfo?.partner_photo_today" (click)="sendStreakReminder()">
+          <button class="streak-remind-btn" *ngIf="coupleInfo?.my_photo_today && !coupleInfo?.partner_photo_today" (click)="sendStreakReminder()">
             <ion-icon name="notifications"></ion-icon> Recordar a mi pareja
           </button>
+          <div *ngIf="!coupleInfo?.my_photo_today" style="margin-top: 15px; text-align: center;">
+            <p style="font-size: 0.9rem; color: #FF4D6D; font-weight: bold; background: rgba(255,77,109,0.1); padding: 10px; border-radius: 10px;">
+              ¡Sube tu foto primero antes de avisar a tu pareja!
+            </p>
+          </div>
         </div>
       </div>
 
@@ -638,6 +643,17 @@ export class PhotoWidgetComponent implements OnInit {
   showStreakModal = false;
 
   avatars: { [key: string]: string } = {};
+
+  get canDeleteSelected(): boolean {
+    if (this.selectedPhotos.size === 0) return false;
+    for (const id of Array.from(this.selectedPhotos)) {
+      const photo = this.photos.find(p => p.id === id);
+      if (photo && !this.isMine(photo)) {
+        return false;
+      }
+    }
+    return true;
+  }
   private firestore = inject(Firestore);
   private observer: IntersectionObserver | null = null;
   
