@@ -44,12 +44,12 @@ export class LoveApiService {
 
   async sendStreakReminder(): Promise<any> {
     const headers = await this.getHeaders();
-    return firstValueFrom(this.http.post(`${API_BASE_URL}/couple/remind-streak`, {}, { headers }));
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/remind-streak`, {}, { headers }));
   }
 
   async sendCustomNotification(title: string, body: string): Promise<any> {
     const headers = await this.getHeaders();
-    return firstValueFrom(this.http.post(`${API_BASE_URL}/couple/custom-notification`, { title, body }, { headers }));
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/custom-notification`, { title, body }, { headers }));
   }
 
   // --- AUTH ---
