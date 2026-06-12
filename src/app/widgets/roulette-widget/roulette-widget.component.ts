@@ -20,7 +20,7 @@ import { LoveApiService } from '../../services/love-api.service';
       
       <div class="header">
         <button class="back-btn" (click)="goBack()"><ion-icon name="arrow-back"></ion-icon></button>
-        <h2>Ruleta de Citas</h2>
+        <h2>Tarro de Citas</h2>
         <p>¿Qué hacemos hoy?</p>
         <button class="fill-btn" (click)="fillSampleDates()"><ion-icon name="sync-outline"></ion-icon></button>
       </div>

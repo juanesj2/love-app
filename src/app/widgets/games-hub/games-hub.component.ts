@@ -56,8 +56,8 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
         <div class="game-card roulette-card" (click)="goTo('games/roulette')">
           <div class="game-icon-bg"><ion-icon name="aperture-outline"></ion-icon></div>
           <div class="game-info">
-            <h3>Ruleta de Citas</h3>
-            <p>Gira la ruleta mágica para decidir el plan del fin de semana. ¡Añade vuestros planes favoritos!</p>
+            <h3>Tarro de Citas</h3>
+            <p>Gira la ruleta para decidir el plan del fin de semana. ¡Añade vuestros planes favoritos al tarro!</p>
           </div>
         </div>
       </div>
