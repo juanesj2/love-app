@@ -460,13 +460,14 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   async loadAvatars() {
     try {
-      const juanDoc = await getDoc(doc(this.firestore, 'locations', 'juan'));
-      if (juanDoc.exists() && juanDoc.data()?.['avatar']) {
-        this.avatars['Juan'] = juanDoc.data()['avatar'];
-      }
-      const robertaDoc = await getDoc(doc(this.firestore, 'locations', 'roberta'));
-      if (robertaDoc.exists() && robertaDoc.data()?.['avatar']) {
-        this.avatars['Roberta'] = robertaDoc.data()['avatar'];
+      const info = await this.api.getCoupleInfo();
+      if (info) {
+        if (info.my_name && info.my_avatar) {
+          this.avatars[info.my_name] = info.my_avatar;
+        }
+        if (info.partner_name && info.partner_avatar) {
+          this.avatars[info.partner_name] = info.partner_avatar;
+        }
       }
     } catch (e) {
       console.error('Error loading avatars', e);
