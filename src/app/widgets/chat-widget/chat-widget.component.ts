@@ -358,7 +358,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
     audio { display: none; }
     
     .messages-content { flex: 1; --background: transparent; }
-    .messages-inner { padding: 20px 15px; display: flex; flex-direction: column; background: transparent !important; }
+    .messages-inner { padding: calc(env(safe-area-inset-top) + 85px) 15px 20px; display: flex; flex-direction: column; background: transparent !important; }
     
     .message-row { position: relative; width: 100%; display: flex; align-items: center; margin-bottom: 12px; }
     .message-content-wrapper { width: 100%; position: relative; z-index: 2; transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
