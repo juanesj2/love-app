@@ -404,7 +404,7 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
   private updateDistanceMarker(latLng: L.LatLng, text: string) {
     const htmlIcon = L.divIcon({
       className: 'distance-pill-icon',
-      html: `<div style="background: white; color: #222; font-weight: 800; border-radius: 24px; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.25); white-space: nowrap; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; box-sizing: border-box; font-family: 'Inter', sans-serif;">${text}</div>`,
+      html: `<div style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); color: #590D22; font-weight: 800; border-radius: 24px; font-size: 1.1rem; box-shadow: 0 8px 25px rgba(255,77,109,0.25); border: 1px solid rgba(255,255,255,0.8); white-space: nowrap; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; box-sizing: border-box; font-family: 'Inter', sans-serif; letter-spacing: -0.5px;">${text}</div>`,
       iconSize: [120, 40],
       iconAnchor: [60, 20]
     });
