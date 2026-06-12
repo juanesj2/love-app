@@ -66,7 +66,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
         </div>
       </div>
 
-      <ion-content class="scroll-content" [class.snap-feed]="viewMode === 'feed'" [scrollEvents]="true" (ionScroll)="onContentScroll($event)">
+      <ion-content class="scroll-content" [class.snap-feed]="true" [hidden]="viewMode !== 'feed'">
         <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
           <ion-refresher-content></ion-refresher-content>
         </ion-refresher>
@@ -117,8 +117,18 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
         </div>
         </div>
 
-        <!-- VISTA GRID (GALERÍA) -->
-        <ng-container *ngIf="viewMode === 'grid'">
+        <ion-infinite-scroll (ionInfinite)="loadMore($event)">
+          <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Cargando más fotos..."></ion-infinite-scroll-content>
+        </ion-infinite-scroll>
+      </ion-content>
+
+      <!-- VISTA GRID (GALERÍA) -->
+      <ion-content #gridContent class="scroll-content" [hidden]="viewMode !== 'grid'" [scrollEvents]="true" (ionScroll)="onContentScroll($event)">
+        <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+          <ion-refresher-content></ion-refresher-content>
+        </ion-refresher>
+
+        <ng-container>
           <div class="grid-wrapper" 
                (touchstart)="onGridTouchStart($event)" 
                (touchmove)="onGridTouchMove($event)" 
@@ -606,7 +616,7 @@ export class PhotoWidgetComponent implements OnInit {
   pendingPhotoText: string = '';
 
   viewMode: 'feed' | 'grid' = 'feed';
-  @ViewChild(IonContent, { static: false }) content!: IonContent;
+  @ViewChild('gridContent', { static: false }) content!: IonContent;
 
   photos: any[] = [];
   groupedPhotos: any[] = [];
