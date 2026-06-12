@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, AlertController, ToastController } from '@ionic/angular/standalone';
+import { IonContent, IonIcon, AlertController, ToastController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { heart, mailOutline, lockClosedOutline, personOutline, shieldCheckmarkOutline } from 'ionicons/icons';
@@ -16,7 +16,7 @@ import { Preferences } from '@capacitor/preferences';
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,
-  imports: [IonContent, CommonModule, FormsModule]
+  imports: [IonContent, IonIcon, CommonModule, FormsModule]
 })
 export class LoginPage implements OnInit {
   private router = inject(Router);
