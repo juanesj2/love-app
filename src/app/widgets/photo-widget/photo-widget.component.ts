@@ -66,7 +66,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
         </div>
       </div>
 
-      <ion-content class="scroll-content" [class.snap-feed]="true" [hidden]="viewMode !== 'feed'">
+      <ion-content class="scroll-content" [class.snap-feed]="true" [class.ion-hide]="viewMode !== 'feed'">
         <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
           <ion-refresher-content></ion-refresher-content>
         </ion-refresher>
@@ -123,7 +123,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
       </ion-content>
 
       <!-- VISTA GRID (GALERÍA) -->
-      <ion-content #gridContent class="scroll-content" [hidden]="viewMode !== 'grid'" [scrollEvents]="true" (ionScroll)="onContentScroll($event)">
+      <ion-content #gridContent class="scroll-content" [class.ion-hide]="viewMode !== 'grid'" [scrollEvents]="true" (ionScroll)="onContentScroll($event)">
         <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
           <ion-refresher-content></ion-refresher-content>
         </ion-refresher>
