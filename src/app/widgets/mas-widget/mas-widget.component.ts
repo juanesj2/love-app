@@ -80,7 +80,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
           </div>
           
           <div class="milestone-list">
-            <div class="milestone-item" *ngFor="let ev of annualEvents">
+            <div class="milestone-item" *ngFor="let ev of annualEvents" (click)="openEventModal(ev)">
               <ion-icon [name]="ev.icon" class="event-icon text-pink"></ion-icon>
               <div class="milestone-info" style="margin-left: 10px;">
                 <span class="m-title">{{ ev.name }}</span>
@@ -90,6 +90,32 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
               <div class="m-days" *ngIf="ev.daysLeft === 0">¡Hoy!</div>
             </div>
           </div>
+
+          <!-- Modal for Event Details -->
+          <ion-modal [isOpen]="isEventModalOpen" (didDismiss)="isEventModalOpen = false" class="custom-modal">
+            <ng-template>
+              <div class="modal-content glass-card" style="margin: 20px; padding: 20px; text-align: center;">
+                <ion-icon [name]="selectedEvent?.icon" style="font-size: 4rem; color: #FF4D6D; margin-bottom: 10px;"></ion-icon>
+                <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 800;">{{ selectedEvent?.name }}</h2>
+                <p style="color: #a4133c; font-size: 1.1rem; font-weight: 600; margin-bottom: 20px;">
+                  {{ selectedEvent?.dateStr }}
+                </p>
+                
+                <div style="background: rgba(255,77,109,0.1); border-radius: 15px; padding: 15px; margin-bottom: 20px;">
+                  <h3 *ngIf="selectedEvent?.daysLeft > 0" style="color: #FF4D6D; margin: 0; font-weight: 900;">
+                    Faltan {{ selectedEvent?.daysLeft }} días
+                  </h3>
+                  <h3 *ngIf="selectedEvent?.daysLeft === 0" style="color: #FF4D6D; margin: 0; font-weight: 900;">
+                    ¡Es hoy! 🎉
+                  </h3>
+                </div>
+
+                <button class="glass-btn" (click)="isEventModalOpen = false" style="width: 100%;">
+                  Cerrar
+                </button>
+              </div>
+            </ng-template>
+          </ion-modal>
 
           <div class="date-picker-glass" style="margin-top: 15px;">
             <label>Mi cumpleaños</label>
@@ -300,6 +326,10 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   timeTogether = { years: 0, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
   
   annualEvents: { name: string, daysLeft: number, dateStr: string, icon: string }[] = [];
+  
+  isEventModalOpen = false;
+  selectedEvent: any = null;
+
   myBirthday: string = '';
   partnerBirthday: string = '';
 
@@ -385,11 +415,8 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
       this.loadMilestones();
     } catch (e) {}
     
-    // Load local bucket list
-    const bucketRes = await Preferences.get({ key: 'localBucketList' });
-    if (bucketRes.value) {
-      this.bucketList = JSON.parse(bucketRes.value);
-    }
+    // Load bucket list from backend
+    this.loadBucketList();
 
     this.startTimer();
 
@@ -490,26 +517,49 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     }
   }
 
+  async loadBucketList() {
+    try {
+      const wishes = await this.api.getWishes();
+      this.bucketList = wishes;
+    } catch (e) {
+      console.error('Error loading wishes', e);
+    }
+  }
+
   async addBucketItem() {
     if (!this.newBucketTitle.trim()) return;
-    this.bucketList.push({ title: this.newBucketTitle.trim(), completed: false });
-    this.newBucketTitle = '';
-    await this.saveBucketList();
+    try {
+      const wish = await this.api.addWish(this.newBucketTitle.trim());
+      this.bucketList.unshift(wish);
+      this.newBucketTitle = '';
+    } catch (e) {
+      this.showToast('Error al añadir deseo', 'danger');
+    }
   }
 
   async toggleBucketItem(index: number) {
-    this.bucketList[index].completed = !this.bucketList[index].completed;
-    await this.saveBucketList();
+    const item = this.bucketList[index];
+    item.completed = !item.completed;
+    try {
+      await this.api.updateWish(item.id, item.completed);
+    } catch (e) {
+      item.completed = !item.completed; // Revert on failure
+      this.showToast('Error al actualizar deseo', 'danger');
+    }
   }
 
   async deleteBucketItem(index: number, event: Event) {
     event.stopPropagation();
+    const item = this.bucketList[index];
+    const originalList = [...this.bucketList];
     this.bucketList.splice(index, 1);
-    await this.saveBucketList();
-  }
-
-  async saveBucketList() {
-    await Preferences.set({ key: 'localBucketList', value: JSON.stringify(this.bucketList) });
+    
+    try {
+      await this.api.deleteWish(item.id);
+    } catch (e) {
+      this.bucketList = originalList; // Revert on failure
+      this.showToast('Error al eliminar deseo', 'danger');
+    }
   }
 
   calculateDays(dateStr: string): number {
@@ -550,6 +600,11 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
       clearInterval(this.timer);
       this.timer = null;
     }
+  }
+
+  openEventModal(ev: any) {
+    this.selectedEvent = ev;
+    this.isEventModalOpen = true;
   }
 
   calculateTime() {
