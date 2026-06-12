@@ -37,6 +37,15 @@ public class MainActivity extends BridgeActivity {
             // Remove it so it doesn't trigger again on rotation/etc.
             intent.removeExtra("open_tab");
         }
+        
+        if (intent != null && intent.hasExtra("open_album_id")) {
+            String openAlbumId = intent.getStringExtra("open_album_id");
+            if (openAlbumId != null && !openAlbumId.isEmpty()) {
+                android.content.SharedPreferences capPrefs = getSharedPreferences("CapacitorStorage", android.content.Context.MODE_PRIVATE);
+                capPrefs.edit().putString("widget_open_album_id", openAlbumId).apply();
+            }
+            intent.removeExtra("open_album_id");
+        }
     }
 
     private void triggerImmediateWidgetUpdates() {

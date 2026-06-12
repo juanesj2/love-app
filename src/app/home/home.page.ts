@@ -250,6 +250,12 @@ export class HomePage implements OnInit, OnDestroy {
       }
       await Preferences.remove({ key: 'widget_open_tab' });
     }
+    
+    const albumRes = await Preferences.get({ key: 'widget_open_album_id' });
+    if (albumRes.value && albumRes.value !== 'feed') {
+      await Preferences.set({ key: 'open_album_id_intent', value: albumRes.value });
+      await Preferences.remove({ key: 'widget_open_album_id' });
+    }
   }
 
   async ngOnInit() {

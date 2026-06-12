@@ -702,8 +702,15 @@ export class PhotoWidgetComponent implements OnInit {
     addIcons({ arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline, calendarOutline: 'calendar-outline', chevronExpand: 'chevron-expand' });
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.loadAvatars();
+    
+    const albumIntent = await Preferences.get({ key: 'open_album_id_intent' });
+    if (albumIntent.value) {
+      this.currentAlbum = { id: parseInt(albumIntent.value), name: 'Cargando...' };
+      await Preferences.remove({ key: 'open_album_id_intent' });
+    }
+    
     this.loadData();
   }
   
