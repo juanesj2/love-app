@@ -8,7 +8,7 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { LoveApiService } from '../../services/love-api.service';
 import { environment } from '../../../environments/environment';
 import { addIcons } from 'ionicons';
-import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline } from 'ionicons/icons';
+import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline } from 'ionicons/icons';
 @Component({
   selector: 'app-chat-widget',
   template: `
@@ -21,7 +21,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
         <div class="messages-inner">
         <div class="message-row" *ngFor="let msg of regularMessages; trackBy: trackByMsgId" [id]="'msg-' + msg.id">
           <!-- Graffitis anclados a este mensaje -->
-          <ng-container *ngIf="graffitisByAnchorId[msg.id]">
+          <ng-container *ngIf="graffitisByAnchorId[msg.id] && !hiddenGraffitisByMsg[msg.id]">
             <img *ngFor="let graf of graffitisByAnchorId[msg.id]" 
                  [src]="environment.storageUrl + graf.photo?.image_path" 
                  class="graffiti-overlay" 
@@ -67,6 +67,10 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
 
                 <div class="bubble" [class.only-photo]="msg.photo && (!msg.mensaje || msg.mensaje === 'null')"
                                     [class.transparent-bubble]="msg.mensaje && msg.mensaje.startsWith('[DOODLE]')">
+                  
+                  <div class="restore-graffitis-btn" *ngIf="hiddenGraffitisByMsg[msg.id]" (click)="showGraffitis(msg.id)">
+                    <ion-icon name="eye"></ion-icon> Mostrar grafitis
+                  </div>
                   
                   <div class="photo-reply" *ngIf="msg.photo && !msg.mensaje?.startsWith('[DOODLE]') && !msg.mensaje?.startsWith('[AUDIO]')">
                     <img [src]="environment.storageUrl + msg.photo.image_path" loading="lazy" />
@@ -307,8 +311,8 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
         </div>
 
         <div class="menu-action" (click)="confirmDeleteGraffiti(selectedGraffiti); closeGraffitiOptions()">
-          <ion-icon name="trash-outline" style="color: #ff4d4d;"></ion-icon>
-          <span>Eliminar para ti</span>
+          <ion-icon name="trash-outline" style="color: #FF4D6D;"></ion-icon>
+          <span style="color: #FF4D6D;">Eliminar para ti</span>
         </div>
         <div class="menu-action" (click)="hideGraffiti(selectedGraffiti); closeGraffitiOptions()">
           <ion-icon name="eye-off-outline"></ion-icon>
@@ -514,19 +518,24 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
     .cp-btn.accept { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3); }
 
     /* Graffiti Context Menu */
-    .graffiti-context-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10000; background: rgba(0,0,0,0.6); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); animation: fadeIn 0.2s ease; }
+    .graffiti-context-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10000; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); animation: fadeIn 0.2s ease; }
     .highlighted-graffiti { pointer-events: none; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.5)); transform: scale(1.02); transition: transform 0.2s; }
     
-    .insta-context-menu { position: absolute; background: rgba(30, 30, 30, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-radius: 16px; width: 240px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); padding: 5px 0; border: 1px solid rgba(255,255,255,0.1); z-index: 10002; animation: popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
-    .menu-header { display: flex; align-items: center; padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); gap: 10px; }
+    .insta-context-menu { position: absolute; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-radius: 20px; width: 240px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); padding: 5px 0; border: 1px solid rgba(255, 77, 109, 0.1); z-index: 10002; animation: popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .menu-header { display: flex; align-items: center; padding: 12px 15px; border-bottom: 1px solid rgba(0,0,0,0.05); gap: 10px; }
     .menu-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
     .menu-avatar-fallback { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; font-weight: bold; font-size: 0.8rem; }
     .menu-user-info { display: flex; flex-direction: column; }
-    .menu-username { color: white; font-weight: 600; font-size: 0.9rem; }
-    .menu-time { color: rgba(255,255,255,0.5); font-size: 0.75rem; }
-    .menu-action { display: flex; align-items: center; gap: 12px; padding: 14px 15px; color: white; font-size: 1rem; cursor: pointer; transition: background 0.2s; }
-    .menu-action:active { background: rgba(255,255,255,0.1); }
-    .menu-action ion-icon { font-size: 1.3rem; }
+    .menu-username { color: #590D22; font-weight: 700; font-size: 0.95rem; }
+    .menu-time { color: #888; font-size: 0.75rem; font-weight: 500; }
+    .menu-action { display: flex; align-items: center; gap: 12px; padding: 14px 15px; color: #590D22; font-weight: 600; font-size: 1rem; cursor: pointer; transition: background 0.2s; }
+    .menu-action:active { background: rgba(255, 77, 109, 0.1); }
+    .menu-action ion-icon { font-size: 1.4rem; color: #590D22; }
+
+    .restore-graffitis-btn { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.9); border: 1px solid rgba(255,77,109,0.3); color: #FF4D6D; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; margin-bottom: 8px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: transform 0.2s; }
+    .restore-graffitis-btn:active { transform: scale(0.95); }
+    .restore-graffitis-btn ion-icon { font-size: 1.1rem; }
+    .mine .restore-graffitis-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
@@ -557,7 +566,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   @ViewChild('doodleCanvas', { static: false }) doodleCanvas: any;
   
   constructor() {
-    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline });
+    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline });
   }
 
   private viewInitialized = false;
@@ -982,6 +991,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   graffitiPressTimer: any;
   graffitiRect = { left: 0, top: 0, width: 0, height: 0 };
   menuRect = { left: 0, top: 0 };
+  hiddenGraffitisByMsg: { [msgId: number]: boolean } = {};
 
   formatTime(dateString: string) {
     if (!dateString) return '';
@@ -1004,14 +1014,27 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         height: rect.height
       };
 
+      // Posicionamiento inteligente asegurando márgenes
       let menuTop = rect.bottom + 10;
-      let menuLeft = rect.left + (rect.width / 2) - 120; // width is 240
+      let menuLeft = rect.left + (rect.width / 2) - 120; // 120 is half of 240px width
       
-      if (menuLeft < 10) menuLeft = 10;
-      if (menuLeft + 240 > window.innerWidth - 10) menuLeft = window.innerWidth - 250;
+      const margin = 20;
+      const menuWidth = 240;
+      const menuHeight = 180; // approximate height
+
+      // Clamp X
+      if (menuLeft < margin) {
+        menuLeft = margin;
+      } else if (menuLeft + menuWidth > window.innerWidth - margin) {
+        menuLeft = window.innerWidth - menuWidth - margin;
+      }
       
-      if (menuTop + 160 > window.innerHeight) {
-        menuTop = rect.top - 170;
+      // Clamp Y
+      if (menuTop + menuHeight > window.innerHeight - margin) {
+        // Not enough space below, place it above
+        menuTop = rect.top - menuHeight - 10;
+        // If it still goes off screen above, clamp to margin
+        if (menuTop < margin) menuTop = margin;
       }
       
       this.menuRect = { left: menuLeft, top: menuTop };
@@ -1028,9 +1051,13 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   hideGraffiti(graf: any) {
-    if (this.graffitisByAnchorId[graf.anchorMsgId]) {
-      this.graffitisByAnchorId[graf.anchorMsgId] = this.graffitisByAnchorId[graf.anchorMsgId].filter((g: any) => g.id !== graf.id);
+    if (graf && graf.anchorMsgId) {
+      this.hiddenGraffitisByMsg[graf.anchorMsgId] = true;
     }
+  }
+
+  showGraffitis(msgId: number) {
+    this.hiddenGraffitisByMsg[msgId] = false;
   }
 
   async confirmDeleteGraffiti(graf: any) {
