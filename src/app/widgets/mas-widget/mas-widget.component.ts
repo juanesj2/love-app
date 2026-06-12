@@ -113,14 +113,14 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
           </div>
           
           <div class="milestone-list">
-            <div class="milestone-item" *ngFor="let m of milestones">
+            <div class="milestone-item" *ngFor="let m of milestones" (click)="openMilestoneModal(m)">
               <div class="milestone-indicator"></div>
               <div class="milestone-info">
                 <span class="m-title">{{ m.title }}</span>
                 <span class="m-date">{{ m.date | date:'longDate' }}</span>
               </div>
               <div class="m-days">{{ calculateDays(m.date) }} d</div>
-              <ion-icon name="close-circle" class="delete-icon" (click)="deleteMilestone(m.id)"></ion-icon>
+              <ion-icon name="close-circle" class="delete-icon" (click)="deleteMilestone(m.id); $event.stopPropagation()"></ion-icon>
             </div>
           </div>
 
@@ -209,6 +209,27 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
           </div>
 
           <button class="glass-btn" (click)="isEventModalOpen = false" style="width: 100%; padding: 15px; font-size: 1.1rem; border-radius: 14px;">
+            Cerrar
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal for Milestone Details -->
+      <div class="custom-overlay" *ngIf="isMilestoneModalOpen" (click)="isMilestoneModalOpen = false">
+        <div class="modal-content glass-card" style="margin: 20px; padding: 30px; text-align: center; width: 85%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.85); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15);" (click)="$event.stopPropagation()">
+          <ion-icon name="flag" style="font-size: 4rem; color: #FF4D6D; margin-bottom: 15px; background: rgba(255,77,109,0.1); padding: 15px; border-radius: 50%;"></ion-icon>
+          <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.5rem;">{{ selectedMilestone?.title }}</h2>
+          <p style="color: #a4133c; font-size: 1.1rem; font-weight: 700; margin-bottom: 25px;">
+            {{ selectedMilestone?.date | date:'longDate' }}
+          </p>
+          
+          <div style="background: rgba(255,77,109,0.1); border-radius: 18px; padding: 18px; margin-bottom: 25px;">
+            <h3 style="color: #FF4D6D; margin: 0; font-weight: 900; font-size: 1.2rem;">
+              Hace {{ calculateDays(selectedMilestone?.date) }} días
+            </h3>
+          </div>
+
+          <button class="glass-btn" (click)="isMilestoneModalOpen = false" style="width: 100%; padding: 15px; font-size: 1.1rem; border-radius: 14px;">
             Cerrar
           </button>
         </div>
@@ -343,6 +364,9 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   
   isEventModalOpen = false;
   selectedEvent: any = null;
+
+  isMilestoneModalOpen = false;
+  selectedMilestone: any = null;
 
   myBirthday: string = '';
   partnerBirthday: string = '';
@@ -619,6 +643,11 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   openEventModal(ev: any) {
     this.selectedEvent = ev;
     this.isEventModalOpen = true;
+  }
+
+  openMilestoneModal(m: any) {
+    this.selectedMilestone = m;
+    this.isMilestoneModalOpen = true;
   }
 
   calculateTime() {
