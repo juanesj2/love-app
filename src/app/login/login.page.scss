@@ -139,6 +139,15 @@ ion-content.login-content {
       &::placeholder {
         color: rgba(89, 13, 34, 0.5);
       }
+
+      /* Eliminar el fondo feo del autocompletado del navegador */
+      &:-webkit-autofill,
+      &:-webkit-autofill:hover, 
+      &:-webkit-autofill:focus, 
+      &:-webkit-autofill:active {
+        -webkit-text-fill-color: #590D22 !important;
+        transition: background-color 5000s ease-in-out 0s;
+      }
     }
   }
 
