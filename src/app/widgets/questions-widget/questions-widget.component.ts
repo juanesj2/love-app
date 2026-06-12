@@ -1,16 +1,16 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoveApiService } from '../../services/love-api.service';
 import { IonIcon, ToastController, IonContent, IonRefresher, IonRefresherContent } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { helpCircleOutline, checkmarkCircleOutline, lockClosedOutline, alertCircleOutline, arrowBack } from 'ionicons/icons';
+import { helpCircleOutline, checkmarkCircleOutline, lockClosedOutline, alertCircleOutline, arrowBack, arrowUp } from 'ionicons/icons';
 import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-questions-widget',
   template: `
-    <ion-content class="scroll-content">
+    <ion-content class="scroll-content" [scrollEvents]="true" (ionScroll)="onScroll($event)">
       <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
@@ -109,6 +109,10 @@ import { Location } from '@angular/common';
         </ng-container>
       </div>
       </div>
+      <!-- Scroll to Top Button -->
+      <div class="scroll-top-btn" [class.visible]="showScrollTop" (click)="scrollToTop()">
+        <ion-icon name="arrow-up"></ion-icon>
+      </div>
     </ion-content>
   `,
   styles: [`
@@ -157,15 +161,22 @@ import { Location } from '@angular/common';
     .category-pill { flex-shrink: 0; padding: 6px 14px; background: rgba(255, 77, 109, 0.1); color: #590D22; border-radius: 20px; font-size: 0.85rem; font-weight: bold; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
     .category-pill.active { background: #FF4D6D; color: white; box-shadow: 0 3px 8px rgba(255,77,109,0.3); }
     .empty-state { text-align: center; color: #a4133c; padding: 30px; font-weight: bold; opacity: 0.8; }
+    
+    .scroll-top-btn { position: fixed; bottom: 30px; right: 20px; width: 50px; height: 50px; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4); cursor: pointer; z-index: 1000; opacity: 0; transform: translateY(20px) scale(0.8); pointer-events: none; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+    .scroll-top-btn.visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+    .scroll-top-btn:active { transform: scale(0.9); }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonIcon, IonContent, IonRefresher, IonRefresherContent]
 })
 export class QuestionsWidgetComponent implements OnInit {
+  @ViewChild(IonContent) content!: IonContent;
+  
   questions: any[] = [];
   draftAnswers: { [key: number]: string } = {};
   viewMode: 'pending' | 'waiting_you' | 'completed' = 'pending';
   selectedCategory: string = 'Todas';
+  showScrollTop = false;
 
   get categories() {
     const cats = this.questions.map(q => q.category);
@@ -198,7 +209,7 @@ export class QuestionsWidgetComponent implements OnInit {
   private location = inject(Location);
 
   constructor() {
-    addIcons({ helpCircleOutline, checkmarkCircleOutline, lockClosedOutline, alertCircleOutline, arrowBack });
+    addIcons({ helpCircleOutline, checkmarkCircleOutline, lockClosedOutline, alertCircleOutline, arrowBack, arrowUp });
   }
 
   ngOnInit() {
@@ -220,6 +231,16 @@ export class QuestionsWidgetComponent implements OnInit {
   async handleRefresh(event: any) {
     await this.loadQuestions();
     event.target.complete();
+  }
+
+  onScroll(event: any) {
+    this.showScrollTop = event.detail.scrollTop > 300;
+  }
+
+  scrollToTop() {
+    if (this.content) {
+      this.content.scrollToTop(500);
+    }
   }
 
   async submitAnswer(id: number) {
