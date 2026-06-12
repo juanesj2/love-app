@@ -401,7 +401,10 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
         });
         if (image.dataUrl) {
           this.uploadingAvatar = true;
-          await this.locationService.uploadAvatar(this.myUserId, image.dataUrl);
+          await this.api.uploadAvatar(image.dataUrl);
+          // Actualizar el avatar local para verlo de inmediato
+          this.myAvatarUrl = image.dataUrl;
+          this.refreshMarkers();
           this.uploadingAvatar = false;
         }
       } catch (e) {
