@@ -470,8 +470,8 @@ import { Firestore, doc, getDoc } from '@angular/fire/firestore';
     .memory-subtitle { color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-top: 2px; }
 
     /* Lightbox Modal */
-    .lightbox-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2000; display: flex; flex-direction: column; justify-content: center; }
-    .lightbox-backdrop { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); }
+    .lightbox-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2000; display: flex; flex-direction: column; justify-content: center; touch-action: none; }
+    .lightbox-backdrop { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); }
     .lightbox-content { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; z-index: 2001; }
     .lightbox-header { position: absolute; top: 0; left: 0; width: 100%; padding: 40px 20px 20px 20px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent); z-index: 2002; }
     .lightbox-date { color: white; font-weight: 600; font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
