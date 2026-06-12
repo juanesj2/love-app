@@ -202,7 +202,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
     .glass-card { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 24px; padding: 22px; margin-bottom: 20px; box-shadow: 0 8px 32px rgba(255, 77, 109, 0.08); border: 1px solid rgba(255, 255, 255, 0.6); }
     
     .section-title { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
-    .section-title ion-icon { font-size: 1.6rem; color: #FF4D6D; background: rgba(255,77,109,0.1); padding: 8px; border-radius: 12px; }
+    .section-title ion-icon { font-size: 1.6rem; color: #FF4D6D; background: rgba(255,77,109,0.1); padding: 8px; border-radius: 12px; flex-shrink: 0; }
     .section-title h3 { margin: 0; font-size: 1.2rem; font-weight: 800; color: #590D22; }
     .desc { font-size: 0.9rem; color: #800f2f; margin-bottom: 15px; line-height: 1.4; font-weight: 500; }
 
