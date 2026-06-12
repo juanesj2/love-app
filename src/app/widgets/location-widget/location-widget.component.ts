@@ -9,18 +9,24 @@ import { Subscription, combineLatest } from 'rxjs';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Preferences } from '@capacitor/preferences';
 import { addIcons } from 'ionicons';
-import { locateOutline, flagOutline, camera, image, close } from 'ionicons/icons';
+import { locateOutline, flagOutline, camera, image, close, locationOutline, heart } from 'ionicons/icons';
 import { LoveApiService } from '../../services/love-api.service';
 
 @Component({
   selector: 'app-location-widget',
   template: `
-    <div class="location-container">
+    <div class="location-container" [class.is-together]="areTogether">
       <div class="map-wrapper">
         <div id="map"></div>
         <button class="center-map-btn" *ngIf="myLastPos" (click)="centerMap()">
           <ion-icon name="locate-outline"></ion-icon>
         </button>
+      </div>
+      
+      <!-- Partner Location Card -->
+      <div class="partner-location-card" *ngIf="partnerCity && !areTogether">
+        <ion-icon name="location-outline"></ion-icon>
+        <span>{{ partnerName }} está en <strong>{{ partnerCity }}</strong></span>
       </div>
       
       <!-- Floating Next Milestone -->
@@ -36,6 +42,13 @@ import { LoveApiService } from '../../services/love-api.service';
       
       <!-- Together Box -->
       <div class="together-box" *ngIf="areTogether">
+        <div class="confetti-container">
+          <ion-icon name="heart" class="heart-drop h1"></ion-icon>
+          <ion-icon name="heart" class="heart-drop h2"></ion-icon>
+          <ion-icon name="heart" class="heart-drop h3"></ion-icon>
+          <ion-icon name="heart" class="heart-drop h4"></ion-icon>
+          <ion-icon name="heart" class="heart-drop h5"></ion-icon>
+        </div>
         <div class="avatars-together">
           <div class="avatar-container together-left" (click)="changeMyAvatar()">
             <img [src]="myAvatarUrl || defaultAvatar" class="avatar" />
@@ -47,7 +60,8 @@ import { LoveApiService } from '../../services/love-api.service';
           </div>
         </div>
         <div class="text-info-together">
-          <h2>¡Estamos juntos! ❤️</h2>
+          <h2>¡Estáis juntos! ❤️</h2>
+          <p>Disfrutad del momento</p>
         </div>
       </div>
     </div>
@@ -57,34 +71,53 @@ import { LoveApiService } from '../../services/love-api.service';
       display: block;
       height: 100%;
     }
-    .location-container { height: 100%; display: flex; flex-direction: column; position: relative; padding-bottom: 80px; box-sizing: border-box; }
-    .map-wrapper { flex: 1; position: relative; }
-    #map { width: 100%; height: 100%; background: #1a1a1a; }
-    ::ng-deep .leaflet-tile-pane { /* Removed invert filter */ }
+    .location-container { height: 100%; display: flex; flex-direction: column; position: relative; padding-bottom: 80px; box-sizing: border-box; overflow: hidden; }
+    .location-container.is-together { background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%); }
+    .location-container.is-together .map-wrapper { opacity: 0; pointer-events: none; transition: opacity 1s ease; }
+    .map-wrapper { flex: 1; position: relative; transition: opacity 1s ease; }
+    #map { width: 100%; height: 100%; background: #fdfbfb; }
+    ::ng-deep .leaflet-tile-pane { filter: brightness(1.02) saturate(1.2) hue-rotate(345deg); }
+    ::ng-deep .leaflet-control-attribution { display: none !important; }
     
+    .partner-location-card { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); z-index: 2000; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border-radius: 20px; padding: 10px 20px; display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 25px rgba(255,77,109,0.2); border: 1px solid rgba(255,255,255,0.8); color: #590D22; font-size: 0.95rem; white-space: nowrap; }
+    .partner-location-card ion-icon { color: #FF4D6D; font-size: 1.3rem; }
     .center-map-btn { position: absolute; top: 15px; right: 15px; z-index: 2000; width: 44px; height: 44px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.4); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-size: 1.5rem; transition: transform 0.2s; }
     .center-map-btn:active { transform: scale(0.9); }
     
-    .next-milestone-card { position: absolute; top: 15px; left: 15px; z-index: 2000; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border-radius: 20px; padding: 10px 18px 10px 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.6); max-width: 65%; cursor: pointer; transition: transform 0.2s; }
+    .next-milestone-card { position: absolute; bottom: 25px; left: 15px; z-index: 2000; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border-radius: 20px; padding: 10px 18px 10px 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.6); max-width: 65%; cursor: pointer; transition: transform 0.2s; }
     .next-milestone-card:active { transform: scale(0.95); }
     .nm-icon { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; box-shadow: 0 4px 10px rgba(255,77,109,0.3); }
     .nm-info { display: flex; flex-direction: column; overflow: hidden; }
     .nm-title { font-weight: 800; color: #590D22; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
     .nm-days { font-weight: 700; color: #FF4D6D; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
     
-    .together-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 20px; padding: 20px 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); z-index: 1000; min-width: 250px; }
+    .together-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.5); border-radius: 30px; padding: 40px 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; box-shadow: 0 20px 50px rgba(201, 24, 74, 0.2); z-index: 1000; min-width: 280px; overflow: hidden; }
     
-    .avatar-container { position: relative; width: 60px; height: 60px; border-radius: 50%; border: 3px solid #FF4D6D; }
+    .avatar-container { position: relative; width: 80px; height: 80px; border-radius: 50%; border: 4px solid #FF4D6D; background: white; z-index: 2; }
     .avatar { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-    .camera-icon { position: absolute; bottom: -5px; right: -5px; background: white; border-radius: 50%; padding: 4px; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .camera-icon { position: absolute; bottom: -5px; right: -5px; background: white; border-radius: 50%; padding: 6px; font-size: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
     
     .avatars-together { display: flex; align-items: center; justify-content: center; }
-    .together-left { z-index: 2; margin-right: -15px; border-color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: 70px; height: 70px; }
-    .together-right { z-index: 1; border-color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: 70px; height: 70px; }
+    .together-left { z-index: 3; margin-right: -20px; border-color: white; box-shadow: 0 8px 25px rgba(0,0,0,0.2); width: 90px; height: 90px; }
+    .together-right { z-index: 2; border-color: white; box-shadow: 0 8px 25px rgba(0,0,0,0.2); width: 90px; height: 90px; }
     
-    .text-info-together { text-align: center; animation: pulse 2s infinite; }
-    .text-info-together h2 { margin: 0; font-size: 1.5rem; font-weight: 800; color: #c9184a; }
+    .text-info-together { text-align: center; animation: pulse 2s infinite; z-index: 2; }
+    .text-info-together h2 { margin: 0 0 5px; font-size: 1.8rem; font-weight: 900; color: #a4133c; letter-spacing: -0.5px; }
+    .text-info-together p { margin: 0; font-size: 1rem; color: #FF4D6D; font-weight: 600; }
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+    /* Hearts falling animation */
+    .confetti-container { position: absolute; top: -50px; left: 0; width: 100%; height: 150%; z-index: 1; pointer-events: none; overflow: hidden; }
+    .heart-drop { position: absolute; color: #ffb3c1; font-size: 24px; animation: fall linear infinite; opacity: 0; }
+    .heart-drop.h1 { left: 10%; animation-duration: 3s; animation-delay: 0s; font-size: 20px; color: #FF4D6D; }
+    .heart-drop.h2 { left: 30%; animation-duration: 4s; animation-delay: 1s; font-size: 28px; }
+    .heart-drop.h3 { left: 50%; animation-duration: 2.5s; animation-delay: 0.5s; font-size: 22px; color: #c9184a; }
+    .heart-drop.h4 { left: 70%; animation-duration: 3.5s; animation-delay: 2s; font-size: 26px; }
+    .heart-drop.h5 { left: 90%; animation-duration: 4.5s; animation-delay: 0.2s; font-size: 18px; color: #FF4D6D; }
+    @keyframes fall { 0% { transform: translateY(-50px) rotate(0deg); opacity: 1; } 100% { transform: translateY(300px) rotate(360deg); opacity: 0; } }
+
+    ::ng-deep .pulse-marker::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%; border: 3px solid #FF4D6D; animation: radarPulse 2s infinite; z-index: -1; }
+    @keyframes radarPulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.6); opacity: 0; } }
   `],
   standalone: true,
   imports: [CommonModule, IonIcon]
@@ -109,6 +142,8 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
 
   public myMood = '';
   public partnerMood = '';
+  public partnerName = '';
+  public partnerCity = '';
 
   public myLastPos?: L.LatLng;
   public partnerLastPos?: L.LatLng;
@@ -124,7 +159,7 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
   private hasCentered = false;
 
   constructor() {
-    addIcons({ locateOutline, flagOutline, camera, image, close });
+    addIcons({ locateOutline, flagOutline, camera, image, close, locationOutline, heart });
   }
 
   private appStateListener?: PluginListenerHandle;
@@ -142,6 +177,7 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
       this.partnerMood = info.partner_mood || '';
       this.myAvatarUrl = info.my_avatar || '';
       this.partnerAvatarUrl = info.partner_avatar || '';
+      this.partnerName = info.partner_name || 'Tu pareja';
 
       const myName = info.my_name || 'Yo';
       this.locationService.updateMyLocation(this.myUserId, myName).catch(err => {
@@ -243,10 +279,22 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
 
   private initMap() {
     this.map = L.map('map', { zoomControl: false }).setView([40.4168, -3.7038], 15);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
       attribution: '&copy; CartoDB'
     }).addTo(this.map);
+  }
+
+  private async getCityName(lat: number, lng: number) {
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=es`);
+      const data = await res.json();
+      if (data && data.address) {
+        this.partnerCity = data.address.city || data.address.town || data.address.village || data.address.county || 'Un lugar desconocido';
+      }
+    } catch(e) {
+      console.error(e);
+    }
   }
 
   private startTracking() {
@@ -265,6 +313,10 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
 
       this.myLastPos = myPos;
       this.partnerLastPos = partnerPos;
+
+      if (!this.partnerCity && partnerPos && !this.areTogether) {
+        this.getCityName(partnerPos.lat, partnerPos.lng);
+      }
 
       const distanceMeters = myPos.distanceTo(partnerPos);
       this.areTogether = distanceMeters < 50; 
@@ -324,7 +376,7 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
       className: 'custom-div-icon',
       html: `
         <div style="position: relative; width: 0; height: 0; display: flex; align-items: center; justify-content: center;">
-          <div style="${backgroundStyle} position: absolute; width:54px; height:54px; border-radius:50%; border:3px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.4); box-sizing: border-box; transform: translate(-50%, -50%);">
+          <div class="pulse-marker" style="${backgroundStyle} position: absolute; width:54px; height:54px; border-radius:50%; border:3px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.15); box-sizing: border-box; transform: translate(-50%, -50%); z-index: 2;">
             ${moodHtml}
           </div>
         </div>
