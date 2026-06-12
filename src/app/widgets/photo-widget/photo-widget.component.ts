@@ -1420,10 +1420,13 @@ export class PhotoWidgetComponent implements OnInit {
   }
 
   isMine(photo: any): boolean {
+    if (!photo) return false;
+    if (this.coupleInfo && this.coupleInfo.my_id) {
+      return String(photo.user_id) === String(this.coupleInfo.my_id);
+    }
     const stored = localStorage.getItem('love_widget_user');
-    if (!stored || !photo || !photo.user) return false;
-    const myName = stored === 'juan' ? 'Juan' : 'Roberta';
-    return photo.user.name === myName;
+    if (!stored) return false;
+    return String(photo.user_id) === stored;
   }
 
   async deletePhoto(photo: any) {
