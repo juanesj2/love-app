@@ -407,6 +407,29 @@ export class LoveApiService {
     return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/widget/food-places`, formData, { headers: reqHeaders }));
   }
 
+  async updateFoodPlace(id: number, name: string, location?: string, rating?: number, description?: string, imageBase64?: string): Promise<any> {
+    const headers = await this.getHeaders();
+    const formData = new FormData();
+    formData.append('_method', 'PUT');
+    formData.append('name', name);
+    if (location) formData.append('location', location);
+    if (rating) formData.append('rating', rating.toString());
+    if (description) formData.append('description', description);
+    
+    if (imageBase64) {
+      try {
+        const response = await fetch(imageBase64);
+        const blob = await response.blob();
+        formData.append('image', blob, 'place.jpg');
+      } catch (e) {
+        console.error('Error converting base64 to blob', e);
+      }
+    }
+
+    // Usamos firstValueFrom de rxjs
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/widget/food-places/${id}`, formData, { headers }));
+  }
+
   async deleteFoodPlace(id: number): Promise<any> {
     const headers = await this.getHeaders();
     return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/love-album/widget/food-places/${id}`, { headers }));
@@ -477,6 +500,28 @@ export class LoveApiService {
     }
 
     return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/widget/movies`, formData, { headers: reqHeaders }));
+  }
+
+  async updateMovie(id: number, title: string, rating?: number, whoFellAsleep?: string, quote?: string, imageBase64?: string): Promise<any> {
+    const headers = await this.getHeaders();
+    const formData = new FormData();
+    formData.append('_method', 'PUT');
+    formData.append('title', title);
+    if (rating) formData.append('rating', rating.toString());
+    if (whoFellAsleep) formData.append('who_fell_asleep', whoFellAsleep);
+    if (quote) formData.append('favorite_quote', quote);
+    
+    if (imageBase64) {
+      try {
+        const response = await fetch(imageBase64);
+        const blob = await response.blob();
+        formData.append('image', blob, 'movie.jpg');
+      } catch (e) {
+        console.error('Error converting base64 to blob', e);
+      }
+    }
+
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/widget/movies/${id}`, formData, { headers }));
   }
 
   async deleteMovie(id: number): Promise<any> {

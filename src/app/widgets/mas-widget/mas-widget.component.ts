@@ -16,6 +16,16 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
   selector: 'app-mas-widget',
   template: `
     <ion-content class="scroll-content">
+      <ng-template #staticStars let-rating="rating">
+        <div style="display: flex; gap: 2px;">
+          <div class="star" [class.is-active]="s <= rating" *ngFor="let s of [1,2,3,4,5]" style="width: 24px; height: 24px; cursor: default;">
+            <div class="svg-container">
+              <svg xmlns="http://www.w3.org/2000/svg" class="svg-outline" viewBox="0 0 24 24"><path d="M12 2.5L9.45 8.5L3 9.06L7.725 13.39L6.25 19.82L12 16.5L17.75 19.82L16.275 13.39L21 9.06L14.55 8.5L12 2.5ZM12 4.75L14 9.33L18.7 9.75L15 13.07L16.18 17.75L12 15.16L7.82 17.75L9 13.07L5.3 9.75L10 9.33L12 4.75Z"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" class="svg-filled" viewBox="0 0 24 24"><path d="M12 2.5L9.45 8.5L3 9.06L7.725 13.39L6.25 19.82L12 16.5L17.75 19.82L16.275 13.39L21 9.06L14.55 8.5L12 2.5Z"></path></svg>
+            </div>
+          </div>
+        </div>
+      </ng-template>
       <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
@@ -301,7 +311,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
                 <div class="place-image" [style.backgroundImage]="'url(' + (place.image_url_full || 'assets/default-food.png') + ')'" style="width: 100%; aspect-ratio: 1; border-radius: 10px; background-size: cover; background-position: center; margin: 0 auto 10px;"></div>
                 <span class="p-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ place.name }}</span>
                 <span class="p-rating" style="color: #FFB703; font-size: 0.8rem;">
-                  <ion-icon name="star" *ngFor="let s of [1,2,3,4,5]" [style.opacity]="s <= place.rating ? 1 : 0.3"></ion-icon>
+                  <ng-container *ngTemplateOutlet="staticStars; context: { rating: place.rating }"></ng-container>
                 </span>
               </div>
             </div>
@@ -324,7 +334,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
                 <div class="movie-image" [style.backgroundImage]="'url(' + (movie.image_url_full || 'assets/default-movie.png') + ')'" style="width: 100%; aspect-ratio: 0.7; border-radius: 8px; background-size: cover; background-position: center; margin: 0 auto 8px;"></div>
                 <span class="m-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ movie.title }}</span>
                 <span class="p-rating" style="color: #FFB703; font-size: 0.7rem;">
-                  <ion-icon name="star" *ngFor="let s of [1,2,3,4,5]" [style.opacity]="s <= movie.rating ? 1 : 0.3"></ion-icon>
+                  <ng-container *ngTemplateOutlet="staticStars; context: { rating: movie.rating }"></ng-container>
                 </span>
               </div>
             </div>
@@ -389,7 +399,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
               {{ selectedFoodPlace?.location }}
             </p>
             <div style="color: #FFB703; font-size: 1.5rem; margin-bottom: 15px;">
-                <ion-icon name="star" *ngFor="let s of [1,2,3,4,5]" [style.opacity]="s <= selectedFoodPlace?.rating ? 1 : 0.3"></ion-icon>
+                <ng-container *ngTemplateOutlet="staticStars; context: { rating: selectedFoodPlace?.rating }"></ng-container>
             </div>
             
             <p *ngIf="selectedFoodPlace?.description" style="color: #590D22; font-size: 1rem; line-height: 1.5; font-weight: 500; text-align: left; background: rgba(255,255,255,0.8); padding: 15px; border-radius: 14px; border: 1px solid rgba(255,77,109,0.2); margin-bottom: 20px;">
@@ -404,7 +414,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
                 <div style="flex: 1;">
                   <span style="display: block; font-weight: 700; color: #590D22;">{{ dish.name }}</span>
                   <span style="color: #FFB703; font-size: 0.8rem;">
-                    <ion-icon name="star" *ngFor="let s of [1,2,3,4,5]" [style.opacity]="s <= dish.rating ? 1 : 0.3"></ion-icon>
+                    <ng-container *ngTemplateOutlet="staticStars; context: { rating: dish.rating }"></ng-container>
                   </span>
                   <p *ngIf="dish.description" style="margin: 5px 0 0; font-size: 0.85rem; color: #a4133c;">{{ dish.description }}</p>
                 </div>
@@ -443,7 +453,8 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             </div>
 
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-              <button class="glass-btn" style="background: rgba(255,0,0,0.1); color: red; flex: 1; padding: 12px;" (click)="deleteFoodPlace(selectedFoodPlace.id)">Eliminar Restaurante</button>
+              <button class="glass-btn" style="flex: 1; padding: 12px; font-size: 0.9rem;" (click)="editFoodPlace(selectedFoodPlace)">Editar</button>
+              <button class="glass-btn" style="background: rgba(255,0,0,0.1); color: red; flex: 1; padding: 12px; font-size: 0.9rem;" (click)="deleteFoodPlace(selectedFoodPlace.id)">Eliminar</button>
               <button class="glass-btn" style="flex: 1; padding: 12px;" (click)="isFoodPlaceModalOpen = false">Cerrar</button>
             </div>
           </div>
@@ -500,7 +511,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             <h2 style="color: #590D22; margin-bottom: 10px; font-weight: 900; font-size: 1.6rem;">{{ selectedMovie?.title }}</h2>
             
             <div style="color: #FFB703; font-size: 1.8rem; margin-bottom: 20px;">
-                <ion-icon name="star" *ngFor="let s of [1,2,3,4,5]" [style.opacity]="s <= selectedMovie?.rating ? 1 : 0.3"></ion-icon>
+                <ng-container *ngTemplateOutlet="staticStars; context: { rating: selectedMovie?.rating }"></ng-container>
             </div>
             
             <div *ngIf="selectedMovie?.who_fell_asleep" style="background: rgba(255,77,109,0.05); border-radius: 14px; padding: 15px; margin-bottom: 15px; text-align: center;">
@@ -515,7 +526,8 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             </p>
             
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-              <button class="glass-btn" style="background: rgba(255,0,0,0.1); color: red; flex: 1; padding: 12px;" (click)="deleteMovie(selectedMovie.id)">Eliminar Peli</button>
+              <button class="glass-btn" style="flex: 1; padding: 12px; font-size: 0.9rem;" (click)="editMovie(selectedMovie)">Editar</button>
+              <button class="glass-btn" style="background: rgba(255,0,0,0.1); color: red; flex: 1; padding: 12px; font-size: 0.9rem;" (click)="deleteMovie(selectedMovie.id)">Eliminar</button>
               <button class="glass-btn" style="flex: 1; padding: 12px;" (click)="isMovieModalOpen = false">Cerrar</button>
             </div>
           </div>
@@ -1269,14 +1281,25 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   async saveFoodPlace() {
     if (!this.newFoodPlace.name) return this.showToast('Ponle nombre al sitio', 'warning');
     try {
-      await this.api.addFoodPlace(this.newFoodPlace.name, this.newFoodPlace.location, this.newFoodPlace.rating, this.newFoodPlace.description, this.newFoodPlace.imageBase64);
+      if (this.newFoodPlace.id) {
+        await this.api.updateFoodPlace(this.newFoodPlace.id, this.newFoodPlace.name, this.newFoodPlace.location, this.newFoodPlace.rating, this.newFoodPlace.description, this.newFoodPlace.imageBase64);
+        this.showToast('Restaurante actualizado', 'success');
+      } else {
+        await this.api.addFoodPlace(this.newFoodPlace.name, this.newFoodPlace.location, this.newFoodPlace.rating, this.newFoodPlace.description, this.newFoodPlace.imageBase64);
+        this.showToast('Restaurante añadido', 'success');
+      }
       this.isAddingFoodPlace = false;
       this.newFoodPlace = { name: '', location: '', description: '', rating: 5, imageBase64: null };
       this.loadFoodAndMovies();
-      this.showToast('Restaurante añadido', 'success');
     } catch (e) {
-      this.showToast('Error al añadir restaurante', 'danger');
+      this.showToast('Error al guardar restaurante', 'danger');
     }
+  }
+
+  editFoodPlace(place: any) {
+    this.newFoodPlace = { ...place, imageBase64: null };
+    this.isFoodPlaceModalOpen = false;
+    this.isAddingFoodPlace = true;
   }
 
   async deleteFoodPlace(id: number) {
@@ -1341,14 +1364,25 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   async saveMovie() {
     if (!this.newMovie.title) return this.showToast('Ponle título', 'warning');
     try {
-      await this.api.addMovie(this.newMovie.title, this.newMovie.rating, this.newMovie.who_fell_asleep, this.newMovie.favorite_quote, this.newMovie.imageBase64);
+      if (this.newMovie.id) {
+        await this.api.updateMovie(this.newMovie.id, this.newMovie.title, this.newMovie.rating, this.newMovie.who_fell_asleep, this.newMovie.favorite_quote, this.newMovie.imageBase64);
+        this.showToast('Peli actualizada', 'success');
+      } else {
+        await this.api.addMovie(this.newMovie.title, this.newMovie.rating, this.newMovie.who_fell_asleep, this.newMovie.favorite_quote, this.newMovie.imageBase64);
+        this.showToast('Peli añadida', 'success');
+      }
       this.isAddingMovie = false;
       this.newMovie = { title: '', who_fell_asleep: '', favorite_quote: '', rating: 5, imageBase64: null };
       this.loadFoodAndMovies();
-      this.showToast('Peli añadida', 'success');
     } catch (e) {
-      this.showToast('Error al añadir', 'danger');
+      this.showToast('Error al guardar', 'danger');
     }
+  }
+
+  editMovie(movie: any) {
+    this.newMovie = { ...movie, imageBase64: null };
+    this.isMovieModalOpen = false;
+    this.isAddingMovie = true;
   }
 
   async deleteMovie(id: number) {
