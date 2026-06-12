@@ -359,8 +359,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             <div style="margin-bottom: 20px;">
               <p style="margin: 0 0 5px; color: #a4133c; font-weight: 600;">Puntuación:</p>
               <div style="display: flex; justify-content: center; gap: 5px;">
-                <label title="Star" class="star" *ngFor="let s of [1,2,3,4,5]" (click)="newFoodPlace.rating = s; $event.preventDefault()">
-                  <input class="checkbox" type="checkbox" [checked]="s <= newFoodPlace.rating" />
+                <label title="Star" class="star" [class.is-active]="s <= newFoodPlace.rating" *ngFor="let s of [1,2,3,4,5]" (click)="newFoodPlace.rating = s; $event.preventDefault()">
                   <div class="svg-container">
                     <svg xmlns="http://www.w3.org/2000/svg" class="svg-outline" viewBox="0 0 24 24"><path d="M12 2.5L9.45 8.5L3 9.06L7.725 13.39L6.25 19.82L12 16.5L17.75 19.82L16.275 13.39L21 9.06L14.55 8.5L12 2.5ZM12 4.75L14 9.33L18.7 9.75L15 13.07L16.18 17.75L12 15.16L7.82 17.75L9 13.07L5.3 9.75L10 9.33L12 4.75Z"></path></svg>
                     <svg xmlns="http://www.w3.org/2000/svg" class="svg-filled" viewBox="0 0 24 24"><path d="M12 2.5L9.45 8.5L3 9.06L7.725 13.39L6.25 19.82L12 16.5L17.75 19.82L16.275 13.39L21 9.06L14.55 8.5L12 2.5Z"></path></svg>
@@ -419,8 +418,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
                  
                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                     <div style="display: flex; gap: 5px;">
-                      <label title="Star" class="star" *ngFor="let s of [1,2,3,4,5]" (click)="newDish.rating = s; $event.preventDefault()">
-                        <input class="checkbox" type="checkbox" [checked]="s <= newDish.rating" />
+                      <label title="Star" class="star" [class.is-active]="s <= newDish.rating" *ngFor="let s of [1,2,3,4,5]" (click)="newDish.rating = s; $event.preventDefault()">
                         <div class="svg-container">
                           <svg xmlns="http://www.w3.org/2000/svg" class="svg-outline" viewBox="0 0 24 24"><path d="M12 2.5L9.45 8.5L3 9.06L7.725 13.39L6.25 19.82L12 16.5L17.75 19.82L16.275 13.39L21 9.06L14.55 8.5L12 2.5ZM12 4.75L14 9.33L18.7 9.75L15 13.07L16.18 17.75L12 15.16L7.82 17.75L9 13.07L5.3 9.75L10 9.33L12 4.75Z"></path></svg>
                           <svg xmlns="http://www.w3.org/2000/svg" class="svg-filled" viewBox="0 0 24 24"><path d="M12 2.5L9.45 8.5L3 9.06L7.725 13.39L6.25 19.82L12 16.5L17.75 19.82L16.275 13.39L21 9.06L14.55 8.5L12 2.5Z"></path></svg>
@@ -474,8 +472,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             <div style="margin-bottom: 20px;">
               <p style="margin: 0 0 5px; color: #a4133c; font-weight: 600;">Puntuación:</p>
               <div style="display: flex; justify-content: center; gap: 5px;">
-                <label title="Star" class="star" *ngFor="let s of [1,2,3,4,5]" (click)="newMovie.rating = s; $event.preventDefault()">
-                  <input class="checkbox" type="checkbox" [checked]="s <= newMovie.rating" />
+                <label title="Star" class="star" [class.is-active]="s <= newMovie.rating" *ngFor="let s of [1,2,3,4,5]" (click)="newMovie.rating = s; $event.preventDefault()">
                   <div class="svg-container">
                     <svg xmlns="http://www.w3.org/2000/svg" class="svg-outline" viewBox="0 0 24 24"><path d="M12 2.5L9.45 8.5L3 9.06L7.725 13.39L6.25 19.82L12 16.5L17.75 19.82L16.275 13.39L21 9.06L14.55 8.5L12 2.5ZM12 4.75L14 9.33L18.7 9.75L15 13.07L16.18 17.75L12 15.16L7.82 17.75L9 13.07L5.3 9.75L10 9.33L12 4.75Z"></path></svg>
                     <svg xmlns="http://www.w3.org/2000/svg" class="svg-filled" viewBox="0 0 24 24"><path d="M12 2.5L9.45 8.5L3 9.06L7.725 13.39L6.25 19.82L12 16.5L17.75 19.82L16.275 13.39L21 9.06L14.55 8.5L12 2.5Z"></path></svg>
@@ -625,17 +622,16 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
         z-index: 99999;
       }
       .star { --star-color: #FF4D6D; position: relative; width: 44px; height: 44px; transition: transform 0.3s ease; cursor: pointer; }
-      .star .checkbox { position: absolute; width: 100%; height: 100%; opacity: 0; z-index: 20; cursor: pointer; }
       .star .svg-container { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
       .star .svg-outline, .star .svg-filled { fill: var(--star-color); position: absolute; width: 100%; height: 100%; transition: all 0.3s ease; }
-      .star .svg-filled { animation: keyframes-svg-filled 1s; opacity: 0; transform: scale(0); }
+      .star .svg-filled { opacity: 0; transform: scale(0); }
       .star .svg-celebrate { position: absolute; display: none; stroke: var(--star-color); fill: var(--star-color); stroke-width: 2px; }
       .star .particle { position: absolute; animation-fill-mode: forwards; display: none; }
-      .star .checkbox:checked ~ .svg-container .svg-outline { opacity: 0; }
-      .star .checkbox:checked ~ .svg-container .svg-filled { opacity: 1; transform: scale(1); }
-      .star .checkbox:not(:checked) ~ .svg-container .svg-filled { animation: keyframes-svg-unfilled 0.3s forwards; }
-      .star .checkbox:checked ~ .svg-container .svg-celebrate { display: block; }
-      .star .checkbox:checked ~ .svg-container .particle { display: block; }
+      .star.is-active .svg-outline { opacity: 0; }
+      .star.is-active .svg-filled { opacity: 1; transform: scale(1); animation: keyframes-svg-filled 1s; }
+      .star:not(.is-active) .svg-filled { animation: keyframes-svg-unfilled 0.3s forwards; }
+      .star.is-active .svg-celebrate { display: block; }
+      .star.is-active .particle { display: block; }
       .star .particle:nth-child(1) { animation: particle-1 1s cubic-bezier(0.25, 0.1, 0.25, 1); }
       .star .particle:nth-child(2) { animation: particle-2 1s ease-out; }
       .star .particle:nth-child(3) { animation: particle-3 1s ease-out; }
