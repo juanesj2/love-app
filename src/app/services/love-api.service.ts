@@ -375,7 +375,9 @@ export class LoveApiService {
   // Food Places
   async getFoodPlaces(): Promise<any[]> {
     const headers = await this.getHeaders();
-    return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/widget/food-places`, { headers }));
+    const result = await firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/widget/food-places`, { headers }));
+    if (result && result.length > 0) console.log('[API-DEBUG] First foodplace keys:', Object.keys(result[0]), '| Full obj:', JSON.stringify(result[0]));
+    return result;
   }
 
   async addFoodPlace(name: string, location?: string, rating?: number, description?: string, imageBase64?: string, category?: string, is_favorite?: boolean): Promise<any> {
@@ -500,7 +502,9 @@ export class LoveApiService {
   // Movies
   async getMovies(): Promise<any[]> {
     const headers = await this.getHeaders();
-    return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/widget/movies`, { headers }));
+    const result = await firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/widget/movies`, { headers }));
+    if (result && result.length > 0) console.log('[API-DEBUG] First movie keys:', Object.keys(result[0]), '| Full obj:', JSON.stringify(result[0]));
+    return result;
   }
 
   async addMovie(title: string, rating?: number, who_fell_asleep?: string, favorite_quote?: string, imageBase64?: string, description?: string, genre?: string, is_favorite?: boolean): Promise<any> {
