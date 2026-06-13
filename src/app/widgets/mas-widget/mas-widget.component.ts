@@ -213,7 +213,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
         </div>
 
         <!-- Logout -->
-        <button class="logout-btn" (click)="confirmLogout()">
+        <button class="logout-btn" (click)="isLogoutModalOpen = true">
           <ion-icon name="log-out-outline"></ion-icon> Cerrar sesión
         </button>
       </div>
@@ -541,6 +541,21 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
           </div>
         </div>
 
+        <!-- Logout Confirmation Modal -->
+        <div class="custom-overlay" *ngIf="isLogoutModalOpen" (click)="isLogoutModalOpen = false">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 30px; text-align: center; width: 85%; max-width: 350px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15);" (click)="$event.stopPropagation()">
+            <ion-icon name="log-out-outline" style="font-size: 4rem; color: #FF4D6D; margin-bottom: 15px; background: rgba(255,77,109,0.1); padding: 15px; border-radius: 50%;"></ion-icon>
+            <h2 style="color: #590D22; margin-bottom: 10px; font-weight: 900; font-size: 1.5rem;">Cerrar Sesión</h2>
+            <p style="color: #a4133c; font-size: 1.05rem; font-weight: 500; margin-bottom: 25px;">
+              ¿Estás seguro de que quieres salir?
+            </p>
+            
+            <div style="display: flex; gap: 10px;">
+              <button class="glass-btn" style="flex: 1; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="isLogoutModalOpen = false">Cancelar</button>
+              <button class="glass-btn" style="flex: 1; background: #FF4D6D; color: white;" (click)="doLogout()">Salir</button>
+            </div>
+          </div>
+        </div>
     </ion-content>
   `,
   styles: [`
@@ -718,6 +733,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   movies: any[] = [];
   
   isFoodListModalOpen = false;
+  isLogoutModalOpen = false;
   isMovieListModalOpen = false;
 
   isAddingFoodPlace = false;
@@ -1239,25 +1255,10 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     });
   }
 
-  async confirmLogout() {
-    const alert = await this.alertCtrl.create({
-      header: 'Cerrar Sesión',
-      message: '¿Estás seguro de que quieres salir?',
-      cssClass: 'premium-alert',
-      buttons: [
-        { text: 'Cancelar', role: 'cancel', cssClass: 'alert-btn-cancel' },
-        { 
-          text: 'Salir', 
-          role: 'destructive',
-          cssClass: 'alert-btn-confirm',
-          handler: () => {
-            this.api.logout();
-            this.router.navigate(['/login']);
-          }
-        }
-      ]
-    });
-    await alert.present();
+  doLogout() {
+    this.isLogoutModalOpen = false;
+    this.api.logout();
+    this.router.navigate(['/login']);
   }
 
   // --- FOOD PLACES & MOVIES API LOGIC ---
