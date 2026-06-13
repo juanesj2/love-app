@@ -460,7 +460,7 @@ import { debounceTime } from 'rxjs/operators';
               <ion-icon *ngIf="selectedFoodPlace?.is_favorite" name="heart" style="color: #FF4D6D; font-size: 1.2rem; vertical-align: middle; margin-left: 5px;"></ion-icon>
             </h2>
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-              <button class="glass-btn" style="padding: 6px 12px; font-size: 1rem; display: inline-flex; align-items: center; gap: 5px; color: #590D22; border: 1px solid rgba(255,77,109,0.3);" (click)="openMap(selectedFoodPlace?.location)">
+              <button class="glass-btn" style="padding: 6px 12px; font-size: 1rem; display: inline-flex; align-items: center; gap: 5px; color: #590D22; background: rgba(255,255,255,0.9); border: 1px solid rgba(255,77,109,0.3);" (click)="openMap(selectedFoodPlace?.location)">
                 <ion-icon name="location-outline" style="font-size: 1.2rem; color: #FF4D6D;"></ion-icon> 
                 <span style="font-weight: 800;">{{ selectedFoodPlace?.location }}</span>
               </button>
@@ -650,8 +650,9 @@ import { debounceTime } from 'rxjs/operators';
               <button class="glass-btn" style="flex: 1; background: #FF4D6D; color: white;" (click)="doLogout()">Salir</button>
             </div>
           </div>
+        </div>
           
-          <!-- Map Modal -->
+        <!-- Map Modal -->
         <div class="custom-overlay" *ngIf="isMapModalOpen" style="z-index: 9999999;" (click)="isMapModalOpen = false">
           <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 15px; font-weight: 900;">Ubicación 📍</h2>
@@ -673,11 +674,9 @@ import { debounceTime } from 'rxjs/operators';
             </div>
           </div>
         </div>
-
-      </div>
-    </ion-content>
-  `,
-  styles: [`
+      </ion-content>
+    `,
+    styles: [`
     :host { display: block; height: 100%; }
     .scroll-content { --background: transparent; }
     .mas-container { padding: calc(env(safe-area-inset-top) + 85px) 20px 20px; font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #fff0f3 0%, #ffccd5 100%); min-height: 100%; padding-bottom: 100px; }
