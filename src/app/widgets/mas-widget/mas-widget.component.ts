@@ -363,14 +363,14 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
             </div>
             
             <div style="max-height: 35vh; overflow-y: auto; overflow-x: hidden; padding-right: 5px; margin-bottom: 20px;">
-              <div class="movies-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-              <div class="movie-item" *ngFor="let movie of filteredMovies" (click)="openMovieModal(movie)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 10px; padding: 8px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
+              <div class="movies-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+              <div class="movie-item" *ngFor="let movie of filteredMovies" (click)="openMovieModal(movie)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
                 <ion-icon *ngIf="movie.is_favorite" name="heart" style="position: absolute; top: -5px; left: -5px; font-size: 1.2rem; color: #FF4D6D; z-index: 5; background: white; border-radius: 50%; padding: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);"></ion-icon>
-                <div style="position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5;" (click)="$event.stopPropagation(); editMovie(movie)">
-                  <ion-icon name="pencil-outline" style="font-size: 1rem; color: #FF4D6D;"></ion-icon>
+                <div style="position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5;" (click)="$event.stopPropagation(); editMovie(movie)">
+                  <ion-icon name="pencil-outline" style="font-size: 1.1rem; color: #FF4D6D;"></ion-icon>
                 </div>
-                <div class="movie-image" [style.backgroundImage]="'url(' + (movie.image_url_full || 'assets/default-movie.png') + ')'" style="width: 100%; aspect-ratio: 0.7; border-radius: 8px; background-size: cover; background-position: center; margin: 0 auto 8px;"></div>
-                <span class="m-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ movie.title }}</span>
+                <div class="movie-image" [style.backgroundImage]="'url(' + (movie.image_url_full || 'assets/default-movie.png') + ')'" style="width: 100%; aspect-ratio: 0.7; border-radius: 10px; background-size: cover; background-position: center; margin: 0 auto 10px;"></div>
+                <span class="m-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ movie.title }}</span>
                 <span class="p-rating" style="color: #FFB703; font-size: 0.7rem;">
                   <ng-container *ngTemplateOutlet="staticStars; context: { rating: movie.rating }"></ng-container>
                 </span>
