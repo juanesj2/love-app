@@ -372,7 +372,7 @@ import { debounceTime } from 'rxjs/operators';
                 <div style="position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5;" (click)="$event.stopPropagation(); editMovie(movie)">
                   <ion-icon name="pencil-outline" style="font-size: 1.1rem; color: #FF4D6D;"></ion-icon>
                 </div>
-                <div class="movie-image" [style.backgroundImage]="'url(' + (movie.image_url_full || 'assets/default-movie.png') + ')'" style="width: 100%; aspect-ratio: 0.7; border-radius: 10px; background-size: cover; background-position: center; margin: 0 auto 10px;"></div>
+                <div class="movie-image" [style.backgroundImage]="'url(' + (movie.image_url_full || movie.image_url || 'assets/default-movie.png') + ')'" style="width: 100%; aspect-ratio: 0.7; border-radius: 10px; background-size: cover; background-position: center; margin: 0 auto 10px;"></div>
                 <span class="m-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ movie.title }}</span>
                 <span class="p-rating" style="color: #FFB703; font-size: 0.7rem;">
                   <ng-container *ngTemplateOutlet="staticStars; context: { rating: movie.rating }"></ng-container>
@@ -545,14 +545,14 @@ import { debounceTime } from 'rxjs/operators';
               <span (click)="showWhoFellAsleep = !showWhoFellAsleep" style="cursor: pointer; user-select: none;" title="Haz clic para revelar una opción secreta 😉">🍿</span>
             </h2>
             
-            <div *ngIf="newMovie.imageBase64 || newMovie.image_url_full" class="milestone-cover" style="width: 120px; height: 180px; border-radius: 12px; margin: 0 auto 20px; overflow: hidden; position: relative;">
-              <img [src]="newMovie.imageBase64 || newMovie.image_url_full" style="width: 100%; height: 100%; object-fit: cover;" />
+            <div *ngIf="newMovie.imageBase64 || newMovie.image_url_full || newMovie.image_url" class="milestone-cover" style="width: 120px; height: 180px; border-radius: 12px; margin: 0 auto 20px; overflow: hidden; position: relative;">
+              <img [src]="newMovie.imageBase64 || newMovie.image_url_full || newMovie.image_url" style="width: 100%; height: 100%; object-fit: cover;" />
               <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="uploadNewMoviePhoto()">
                  <ion-icon name="camera-outline" style="color: white; font-size: 3rem;"></ion-icon>
               </div>
             </div>
             
-            <button *ngIf="!newMovie.imageBase64 && !newMovie.image_url_full" class="glass-btn" style="margin-bottom: 15px;" (click)="uploadNewMoviePhoto()">
+            <button *ngIf="!newMovie.imageBase64 && !newMovie.image_url_full && !newMovie.image_url" class="glass-btn" style="margin-bottom: 15px;" (click)="uploadNewMoviePhoto()">
               <ion-icon name="camera-outline"></ion-icon> Cartel / Foto
             </button>
             
@@ -605,8 +605,8 @@ import { debounceTime } from 'rxjs/operators';
               <ion-icon name="close-outline" style="font-size: 1.8rem; color: #590D22;"></ion-icon>
             </div>
             
-            <div *ngIf="selectedMovie?.image_url_full" class="milestone-cover" style="width: 140px; height: 210px; border-radius: 12px; margin: 0 auto 20px; overflow: hidden; position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
-              <img [src]="selectedMovie?.image_url_full" style="width: 100%; height: 100%; object-fit: cover;" />
+            <div *ngIf="selectedMovie?.image_url_full || selectedMovie?.image_url" class="milestone-cover" style="width: 140px; height: 210px; border-radius: 12px; margin: 0 auto 20px; overflow: hidden; position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
+              <img [src]="selectedMovie?.image_url_full || selectedMovie?.image_url" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             
             <h2 style="color: #590D22; margin-bottom: 10px; font-weight: 900; font-size: 1.6rem;">
