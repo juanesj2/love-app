@@ -245,7 +245,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
 
       <!-- Modal for Milestone Details -->
       <div class="custom-overlay" *ngIf="isMilestoneModalOpen" (click)="isMilestoneModalOpen = false">
-        <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+        <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
           
           <!-- Portada del Hito -->
           <div *ngIf="selectedMilestone?.image_url_full || selectedMilestone?.newImageBase64" class="milestone-cover" style="width: 100%; height: 180px; border-radius: 18px; margin-bottom: 20px; overflow: hidden; position: relative;">
@@ -387,7 +387,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
 
         <!-- Add Food Place Modal -->
         <div class="custom-overlay" *ngIf="isAddingFoodPlace" (click)="isAddingFoodPlace = false">
-          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 20px; font-weight: 900;">{{ newFoodPlace.id ? 'Editar Restaurante' : 'Nuevo Restaurante' }} 🍔</h2>
             
             <div *ngIf="newFoodPlace.imageBase64" class="milestone-cover" style="width: 100%; height: 150px; border-radius: 18px; margin-bottom: 20px; overflow: hidden; position: relative;">
@@ -528,7 +528,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
 
         <!-- Add Movie Modal -->
         <div class="custom-overlay" *ngIf="isAddingMovie" (click)="isAddingMovie = false">
-          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 20px; font-weight: 900;">
               {{ newMovie.id ? 'Editar Peli/Serie' : 'Nueva Peli/Serie' }} 
               <span (click)="showWhoFellAsleep = !showWhoFellAsleep" style="cursor: pointer; user-select: none;" title="Haz clic para revelar una opción secreta 😉">🍿</span>
@@ -643,7 +643,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
           </div>
           <!-- Confirm Modal -->
         <div class="custom-overlay" *ngIf="isConfirmModalOpen" style="z-index: 100000;" (click)="isConfirmModalOpen = false">
-          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 15px; font-weight: 900;">{{ confirmTitle }}</h2>
             <p style="color: #a4133c; font-size: 1.1rem; margin-bottom: 25px; font-weight: 500;">{{ confirmMessage }}</p>
             <div style="display: flex; gap: 10px;">
