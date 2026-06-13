@@ -79,6 +79,10 @@ export class TutorialService {
       ],
       onDestroyed: () => {
         this.markTutorialAsSeen('welcome');
+        // Cuando termina el tour de bienvenida, como estamos en la pestaña de fotos, lanzamos su tutorial
+        setTimeout(() => {
+          this.showPhotosTour();
+        }, 500);
       }
     });
 

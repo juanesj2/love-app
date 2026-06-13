@@ -838,7 +838,6 @@ export class PhotoWidgetComponent implements OnInit {
       console.error(e);
       this.showError('No se pudo cargar la galería. Comprueba tu conexión.');
     } finally {
-      this.tutorialService.showPhotosTour();
       this.cdr.detectChanges();
     }
   }
@@ -1005,7 +1004,6 @@ export class PhotoWidgetComponent implements OnInit {
       this.currentViewDate = this.groupPhotosByDate()[0]?.date || 'Hoy';
       this.cdr.detectChanges();
 
-      this.tutorialService.showPhotosTour();
       toast.present();
     } catch (e: any) {
       console.error(e);
