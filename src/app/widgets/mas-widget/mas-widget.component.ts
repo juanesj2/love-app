@@ -10,7 +10,8 @@ import { Preferences } from '@capacitor/preferences';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { LocationService } from '../../services/location.service';
 import { addIcons } from 'ionicons';
-import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add } from 'ionicons/icons';
+import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add } from 'ionicons/icons';
+
 
 @Component({
   selector: 'app-mas-widget',
@@ -813,7 +814,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   selectedMovie: any = null;
 
   constructor() {
-    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar, add, pencilOutline });
+    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar, add, pencilOutline });
   }
 
   async ngOnInit() {
