@@ -2,6 +2,7 @@ import { Component, inject, OnInit, OnDestroy, Output, EventEmitter } from '@ang
 import { App } from '@capacitor/app';
 import { PluginListenerHandle } from '@capacitor/core';
 import { CommonModule } from '@angular/common';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonRefresher, IonRefresherContent, IonIcon, ToastController, ActionSheetController, AlertController, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
@@ -10,7 +11,7 @@ import { Preferences } from '@capacitor/preferences';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { LocationService } from '../../services/location.service';
 import { addIcons } from 'ionicons';
-import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add } from 'ionicons/icons';
+import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline } from 'ionicons/icons';
 
 
 @Component({
@@ -453,9 +454,9 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
               {{ selectedFoodPlace?.name }}
               <ion-icon *ngIf="selectedFoodPlace?.is_favorite" name="heart" style="color: #FF4D6D; font-size: 1.2rem; vertical-align: middle; margin-left: 5px;"></ion-icon>
             </h2>
-            <p style="color: #a4133c; font-size: 1.1rem; font-weight: 700; margin-bottom: 10px;">
-              {{ selectedFoodPlace?.location }}
-              <span *ngIf="selectedFoodPlace?.category" style="display: inline-block; margin-left: 5px; background: rgba(255,77,109,0.1); padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; color: #FF4D6D;">{{ selectedFoodPlace.category }}</span>
+            <p style="color: #a4133c; font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;" (click)="openMap(selectedFoodPlace?.location)">
+              <ion-icon name="location-outline" style="font-size: 1.2rem;"></ion-icon> {{ selectedFoodPlace?.location }}
+              <span *ngIf="selectedFoodPlace?.category" style="margin-left: 5px; background: rgba(255,77,109,0.1); padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; color: #FF4D6D;">{{ selectedFoodPlace.category }}</span>
             </p>
             <div style="color: #FFB703; font-size: 1.5rem; margin-bottom: 15px;">
                 <ng-container *ngTemplateOutlet="staticStars; context: { rating: selectedFoodPlace?.rating }"></ng-container>
@@ -641,6 +642,18 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
               <button class="glass-btn" style="flex: 1; background: #FF4D6D; color: white;" (click)="doLogout()">Salir</button>
             </div>
           </div>
+          
+          <!-- Map Modal -->
+        <div class="custom-overlay" *ngIf="isMapModalOpen" style="z-index: 100000;" (click)="isMapModalOpen = false">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+            <h2 style="color: #590D22; margin-bottom: 15px; font-weight: 900;">Ubicación 📍</h2>
+            <div style="width: 100%; height: 300px; border-radius: 12px; overflow: hidden; margin-bottom: 20px;">
+              <iframe *ngIf="safeMapUrl" [src]="safeMapUrl" width="100%" height="100%" frameborder="0" style="border:0;" allowfullscreen></iframe>
+            </div>
+            <button class="glass-btn" style="width: 100%; padding: 12px;" (click)="isMapModalOpen = false">Cerrar</button>
+          </div>
+        </div>
+        
           <!-- Confirm Modal -->
         <div class="custom-overlay" *ngIf="isConfirmModalOpen" style="z-index: 100000;" (click)="isConfirmModalOpen = false">
           <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
@@ -813,6 +826,10 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private alertCtrl = inject(AlertController);
   private locationService = inject(LocationService);
+  private sanitizer = inject(DomSanitizer);
+
+  isMapModalOpen = false;
+  safeMapUrl: SafeResourceUrl | null = null;
 
   startDate: string = '';
   selectedAlbumId: number | string = 'feed';
@@ -853,6 +870,13 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
   isAddingFoodPlace = false;
   newFoodPlace: any = { name: '', location: '', description: '', rating: 5, category: '', is_favorite: false, imageBase64: null };
+
+  openMap(location: string) {
+    if (!location) return;
+    const url = `https://maps.google.com/maps?q=${encodeURIComponent(location)}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
+    this.safeMapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    this.isMapModalOpen = true;
+  }
   isFoodPlaceModalOpen = false;
   selectedFoodPlace: any = null;
   
@@ -908,7 +932,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   }
 
   constructor() {
-    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar, add, pencilOutline });
+    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar, add, pencilOutline, locationOutline });
   }
 
   async ngOnInit() {
