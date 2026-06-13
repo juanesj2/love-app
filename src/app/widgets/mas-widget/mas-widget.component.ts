@@ -767,9 +767,15 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
         backdrop-filter: blur(5px);
         -webkit-backdrop-filter: blur(5px);
         display: flex;
-        align-items: center;
         justify-content: center;
         z-index: 99999;
+        overflow-y: auto;
+        padding: 20px 0;
+        box-sizing: border-box;
+      }
+      .modal-content {
+        margin: auto !important;
+        max-height: none !important; /* Let it grow if needed, or keep its inline max-height */
       }
       .star { --star-color: #FF4D6D; position: relative; width: 44px; height: 44px; transition: transform 0.3s ease; cursor: pointer; }
       .star .svg-container { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
