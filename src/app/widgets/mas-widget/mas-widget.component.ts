@@ -437,6 +437,7 @@ import { debounceTime } from 'rxjs/operators';
             </div>
             
             <div style="display: flex; gap: 10px;">
+              <button *ngIf="newFoodPlace?.id" class="glass-btn" style="flex: 1; background: rgba(255,0,0,0.1); color: red; font-size: 0.9rem;" (click)="deleteFoodPlace(newFoodPlace.id)">Eliminar</button>
               <button class="glass-btn" style="flex: 1; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="isAddingFoodPlace = false">Cancelar</button>
               <button class="glass-btn" style="flex: 1;" (click)="saveFoodPlace()">Guardar</button>
             </div>
@@ -532,10 +533,7 @@ import { debounceTime } from 'rxjs/operators';
               </button>
             </div>
 
-            <div style="display: flex; gap: 10px; margin-top: 20px; margin-bottom: 30px;">
-              <button class="glass-btn" style="background: rgba(255,0,0,0.1); color: red; flex: 1; padding: 12px; font-size: 0.9rem;" (click)="deleteFoodPlace(selectedFoodPlace.id)">Eliminar</button>
-              <button class="glass-btn" style="flex: 1; padding: 12px;" (click)="isFoodPlaceModalOpen = false">Cerrar</button>
-            </div>
+
           </div>
         </div>
 
@@ -588,6 +586,7 @@ import { debounceTime } from 'rxjs/operators';
             </div>
             
             <div style="display: flex; gap: 10px;">
+              <button *ngIf="newMovie?.id" class="glass-btn" style="flex: 1; background: rgba(255,0,0,0.1); color: red; font-size: 0.9rem;" (click)="deleteMovie(newMovie.id)">Eliminar</button>
               <button class="glass-btn" style="flex: 1; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="isAddingMovie = false">Cancelar</button>
               <button class="glass-btn" style="flex: 1;" (click)="saveMovie()">Guardar</button>
             </div>
@@ -637,10 +636,7 @@ import { debounceTime } from 'rxjs/operators';
               "{{ selectedMovie.favorite_quote }}"
             </p>
             
-            <div style="display: flex; gap: 10px; margin-top: 20px; margin-bottom: 30px;">
-              <button class="glass-btn" style="background: rgba(255,0,0,0.1); color: red; flex: 1; padding: 12px; font-size: 0.9rem;" (click)="deleteMovie(selectedMovie.id)">Eliminar</button>
-              <button class="glass-btn" style="flex: 1; padding: 12px;" (click)="isMovieModalOpen = false">Cerrar</button>
-            </div>
+
           </div>
         </div>
 
@@ -1541,6 +1537,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
       try {
         await this.api.deleteFoodPlace(id);
         this.isFoodPlaceModalOpen = false;
+        this.isAddingFoodPlace = false;
         this.loadFoodAndMovies();
         this.showToast('Eliminado', 'success');
       } catch (e) {}
@@ -1651,6 +1648,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
       try {
         await this.api.deleteMovie(id);
         this.isMovieModalOpen = false;
+        this.isAddingMovie = false;
         this.loadFoodAndMovies();
         this.showToast('Eliminada', 'success');
       } catch (e) {}
