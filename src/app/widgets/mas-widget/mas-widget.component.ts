@@ -318,7 +318,8 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
               </button>
             </div>
             
-            <div class="food-places-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
+            <div style="max-height: 50vh; overflow-y: auto; overflow-x: hidden; padding-right: 5px; margin-bottom: 20px;">
+              <div class="food-places-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
               <div class="food-place-item" *ngFor="let place of filteredFoodPlaces" (click)="openFoodPlaceModal(place)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
                 
                 <div *ngIf="place.is_favorite" style="position: absolute; top: 8px; left: 8px; z-index: 5;">
@@ -335,6 +336,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
                   <ng-container *ngTemplateOutlet="staticStars; context: { rating: place.rating }"></ng-container>
                 </span>
               </div>
+              </div>
             </div>
             
             <button class="glass-btn" style="width: 100%; margin-bottom: 10px;" (click)="isAddingFoodPlace = true">
@@ -350,7 +352,8 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
             <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="film-outline"></ion-icon> Cine en Pareja</h2>
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Películas y series que vemos juntos</p>
             
-            <div class="movies-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
+            <div style="max-height: 50vh; overflow-y: auto; overflow-x: hidden; padding-right: 5px; margin-bottom: 20px;">
+              <div class="movies-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
               <div class="movie-item" *ngFor="let movie of movies" (click)="openMovieModal(movie)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 10px; padding: 8px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
                 <div style="position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5;" (click)="$event.stopPropagation(); editMovie(movie)">
                   <ion-icon name="pencil-outline" style="font-size: 1rem; color: #FF4D6D;"></ion-icon>
@@ -360,6 +363,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
                 <span class="p-rating" style="color: #FFB703; font-size: 0.7rem;">
                   <ng-container *ngTemplateOutlet="staticStars; context: { rating: movie.rating }"></ng-container>
                 </span>
+              </div>
               </div>
             </div>
             
@@ -601,7 +605,19 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
               <button class="glass-btn" style="flex: 1; background: #FF4D6D; color: white;" (click)="doLogout()">Salir</button>
             </div>
           </div>
+          <!-- Confirm Modal -->
+        <div class="custom-overlay" *ngIf="isConfirmModalOpen" (click)="isConfirmModalOpen = false">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+            <h2 style="color: #590D22; margin-bottom: 15px; font-weight: 900;">{{ confirmTitle }}</h2>
+            <p style="color: #a4133c; font-size: 1.1rem; margin-bottom: 25px; font-weight: 500;">{{ confirmMessage }}</p>
+            <div style="display: flex; gap: 10px;">
+              <button class="glass-btn" style="flex: 1; background: rgba(128,15,47,0.1); color: #800f2f; box-shadow: none;" (click)="isConfirmModalOpen = false">Cancelar</button>
+              <button class="glass-btn" style="flex: 1; box-shadow: none;" (click)="executeConfirm()">Sí, eliminar</button>
+            </div>
+          </div>
         </div>
+
+      </div>
     </ion-content>
   `,
   styles: [`
@@ -812,6 +828,24 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   newMovie: any = { title: '', description: '', who_fell_asleep: '', favorite_quote: '', rating: 5, imageBase64: null };
   isMovieModalOpen = false;
   selectedMovie: any = null;
+
+  
+  isConfirmModalOpen = false;
+  confirmTitle = '';
+  confirmMessage = '';
+  confirmAction: () => void = () => {};
+
+  showConfirm(title: string, message: string, action: () => void) {
+    this.confirmTitle = title;
+    this.confirmMessage = message;
+    this.confirmAction = action;
+    this.isConfirmModalOpen = true;
+  }
+
+  executeConfirm() {
+    this.confirmAction();
+    this.isConfirmModalOpen = false;
+  }
 
   constructor() {
     addIcons({ logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar, add, pencilOutline });
@@ -1377,14 +1411,15 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     this.isAddingFoodPlace = true;
   }
 
-  async deleteFoodPlace(id: number) {
-    if(!confirm('¿Eliminar este restaurante?')) return;
-    try {
-      await this.api.deleteFoodPlace(id);
-      this.isFoodPlaceModalOpen = false;
-      this.loadFoodAndMovies();
-      this.showToast('Eliminado', 'success');
-    } catch (e) {}
+  deleteFoodPlace(id: number) {
+    this.showConfirm('Eliminar restaurante', '¿Seguro que quieres eliminar este restaurante de la lista?', async () => {
+      try {
+        await this.api.deleteFoodPlace(id);
+        this.isFoodPlaceModalOpen = false;
+        this.loadFoodAndMovies();
+        this.showToast('Eliminado', 'success');
+      } catch (e) {}
+    });
   }
 
   // Food Dishes
@@ -1412,13 +1447,16 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     }
   }
 
-  async deleteFoodDish(dishId: number) {
-    if(!confirm('¿Eliminar este plato?')) return;
-    try {
-      await this.api.deleteFoodDish(this.selectedFoodPlace.id, dishId);
-      this.selectedFoodPlace.dishes = this.selectedFoodPlace.dishes.filter((d:any) => d.id !== dishId);
-      this.loadFoodAndMovies();
-    } catch (e) {}
+  deleteFoodDish(dishId: number) {
+    this.showConfirm('Eliminar plato', '¿Seguro que quieres eliminar este plato?', async () => {
+      try {
+        await this.api.deleteFoodDish(this.selectedFoodPlace.id, dishId);
+        if (this.selectedFoodPlace) {
+          this.selectedFoodPlace.dishes = this.selectedFoodPlace.dishes.filter((d: any) => d.id !== dishId);
+        }
+        this.showToast('Plato eliminado', 'success');
+      } catch (e) {}
+    });
   }
 
   // Movies
@@ -1461,13 +1499,14 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     this.isAddingMovie = true;
   }
 
-  async deleteMovie(id: number) {
-    if(!confirm('¿Eliminar esta peli?')) return;
-    try {
-      await this.api.deleteMovie(id);
-      this.isMovieModalOpen = false;
-      this.loadFoodAndMovies();
-      this.showToast('Eliminada', 'success');
-    } catch (e) {}
+  deleteMovie(id: number) {
+    this.showConfirm('Eliminar película', '¿Seguro que quieres eliminar esta peli?', async () => {
+      try {
+        await this.api.deleteMovie(id);
+        this.isMovieModalOpen = false;
+        this.loadFoodAndMovies();
+        this.showToast('Eliminada', 'success');
+      } catch (e) {}
+    });
   }
 }
