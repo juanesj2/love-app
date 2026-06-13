@@ -390,14 +390,14 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
           <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 20px; font-weight: 900;">{{ newFoodPlace.id ? 'Editar Restaurante' : 'Nuevo Restaurante' }} 🍔</h2>
             
-            <div *ngIf="newFoodPlace.imageBase64" class="milestone-cover" style="width: 100%; height: 150px; border-radius: 18px; margin-bottom: 20px; overflow: hidden; position: relative;">
-              <img [src]="newFoodPlace.imageBase64" style="width: 100%; height: 100%; object-fit: cover;" />
+            <div *ngIf="newFoodPlace.imageBase64 || newFoodPlace.image_url_full" class="milestone-cover" style="width: 100%; height: 150px; border-radius: 18px; margin-bottom: 20px; overflow: hidden; position: relative;">
+              <img [src]="newFoodPlace.imageBase64 || newFoodPlace.image_url_full" style="width: 100%; height: 100%; object-fit: cover;" />
               <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="uploadNewFoodPlacePhoto()">
                  <ion-icon name="camera-outline" style="color: white; font-size: 3rem;"></ion-icon>
               </div>
             </div>
             
-            <button *ngIf="!newFoodPlace.imageBase64" class="glass-btn" style="margin-bottom: 15px;" (click)="uploadNewFoodPlacePhoto()">
+            <button *ngIf="!newFoodPlace.imageBase64 && !newFoodPlace.image_url_full" class="glass-btn" style="margin-bottom: 15px;" (click)="uploadNewFoodPlacePhoto()">
               <ion-icon name="camera-outline"></ion-icon> Añadir Foto
             </button>
             
@@ -506,7 +506,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
                     <ion-icon name="camera" style="font-size: 1.8rem; color: #FF4D6D;" (click)="uploadNewDishPhoto()"></ion-icon>
                  </div>
                  
-                 <div *ngIf="newDish.imageBase64" style="height: 100px; border-radius: 8px; background-size: cover; background-position: center; margin-bottom: 10px;" [style.backgroundImage]="'url(' + newDish.imageBase64 + ')'"></div>
+                 <div *ngIf="newDish.imageBase64 || newDish.image_url_full" style="height: 100px; border-radius: 8px; background-size: cover; background-position: center; margin-bottom: 10px;" [style.backgroundImage]="'url(' + (newDish.imageBase64 || newDish.image_url_full) + ')'"></div>
                  
                  <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                     <button class="glass-btn" style="flex: 1; padding: 10px; font-size: 0.9rem;" (click)="isAddingDish = false">Cancelar</button>
@@ -534,14 +534,14 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
               <span (click)="showWhoFellAsleep = !showWhoFellAsleep" style="cursor: pointer; user-select: none;" title="Haz clic para revelar una opción secreta 😉">🍿</span>
             </h2>
             
-            <div *ngIf="newMovie.imageBase64" class="milestone-cover" style="width: 120px; height: 180px; border-radius: 12px; margin: 0 auto 20px; overflow: hidden; position: relative;">
-              <img [src]="newMovie.imageBase64" style="width: 100%; height: 100%; object-fit: cover;" />
+            <div *ngIf="newMovie.imageBase64 || newMovie.image_url_full" class="milestone-cover" style="width: 120px; height: 180px; border-radius: 12px; margin: 0 auto 20px; overflow: hidden; position: relative;">
+              <img [src]="newMovie.imageBase64 || newMovie.image_url_full" style="width: 100%; height: 100%; object-fit: cover;" />
               <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="uploadNewMoviePhoto()">
                  <ion-icon name="camera-outline" style="color: white; font-size: 3rem;"></ion-icon>
               </div>
             </div>
             
-            <button *ngIf="!newMovie.imageBase64" class="glass-btn" style="margin-bottom: 15px;" (click)="uploadNewMoviePhoto()">
+            <button *ngIf="!newMovie.imageBase64 && !newMovie.image_url_full" class="glass-btn" style="margin-bottom: 15px;" (click)="uploadNewMoviePhoto()">
               <ion-icon name="camera-outline"></ion-icon> Cartel / Foto
             </button>
             
