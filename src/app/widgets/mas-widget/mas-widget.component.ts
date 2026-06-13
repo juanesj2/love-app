@@ -123,13 +123,13 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
           </div>
           
           <div class="milestone-list">
-            <div class="milestone-item" *ngFor="let m of milestones" (click)="openMilestoneModal(m)">
+            <div class="milestone-item" *ngFor="let m of milestones" (click)="openMilestoneModal(m)" [class.is-past]="isPast(m.date)">
               <div class="milestone-indicator"></div>
               <div class="milestone-info">
                 <span class="m-title">{{ m.title }}</span>
                 <span class="m-date">{{ m.date | date:'longDate' }}</span>
               </div>
-              <div class="m-days">{{ calculateDays(m.date) }} d</div>
+              <div class="m-days">{{ isPast(m.date) ? 'Hace ' + calculateDays(m.date) + ' d' : calculateDays(m.date) + ' d' }}</div>
               <ion-icon name="close-circle" class="delete-icon" (click)="deleteMilestone(m.id); $event.stopPropagation()"></ion-icon>
             </div>
           </div>
@@ -611,6 +611,11 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
     .m-title { display: block; font-weight: 800; color: #590D22; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .m-date { font-size: 0.8rem; color: #a4133c; font-weight: 600; margin-top: 2px; display: block; }
     .m-days { font-weight: 900; color: #FF4D6D; background: rgba(255,77,109,0.1); padding: 6px 12px; border-radius: 12px; font-size: 0.85rem; }
+    
+    .milestone-item.is-past { opacity: 0.85; }
+    .milestone-item.is-past .milestone-indicator { background: #b0b0b0; }
+    .milestone-item.is-past .m-days { color: #6c757d; background: rgba(108,117,125,0.15); }
+    
     
     .bucket-item.is-done { opacity: 0.6; background: rgba(255,255,255,0.4); }
     .bucket-item.is-done .b-text { text-decoration: line-through; color: #a4133c; }
