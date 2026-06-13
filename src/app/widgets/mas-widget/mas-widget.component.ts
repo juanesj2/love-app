@@ -403,7 +403,12 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
             </button>
             
             <input type="text" placeholder="Nombre del sitio" [(ngModel)]="newFoodPlace.name" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
-            <input type="text" placeholder="Ubicación (ej: Madrid)" [(ngModel)]="newFoodPlace.location" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+              <input type="text" placeholder="Ubicación (ej: Madrid)" [(ngModel)]="newFoodPlace.location" class="glass-input" style="flex: 1; margin-bottom: 0;" />
+              <button class="glass-btn" style="padding: 0 15px; display: flex; align-items: center; justify-content: center;" (click)="openMap(newFoodPlace.location)" title="Ver en mapa">
+                <ion-icon name="location-outline" style="font-size: 1.2rem;"></ion-icon>
+              </button>
+            </div>
             
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
               <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="newFoodPlace.category" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 14px; --padding-bottom: 14px;" placeholder="(Sin categoría)">
