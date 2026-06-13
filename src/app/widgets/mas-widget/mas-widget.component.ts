@@ -310,6 +310,8 @@ import { debounceTime } from 'rxjs/operators';
             <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="restaurant-outline"></ion-icon> Tour Gastronómico</h2>
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Restaurantes y platos que hemos probado</p>
             
+            <input type="text" [(ngModel)]="searchQueryFoodPlaces" placeholder="Buscar restaurante..." class="glass-input" style="width: 100%; margin-bottom: 15px; font-weight: 600;">
+
             <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
               <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedFoodCategory" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todas las categorías">
                 <ion-select-option value="">Todas las categorías</ion-select-option>
@@ -355,6 +357,8 @@ import { debounceTime } from 'rxjs/operators';
             <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="film-outline"></ion-icon> Cine en Pareja</h2>
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Películas y series que vemos juntos</p>
             
+            <input type="text" [(ngModel)]="searchQueryMovies" placeholder="Buscar película o serie..." class="glass-input" style="width: 100%; margin-bottom: 15px; font-weight: 600;">
+
             <div style="display: flex; gap: 10px; margin-bottom: 15px; width: 100%;">
               <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedMovieGenre" class="glass-input" style="flex: 1; margin: 0; border: 2px solid #FF4D6D; background: white; font-weight: 600; color: #590D22; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todas las categorías">
                 <ion-select-option value="">Todas las categorías</ion-select-option>
@@ -900,13 +904,15 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   
   foodCategories = ['Española', 'Italiana', 'Árabe', 'Asiática', 'Mexicana', 'Americana', 'Comida Rápida', 'Desayunos/Brunch', 'Postres', 'Otro'];
   selectedFoodCategory = '';
+  searchQueryFoodPlaces = '';
   showFavoritesOnlyFoodPlaces = false;
 
   get filteredFoodPlaces() {
     return this.foodPlaces.filter(p => {
       const matchFav = this.showFavoritesOnlyFoodPlaces ? p.is_favorite : true;
       const matchCat = this.selectedFoodCategory ? p.category === this.selectedFoodCategory : true;
-      return matchFav && matchCat;
+      const matchSearch = this.searchQueryFoodPlaces ? p.name.toLowerCase().includes(this.searchQueryFoodPlaces.toLowerCase()) : true;
+      return matchFav && matchCat && matchSearch;
     });
   }
   
@@ -921,13 +927,15 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   
   movieGenres = ['Acción', 'Comedia', 'Drama', 'Terror', 'Ciencia Ficción', 'Fantasía', 'Romance', 'Animación', 'Documental', 'Thriller', 'Otro'];
   selectedMovieGenre = '';
+  searchQueryMovies = '';
   showFavoritesOnlyMovies = false;
 
   get filteredMovies() {
     return this.movies.filter(m => {
       const matchFav = this.showFavoritesOnlyMovies ? m.is_favorite : true;
       const matchGenre = this.selectedMovieGenre ? m.genre === this.selectedMovieGenre : true;
-      return matchFav && matchGenre;
+      const matchSearch = this.searchQueryMovies ? m.title.toLowerCase().includes(this.searchQueryMovies.toLowerCase()) : true;
+      return matchFav && matchGenre && matchSearch;
     });
   }
 
