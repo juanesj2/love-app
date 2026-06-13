@@ -303,6 +303,16 @@ ion-popover.love-popover {
   ion-item {
     font-weight: 600;
     --border-color: rgba(255, 77, 109, 0.1) !important;
+    --background-hover: rgba(255, 77, 109, 0.1) !important;
+    --background-hover-opacity: 1 !important;
+    --background-focused: rgba(255, 77, 109, 0.15) !important;
+    --background-focused-opacity: 1 !important;
+    --background-activated: rgba(255, 77, 109, 0.15) !important;
+    --background-activated-opacity: 1 !important;
+  }
+  
+  ion-item.item-radio-checked {
+    --background: rgba(255, 77, 109, 0.08) !important;
   }
   
   ion-radio {
