@@ -465,11 +465,19 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
               "{{ selectedFoodPlace.description }}"
             </p>
             
-            <div class="dishes-section" style="text-align: left; margin-bottom: 20px;">
+            <div class="dishes-section" style="text-align: left; margin-bottom: 20px; max-height: 40vh; overflow-y: auto; padding-right: 5px;">
               <h4 style="color: #800f2f; font-weight: 800; border-bottom: 2px solid rgba(255,77,109,0.2); padding-bottom: 5px; margin-bottom: 15px;">Platos</h4>
               
               <div class="dish-item" *ngFor="let dish of selectedFoodPlace?.dishes" style="display: flex; gap: 10px; background: rgba(255,255,255,0.6); padding: 10px; border-radius: 12px; margin-bottom: 10px; align-items: center;">
-                <div *ngIf="dish.image_url_full" style="width: 60px; height: 60px; border-radius: 8px; background-size: cover; background-position: center;" [style.backgroundImage]="'url(' + dish.image_url_full + ')'"></div>
+                <div style="position: relative;">
+                  <div *ngIf="dish.image_url_full" style="width: 60px; height: 60px; border-radius: 8px; background-size: cover; background-position: center;" [style.backgroundImage]="'url(' + dish.image_url_full + ')'"></div>
+                  <div *ngIf="!dish.image_url_full" style="width: 60px; height: 60px; border-radius: 8px; background: rgba(255,77,109,0.1); display: flex; align-items: center; justify-content: center;">
+                    <ion-icon name="restaurant-outline" style="font-size: 1.5rem; color: rgba(255,77,109,0.5);"></ion-icon>
+                  </div>
+                  <div style="position: absolute; top: -6px; left: -6px; width: 22px; height: 22px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; z-index: 2;" (click)="editFoodDish(dish)">
+                    <ion-icon name="pencil-outline" style="font-size: 0.9rem; color: #FF4D6D;"></ion-icon>
+                  </div>
+                </div>
                 <div style="flex: 1;">
                   <span style="display: block; font-weight: 700; color: #590D22;">{{ dish.name }}</span>
                   <span style="color: #FFB703; font-size: 0.8rem;">
@@ -861,7 +869,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   }
   
   isAddingDish = false;
-  newDish: any = { name: '', description: '', rating: 5, imageBase64: null };
+  newDish: any = { id: null, name: '', description: '', rating: 5, imageBase64: null };
   
   isAddingMovie = false;
   showWhoFellAsleep = false;
@@ -1487,16 +1495,38 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   async saveFoodDish() {
     if (!this.newDish.name) return this.showToast('Ponle nombre al plato', 'warning');
     try {
-      const dish = await this.api.addFoodDish(this.selectedFoodPlace.id, this.newDish.name, this.newDish.rating, this.newDish.description, this.newDish.imageBase64);
-      if(!this.selectedFoodPlace.dishes) this.selectedFoodPlace.dishes = [];
-      this.selectedFoodPlace.dishes.push(dish);
+      if (this.newDish.id) {
+        // Update existing
+        const updated = await this.api.updateFoodDish(this.selectedFoodPlace.id, this.newDish.id, this.newDish.name, this.newDish.rating, this.newDish.description, this.newDish.imageBase64);
+        const index = this.selectedFoodPlace.dishes.findIndex((d: any) => d.id === this.newDish.id);
+        if (index !== -1) {
+          this.selectedFoodPlace.dishes[index] = updated;
+        }
+        this.showToast('Plato actualizado', 'success');
+      } else {
+        // Create new
+        const dish = await this.api.addFoodDish(this.selectedFoodPlace.id, this.newDish.name, this.newDish.rating, this.newDish.description, this.newDish.imageBase64);
+        if(!this.selectedFoodPlace.dishes) this.selectedFoodPlace.dishes = [];
+        this.selectedFoodPlace.dishes.push(dish);
+        this.showToast('Plato añadido', 'success');
+      }
       this.isAddingDish = false;
-      this.newDish = { name: '', description: '', rating: 5, imageBase64: null };
+      this.newDish = { id: null, name: '', description: '', rating: 5, imageBase64: null };
       this.loadFoodAndMovies();
-      this.showToast('Plato añadido', 'success');
     } catch (e) {
-      this.showToast('Error al añadir plato', 'danger');
+      this.showToast('Error al guardar plato', 'danger');
     }
+  }
+
+  editFoodDish(dish: any) {
+    this.newDish = {
+      id: dish.id,
+      name: dish.name,
+      description: dish.description || '',
+      rating: dish.rating || 5,
+      imageBase64: dish.image_url_full || null
+    };
+    this.isAddingDish = true;
   }
 
   deleteFoodDish(dishId: number) {

@@ -467,6 +467,31 @@ export class LoveApiService {
     return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/widget/food-places/${placeId}/dishes`, formData, { headers: reqHeaders }));
   }
 
+  async updateFoodDish(placeId: number, dishId: number, name: string, rating?: number, description?: string, imageBase64?: string): Promise<any> {
+    const formData = new FormData();
+    formData.append('name', name);
+    if (rating) formData.append('rating', rating.toString());
+    if (description) formData.append('description', description);
+    
+    if (imageBase64 && imageBase64.startsWith('data:')) {
+      try {
+        const response = await fetch(imageBase64);
+        const blob = await response.blob();
+        formData.append('image', blob, `dish_${Date.now()}.jpg`);
+      } catch (e) {
+        console.error('Error attaching image', e);
+      }
+    }
+    
+    let reqHeaders = new HttpHeaders();
+    const tokenData = await Preferences.get({ key: 'auth_token' });
+    if (tokenData.value) {
+      reqHeaders = reqHeaders.set('Authorization', `Bearer ${tokenData.value}`);
+    }
+
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/widget/food-places/${placeId}/dishes/${dishId}`, formData, { headers: reqHeaders }));
+  }
+
   async deleteFoodDish(placeId: number, dishId: number): Promise<any> {
     const headers = await this.getHeaders();
     return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/love-album/widget/food-places/${placeId}/dishes/${dishId}`, { headers }));
