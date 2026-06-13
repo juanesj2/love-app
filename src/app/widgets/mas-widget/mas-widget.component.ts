@@ -508,7 +508,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
                  
                  <div *ngIf="newDish.imageBase64" style="height: 100px; border-radius: 8px; background-size: cover; background-position: center; margin-bottom: 10px;" [style.backgroundImage]="'url(' + newDish.imageBase64 + ')'"></div>
                  
-                 <div style="display: flex; gap: 10px;">
+                 <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                     <button class="glass-btn" style="flex: 1; padding: 10px; font-size: 0.9rem;" (click)="isAddingDish = false">Cancelar</button>
                     <button class="glass-btn" style="flex: 1; padding: 10px; font-size: 0.9rem;" (click)="saveFoodDish()">Guardar Plato</button>
                  </div>
