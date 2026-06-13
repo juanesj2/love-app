@@ -3,7 +3,7 @@ import { App } from '@capacitor/app';
 import { PluginListenerHandle } from '@capacitor/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonRefresher, IonRefresherContent, IonIcon, ToastController, ActionSheetController, AlertController } from '@ionic/angular/standalone';
+import { IonContent, IonRefresher, IonRefresherContent, IonIcon, ToastController, ActionSheetController, AlertController, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { LoveApiService } from '../../services/love-api.service';
 import { Preferences } from '@capacitor/preferences';
@@ -169,10 +169,10 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
           <!-- Widget Config (Spans full width) -->
           <div class="grid-card full-width">
             <h4><ion-icon name="settings-outline" class="text-pink"></ion-icon> Colección del Widget</h4>
-            <select [(ngModel)]="selectedAlbumId" (change)="saveSelectedAlbum()" class="glass-select">
-              <option value="feed">Todas las fotos</option>
-              <option *ngFor="let album of albums" [value]="album.id">{{ album.name }}</option>
-            </select>
+            <ion-select interface="popover" [(ngModel)]="selectedAlbumId" (ionChange)="saveSelectedAlbum()" class="glass-select" style="--padding-start: 16px; --padding-end: 16px; --padding-top: 14px; --padding-bottom: 14px;">
+              <ion-select-option value="feed">Todas las fotos</ion-select-option>
+              <ion-select-option *ngFor="let album of albums" [value]="album.id">{{ album.name }}</ion-select-option>
+            </ion-select>
           </div>
 
           <!-- Tour Gastronómico -->
@@ -308,10 +308,10 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Restaurantes y platos que hemos probado</p>
             
             <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
-              <select [(ngModel)]="selectedFoodCategory" class="glass-input" style="flex: 1; padding: 8px;">
-                <option value="">Todas las categorías</option>
-                <option *ngFor="let cat of foodCategories" [value]="cat">{{ cat }}</option>
-              </select>
+              <ion-select interface="popover" [(ngModel)]="selectedFoodCategory" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todas las categorías">
+                <ion-select-option value="">Todas las categorías</ion-select-option>
+                <ion-select-option *ngFor="let cat of foodCategories" [value]="cat">{{ cat }}</ion-select-option>
+              </ion-select>
               
               <button class="glass-btn" style="padding: 8px 15px; font-size: 1.5rem; width: auto; flex: 0 0 auto; box-shadow: none;" [style.color]="showFavoritesOnlyFoodPlaces ? '#FF4D6D' : '#888'" [style.background]="showFavoritesOnlyFoodPlaces ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="showFavoritesOnlyFoodPlaces = !showFavoritesOnlyFoodPlaces">
                 <ion-icon [name]="showFavoritesOnlyFoodPlaces ? 'heart' : 'heart-outline'"></ion-icon>
@@ -353,10 +353,10 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Películas y series que vemos juntos</p>
             
             <div style="display: flex; gap: 10px; margin-bottom: 15px; width: 100%;">
-              <select [(ngModel)]="selectedMovieGenre" class="glass-input" style="flex: 1; margin: 0; border: 2px solid #FF4D6D; background: white; font-weight: 600; color: #590D22;">
-                <option value="">Todas las categorías</option>
-                <option *ngFor="let cat of movieGenres" [value]="cat">{{ cat }}</option>
-              </select>
+              <ion-select interface="popover" [(ngModel)]="selectedMovieGenre" class="glass-input" style="flex: 1; margin: 0; border: 2px solid #FF4D6D; background: white; font-weight: 600; color: #590D22; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todas las categorías">
+                <ion-select-option value="">Todas las categorías</ion-select-option>
+                <ion-select-option *ngFor="let cat of movieGenres" [value]="cat">{{ cat }}</ion-select-option>
+              </ion-select>
               <button class="glass-btn" style="padding: 0 15px; font-size: 1.5rem; width: auto; flex: 0 0 auto; box-shadow: none; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 77, 109, 0.2);" [style.color]="showFavoritesOnlyMovies ? '#FF4D6D' : '#888'" [style.background]="showFavoritesOnlyMovies ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="showFavoritesOnlyMovies = !showFavoritesOnlyMovies">
                 <ion-icon [name]="showFavoritesOnlyMovies ? 'heart' : 'heart-outline'"></ion-icon>
               </button>
@@ -405,10 +405,10 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
             <input type="text" placeholder="Ubicación (ej: Madrid)" [(ngModel)]="newFoodPlace.location" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
             
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-              <select [(ngModel)]="newFoodPlace.category" class="glass-input" style="flex: 1;">
-                <option value="">(Sin categoría)</option>
-                <option *ngFor="let cat of foodCategories" [value]="cat">{{ cat }}</option>
-              </select>
+              <ion-select interface="popover" [(ngModel)]="newFoodPlace.category" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 14px; --padding-bottom: 14px;" placeholder="(Sin categoría)">
+                <ion-select-option value="">(Sin categoría)</ion-select-option>
+                <ion-select-option *ngFor="let cat of foodCategories" [value]="cat">{{ cat }}</ion-select-option>
+              </ion-select>
               
               <button class="glass-btn" style="padding: 0 15px; font-size: 1.5rem; width: auto; flex: 0 0 auto; box-shadow: none; display: flex; align-items: center; justify-content: center;" [style.color]="newFoodPlace.is_favorite ? '#FF4D6D' : '#888'" [style.background]="newFoodPlace.is_favorite ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="newFoodPlace.is_favorite = !newFoodPlace.is_favorite">
                 <ion-icon [name]="newFoodPlace.is_favorite ? 'heart' : 'heart-outline'"></ion-icon>
@@ -541,10 +541,10 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
             <textarea placeholder="¿De qué iba la peli/serie?" [(ngModel)]="newMovie.description" class="glass-input" style="width: 100%; min-height: 60px; margin-bottom: 10px; resize: vertical;"></textarea>
             
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-              <select [(ngModel)]="newMovie.genre" class="glass-input" style="flex: 1;">
-                <option value="">(Sin categoría)</option>
-                <option *ngFor="let cat of movieGenres" [value]="cat">{{ cat }}</option>
-              </select>
+              <ion-select interface="popover" [(ngModel)]="newMovie.genre" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 14px; --padding-bottom: 14px;" placeholder="(Sin categoría)">
+                <ion-select-option value="">(Sin categoría)</ion-select-option>
+                <ion-select-option *ngFor="let cat of movieGenres" [value]="cat">{{ cat }}</ion-select-option>
+              </ion-select>
               
               <button class="glass-btn" style="padding: 0 15px; font-size: 1.5rem; width: auto; flex: 0 0 auto; box-shadow: none; display: flex; align-items: center; justify-content: center;" [style.color]="newMovie.is_favorite ? '#FF4D6D' : '#888'" [style.background]="newMovie.is_favorite ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="newMovie.is_favorite = !newMovie.is_favorite">
                 <ion-icon [name]="newMovie.is_favorite ? 'heart' : 'heart-outline'"></ion-icon>
@@ -782,7 +782,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
       @keyframes particle-8 { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 45% { transform: translate(0, -35px) scale(0.6); opacity: 0.6; } 100% { transform: translate(0, 45px) scale(0); opacity: 0; } }
   `],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonIcon, IonContent, IonRefresher, IonRefresherContent]
+  imports: [CommonModule, FormsModule, IonIcon, IonContent, IonRefresher, IonRefresherContent, IonSelect, IonSelectOption]
 })
 export class MasWidgetComponent implements OnInit, OnDestroy {
   @Output() openGameEvent = new EventEmitter<void>();
