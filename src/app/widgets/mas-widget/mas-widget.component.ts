@@ -674,7 +674,18 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
     
     .glass-select { width: 100%; padding: 14px 16px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); font-family: 'Inter', sans-serif; font-size: 1rem; color: #590D22; font-weight: 700; outline: none; appearance: none; cursor: pointer; }
     .glass-select:focus { border-color: #FF4D6D; background: #fff; }
-    ion-select.glass-input, ion-select.glass-select { --highlight-color-valid: #FF4D6D; --highlight-color-invalid: #FF4D6D; --highlight-color-focused: #FF4D6D; --icon-color: #FF4D6D; }
+    ion-select.glass-input, ion-select.glass-select { 
+      padding: 0 !important; 
+      --padding-top: 12px !important; 
+      --padding-bottom: 12px !important; 
+      --padding-start: 16px !important; 
+      --padding-end: 16px !important; 
+      --highlight-color-valid: transparent; 
+      --highlight-color-invalid: transparent; 
+      --highlight-color-focused: transparent; 
+      --icon-color: #FF4D6D; 
+      min-height: unset; 
+    }
 
     .glass-btn { width: 100%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none; padding: 14px; border-radius: 14px; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3); }
     .glass-btn:active { transform: scale(0.98); box-shadow: 0 2px 8px rgba(255, 77, 109, 0.2); }
