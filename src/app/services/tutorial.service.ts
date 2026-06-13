@@ -154,4 +154,67 @@ export class TutorialService {
       tour.drive();
     }, 800);
   }
+
+  public async showMapTour() {
+    if (await this.hasSeenTutorial('map')) return;
+
+    const tour = driver({
+      showProgress: false,
+      doneBtnText: '¡Entendido!',
+      steps: [
+        {
+          element: '.privacy-map-btn',
+          popover: {
+            title: 'Modo Fantasma 👻',
+            description: 'Activa o desactiva tu ubicación. Si la ocultas, no podrás ver dónde está tu pareja.',
+            side: 'bottom',
+            align: 'start'
+          }
+        },
+        {
+          element: '.partner-location-card',
+          popover: {
+            title: 'Estado de tu Pareja',
+            description: 'Aquí verás a qué distancia está. Toca la tarjeta para centrar el mapa.',
+            side: 'top',
+            align: 'center'
+          }
+        }
+      ],
+      onDestroyed: () => {
+        this.markTutorialAsSeen('map');
+      }
+    });
+
+    setTimeout(() => {
+      tour.drive();
+    }, 800);
+  }
+
+  public async showMasTour() {
+    if (await this.hasSeenTutorial('mas')) return;
+
+    const tour = driver({
+      showProgress: false,
+      doneBtnText: '¡A explorar!',
+      steps: [
+        {
+          element: '.grid-card',
+          popover: {
+            title: 'Panel de Control ⚙️',
+            description: 'Aquí tienes un montón de herramientas extras: notas compartidas, hitos, y todo lo demás.',
+            side: 'bottom',
+            align: 'center'
+          }
+        }
+      ],
+      onDestroyed: () => {
+        this.markTutorialAsSeen('mas');
+      }
+    });
+
+    setTimeout(() => {
+      tour.drive();
+    }, 800);
+  }
 }
