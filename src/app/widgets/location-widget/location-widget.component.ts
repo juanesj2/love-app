@@ -184,6 +184,9 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
 
   public myLastPos?: L.LatLng;
   public partnerLastPos?: L.LatLng;
+  
+  private lastMeData: any;
+  private lastPartnerData: any;
 
   private myMarker?: L.Marker;
   private partnerMarker?: L.Marker;
@@ -353,6 +356,9 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
             if (this.isGhostMode) {
               this.areTogether = false;
             }
+            if (this.lastMeData && this.lastPartnerData) {
+              this.renderMapState(this.lastMeData, this.lastPartnerData);
+            }
           }
         },
         { text: 'Cancelar', role: 'cancel', cssClass: 'premium-cancel-btn' }
@@ -366,73 +372,81 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
     const partner$ = this.locationService.listenToUserLocation(this.partnerId);
 
     this.locationsSub = combineLatest([me$, partner$]).subscribe(([me, partner]) => {
-      this.partnerIsGhost = partner?.is_sharing === false;
-
-      const myPos = me?.position 
-        ? L.latLng(me.position.latitude, me.position.longitude)
-        : L.latLng(40.4168, -3.7038); // Madrid
-
-      const partnerPos = partner?.position
-        ? L.latLng(partner.position.latitude, partner.position.longitude)
-        : L.latLng(41.3851, 2.1734); // Barcelona
-
-      this.myLastPos = myPos;
-      
-      let distanceMeters = 0;
-
-      if (this.isGhostMode || this.partnerIsGhost) {
-        this.areTogether = false;
-        this.partnerLastPos = undefined;
-        
-        if (this.partnerMarker) {
-          this.map.removeLayer(this.partnerMarker);
-          this.partnerMarker = undefined;
-        }
-        if (this.distanceMarker) {
-          this.map.removeLayer(this.distanceMarker);
-          this.distanceMarker = undefined;
-        }
-        if (this.connectionLine) {
-          this.map.removeLayer(this.connectionLine);
-          this.connectionLine = undefined;
-        }
-      } else {
-        this.partnerLastPos = partnerPos;
-        if (!this.partnerCity && partnerPos && !this.areTogether) {
-          this.getCityName(partnerPos.lat, partnerPos.lng);
-        }
-        distanceMeters = myPos.distanceTo(partnerPos);
-        this.areTogether = distanceMeters < 50; 
-      }
-
-      if (this.areTogether) {
-        this.clearMapElements();
-        if (!this.hasCentered) {
-          this.centerMap();
-          this.hasCentered = true;
-        }
-      } else {
-        if (!this.isGhostMode) {
-          this.updateMarker('me', myPos, this.myAvatarUrl);
-          
-          if (!this.partnerIsGhost) {
-            this.updateMarker('partner', partnerPos, this.partnerAvatarUrl);
-            this.drawConnection(myPos, partnerPos);
-            
-            const midPoint = L.latLng((myPos.lat + partnerPos.lat) / 2, (myPos.lng + partnerPos.lng) / 2);
-            const distText = distanceMeters > 1000
-              ? `${(distanceMeters / 1000).toLocaleString('es-ES', { maximumFractionDigits: 0 })} km`
-              : `${Math.round(distanceMeters)} m`;
-            this.updateDistanceMarker(midPoint, distText);
-          }
-        }
-        
-        if (!this.hasCentered) {
-          this.centerMap();
-          this.hasCentered = true;
-        }
-      }
+      this.lastMeData = me;
+      this.lastPartnerData = partner;
+      this.renderMapState(me, partner);
     });
+  }
+
+  private renderMapState(me: any, partner: any) {
+    if (!me || !partner) return;
+
+    this.partnerIsGhost = partner?.is_sharing === false;
+
+    const myPos = me?.position 
+      ? L.latLng(me.position.latitude, me.position.longitude)
+      : L.latLng(40.4168, -3.7038); // Madrid
+
+    const partnerPos = partner?.position
+      ? L.latLng(partner.position.latitude, partner.position.longitude)
+      : L.latLng(41.3851, 2.1734); // Barcelona
+
+    this.myLastPos = myPos;
+    
+    let distanceMeters = 0;
+
+    if (this.isGhostMode || this.partnerIsGhost) {
+      this.areTogether = false;
+      this.partnerLastPos = undefined;
+      
+      if (this.partnerMarker) {
+        this.map.removeLayer(this.partnerMarker);
+        this.partnerMarker = undefined;
+      }
+      if (this.distanceMarker) {
+        this.map.removeLayer(this.distanceMarker);
+        this.distanceMarker = undefined;
+      }
+      if (this.connectionLine) {
+        this.map.removeLayer(this.connectionLine);
+        this.connectionLine = undefined;
+      }
+    } else {
+      this.partnerLastPos = partnerPos;
+      if (!this.partnerCity && partnerPos && !this.areTogether) {
+        this.getCityName(partnerPos.lat, partnerPos.lng);
+      }
+      distanceMeters = myPos.distanceTo(partnerPos);
+      this.areTogether = distanceMeters < 50; 
+    }
+
+    if (this.areTogether) {
+      this.clearMapElements();
+      if (!this.hasCentered) {
+        this.centerMap();
+        this.hasCentered = true;
+      }
+    } else {
+      if (!this.isGhostMode) {
+        this.updateMarker('me', myPos, this.myAvatarUrl);
+        
+        if (!this.partnerIsGhost) {
+          this.updateMarker('partner', partnerPos, this.partnerAvatarUrl);
+          this.drawConnection(myPos, partnerPos);
+          
+          const midPoint = L.latLng((myPos.lat + partnerPos.lat) / 2, (myPos.lng + partnerPos.lng) / 2);
+          const distText = distanceMeters > 1000
+            ? `${(distanceMeters / 1000).toLocaleString('es-ES', { maximumFractionDigits: 0 })} km`
+            : `${Math.round(distanceMeters)} m`;
+          this.updateDistanceMarker(midPoint, distText);
+        }
+      }
+      
+      if (!this.hasCentered) {
+        this.centerMap();
+        this.hasCentered = true;
+      }
+    }
   }
 
   public centerMap() {
