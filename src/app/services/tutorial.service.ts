@@ -57,6 +57,16 @@ export class TutorialService {
           }
         },
         {
+          element: '.center-btn',
+          popover: {
+            title: 'Sube Momentos 📸',
+            description: 'Toca aquí para hacer una foto o subirla de tu galería y compartirla al instante.',
+            side: 'top',
+            align: 'center',
+            popoverClass: 'tour-bottom-tab'
+          }
+        },
+        {
           element: '#tab-map',
           popover: {
             title: 'El Mapa 🗺️',
