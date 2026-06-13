@@ -280,30 +280,30 @@
 }
 
 /* Custom Pink Love Select Popover */
-.love-popover {
-  --background: rgba(255, 255, 255, 0.95);
-  --color: #590D22;
-  --box-shadow: 0 10px 40px rgba(255, 77, 109, 0.2);
+.love-popover::part(content) {
+  background: rgba(255, 245, 248, 0.85) !important;
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 77, 109, 0.15);
+  box-shadow: 0 10px 40px rgba(255, 77, 109, 0.2);
+}
+
+.love-popover {
+  --color: #590D22;
   
   ion-content {
-    --background: transparent;
+    --background: transparent !important;
   }
   
   ion-item {
-    --background: transparent;
-    --color: #590D22;
+    --background: transparent !important;
+    --color: #590D22 !important;
     font-weight: 600;
   }
   
   ion-radio {
-    --color: #a4133c;
-    --color-checked: #FF4D6D;
-  }
-  
-  .popover-viewport {
-    border-radius: 16px;
-    border: 1px solid rgba(255, 77, 109, 0.1);
+    --color: #a4133c !important;
+    --color-checked: #FF4D6D !important;
   }
 }
