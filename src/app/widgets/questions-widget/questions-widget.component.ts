@@ -121,7 +121,7 @@ import { Location } from '@angular/common';
       height: 100%;
     }
     .scroll-content { --background: transparent; }
-    .questions-container { padding: calc(env(safe-area-inset-top) + 85px) 20px 20px; background: #fff0f3; min-height: 100%; padding-bottom: 100px; box-sizing: border-box; }
+    .questions-container { padding: calc(env(safe-area-inset-top) + 40px) 20px 20px; background: #fff0f3; min-height: 100%; padding-bottom: 100px; box-sizing: border-box; }
     .q-header { text-align: center; margin-bottom: 20px; position: relative; }
     .back-btn { position: absolute; left: 0; top: 0; background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; }
     .q-header h2 { color: #590D22; margin: 0 0 5px; font-weight: 800; font-size: 1.8rem; padding-top: 5px; }

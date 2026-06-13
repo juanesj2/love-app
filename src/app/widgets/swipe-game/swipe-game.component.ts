@@ -177,7 +177,7 @@ import { Location } from '@angular/common';
       display: block;
     }
     .scroll-content { --background: transparent; }
-    .swipe-container { padding: calc(env(safe-area-inset-top) + 85px) 20px 20px; background: #fff0f3; min-height: 100%; display: flex; flex-direction: column; padding-bottom: 50px; }
+    .swipe-container { padding: calc(env(safe-area-inset-top) + 40px) 20px 20px; background: #fff0f3; min-height: 100%; display: flex; flex-direction: column; padding-bottom: 50px; }
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .back-btn, .stats-btn { background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; flex-shrink: 0; }
     .header-titles { flex: 1; text-align: center; display: flex; flex-direction: column; align-items: center; }

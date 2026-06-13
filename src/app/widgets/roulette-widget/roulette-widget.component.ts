@@ -63,7 +63,7 @@ import { LoveApiService } from '../../services/love-api.service';
   `,
   styles: [`
     .roulette-content { --background: #fdf5f7; }
-    .header { text-align: center; padding: calc(env(safe-area-inset-top) + 85px) 20px 10px; position: relative; }
+    .header { text-align: center; padding: calc(env(safe-area-inset-top) + 40px) 20px 10px; position: relative; }
     .back-btn { position: absolute; left: 20px; top: 20px; background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; z-index: 10; }
     .fill-btn { position: absolute; right: 20px; top: 20px; background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; z-index: 10; }
     .header h2 { color: #590D22; margin: 0 0 5px; font-weight: 800; font-size: 1.8rem; padding-top: 5px; }
