@@ -981,9 +981,11 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
   calculateDays(dateStr: string): number {
     if (!dateStr) return 0;
-    const d = new Date(dateStr).getTime();
-    const now = new Date().getTime();
-    return Math.floor(Math.abs(now - d) / (1000 * 60 * 60 * 24));
+    const d = new Date(dateStr);
+    const now = new Date();
+    d.setHours(0,0,0,0);
+    now.setHours(0,0,0,0);
+    return Math.round(Math.abs(now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
   }
 
   isPast(dateStr: string): boolean {
