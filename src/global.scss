@@ -320,3 +320,10 @@ ion-popover.love-popover {
     --color-checked: #FF4D6D !important;
   }
 }
+
+/* Remove tab bar shadow */
+ion-tab-bar {
+  box-shadow: none !important;
+  --border: none !important;
+  border-top: none !important;
+}
