@@ -378,13 +378,15 @@ export class LoveApiService {
     return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/widget/food-places`, { headers }));
   }
 
-  async addFoodPlace(name: string, location?: string, rating?: number, description?: string, imageBase64?: string): Promise<any> {
+  async addFoodPlace(name: string, location?: string, rating?: number, description?: string, imageBase64?: string, category?: string, is_favorite?: boolean): Promise<any> {
     const headers = await this.getHeaders();
     const formData = new FormData();
     formData.append('name', name);
     if (location) formData.append('location', location);
     if (rating) formData.append('rating', rating.toString());
     if (description) formData.append('description', description);
+    if (category) formData.append('category', category);
+    if (is_favorite !== undefined) formData.append('is_favorite', is_favorite.toString());
     
     if (imageBase64) {
       try {
@@ -407,7 +409,7 @@ export class LoveApiService {
     return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/widget/food-places`, formData, { headers: reqHeaders }));
   }
 
-  async updateFoodPlace(id: number, name: string, location?: string, rating?: number, description?: string, imageBase64?: string): Promise<any> {
+  async updateFoodPlace(id: number, name: string, location?: string, rating?: number, description?: string, imageBase64?: string, category?: string, is_favorite?: boolean): Promise<any> {
     const headers = await this.getHeaders();
     const formData = new FormData();
     formData.append('_method', 'PUT');
@@ -415,6 +417,8 @@ export class LoveApiService {
     if (location) formData.append('location', location);
     if (rating) formData.append('rating', rating.toString());
     if (description) formData.append('description', description);
+    if (category) formData.append('category', category);
+    if (is_favorite !== undefined) formData.append('is_favorite', is_favorite.toString());
     
     if (imageBase64) {
       try {

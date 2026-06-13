@@ -306,13 +306,30 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="restaurant-outline"></ion-icon> Tour Gastronómico</h2>
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Restaurantes y platos que hemos probado</p>
             
+            <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
+              <select [(ngModel)]="selectedFoodCategory" class="glass-input" style="flex: 1; padding: 8px;">
+                <option value="">Todas las categorías</option>
+                <option *ngFor="let cat of foodCategories" [value]="cat">{{ cat }}</option>
+              </select>
+              
+              <button class="glass-btn" style="padding: 8px 12px; font-size: 1.2rem;" [style.color]="showFavoritesOnlyFoodPlaces ? '#FF4D6D' : '#888'" [style.background]="showFavoritesOnlyFoodPlaces ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="showFavoritesOnlyFoodPlaces = !showFavoritesOnlyFoodPlaces">
+                <ion-icon [name]="showFavoritesOnlyFoodPlaces ? 'heart' : 'heart-outline'"></ion-icon>
+              </button>
+            </div>
+            
             <div class="food-places-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
-              <div class="food-place-item" *ngFor="let place of foodPlaces" (click)="openFoodPlaceModal(place)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
+              <div class="food-place-item" *ngFor="let place of filteredFoodPlaces" (click)="openFoodPlaceModal(place)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
+                
+                <div *ngIf="place.is_favorite" style="position: absolute; top: 8px; left: 8px; z-index: 5;">
+                  <ion-icon name="heart" style="color: #FF4D6D; font-size: 1.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));"></ion-icon>
+                </div>
+                
                 <div style="position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5;" (click)="$event.stopPropagation(); editFoodPlace(place)">
                   <ion-icon name="pencil-outline" style="font-size: 1.1rem; color: #FF4D6D;"></ion-icon>
                 </div>
                 <div class="place-image" [style.backgroundImage]="'url(' + (place.image_url_full || 'assets/default-food.png') + ')'" style="width: 100%; aspect-ratio: 1; border-radius: 10px; background-size: cover; background-position: center; margin: 0 auto 10px;"></div>
                 <span class="p-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ place.name }}</span>
+                <span *ngIf="place.category" style="display: block; font-size: 0.7rem; color: #a4133c; margin-bottom: 2px;">{{ place.category }}</span>
                 <span class="p-rating" style="color: #FFB703; font-size: 0.8rem;">
                   <ng-container *ngTemplateOutlet="staticStars; context: { rating: place.rating }"></ng-container>
                 </span>
@@ -370,6 +387,18 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             
             <input type="text" placeholder="Nombre del sitio" [(ngModel)]="newFoodPlace.name" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
             <input type="text" placeholder="Ubicación (ej: Madrid)" [(ngModel)]="newFoodPlace.location" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+              <select [(ngModel)]="newFoodPlace.category" class="glass-input" style="flex: 1;">
+                <option value="">(Sin categoría)</option>
+                <option *ngFor="let cat of foodCategories" [value]="cat">{{ cat }}</option>
+              </select>
+              
+              <button class="glass-btn" style="padding: 0 15px; font-size: 1.5rem;" [style.color]="newFoodPlace.is_favorite ? '#FF4D6D' : '#888'" (click)="newFoodPlace.is_favorite = !newFoodPlace.is_favorite">
+                <ion-icon [name]="newFoodPlace.is_favorite ? 'heart' : 'heart-outline'"></ion-icon>
+              </button>
+            </div>
+            
             <textarea placeholder="¿Qué tal estaba? Plato estrella, etc." [(ngModel)]="newFoodPlace.description" class="glass-input" style="width: 100%; min-height: 80px; margin-bottom: 10px; resize: vertical;"></textarea>
             
             <div style="margin-bottom: 20px;">
@@ -404,9 +433,13 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
               <img [src]="selectedFoodPlace?.image_url_full" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             
-            <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;">{{ selectedFoodPlace?.name }}</h2>
+            <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;">
+              {{ selectedFoodPlace?.name }}
+              <ion-icon *ngIf="selectedFoodPlace?.is_favorite" name="heart" style="color: #FF4D6D; font-size: 1.2rem; vertical-align: middle; margin-left: 5px;"></ion-icon>
+            </h2>
             <p style="color: #a4133c; font-size: 1.1rem; font-weight: 700; margin-bottom: 10px;">
               {{ selectedFoodPlace?.location }}
+              <span *ngIf="selectedFoodPlace?.category" style="display: inline-block; margin-left: 5px; background: rgba(255,77,109,0.1); padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; color: #FF4D6D;">{{ selectedFoodPlace.category }}</span>
             </p>
             <div style="color: #FFB703; font-size: 1.5rem; margin-bottom: 15px;">
                 <ng-container *ngTemplateOutlet="staticStars; context: { rating: selectedFoodPlace?.rating }"></ng-container>
@@ -754,9 +787,21 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   isMovieListModalOpen = false;
 
   isAddingFoodPlace = false;
-  newFoodPlace: any = { name: '', location: '', description: '', rating: 5, imageBase64: null };
+  newFoodPlace: any = { name: '', location: '', description: '', rating: 5, category: '', is_favorite: false, imageBase64: null };
   isFoodPlaceModalOpen = false;
   selectedFoodPlace: any = null;
+  
+  foodCategories = ['Española', 'Italiana', 'Árabe', 'Asiática', 'Mexicana', 'Americana', 'Comida Rápida', 'Desayunos/Brunch', 'Postres', 'Otro'];
+  selectedFoodCategory = '';
+  showFavoritesOnlyFoodPlaces = false;
+
+  get filteredFoodPlaces() {
+    return this.foodPlaces.filter(p => {
+      const matchFav = this.showFavoritesOnlyFoodPlaces ? p.is_favorite : true;
+      const matchCat = this.selectedFoodCategory ? p.category === this.selectedFoodCategory : true;
+      return matchFav && matchCat;
+    });
+  }
   
   isAddingDish = false;
   newDish: any = { name: '', description: '', rating: 5, imageBase64: null };
@@ -1311,14 +1356,14 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     if (!this.newFoodPlace.name) return this.showToast('Ponle nombre al sitio', 'warning');
     try {
       if (this.newFoodPlace.id) {
-        await this.api.updateFoodPlace(this.newFoodPlace.id, this.newFoodPlace.name, this.newFoodPlace.location, this.newFoodPlace.rating, this.newFoodPlace.description, this.newFoodPlace.imageBase64);
+        await this.api.updateFoodPlace(this.newFoodPlace.id, this.newFoodPlace.name, this.newFoodPlace.location, this.newFoodPlace.rating, this.newFoodPlace.description, this.newFoodPlace.imageBase64, this.newFoodPlace.category, this.newFoodPlace.is_favorite);
         this.showToast('Restaurante actualizado', 'success');
       } else {
-        await this.api.addFoodPlace(this.newFoodPlace.name, this.newFoodPlace.location, this.newFoodPlace.rating, this.newFoodPlace.description, this.newFoodPlace.imageBase64);
+        await this.api.addFoodPlace(this.newFoodPlace.name, this.newFoodPlace.location, this.newFoodPlace.rating, this.newFoodPlace.description, this.newFoodPlace.imageBase64, this.newFoodPlace.category, this.newFoodPlace.is_favorite);
         this.showToast('Restaurante añadido', 'success');
       }
       this.isAddingFoodPlace = false;
-      this.newFoodPlace = { name: '', location: '', description: '', rating: 5, imageBase64: null };
+      this.newFoodPlace = { name: '', location: '', description: '', rating: 5, category: '', is_favorite: false, imageBase64: null };
       this.loadFoodAndMovies();
     } catch (e) {
       this.showToast('Error al guardar restaurante', 'danger');
