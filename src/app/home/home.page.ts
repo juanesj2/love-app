@@ -167,7 +167,7 @@ import { App } from '@capacitor/app';
       @keyframes heartbeat { 0% { transform: scale(1); } 25% { transform: scale(1.3); } 50% { transform: scale(1); } 75% { transform: scale(1.3); } 100% { transform: scale(1); } }
   
       .custom-footer { background: transparent; border: none; padding: 0 15px calc(env(safe-area-inset-bottom) + 15px) 15px; position: absolute; bottom: 0; width: 100%; pointer-events: none; z-index: 1000; }
-      .custom-tab-bar { pointer-events: auto; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; padding: 5px 15px; height: 70px; border-radius: 35px; box-shadow: none; border: 1px solid rgba(255,255,255,0.5); position: relative; margin-bottom: 5px; }
+      .custom-tab-bar { pointer-events: auto; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; padding: 5px 15px; height: 70px; border-radius: 35px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.5); position: relative; margin-bottom: 5px; }
       .tab-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #a08c92; width: 55px; font-size: 0.75rem; gap: 4px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; }
       .tab-btn.active { color: #FF4D6D; font-weight: 800; transform: translateY(-3px); }
       
