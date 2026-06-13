@@ -459,10 +459,13 @@ import { debounceTime } from 'rxjs/operators';
               {{ selectedFoodPlace?.name }}
               <ion-icon *ngIf="selectedFoodPlace?.is_favorite" name="heart" style="color: #FF4D6D; font-size: 1.2rem; vertical-align: middle; margin-left: 5px;"></ion-icon>
             </h2>
-            <p style="color: #a4133c; font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;" (click)="openMap(selectedFoodPlace?.location)">
-              <ion-icon name="location-outline" style="font-size: 1.2rem;"></ion-icon> {{ selectedFoodPlace?.location }}
-              <span *ngIf="selectedFoodPlace?.category" style="margin-left: 5px; background: rgba(255,77,109,0.1); padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; color: #FF4D6D;">{{ selectedFoodPlace.category }}</span>
-            </p>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+              <button class="glass-btn" style="padding: 6px 12px; font-size: 1rem; display: inline-flex; align-items: center; gap: 5px; color: #590D22; border: 1px solid rgba(255,77,109,0.3);" (click)="openMap(selectedFoodPlace?.location)">
+                <ion-icon name="location-outline" style="font-size: 1.2rem; color: #FF4D6D;"></ion-icon> 
+                <span style="font-weight: 800;">{{ selectedFoodPlace?.location }}</span>
+              </button>
+              <span *ngIf="selectedFoodPlace?.category" style="background: rgba(255,77,109,0.1); padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 700; color: #FF4D6D;">{{ selectedFoodPlace.category }}</span>
+            </div>
             <div style="color: #FFB703; font-size: 1.5rem; margin-bottom: 15px;">
                 <ng-container *ngTemplateOutlet="staticStars; context: { rating: selectedFoodPlace?.rating }"></ng-container>
             </div>
@@ -649,7 +652,7 @@ import { debounceTime } from 'rxjs/operators';
           </div>
           
           <!-- Map Modal -->
-        <div class="custom-overlay" *ngIf="isMapModalOpen" style="z-index: 100000;" (click)="isMapModalOpen = false">
+        <div class="custom-overlay" *ngIf="isMapModalOpen" style="z-index: 9999999;" (click)="isMapModalOpen = false">
           <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 15px; font-weight: 900;">Ubicación 📍</h2>
             <div style="width: 100%; height: 300px; border-radius: 12px; overflow: hidden; margin-bottom: 20px;">
