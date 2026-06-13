@@ -368,7 +368,7 @@ import { debounceTime } from 'rxjs/operators';
             <div style="max-height: 35vh; overflow-y: auto; overflow-x: hidden; padding-right: 5px; margin-bottom: 20px;">
               <div class="movies-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
               <div class="movie-item" *ngFor="let movie of filteredMovies" (click)="openMovieModal(movie)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
-                <ion-icon *ngIf="movie.is_favorite" name="heart" style="position: absolute; top: -5px; left: -5px; font-size: 1.2rem; color: #FF4D6D; z-index: 5; background: white; border-radius: 50%; padding: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);"></ion-icon>
+                <div *ngIf="movie.is_favorite" style="position: absolute; top: 8px; left: 8px; width: 26px; height: 26px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5;"><ion-icon name="heart" style="font-size: 1.1rem; color: #FF4D6D;"></ion-icon></div>
                 <div style="position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5;" (click)="$event.stopPropagation(); editMovie(movie)">
                   <ion-icon name="pencil-outline" style="font-size: 1.1rem; color: #FF4D6D;"></ion-icon>
                 </div>
@@ -1477,6 +1477,8 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     try {
       this.foodPlaces = await this.api.getFoodPlaces();
       this.movies = await this.api.getMovies();
+      console.log('[DEBUG] movies from API:', JSON.stringify(this.movies?.slice(0,1)));
+      console.log('[DEBUG] food places from API:', JSON.stringify(this.foodPlaces?.slice(0,1)));
     } catch (e) {
       console.error('Error loading food and movies', e);
     }
