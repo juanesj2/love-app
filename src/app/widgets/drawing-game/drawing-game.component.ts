@@ -156,7 +156,7 @@ import { Location } from '@angular/common';
       display: block;
       height: 100%;
     }
-    .drawing-container { padding: 20px; background: #fff0f3; min-height: 100vh; display: flex; flex-direction: column; overflow-y: auto; height: 100vh; box-sizing: border-box; }
+    .drawing-container { padding: calc(env(safe-area-inset-top) + 85px) 20px 20px; background: #fff0f3; min-height: 100vh; display: flex; flex-direction: column; overflow-y: auto; height: 100vh; box-sizing: border-box; }
     .header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
     .back-btn { background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; flex-shrink: 0; }
     .header-titles { flex: 1; text-align: center; display: flex; flex-direction: column; align-items: center; margin-right: 40px; }
