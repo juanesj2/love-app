@@ -303,7 +303,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
 
         <!-- Food List Modal -->
         <div class="custom-overlay" *ngIf="isFoodListModalOpen" (click)="isFoodListModalOpen = false">
-          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 75vh; overflow-y: auto; z-index: 1000;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 85vh; overflow-y: hidden; z-index: 1000;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="restaurant-outline"></ion-icon> Tour Gastronómico</h2>
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Restaurantes y platos que hemos probado</p>
             
@@ -348,7 +348,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
 
         <!-- Movies List Modal -->
         <div class="custom-overlay" *ngIf="isMovieListModalOpen" (click)="isMovieListModalOpen = false">
-          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 85vh; overflow-y: hidden;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="film-outline"></ion-icon> Cine en Pareja</h2>
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Películas y series que vemos juntos</p>
             
