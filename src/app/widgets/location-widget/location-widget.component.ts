@@ -358,6 +358,10 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
             }
             if (this.lastMeData && this.lastPartnerData) {
               this.renderMapState(this.lastMeData, this.lastPartnerData);
+              if (!this.isGhostMode && !this.partnerIsGhost) {
+                // Auto-centrar en la pareja al encender la ubicación
+                setTimeout(() => this.centerOnPartner(), 150);
+              }
             }
           }
         },
