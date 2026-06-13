@@ -326,4 +326,16 @@ ion-tab-bar {
   box-shadow: none !important;
   --border: none !important;
   border-top: none !important;
+  --box-shadow: none !important;
+  filter: none !important;
+}
+
+ion-tab-bar::part(native) {
+  box-shadow: none !important;
+  border-top: none !important;
+}
+
+.tab-bar-shadow,
+.tabbar {
+  box-shadow: none !important;
 }
