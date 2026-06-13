@@ -11,7 +11,7 @@ import { Preferences } from '@capacitor/preferences';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { LocationService } from '../../services/location.service';
 import { addIcons } from 'ionicons';
-import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline } from 'ionicons/icons';
+import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline } from 'ionicons/icons';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
@@ -447,8 +447,12 @@ import { debounceTime } from 'rxjs/operators';
         <div class="custom-overlay" *ngIf="isFoodPlaceModalOpen" (click)="isFoodPlaceModalOpen = false">
           <div class="modal-content glass-card" style="position: relative; margin: 10px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
             
-            <div style="position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 10; cursor: pointer;" (click)="editFoodPlace(selectedFoodPlace)">
+            <div style="position: absolute; top: 15px; left: 15px; width: 36px; height: 36px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 10; cursor: pointer;" (click)="editFoodPlace(selectedFoodPlace)">
               <ion-icon name="pencil-outline" style="font-size: 1.5rem; color: #FF4D6D;"></ion-icon>
+            </div>
+            
+            <div style="position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 10; cursor: pointer;" (click)="isFoodPlaceModalOpen = false">
+              <ion-icon name="close-outline" style="font-size: 1.8rem; color: #590D22;"></ion-icon>
             </div>
             
             <div *ngIf="selectedFoodPlace?.image_url_full" class="milestone-cover" style="width: 100%; height: 180px; border-radius: 18px; margin-bottom: 20px; overflow: hidden; position: relative;">
@@ -594,8 +598,12 @@ import { debounceTime } from 'rxjs/operators';
         <div class="custom-overlay" *ngIf="isMovieModalOpen" (click)="isMovieModalOpen = false">
           <div class="modal-content glass-card" style="position: relative; margin: 10px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
             
-            <div style="position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 10; cursor: pointer;" (click)="editMovie(selectedMovie)">
+            <div style="position: absolute; top: 15px; left: 15px; width: 36px; height: 36px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 10; cursor: pointer;" (click)="editMovie(selectedMovie)">
               <ion-icon name="pencil-outline" style="font-size: 1.5rem; color: #FF4D6D;"></ion-icon>
+            </div>
+            
+            <div style="position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 10; cursor: pointer;" (click)="isMovieModalOpen = false">
+              <ion-icon name="close-outline" style="font-size: 1.8rem; color: #590D22;"></ion-icon>
             </div>
             
             <div *ngIf="selectedMovie?.image_url_full" class="milestone-cover" style="width: 140px; height: 210px; border-radius: 12px; margin: 0 auto 20px; overflow: hidden; position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
@@ -946,7 +954,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   }
 
   constructor() {
-    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar, add, pencilOutline, locationOutline });
+    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, add, pencilOutline, locationOutline, restaurantOutline, filmOutline, star, cameraOutline });
   }
 
   async ngOnInit() {
