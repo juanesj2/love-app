@@ -352,9 +352,20 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
             <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="film-outline"></ion-icon> Cine en Pareja</h2>
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Películas y series que vemos juntos</p>
             
+            <div style="display: flex; gap: 10px; margin-bottom: 15px; width: 100%;">
+              <select [(ngModel)]="selectedMovieGenre" class="glass-input" style="flex: 1; margin: 0; border: 2px solid #FF4D6D; background: white; font-weight: 600; color: #590D22;">
+                <option value="">Todas las categorías</option>
+                <option *ngFor="let cat of movieGenres" [value]="cat">{{ cat }}</option>
+              </select>
+              <button class="glass-btn" style="padding: 0 15px; font-size: 1.5rem; width: auto; flex: 0 0 auto; box-shadow: none; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 77, 109, 0.2);" [style.color]="showFavoritesOnlyMovies ? '#FF4D6D' : '#888'" [style.background]="showFavoritesOnlyMovies ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="showFavoritesOnlyMovies = !showFavoritesOnlyMovies">
+                <ion-icon [name]="showFavoritesOnlyMovies ? 'heart' : 'heart-outline'"></ion-icon>
+              </button>
+            </div>
+            
             <div style="max-height: 35vh; overflow-y: auto; overflow-x: hidden; padding-right: 5px; margin-bottom: 20px;">
               <div class="movies-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-              <div class="movie-item" *ngFor="let movie of movies" (click)="openMovieModal(movie)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 10px; padding: 8px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
+              <div class="movie-item" *ngFor="let movie of filteredMovies" (click)="openMovieModal(movie)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 10px; padding: 8px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
+                <ion-icon *ngIf="movie.is_favorite" name="heart" style="position: absolute; top: -5px; left: -5px; font-size: 1.2rem; color: #FF4D6D; z-index: 5; background: white; border-radius: 50%; padding: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);"></ion-icon>
                 <div style="position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5;" (click)="$event.stopPropagation(); editMovie(movie)">
                   <ion-icon name="pencil-outline" style="font-size: 1rem; color: #FF4D6D;"></ion-icon>
                 </div>
@@ -528,6 +539,17 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
             
             <input type="text" placeholder="Título" [(ngModel)]="newMovie.title" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
             <textarea placeholder="¿De qué iba la peli/serie?" [(ngModel)]="newMovie.description" class="glass-input" style="width: 100%; min-height: 60px; margin-bottom: 10px; resize: vertical;"></textarea>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+              <select [(ngModel)]="newMovie.genre" class="glass-input" style="flex: 1;">
+                <option value="">(Sin categoría)</option>
+                <option *ngFor="let cat of movieGenres" [value]="cat">{{ cat }}</option>
+              </select>
+              
+              <button class="glass-btn" style="padding: 0 15px; font-size: 1.5rem; width: auto; flex: 0 0 auto; box-shadow: none; display: flex; align-items: center; justify-content: center;" [style.color]="newMovie.is_favorite ? '#FF4D6D' : '#888'" [style.background]="newMovie.is_favorite ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="newMovie.is_favorite = !newMovie.is_favorite">
+                <ion-icon [name]="newMovie.is_favorite ? 'heart' : 'heart-outline'"></ion-icon>
+              </button>
+            </div>
             <input *ngIf="showWhoFellAsleep" type="text" placeholder="¿Quién se quedó dormido primero?" [(ngModel)]="newMovie.who_fell_asleep" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
             <textarea placeholder="Nuestra frase favorita / Momento top" [(ngModel)]="newMovie.favorite_quote" class="glass-input" style="width: 100%; min-height: 80px; margin-bottom: 10px; resize: vertical;"></textarea>
             
@@ -563,7 +585,13 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
               <img [src]="selectedMovie?.image_url_full" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             
-            <h2 style="color: #590D22; margin-bottom: 10px; font-weight: 900; font-size: 1.6rem;">{{ selectedMovie?.title }}</h2>
+            <h2 style="color: #590D22; margin-bottom: 10px; font-weight: 900; font-size: 1.6rem;">
+              {{ selectedMovie?.title }}
+              <ion-icon *ngIf="selectedMovie?.is_favorite" name="heart" style="color: #FF4D6D; font-size: 1.2rem; vertical-align: middle; margin-left: 5px;"></ion-icon>
+            </h2>
+            <div *ngIf="selectedMovie?.genre" style="margin-bottom: 10px;">
+              <span style="display: inline-block; background: rgba(255,77,109,0.1); padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; color: #FF4D6D;">{{ selectedMovie.genre }}</span>
+            </div>
             
             <div style="color: #FFB703; font-size: 1.8rem; margin-bottom: 20px;">
                 <ng-container *ngTemplateOutlet="staticStars; context: { rating: selectedMovie?.rating }"></ng-container>
@@ -825,9 +853,21 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   
   isAddingMovie = false;
   showWhoFellAsleep = false;
-  newMovie: any = { title: '', description: '', who_fell_asleep: '', favorite_quote: '', rating: 5, imageBase64: null };
+  newMovie: any = { title: '', description: '', who_fell_asleep: '', favorite_quote: '', rating: 5, genre: '', is_favorite: false, imageBase64: null };
   isMovieModalOpen = false;
   selectedMovie: any = null;
+  
+  movieGenres = ['Acción', 'Comedia', 'Drama', 'Terror', 'Ciencia Ficción', 'Fantasía', 'Romance', 'Animación', 'Documental', 'Thriller', 'Otro'];
+  selectedMovieGenre = '';
+  showFavoritesOnlyMovies = false;
+
+  get filteredMovies() {
+    return this.movies.filter(m => {
+      const matchFav = this.showFavoritesOnlyMovies ? m.is_favorite : true;
+      const matchGenre = this.selectedMovieGenre ? m.genre === this.selectedMovieGenre : true;
+      return matchFav && matchGenre;
+    });
+  }
 
   
   isConfirmModalOpen = false;
@@ -1478,14 +1518,14 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     if (!this.newMovie.title) return this.showToast('Ponle título', 'warning');
     try {
       if (this.newMovie.id) {
-        await this.api.updateMovie(this.newMovie.id, this.newMovie.title, this.newMovie.rating, this.newMovie.who_fell_asleep, this.newMovie.favorite_quote, this.newMovie.imageBase64, this.newMovie.description);
+        await this.api.updateMovie(this.newMovie.id, this.newMovie.title, this.newMovie.rating, this.newMovie.who_fell_asleep, this.newMovie.favorite_quote, this.newMovie.imageBase64, this.newMovie.description, this.newMovie.genre, this.newMovie.is_favorite);
         this.showToast('Peli actualizada', 'success');
       } else {
-        await this.api.addMovie(this.newMovie.title, this.newMovie.rating, this.newMovie.who_fell_asleep, this.newMovie.favorite_quote, this.newMovie.imageBase64, this.newMovie.description);
+        await this.api.addMovie(this.newMovie.title, this.newMovie.rating, this.newMovie.who_fell_asleep, this.newMovie.favorite_quote, this.newMovie.imageBase64, this.newMovie.description, this.newMovie.genre, this.newMovie.is_favorite);
         this.showToast('Peli añadida', 'success');
       }
       this.isAddingMovie = false;
-      this.newMovie = { title: '', description: '', who_fell_asleep: '', favorite_quote: '', rating: 5, imageBase64: null };
+      this.newMovie = { title: '', description: '', who_fell_asleep: '', favorite_quote: '', rating: 5, genre: '', is_favorite: false, imageBase64: null };
       this.showWhoFellAsleep = false;
       this.loadFoodAndMovies();
     } catch (e) {

@@ -478,7 +478,7 @@ export class LoveApiService {
     return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/widget/movies`, { headers }));
   }
 
-  async addMovie(title: string, rating?: number, who_fell_asleep?: string, favorite_quote?: string, imageBase64?: string, description?: string): Promise<any> {
+  async addMovie(title: string, rating?: number, who_fell_asleep?: string, favorite_quote?: string, imageBase64?: string, description?: string, genre?: string, is_favorite?: boolean): Promise<any> {
     const headers = await this.getHeaders();
     const formData = new FormData();
     formData.append('title', title);
@@ -486,6 +486,8 @@ export class LoveApiService {
     if (who_fell_asleep) formData.append('who_fell_asleep', who_fell_asleep);
     if (favorite_quote) formData.append('favorite_quote', favorite_quote);
     if (description) formData.append('description', description);
+    if (genre) formData.append('genre', genre);
+    if (is_favorite !== undefined) formData.append('is_favorite', is_favorite.toString());
     
     if (imageBase64) {
       try {
@@ -507,7 +509,7 @@ export class LoveApiService {
     return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/widget/movies`, formData, { headers: reqHeaders }));
   }
 
-  async updateMovie(id: number, title: string, rating?: number, whoFellAsleep?: string, quote?: string, imageBase64?: string, description?: string): Promise<any> {
+  async updateMovie(id: number, title: string, rating?: number, whoFellAsleep?: string, quote?: string, imageBase64?: string, description?: string, genre?: string, is_favorite?: boolean): Promise<any> {
     const headers = await this.getHeaders();
     const formData = new FormData();
     formData.append('_method', 'PUT');
@@ -516,6 +518,8 @@ export class LoveApiService {
     if (whoFellAsleep) formData.append('who_fell_asleep', whoFellAsleep);
     if (quote) formData.append('favorite_quote', quote);
     if (description) formData.append('description', description);
+    if (genre) formData.append('genre', genre);
+    if (is_favorite !== undefined) formData.append('is_favorite', is_favorite.toString());
     
     if (imageBase64) {
       try {
