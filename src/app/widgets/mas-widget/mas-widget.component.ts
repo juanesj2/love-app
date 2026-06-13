@@ -303,7 +303,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
 
         <!-- Food List Modal -->
         <div class="custom-overlay" *ngIf="isFoodListModalOpen" (click)="isFoodListModalOpen = false">
-          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 75vh; overflow-y: auto; z-index: 1000;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="restaurant-outline"></ion-icon> Tour Gastronómico</h2>
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Restaurantes y platos que hemos probado</p>
             
@@ -318,7 +318,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
               </button>
             </div>
             
-            <div style="max-height: 50vh; overflow-y: auto; overflow-x: hidden; padding-right: 5px; margin-bottom: 20px;">
+            <div style="max-height: 35vh; overflow-y: auto; overflow-x: hidden; padding-right: 5px; margin-bottom: 20px;">
               <div class="food-places-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
               <div class="food-place-item" *ngFor="let place of filteredFoodPlaces" (click)="openFoodPlaceModal(place)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
                 
@@ -348,11 +348,11 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
 
         <!-- Movies List Modal -->
         <div class="custom-overlay" *ngIf="isMovieListModalOpen" (click)="isMovieListModalOpen = false">
-          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="film-outline"></ion-icon> Cine en Pareja</h2>
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Películas y series que vemos juntos</p>
             
-            <div style="max-height: 50vh; overflow-y: auto; overflow-x: hidden; padding-right: 5px; margin-bottom: 20px;">
+            <div style="max-height: 35vh; overflow-y: auto; overflow-x: hidden; padding-right: 5px; margin-bottom: 20px;">
               <div class="movies-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
               <div class="movie-item" *ngFor="let movie of movies" (click)="openMovieModal(movie)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 10px; padding: 8px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
                 <div style="position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5;" (click)="$event.stopPropagation(); editMovie(movie)">
@@ -606,7 +606,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
             </div>
           </div>
           <!-- Confirm Modal -->
-        <div class="custom-overlay" *ngIf="isConfirmModalOpen" (click)="isConfirmModalOpen = false">
+        <div class="custom-overlay" *ngIf="isConfirmModalOpen" style="z-index: 100000;" (click)="isConfirmModalOpen = false">
           <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 15px; font-weight: 900;">{{ confirmTitle }}</h2>
             <p style="color: #a4133c; font-size: 1.1rem; margin-bottom: 25px; font-weight: 500;">{{ confirmMessage }}</p>
