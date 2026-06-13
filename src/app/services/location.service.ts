@@ -3,6 +3,7 @@ import { Firestore, doc, docData, setDoc, GeoPoint } from '@angular/fire/firesto
 import { Geolocation } from '@capacitor/geolocation';
 import { registerPlugin } from '@capacitor/core';
 import { Observable } from 'rxjs';
+import { Preferences } from '@capacitor/preferences';
 import type { BackgroundGeolocationPlugin } from '@capacitor-community/background-geolocation';
 
 const BackgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>('BackgroundGeolocation');
@@ -11,6 +12,7 @@ export interface UserLocation {
   name: string;
   position: GeoPoint;
   avatar: string;
+  is_sharing?: boolean;
 }
 
 @Injectable({
@@ -19,8 +21,34 @@ export interface UserLocation {
 export class LocationService {
   private firestore = inject(Firestore);
 
+  async getPrivacyMode(): Promise<boolean> {
+    const { value } = await Preferences.get({ key: 'ghost_mode' });
+    return value === 'true';
+  }
+
+  async setPrivacyMode(isGhost: boolean): Promise<void> {
+    await Preferences.set({ key: 'ghost_mode', value: isGhost ? 'true' : 'false' });
+  }
+
   async updateMyLocation(userId: string, name: string) {
     try {
+      const isGhost = await this.getPrivacyMode();
+      const userDocRef = doc(this.firestore, `locations/${userId}`);
+      
+      if (isGhost) {
+        await setDoc(userDocRef, {
+          name: name,
+          is_sharing: false
+        }, { merge: true });
+        
+        const savedWatcher = localStorage.getItem('bg_watcher_id');
+        if (savedWatcher) {
+           BackgroundGeolocation.removeWatcher({ id: savedWatcher });
+           localStorage.removeItem('bg_watcher_id');
+        }
+        return;
+      }
+
       // 1. Pedir permisos explícitamente (evita bloqueos silenciosos)
       const permissions = await Geolocation.checkPermissions();
       if (permissions.location !== 'granted') {
@@ -35,11 +63,11 @@ export class LocationService {
       });
 
       const geoPoint = new GeoPoint(coordinates.coords.latitude, coordinates.coords.longitude);
-      const userDocRef = doc(this.firestore, `locations/${userId}`);
 
       await setDoc(userDocRef, {
         name: name,
-        position: geoPoint
+        position: geoPoint,
+        is_sharing: true
       }, { merge: true });
 
       console.log('Ubicación actualizada:', userId);
@@ -65,14 +93,16 @@ export class LocationService {
             return console.error(error);
           }
           if (location) {
+            const currentGhost = await this.getPrivacyMode();
+            if (currentGhost) return;
             const bgGeoPoint = new GeoPoint(location.latitude, location.longitude);
-            await setDoc(userDocRef, { position: bgGeoPoint }, { merge: true });
+            await setDoc(userDocRef, { position: bgGeoPoint, is_sharing: true }, { merge: true });
             console.log('Fondo actualizado:', location);
           }
         }
       ).then(watcherId => {
-        // Guardar watcher_id si es necesario (para detenerlo luego)
-        // localStorage.setItem('bg_watcher_id', watcherId);
+        // Guardar watcher_id para detenerlo si se activa el modo fantasma
+        localStorage.setItem('bg_watcher_id', watcherId);
       });
 
     } catch (error) {

@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule, ToastController, ActionSheetController, AlertController, IonContent } from '@ionic/angular';
 import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { LoveApiService } from '../../services/love-api.service';
+import { TutorialService } from '../../services/tutorial.service';
 import { environment } from '../../../environments/environment';
 import { addIcons } from 'ionicons';
 import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline } from 'ionicons/icons';
@@ -543,10 +544,11 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
   imports: [CommonModule, FormsModule, IonicModule]
 })
 export class ChatWidgetComponent implements OnInit, AfterViewInit {
-  @ViewChild(IonContent, { static: false }) private msgContainer!: IonContent;
+  @ViewChild('msgContainer') msgContainer!: IonContent;
   private api = inject(LoveApiService);
   private toastController = inject(ToastController);
   private firestore = inject(Firestore);
+  private tutorialService = inject(TutorialService);
   private cdr = inject(ChangeDetectorRef);
   private actionSheetCtrl = inject(ActionSheetController);
   private alertCtrl = inject(AlertController);
@@ -577,6 +579,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     this.currentUser = localStorage.getItem('love_widget_user') === 'juan' ? 'Juan' : 'Roberta';
     await this.loadAvatars();
     await this.loadMessages();
+    this.tutorialService.showChatTour();
   }
 
   ngOnDestroy() {

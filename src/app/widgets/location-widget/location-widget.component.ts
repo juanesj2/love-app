@@ -9,13 +9,26 @@ import { Subscription, combineLatest } from 'rxjs';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Preferences } from '@capacitor/preferences';
 import { addIcons } from 'ionicons';
-import { locateOutline, flagOutline, camera, image, close, locationOutline, heart } from 'ionicons/icons';
+import { locateOutline, flagOutline, camera, image, close, locationOutline, heart, eyeOutline, eyeOffOutline } from 'ionicons/icons';
 import { LoveApiService } from '../../services/love-api.service';
 
 @Component({
   selector: 'app-location-widget',
   template: `
     <div class="location-container" [class.is-together]="areTogether">
+      
+      <button class="privacy-map-btn" (click)="togglePrivacy()">
+        <ion-icon [name]="isGhostMode ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+      </button>
+
+      <div class="ghost-overlay" *ngIf="isGhostMode">
+        <div class="ghost-box">
+          <ion-icon name="eye-off-outline"></ion-icon>
+          <h3>Modo Fantasma Activo</h3>
+          <p>Tu ubicación está oculta. Actívala para ver dónde está tu pareja.</p>
+        </div>
+      </div>
+
       <div class="map-wrapper">
         <div id="map"></div>
         <button class="center-map-btn" *ngIf="myLastPos" (click)="centerMap()">
@@ -24,13 +37,17 @@ import { LoveApiService } from '../../services/love-api.service';
       </div>
       
       <!-- Partner Location Card -->
-        <div class="partner-location-card" *ngIf="!areTogether" (click)="centerOnPartner()">
-          <div class="poke-btn-mini" (click)="triggerPoke($event)">
+        <div class="partner-location-card" *ngIf="!areTogether && !isGhostMode" (click)="!partnerIsGhost && centerOnPartner()">
+          <div class="poke-btn-mini" *ngIf="!partnerIsGhost" (click)="triggerPoke($event)">
             <ion-icon name="heart"></ion-icon>
           </div>
-          <div class="avatar-container-mini">
-            <img [src]="partnerAvatarUrl || defaultAvatar" class="avatar-mini" />
-            <div class="mood-badge-mini" *ngIf="partnerMood">{{ partnerMood }}</div>
+          <div class="avatar-container-mini" [class.ghost]="partnerIsGhost">
+            <img *ngIf="!partnerIsGhost" [src]="partnerAvatarUrl || defaultAvatar" class="avatar-mini" />
+            <ion-icon *ngIf="partnerIsGhost" name="eye-off-outline" class="avatar-mini-ghost"></ion-icon>
+            <div class="mood-badge-mini" *ngIf="partnerMood && !partnerIsGhost">{{ partnerMood }}</div>
+          </div>
+          <div class="partner-info-mini" *ngIf="partnerIsGhost">
+            <strong>Ubicación Oculta</strong>
           </div>
         </div>
       
@@ -78,6 +95,15 @@ import { LoveApiService } from '../../services/love-api.service';
     }
     .location-container { height: 100%; display: flex; flex-direction: column; position: relative; overflow: hidden; }
     .location-container.is-together { background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%); }
+    .privacy-map-btn { position: absolute; top: 16px; left: 16px; z-index: 999; background: rgba(255,255,255,0.95); border: none; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #590D22; box-shadow: 0 4px 10px rgba(0,0,0,0.15); cursor: pointer; backdrop-filter: blur(5px); }
+    .ghost-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(255, 154, 158, 0.4) 0%, rgba(254, 207, 239, 0.4) 100%); backdrop-filter: blur(12px); z-index: 998; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+    .ghost-box { background: white; padding: 30px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); color: #590D22; max-width: 300px; }
+    .ghost-box ion-icon { font-size: 48px; color: #FF4D6D; margin-bottom: 15px; }
+    .ghost-box h3 { margin: 0 0 10px 0; font-weight: 800; font-size: 20px; }
+    .ghost-box p { margin: 0; color: #666; font-size: 15px; line-height: 1.4; }
+    .avatar-container-mini.ghost { background: #f3f4f6; display: flex; align-items: center; justify-content: center; border: 2px solid #ddd; }
+    .avatar-mini-ghost { font-size: 24px; color: #9ca3af; }
+    .partner-info-mini { margin-left: 12px; color: #590D22; font-size: 15px; }
     .location-container.is-together .map-wrapper { opacity: 0; pointer-events: none; transition: opacity 1s ease; }
     .map-wrapper { flex: 1; position: relative; transition: opacity 1s ease; }
     #map { width: 100%; height: 100%; background: #fdfbfb; }
@@ -142,6 +168,9 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
   public myUserId!: string;
   public partnerId!: string;
 
+  public isGhostMode = false;
+  public partnerIsGhost = false;
+
   public uploadingAvatar = false;
   public areTogether = false;
   public defaultAvatar = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffb3c1"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
@@ -167,12 +196,14 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
   private hasCentered = false;
 
   constructor() {
-    addIcons({ locateOutline, flagOutline, camera, image, close, locationOutline, heart });
+    addIcons({ locateOutline, flagOutline, camera, image, close, locationOutline, heart, eyeOutline, eyeOffOutline });
   }
 
   private appStateListener?: PluginListenerHandle;
 
   async ngOnInit() {
+    this.isGhostMode = await this.locationService.getPrivacyMode();
+
     setTimeout(() => {
       this.initMap();
     }, 100);
@@ -305,12 +336,38 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
     }
   }
 
+  async togglePrivacy() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Modo Privacidad',
+      subHeader: this.isGhostMode ? 'Tu ubicación está oculta (Modo Fantasma)' : 'Estás compartiendo tu ubicación',
+      cssClass: 'premium-action-sheet',
+      buttons: [
+        {
+          text: this.isGhostMode ? 'Encender Ubicación' : 'Apagar Ubicación',
+          icon: this.isGhostMode ? 'eye-outline' : 'eye-off-outline',
+          cssClass: 'premium-main-btn',
+          handler: () => {
+            this.isGhostMode = !this.isGhostMode;
+            this.locationService.setPrivacyMode(this.isGhostMode);
+            this.locationService.updateMyLocation(this.myUserId, 'Yo');
+            if (this.isGhostMode) {
+              this.areTogether = false;
+            }
+          }
+        },
+        { text: 'Cancelar', role: 'cancel', cssClass: 'premium-cancel-btn' }
+      ]
+    });
+    await actionSheet.present();
+  }
+
   private startTracking() {
     const me$ = this.locationService.listenToUserLocation(this.myUserId);
     const partner$ = this.locationService.listenToUserLocation(this.partnerId);
 
     this.locationsSub = combineLatest([me$, partner$]).subscribe(([me, partner]) => {
-      // Fallback si no hay posición en Firebase (ej: Madrid y Barcelona)
+      this.partnerIsGhost = partner?.is_sharing === false;
+
       const myPos = me?.position 
         ? L.latLng(me.position.latitude, me.position.longitude)
         : L.latLng(40.4168, -3.7038); // Madrid
@@ -320,14 +377,33 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
         : L.latLng(41.3851, 2.1734); // Barcelona
 
       this.myLastPos = myPos;
-      this.partnerLastPos = partnerPos;
+      
+      let distanceMeters = 0;
 
-      if (!this.partnerCity && partnerPos && !this.areTogether) {
-        this.getCityName(partnerPos.lat, partnerPos.lng);
+      if (this.isGhostMode || this.partnerIsGhost) {
+        this.areTogether = false;
+        this.partnerLastPos = undefined;
+        
+        if (this.partnerMarker) {
+          this.map.removeLayer(this.partnerMarker);
+          this.partnerMarker = undefined;
+        }
+        if (this.distanceMarker) {
+          this.map.removeLayer(this.distanceMarker);
+          this.distanceMarker = undefined;
+        }
+        if (this.connectionLine) {
+          this.map.removeLayer(this.connectionLine);
+          this.connectionLine = undefined;
+        }
+      } else {
+        this.partnerLastPos = partnerPos;
+        if (!this.partnerCity && partnerPos && !this.areTogether) {
+          this.getCityName(partnerPos.lat, partnerPos.lng);
+        }
+        distanceMeters = myPos.distanceTo(partnerPos);
+        this.areTogether = distanceMeters < 50; 
       }
-
-      const distanceMeters = myPos.distanceTo(partnerPos);
-      this.areTogether = distanceMeters < 50; 
 
       if (this.areTogether) {
         this.clearMapElements();
@@ -336,15 +412,20 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
           this.hasCentered = true;
         }
       } else {
-        this.updateMarker('me', myPos, this.myAvatarUrl);
-        this.updateMarker('partner', partnerPos, this.partnerAvatarUrl);
-        this.drawConnection(myPos, partnerPos);
-        
-        const midPoint = L.latLng((myPos.lat + partnerPos.lat) / 2, (myPos.lng + partnerPos.lng) / 2);
-        const distText = distanceMeters > 1000
-          ? `${(distanceMeters / 1000).toLocaleString('es-ES', { maximumFractionDigits: 0 })} km`
-          : `${Math.round(distanceMeters)} m`;
-        this.updateDistanceMarker(midPoint, distText);
+        if (!this.isGhostMode) {
+          this.updateMarker('me', myPos, this.myAvatarUrl);
+          
+          if (!this.partnerIsGhost) {
+            this.updateMarker('partner', partnerPos, this.partnerAvatarUrl);
+            this.drawConnection(myPos, partnerPos);
+            
+            const midPoint = L.latLng((myPos.lat + partnerPos.lat) / 2, (myPos.lng + partnerPos.lng) / 2);
+            const distText = distanceMeters > 1000
+              ? `${(distanceMeters / 1000).toLocaleString('es-ES', { maximumFractionDigits: 0 })} km`
+              : `${Math.round(distanceMeters)} m`;
+            this.updateDistanceMarker(midPoint, distText);
+          }
+        }
         
         if (!this.hasCentered) {
           this.centerMap();
@@ -456,7 +537,7 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
       buttons: [
         { text: 'Tomar Foto', icon: 'camera', handler: () => callback(CameraSource.Camera) },
         { text: 'De la Galería', icon: 'image', handler: () => callback(CameraSource.Photos) },
-        { text: 'Cancelar', icon: 'close', role: 'cancel' }
+        { text: 'Cancelar', icon: 'close', role: 'cancel', cssClass: 'premium-cancel-btn' }
       ]
     });
     await actionSheet.present();

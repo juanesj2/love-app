@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ToastController, AlertController, ActionSheetController, ModalController, IonContent } from '@ionic/angular';
 import { LoveApiService } from '../../services/love-api.service';
+import { TutorialService } from '../../services/tutorial.service';
 import { environment } from '../../../environments/environment';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Capacitor } from '@capacitor/core';
@@ -48,7 +49,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
         </div>
         
         <div class="floating-actions">
-          <button class="albums-btn-small" (click)="openAlbumsModal()">
+          <button id="photo-album-selector" class="albums-btn-small" (click)="openAlbumsModal()">
             <ion-icon name="images-outline"></ion-icon>
           </button>
           
@@ -615,6 +616,7 @@ export class PhotoWidgetComponent implements OnInit {
   private alertController = inject(AlertController);
   private actionSheetCtrl = inject(ActionSheetController);
   private cdr = inject(ChangeDetectorRef);
+  private tutorialService = inject(TutorialService);
   public environment = environment;
   
   pendingPhotoFile: File | null = null;
@@ -622,7 +624,7 @@ export class PhotoWidgetComponent implements OnInit {
   pendingPhotoText: string = '';
 
   viewMode: 'feed' | 'grid' = 'feed';
-  @ViewChild('gridContent', { static: false }) content!: IonContent;
+  @ViewChild(IonContent, { static: false }) content!: IonContent;
 
   photos: any[] = [];
   groupedPhotos: any[] = [];
@@ -664,6 +666,7 @@ export class PhotoWidgetComponent implements OnInit {
   fadingGlobalDate = false;
   lastShownDate = '';
   dateOverlayTimeout: any;
+  currentViewDate: string = 'Hoy';
 
   // --- Galería Premium ---
   currentGalleryFilter: 'todas' | 'solo_yo' | 'solo_pareja' | 'ultimas' = 'todas';
@@ -835,6 +838,7 @@ export class PhotoWidgetComponent implements OnInit {
       console.error(e);
       this.showError('No se pudo cargar la galería. Comprueba tu conexión.');
     } finally {
+      this.tutorialService.showPhotosTour();
       this.cdr.detectChanges();
     }
   }
@@ -891,6 +895,7 @@ export class PhotoWidgetComponent implements OnInit {
     
     // Convertir a array manteniendo el orden de las claves
     this.groupedPhotos = Object.keys(groups).map(k => ({ date: k, photos: groups[k] }));
+    return this.groupedPhotos;
   }
 
   groupPhotosForGallery() {
@@ -997,8 +1002,12 @@ export class PhotoWidgetComponent implements OnInit {
         position: 'top',
         color: 'success'
       });
+      this.currentViewDate = this.groupPhotosByDate()[0]?.date || 'Hoy';
+      this.cdr.detectChanges();
+
+      this.tutorialService.showPhotosTour();
       toast.present();
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
       const toast = await this.toastController.create({
         message: 'Error al enviar el recordatorio',

@@ -17,6 +17,7 @@ import { MasWidgetComponent } from '../widgets/mas-widget/mas-widget.component';
 import { QuestionsWidgetComponent } from '../widgets/questions-widget/questions-widget.component';
 import { LoveApiService } from '../services/love-api.service';
 import { LocationService } from '../services/location.service';
+import { TutorialService } from '../services/tutorial.service';
 import { Camera, CameraResultType, CameraSource, CameraDirection } from '@capacitor/camera';
 import { Preferences } from '@capacitor/preferences';
 import { App } from '@capacitor/app';
@@ -60,14 +61,14 @@ import { App } from '@capacitor/app';
     <ion-footer class="custom-footer">
       <div class="custom-tab-bar">
         <!-- Album -->
-        <div class="tab-btn" (click)="selectedWidget = 'photo'" [class.active]="selectedWidget === 'photo'">
+        <div id="tab-photo" class="tab-btn" (click)="selectedWidget = 'photo'" [class.active]="selectedWidget === 'photo'">
           <ion-icon name="images-outline" *ngIf="selectedWidget !== 'photo'"></ion-icon>
           <ion-icon name="images" *ngIf="selectedWidget === 'photo'"></ion-icon>
           <span>Álbum</span>
         </div>
         
         <!-- Chat -->
-        <div class="tab-btn" (click)="selectedWidget = 'chat'" [class.active]="selectedWidget === 'chat'">
+        <div id="tab-chat" class="tab-btn" (click)="selectedWidget = 'chat'" [class.active]="selectedWidget === 'chat'">
           <div style="position: relative; display: flex;">
             <ion-icon name="chatbubbles-outline" *ngIf="selectedWidget !== 'chat'"></ion-icon>
             <ion-icon name="chatbubbles" *ngIf="selectedWidget === 'chat'"></ion-icon>
@@ -84,14 +85,14 @@ import { App } from '@capacitor/app';
         </div>
         
         <!-- Map -->
-        <div class="tab-btn" (click)="selectedWidget = 'location'" [class.active]="selectedWidget === 'location'">
+        <div id="tab-map" class="tab-btn" (click)="selectedWidget = 'location'" [class.active]="selectedWidget === 'location'">
           <ion-icon name="map-outline" *ngIf="selectedWidget !== 'location'"></ion-icon>
           <ion-icon name="map" *ngIf="selectedWidget === 'location'"></ion-icon>
           <span>Mapa</span>
         </div>
         
         <!-- Más -->
-        <div class="tab-btn" (click)="selectedWidget = 'mas'" [class.active]="selectedWidget === 'mas'">
+        <div id="tab-mas" class="tab-btn" (click)="selectedWidget = 'mas'" [class.active]="selectedWidget === 'mas'">
           <ion-icon name="ellipsis-horizontal-outline" *ngIf="selectedWidget !== 'mas'"></ion-icon>
           <ion-icon name="ellipsis-horizontal" *ngIf="selectedWidget === 'mas'"></ion-icon>
           <span>Más</span>
@@ -238,6 +239,7 @@ export class HomePage implements OnInit, OnDestroy {
   private alertController = inject(AlertController);
   private actionSheetCtrl = inject(ActionSheetController);
   private router = inject(Router);
+  private tutorialService = inject(TutorialService);
 
   @ViewChild('photoWidget') photoWidgetComp?: PhotoWidgetComponent;
   @ViewChild('chatWidget') chatWidgetComp?: ChatWidgetComponent;
@@ -283,6 +285,9 @@ export class HomePage implements OnInit, OnDestroy {
       }
     });
     this.checkWidgetIntent();
+    
+    // Mostrar tour inicial si no lo ha visto
+    this.tutorialService.showWelcomeTour();
   }
 
   ngOnDestroy() {
