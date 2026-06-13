@@ -680,9 +680,9 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
       --padding-bottom: 12px !important; 
       --padding-start: 16px !important; 
       --padding-end: 16px !important; 
-      --highlight-color-valid: transparent; 
-      --highlight-color-invalid: transparent; 
-      --highlight-color-focused: transparent; 
+      --highlight-color-valid: #FF4D6D !important; 
+      --highlight-color-invalid: #FF4D6D !important; 
+      --highlight-color-focused: #FF4D6D !important; 
       --icon-color: #FF4D6D; 
       min-height: unset; 
     }
