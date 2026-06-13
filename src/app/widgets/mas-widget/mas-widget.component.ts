@@ -312,7 +312,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
                 <option *ngFor="let cat of foodCategories" [value]="cat">{{ cat }}</option>
               </select>
               
-              <button class="glass-btn" style="padding: 8px 12px; font-size: 1.2rem;" [style.color]="showFavoritesOnlyFoodPlaces ? '#FF4D6D' : '#888'" [style.background]="showFavoritesOnlyFoodPlaces ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="showFavoritesOnlyFoodPlaces = !showFavoritesOnlyFoodPlaces">
+              <button class="glass-btn" style="padding: 8px 15px; font-size: 1.5rem; width: auto; flex: 0 0 auto; box-shadow: none;" [style.color]="showFavoritesOnlyFoodPlaces ? '#FF4D6D' : '#888'" [style.background]="showFavoritesOnlyFoodPlaces ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="showFavoritesOnlyFoodPlaces = !showFavoritesOnlyFoodPlaces">
                 <ion-icon [name]="showFavoritesOnlyFoodPlaces ? 'heart' : 'heart-outline'"></ion-icon>
               </button>
             </div>
@@ -394,7 +394,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
                 <option *ngFor="let cat of foodCategories" [value]="cat">{{ cat }}</option>
               </select>
               
-              <button class="glass-btn" style="padding: 0 15px; font-size: 1.5rem;" [style.color]="newFoodPlace.is_favorite ? '#FF4D6D' : '#888'" (click)="newFoodPlace.is_favorite = !newFoodPlace.is_favorite">
+              <button class="glass-btn" style="padding: 0 15px; font-size: 1.5rem; width: auto; flex: 0 0 auto; box-shadow: none; display: flex; align-items: center; justify-content: center;" [style.color]="newFoodPlace.is_favorite ? '#FF4D6D' : '#888'" [style.background]="newFoodPlace.is_favorite ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="newFoodPlace.is_favorite = !newFoodPlace.is_favorite">
                 <ion-icon [name]="newFoodPlace.is_favorite ? 'heart' : 'heart-outline'"></ion-icon>
               </button>
             </div>
