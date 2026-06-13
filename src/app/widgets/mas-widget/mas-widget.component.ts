@@ -169,7 +169,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
           <!-- Widget Config (Spans full width) -->
           <div class="grid-card full-width">
             <h4><ion-icon name="settings-outline" class="text-pink"></ion-icon> Colección del Widget</h4>
-            <ion-select interface="popover" [(ngModel)]="selectedAlbumId" (ionChange)="saveSelectedAlbum()" class="glass-select" style="--padding-start: 16px; --padding-end: 16px; --padding-top: 14px; --padding-bottom: 14px;">
+            <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedAlbumId" (ionChange)="saveSelectedAlbum()" class="glass-select" style="--padding-start: 16px; --padding-end: 16px; --padding-top: 14px; --padding-bottom: 14px;">
               <ion-select-option value="feed">Todas las fotos</ion-select-option>
               <ion-select-option *ngFor="let album of albums" [value]="album.id">{{ album.name }}</ion-select-option>
             </ion-select>
@@ -308,7 +308,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Restaurantes y platos que hemos probado</p>
             
             <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
-              <ion-select interface="popover" [(ngModel)]="selectedFoodCategory" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todas las categorías">
+              <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedFoodCategory" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todas las categorías">
                 <ion-select-option value="">Todas las categorías</ion-select-option>
                 <ion-select-option *ngFor="let cat of foodCategories" [value]="cat">{{ cat }}</ion-select-option>
               </ion-select>
@@ -353,7 +353,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Películas y series que vemos juntos</p>
             
             <div style="display: flex; gap: 10px; margin-bottom: 15px; width: 100%;">
-              <ion-select interface="popover" [(ngModel)]="selectedMovieGenre" class="glass-input" style="flex: 1; margin: 0; border: 2px solid #FF4D6D; background: white; font-weight: 600; color: #590D22; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todas las categorías">
+              <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedMovieGenre" class="glass-input" style="flex: 1; margin: 0; border: 2px solid #FF4D6D; background: white; font-weight: 600; color: #590D22; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todas las categorías">
                 <ion-select-option value="">Todas las categorías</ion-select-option>
                 <ion-select-option *ngFor="let cat of movieGenres" [value]="cat">{{ cat }}</ion-select-option>
               </ion-select>
@@ -405,7 +405,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
             <input type="text" placeholder="Ubicación (ej: Madrid)" [(ngModel)]="newFoodPlace.location" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
             
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-              <ion-select interface="popover" [(ngModel)]="newFoodPlace.category" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 14px; --padding-bottom: 14px;" placeholder="(Sin categoría)">
+              <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="newFoodPlace.category" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 14px; --padding-bottom: 14px;" placeholder="(Sin categoría)">
                 <ion-select-option value="">(Sin categoría)</ion-select-option>
                 <ion-select-option *ngFor="let cat of foodCategories" [value]="cat">{{ cat }}</ion-select-option>
               </ion-select>
@@ -541,7 +541,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
             <textarea placeholder="¿De qué iba la peli/serie?" [(ngModel)]="newMovie.description" class="glass-input" style="width: 100%; min-height: 60px; margin-bottom: 10px; resize: vertical;"></textarea>
             
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-              <ion-select interface="popover" [(ngModel)]="newMovie.genre" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 14px; --padding-bottom: 14px;" placeholder="(Sin categoría)">
+              <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="newMovie.genre" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 14px; --padding-bottom: 14px;" placeholder="(Sin categoría)">
                 <ion-select-option value="">(Sin categoría)</ion-select-option>
                 <ion-select-option *ngFor="let cat of movieGenres" [value]="cat">{{ cat }}</ion-select-option>
               </ion-select>

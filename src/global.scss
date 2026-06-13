@@ -278,3 +278,32 @@
     }
   }
 }
+
+/* Custom Pink Love Select Popover */
+.love-popover {
+  --background: rgba(255, 255, 255, 0.95);
+  --color: #590D22;
+  --box-shadow: 0 10px 40px rgba(255, 77, 109, 0.2);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  
+  ion-content {
+    --background: transparent;
+  }
+  
+  ion-item {
+    --background: transparent;
+    --color: #590D22;
+    font-weight: 600;
+  }
+  
+  ion-radio {
+    --color: #a4133c;
+    --color-checked: #FF4D6D;
+  }
+  
+  .popover-viewport {
+    border-radius: 16px;
+    border: 1px solid rgba(255, 77, 109, 0.1);
+  }
+}
