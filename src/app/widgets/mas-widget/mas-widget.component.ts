@@ -4,7 +4,7 @@ import { PluginListenerHandle } from '@capacitor/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonRefresher, IonRefresherContent, IonIcon, ToastController, ActionSheetController, AlertController, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
+import { IonContent, IonRefresher, IonRefresherContent, IonIcon, ToastController, ActionSheetController, AlertController, IonSelect, IonSelectOption, IonSearchbar } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { LoveApiService } from '../../services/love-api.service';
 import { Preferences } from '@capacitor/preferences';
@@ -310,7 +310,7 @@ import { debounceTime } from 'rxjs/operators';
             <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="restaurant-outline"></ion-icon> Tour Gastronómico</h2>
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Restaurantes y platos que hemos probado</p>
             
-            <input type="text" [(ngModel)]="searchQueryFoodPlaces" placeholder="Buscar restaurante..." class="glass-input" style="width: 100%; margin-bottom: 15px; font-weight: 600;">
+            <ion-searchbar animated="true" [(ngModel)]="searchQueryFoodPlaces" placeholder="Buscar restaurante..." class="custom-searchbar" style="--border-radius: 14px; --background: rgba(255,255,255,0.8); --box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 0; margin-bottom: 15px;"></ion-searchbar>
 
             <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
               <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedFoodCategory" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todas las categorías">
@@ -357,7 +357,7 @@ import { debounceTime } from 'rxjs/operators';
             <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="film-outline"></ion-icon> Cine en Pareja</h2>
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Películas y series que vemos juntos</p>
             
-            <input type="text" [(ngModel)]="searchQueryMovies" placeholder="Buscar película o serie..." class="glass-input" style="width: 100%; margin-bottom: 15px; font-weight: 600;">
+            <ion-searchbar animated="true" [(ngModel)]="searchQueryMovies" placeholder="Buscar pel�cula o serie..." class="custom-searchbar" style="--border-radius: 14px; --background: rgba(255,255,255,0.8); --box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 0; margin-bottom: 15px;"></ion-searchbar>
 
             <div style="display: flex; gap: 10px; margin-bottom: 15px; width: 100%;">
               <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedMovieGenre" class="glass-input" style="flex: 1; margin: 0; border: 2px solid #FF4D6D; background: white; font-weight: 600; color: #590D22; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todas las categorías">
@@ -830,7 +830,7 @@ import { debounceTime } from 'rxjs/operators';
       @keyframes particle-8 { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 45% { transform: translate(0, -35px) scale(0.6); opacity: 0.6; } 100% { transform: translate(0, 45px) scale(0); opacity: 0; } }
   `],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonIcon, IonContent, IonRefresher, IonRefresherContent, IonSelect, IonSelectOption]
+  imports: [CommonModule, FormsModule, IonIcon, IonContent, IonRefresher, IonRefresherContent, IonSelect, IonSelectOption, IonSearchbar]
 })
 export class MasWidgetComponent implements OnInit, OnDestroy {
   @Output() openGameEvent = new EventEmitter<void>();
@@ -1485,8 +1485,6 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     try {
       this.foodPlaces = await this.api.getFoodPlaces();
       this.movies = await this.api.getMovies();
-      console.log('[DEBUG] movies from API:', JSON.stringify(this.movies?.slice(0,1)));
-      console.log('[DEBUG] food places from API:', JSON.stringify(this.foodPlaces?.slice(0,1)));
     } catch (e) {
       console.error('Error loading food and movies', e);
     }
