@@ -472,7 +472,10 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
         <!-- Add Movie Modal -->
         <div class="custom-overlay" *ngIf="isAddingMovie" (click)="isAddingMovie = false">
           <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
-            <h2 style="color: #590D22; margin-bottom: 20px; font-weight: 900;">{{ newMovie.id ? 'Editar Peli/Serie' : 'Nueva Peli/Serie' }} 🍿</h2>
+            <h2 style="color: #590D22; margin-bottom: 20px; font-weight: 900;">
+              {{ newMovie.id ? 'Editar Peli/Serie' : 'Nueva Peli/Serie' }} 
+              <span (click)="showWhoFellAsleep = !showWhoFellAsleep" style="cursor: pointer; user-select: none;" title="Haz clic para revelar una opción secreta 😉">🍿</span>
+            </h2>
             
             <div *ngIf="newMovie.imageBase64" class="milestone-cover" style="width: 120px; height: 180px; border-radius: 12px; margin: 0 auto 20px; overflow: hidden; position: relative;">
               <img [src]="newMovie.imageBase64" style="width: 100%; height: 100%; object-fit: cover;" />
@@ -486,7 +489,8 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             </button>
             
             <input type="text" placeholder="Título" [(ngModel)]="newMovie.title" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
-            <input type="text" placeholder="¿Quién se quedó dormido primero?" [(ngModel)]="newMovie.who_fell_asleep" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
+            <textarea placeholder="¿De qué iba la peli/serie?" [(ngModel)]="newMovie.description" class="glass-input" style="width: 100%; min-height: 60px; margin-bottom: 10px; resize: vertical;"></textarea>
+            <input *ngIf="showWhoFellAsleep" type="text" placeholder="¿Quién se quedó dormido primero?" [(ngModel)]="newMovie.who_fell_asleep" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
             <textarea placeholder="Nuestra frase favorita / Momento top" [(ngModel)]="newMovie.favorite_quote" class="glass-input" style="width: 100%; min-height: 80px; margin-bottom: 10px; resize: vertical;"></textarea>
             
             <div style="margin-bottom: 20px;">
@@ -526,6 +530,10 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             <div style="color: #FFB703; font-size: 1.8rem; margin-bottom: 20px;">
                 <ng-container *ngTemplateOutlet="staticStars; context: { rating: selectedMovie?.rating }"></ng-container>
             </div>
+            
+            <p *ngIf="selectedMovie?.description" style="color: #590D22; font-size: 0.95rem; line-height: 1.4; margin-bottom: 20px; text-align: center; white-space: pre-wrap;">
+              {{ selectedMovie.description }}
+            </p>
             
             <div *ngIf="selectedMovie?.who_fell_asleep" style="background: rgba(255,77,109,0.05); border-radius: 14px; padding: 15px; margin-bottom: 15px; text-align: center;">
               <p style="margin: 0; color: #a4133c; font-size: 0.95rem;">
@@ -754,7 +762,8 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   newDish: any = { name: '', description: '', rating: 5, imageBase64: null };
   
   isAddingMovie = false;
-  newMovie: any = { title: '', who_fell_asleep: '', favorite_quote: '', rating: 5, imageBase64: null };
+  showWhoFellAsleep = false;
+  newMovie: any = { title: '', description: '', who_fell_asleep: '', favorite_quote: '', rating: 5, imageBase64: null };
   isMovieModalOpen = false;
   selectedMovie: any = null;
 
@@ -1385,14 +1394,15 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     if (!this.newMovie.title) return this.showToast('Ponle título', 'warning');
     try {
       if (this.newMovie.id) {
-        await this.api.updateMovie(this.newMovie.id, this.newMovie.title, this.newMovie.rating, this.newMovie.who_fell_asleep, this.newMovie.favorite_quote, this.newMovie.imageBase64);
+        await this.api.updateMovie(this.newMovie.id, this.newMovie.title, this.newMovie.rating, this.newMovie.who_fell_asleep, this.newMovie.favorite_quote, this.newMovie.imageBase64, this.newMovie.description);
         this.showToast('Peli actualizada', 'success');
       } else {
-        await this.api.addMovie(this.newMovie.title, this.newMovie.rating, this.newMovie.who_fell_asleep, this.newMovie.favorite_quote, this.newMovie.imageBase64);
+        await this.api.addMovie(this.newMovie.title, this.newMovie.rating, this.newMovie.who_fell_asleep, this.newMovie.favorite_quote, this.newMovie.imageBase64, this.newMovie.description);
         this.showToast('Peli añadida', 'success');
       }
       this.isAddingMovie = false;
-      this.newMovie = { title: '', who_fell_asleep: '', favorite_quote: '', rating: 5, imageBase64: null };
+      this.newMovie = { title: '', description: '', who_fell_asleep: '', favorite_quote: '', rating: 5, imageBase64: null };
+      this.showWhoFellAsleep = false;
       this.loadFoodAndMovies();
     } catch (e) {
       this.showToast('Error al guardar', 'danger');
