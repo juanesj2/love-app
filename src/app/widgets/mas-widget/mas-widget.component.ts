@@ -12,6 +12,8 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { LocationService } from '../../services/location.service';
 import { addIcons } from 'ionicons';
 import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline } from 'ionicons/icons';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 
 @Component({
@@ -340,7 +342,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
               </div>
             </div>
             
-            <button class="glass-btn" style="width: 100%; margin-bottom: 10px;" (click)="isAddingFoodPlace = true">
+            <button class="glass-btn" style="width: 100%; margin-bottom: 10px;" (click)="openAddFoodPlaceModal()">
               <ion-icon name="add-circle-outline"></ion-icon> Añadir Restaurante
             </button>
             <button class="glass-btn" style="width: 100%; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="isFoodListModalOpen = false">Cerrar</button>
@@ -403,11 +405,9 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
             </button>
             
             <input type="text" placeholder="Nombre del sitio" [(ngModel)]="newFoodPlace.name" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
-            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-              <input type="text" placeholder="Ubicación (ej: Madrid)" [(ngModel)]="newFoodPlace.location" class="glass-input" style="flex: 1; margin-bottom: 0;" />
-              <button class="glass-btn" style="padding: 0 15px; display: flex; align-items: center; justify-content: center;" (click)="openMap(newFoodPlace.location)" title="Ver en mapa">
-                <ion-icon name="location-outline" style="font-size: 1.2rem;"></ion-icon>
-              </button>
+            <input type="text" placeholder="Ubicación (ej: Madrid)" [(ngModel)]="newFoodPlace.location" (ngModelChange)="onLocationChange($event)" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
+            <div *ngIf="previewMapUrl" style="width: 100%; height: 150px; border-radius: 12px; overflow: hidden; margin-bottom: 10px;">
+              <iframe [src]="previewMapUrl" width="100%" height="100%" frameborder="0" style="border:0;" allowfullscreen></iframe>
             </div>
             
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
@@ -835,6 +835,9 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
   isMapModalOpen = false;
   safeMapUrl: SafeResourceUrl | null = null;
+  
+  previewMapUrl: SafeResourceUrl | null = null;
+  locationSubject = new Subject<string>();
 
   startDate: string = '';
   selectedAlbumId: number | string = 'feed';
@@ -881,6 +884,10 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     const url = `https://maps.google.com/maps?q=${encodeURIComponent(location)}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
     this.safeMapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
     this.isMapModalOpen = true;
+  }
+
+  onLocationChange(value: string) {
+    this.locationSubject.next(value);
   }
   isFoodPlaceModalOpen = false;
   selectedFoodPlace: any = null;
@@ -941,6 +948,15 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    this.locationSubject.pipe(debounceTime(2000)).subscribe(location => {
+      if (location && location.trim().length > 0) {
+        const url = `https://maps.google.com/maps?q=${encodeURIComponent(location)}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
+        this.previewMapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+      } else {
+        this.previewMapUrl = null;
+      }
+    });
+
     // 1. Sync Date from API
     try {
       const info = await this.api.getCoupleInfo();
@@ -1494,8 +1510,18 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     }
   }
 
+  openAddFoodPlaceModal() {
+    this.newFoodPlace = { name: '', location: '', description: '', rating: 5, category: '', is_favorite: false, imageBase64: null };
+    this.previewMapUrl = null;
+    this.isAddingFoodPlace = true;
+  }
+
   editFoodPlace(place: any) {
     this.newFoodPlace = { ...place, imageBase64: null };
+    this.previewMapUrl = null;
+    if (this.newFoodPlace.location) {
+        this.onLocationChange(this.newFoodPlace.location);
+    }
     this.isFoodPlaceModalOpen = false;
     this.isAddingFoodPlace = true;
   }
