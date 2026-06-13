@@ -1615,14 +1615,22 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     this.presentPhotoOptions(async (source) => {
       try {
         const image = await Camera.getPhoto({ quality: 80, allowEditing: true, resultType: CameraResultType.DataUrl, source });
-        if (image.dataUrl) this.newMovie.imageBase64 = image.dataUrl;
-      } catch (e) { console.log(e); }
+        if (image.dataUrl) {
+          this.newMovie.imageBase64 = image.dataUrl;
+          console.log('[PHOTO] Movie photo set, dataUrl length:', image.dataUrl.length);
+        } else {
+          console.warn('[PHOTO] Camera returned no dataUrl');
+        }
+      } catch (e) {
+        console.error('[PHOTO] Error getting movie photo:', e);
+      }
     });
   }
 
   async saveMovie() {
     if (!this.newMovie.title) return this.showToast('Ponle título', 'warning');
     try {
+      console.log('[SAVE] imageBase64 presente:', !!this.newMovie.imageBase64, 'length:', this.newMovie.imageBase64?.length);
       if (this.newMovie.id) {
         await this.api.updateMovie(this.newMovie.id, this.newMovie.title, this.newMovie.rating, this.newMovie.who_fell_asleep, this.newMovie.favorite_quote, this.newMovie.imageBase64, this.newMovie.description, this.newMovie.genre, this.newMovie.is_favorite);
         this.showToast('Peli actualizada', 'success');
