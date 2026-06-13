@@ -439,7 +439,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
 
         <!-- View Food Place Modal -->
         <div class="custom-overlay" *ngIf="isFoodPlaceModalOpen" (click)="isFoodPlaceModalOpen = false">
-          <div class="modal-content glass-card" style="position: relative; margin: 10px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 80vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" style="position: relative; margin: 10px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 70vh; overflow-y: auto;" (click)="$event.stopPropagation()">
             
             <div style="position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 10; cursor: pointer;" (click)="editFoodPlace(selectedFoodPlace)">
               <ion-icon name="pencil-outline" style="font-size: 1.5rem; color: #FF4D6D;"></ion-icon>
@@ -583,7 +583,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagO
 
         <!-- View Movie Modal -->
         <div class="custom-overlay" *ngIf="isMovieModalOpen" (click)="isMovieModalOpen = false">
-          <div class="modal-content glass-card" style="position: relative; margin: 10px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 80vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" style="position: relative; margin: 10px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 70vh; overflow-y: auto;" (click)="$event.stopPropagation()">
             
             <div style="position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 10; cursor: pointer;" (click)="editMovie(selectedMovie)">
               <ion-icon name="pencil-outline" style="font-size: 1.5rem; color: #FF4D6D;"></ion-icon>
