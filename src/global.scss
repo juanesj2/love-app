@@ -18,6 +18,9 @@
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
 
+/* Driver.js (Tutorials) CSS */
+@import "driver.js/dist/driver.css";
+
 /* Optional CSS utils that can be commented out */
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/float-elements.css";
@@ -520,3 +523,56 @@ button.action-sheet-cancel.premium-cancel-btn::after {
   transform: translateY(-20px) !important;
 }
 }
+
+/* Custom Driver.js Theme */
+.driver-popover {
+  border-radius: 20px !important;
+  border: none !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+  padding: 20px !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.driver-popover-title {
+  color: #590D22 !important;
+  font-weight: 800 !important;
+  font-size: 1.2rem !important;
+  margin-bottom: 8px !important;
+}
+
+.driver-popover-description {
+  color: #a08c92 !important;
+  font-size: 0.95rem !important;
+  line-height: 1.4 !important;
+}
+
+.driver-popover-footer button {
+  border-radius: 12px !important;
+  text-shadow: none !important;
+  font-weight: 600 !important;
+  transition: transform 0.2s !important;
+}
+
+.driver-popover-footer button:active {
+  transform: scale(0.95) !important;
+}
+
+.driver-popover-next-btn, .driver-popover-done-btn {
+  background: linear-gradient(135deg, #FF4D6D, #c9184a) !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3) !important;
+}
+
+.driver-popover-prev-btn {
+  background: #f8f9fa !important;
+  color: #a08c92 !important;
+  border: 1px solid #e9ecef !important;
+}
+
+.driver-popover-progress-text {
+  color: #a4133c !important;
+  font-weight: 600 !important;
+}
+
