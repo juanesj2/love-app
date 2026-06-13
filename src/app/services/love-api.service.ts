@@ -386,7 +386,7 @@ export class LoveApiService {
     if (rating) formData.append('rating', rating.toString());
     if (description) formData.append('description', description);
     if (category) formData.append('category', category);
-    if (is_favorite !== undefined) formData.append('is_favorite', is_favorite.toString());
+    if (is_favorite !== undefined) formData.append('is_favorite', is_favorite ? '1' : '0');
     
     if (imageBase64) {
       try {
@@ -418,7 +418,7 @@ export class LoveApiService {
     if (rating) formData.append('rating', rating.toString());
     if (description) formData.append('description', description);
     if (category) formData.append('category', category);
-    if (is_favorite !== undefined) formData.append('is_favorite', is_favorite.toString());
+    if (is_favorite !== undefined) formData.append('is_favorite', is_favorite ? '1' : '0');
     
     if (imageBase64) {
       try {
@@ -512,7 +512,7 @@ export class LoveApiService {
     if (favorite_quote) formData.append('favorite_quote', favorite_quote);
     if (description) formData.append('description', description);
     if (genre) formData.append('genre', genre);
-    if (is_favorite !== undefined) formData.append('is_favorite', is_favorite.toString());
+    if (is_favorite !== undefined) formData.append('is_favorite', is_favorite ? '1' : '0');
     
     if (imageBase64) {
       try {
@@ -544,7 +544,7 @@ export class LoveApiService {
     if (quote) formData.append('favorite_quote', quote);
     if (description) formData.append('description', description);
     if (genre) formData.append('genre', genre);
-    if (is_favorite !== undefined) formData.append('is_favorite', is_favorite.toString());
+    if (is_favorite !== undefined) formData.append('is_favorite', is_favorite ? '1' : '0');
     
     if (imageBase64) {
       try {
