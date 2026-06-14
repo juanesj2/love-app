@@ -109,7 +109,7 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
   standalone: true,
   imports: [CommonModule, IonIcon]
 })
-export class GamesHubComponent implements OnInit {
+export class GamesHubComponent {
   progress: any = null;
   private api = inject(LoveApiService);
   private tutorialService = inject(TutorialService);
@@ -118,7 +118,7 @@ export class GamesHubComponent implements OnInit {
     addIcons({ gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arrowBack, apertureOutline });
   }
 
-  async ngOnInit() {
+  async ionViewDidEnter() {
     try {
       this.progress = await this.api.getGamesProgress();
     } catch (e) {

@@ -215,6 +215,9 @@ export class QuestionsWidgetComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  ionViewDidEnter() {
     this.loadQuestions();
     setTimeout(() => {
       this.tutorialService.showTestTour();
