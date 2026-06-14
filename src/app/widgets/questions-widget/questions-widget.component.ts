@@ -227,9 +227,20 @@ export class QuestionsWidgetComponent implements OnInit {
 
   async loadQuestions() {
     try {
-      this.questions = await this.api.getQuestions();
+      const response: any = await this.api.getQuestions();
+      let q: any[] = [];
+      
+      if (Array.isArray(response)) {
+        q = response;
+      } else if (response && Array.isArray(response.data)) {
+        q = response.data;
+      } else if (response && typeof response === 'object') {
+        q = Object.values(response).find(val => Array.isArray(val)) as any[] || [];
+      }
+      this.questions = q;
     } catch (e) {
       console.error(e);
+      this.questions = [];
     }
   }
 

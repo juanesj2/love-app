@@ -332,9 +332,20 @@ export class SwipeGameComponent implements OnInit {
 
   async loadCategories() {
     try {
-      this.categories = await this.api.getSwipeCategories();
+      const response: any = await this.api.getSwipeCategories();
+      let cats: string[] = [];
+      
+      if (Array.isArray(response)) {
+        cats = response;
+      } else if (response && Array.isArray(response.data)) {
+        cats = response.data;
+      } else if (response && typeof response === 'object') {
+        cats = Object.values(response).find(val => Array.isArray(val)) as any[] || [];
+      }
+      this.categories = cats;
     } catch (e) {
       console.error(e);
+      this.categories = [];
     }
   }
 
@@ -348,11 +359,25 @@ export class SwipeGameComponent implements OnInit {
 
   async loadAllCards() {
     try {
-      const all = await this.api.getAllSwipeCards();
+      const response: any = await this.api.getAllSwipeCards();
+      let all: any[] = [];
+      
+      if (Array.isArray(response)) {
+        all = response;
+      } else if (response && Array.isArray(response.data)) {
+        all = response.data;
+      } else if (response && Array.isArray(response.cards)) {
+        all = response.cards;
+      } else if (response && typeof response === 'object') {
+        // Fallback for unknown object wrappers
+        all = Object.values(response).find(val => Array.isArray(val)) as any[] || [];
+      }
+
       this.allCards = this.selectedCategory ? all.filter(c => c.category === this.selectedCategory) : all;
       this.prepareStack();
     } catch (e) {
       console.error(e);
+      this.allCards = [];
     }
   }
 
