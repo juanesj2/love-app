@@ -127,6 +127,8 @@ export class RouletteWidgetComponent implements OnInit, OnDestroy {
     addIcons({ closeCircle, addCircleOutline, syncOutline, arrowBack });
   }
 
+  ngOnInit() {}
+
   ionViewDidEnter() {
     this.loadOptions();
     setTimeout(() => {
