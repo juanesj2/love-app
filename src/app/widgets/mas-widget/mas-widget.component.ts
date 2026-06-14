@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonRefresher, IonRefresherContent, IonIcon, ToastController, ActionSheetController, AlertController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { LoveApiService } from '../../services/love-api.service';
+import { TutorialService } from '../../services/tutorial.service';
 import { Preferences } from '@capacitor/preferences';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { LocationService } from '../../services/location.service';
@@ -175,7 +176,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
           </div>
 
           <!-- Tour Gastronómico -->
-          <div class="grid-card interactive" id="mas-gastro" (click)="isFoodListModalOpen = true">
+          <div class="grid-card interactive" id="mas-gastro" (click)="openFoodListModal()">
             <div class="icon-circle" style="background: linear-gradient(135deg, #FF9A9E, #FECFEF); box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3); color: #c9184a;">
               <ion-icon name="restaurant-outline"></ion-icon>
             </div>
@@ -184,7 +185,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
           </div>
 
           <!-- Cine en Pareja -->
-          <div class="grid-card interactive" id="mas-cine" (click)="isMovieListModalOpen = true">
+          <div class="grid-card interactive" id="mas-cine" (click)="openMovieListModal()">
             <div class="icon-circle" style="background: linear-gradient(135deg, #a2d2ff, #bde0fe); box-shadow: 0 4px 15px rgba(162, 210, 255, 0.3); color: #023e8a;">
               <ion-icon name="film-outline"></ion-icon>
             </div>
@@ -302,11 +303,11 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 
         <!-- Food List Modal -->
         <div class="custom-overlay" *ngIf="isFoodListModalOpen" (click)="isFoodListModalOpen = false">
-          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" id="tour-food-modal" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="restaurant-outline"></ion-icon> Tour Gastronómico</h2>
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Restaurantes y platos que hemos probado</p>
             
-            <div class="food-places-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
+            <div class="food-places-grid" id="tour-food-list" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
               <div class="food-place-item" *ngFor="let place of foodPlaces" (click)="openFoodPlaceModal(place)" style="background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
                 <div class="place-image" [style.backgroundImage]="'url(' + (place.image_url_full || 'assets/default-food.png') + ')'" style="width: 100%; aspect-ratio: 1; border-radius: 10px; background-size: cover; background-position: center; margin: 0 auto 10px;"></div>
                 <span class="p-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ place.name }}</span>
@@ -316,7 +317,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
               </div>
             </div>
             
-            <button class="glass-btn" style="width: 100%; margin-bottom: 10px;" (click)="isAddingFoodPlace = true">
+            <button class="glass-btn" id="tour-food-add" style="width: 100%; margin-bottom: 10px;" (click)="openAddFoodPlaceModal()">
               <ion-icon name="add-circle-outline"></ion-icon> Añadir Restaurante
             </button>
             <button class="glass-btn" style="width: 100%; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="isFoodListModalOpen = false">Cerrar</button>
@@ -325,11 +326,11 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 
         <!-- Movies List Modal -->
         <div class="custom-overlay" *ngIf="isMovieListModalOpen" (click)="isMovieListModalOpen = false">
-          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" id="tour-movie-modal" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="film-outline"></ion-icon> Cine en Pareja</h2>
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Películas y series que vemos juntos</p>
             
-            <div class="movies-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
+            <div class="movies-grid" id="tour-movie-list" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
               <div class="movie-item" *ngFor="let movie of movies" (click)="openMovieModal(movie)" style="background: rgba(255,255,255,0.8); border-radius: 10px; padding: 8px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
                 <div class="movie-image" [style.backgroundImage]="'url(' + (movie.image_url_full || 'assets/default-movie.png') + ')'" style="width: 100%; aspect-ratio: 0.7; border-radius: 8px; background-size: cover; background-position: center; margin: 0 auto 8px;"></div>
                 <span class="m-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ movie.title }}</span>
@@ -339,7 +340,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
               </div>
             </div>
             
-            <button class="glass-btn" style="width: 100%; margin-bottom: 10px;" (click)="isAddingMovie = true">
+            <button class="glass-btn" id="tour-movie-add" style="width: 100%; margin-bottom: 10px;" (click)="isAddingMovie = true">
               <ion-icon name="add-circle-outline"></ion-icon> Añadir Película/Serie
             </button>
             <button class="glass-btn" style="width: 100%; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="isMovieListModalOpen = false">Cerrar</button>
@@ -363,7 +364,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             </button>
             
             <input type="text" placeholder="Nombre del sitio" [(ngModel)]="newFoodPlace.name" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
-            <input type="text" placeholder="Ubicación (ej: Madrid)" [(ngModel)]="newFoodPlace.location" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
+            <input type="text" placeholder="Ubicación (ej: Madrid)" [(ngModel)]="newFoodPlace.location" class="glass-input" id="tour-food-location" style="width: 100%; margin-bottom: 10px;" />
             <textarea placeholder="¿Qué tal estaba? Plato estrella, etc." [(ngModel)]="newFoodPlace.description" class="glass-input" style="width: 100%; min-height: 80px; margin-bottom: 10px; resize: vertical;"></textarea>
             
             <div style="margin-bottom: 20px;">
@@ -670,6 +671,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   @Output() openGameEvent = new EventEmitter<void>();
 
   private api = inject(LoveApiService);
+  private tutorialService = inject(TutorialService);
   private toastCtrl = inject(ToastController);
   private actionSheetCtrl = inject(ActionSheetController);
   private router = inject(Router);
@@ -984,6 +986,32 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     await Preferences.set({ key: 'widgetAlbumName', value: albumName });
     
     this.showToast('Configuración guardada. El widget tardará unos minutos en actualizarse.', 'success');
+  }
+
+  ngOnInit() {
+    this.loadData();
+    this.startLocationTracking();
+  }
+
+  openFoodListModal() {
+    this.isFoodListModalOpen = true;
+    setTimeout(() => {
+      this.tutorialService.showFoodTour();
+    }, 500);
+  }
+
+  openMovieListModal() {
+    this.isMovieListModalOpen = true;
+    setTimeout(() => {
+      this.tutorialService.showMovieTour();
+    }, 500);
+  }
+
+  openAddFoodPlaceModal() {
+    this.isAddingFoodPlace = true;
+    setTimeout(() => {
+      this.tutorialService.showAddFoodTour();
+    }, 500);
   }
 
   startTimer() {

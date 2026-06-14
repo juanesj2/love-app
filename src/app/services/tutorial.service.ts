@@ -323,4 +323,119 @@ export class TutorialService {
       tour.drive();
     }, 800);
   }
+
+  public async showFoodTour() {
+    if (await this.hasSeenTutorial('food_tour')) return;
+
+    const tour = driver({
+      showProgress: true,
+      doneBtnText: '¡A comer!',
+      nextBtnText: 'Siguiente',
+      prevBtnText: 'Atrás',
+      steps: [
+        {
+          element: '#tour-food-modal',
+          popover: {
+            title: 'Tour Gastronómico 🍔',
+            description: 'Aquí podéis guardar todos los restaurantes que habéis visitado o los que queréis probar.',
+            side: 'top',
+            align: 'center'
+          }
+        },
+        {
+          element: '#tour-food-list',
+          popover: {
+            title: 'Vuestros Restaurantes 🍽️',
+            description: 'La lista de los sitios. Pulsa en cualquiera para ver los detalles y vuestra puntuación.',
+            side: 'top',
+            align: 'center'
+          }
+        },
+        {
+          element: '#tour-food-add',
+          popover: {
+            title: 'Añadir un sitio ➕',
+            description: 'Pulsa aquí para guardar un nuevo restaurante en la lista.',
+            side: 'top',
+            align: 'center'
+          }
+        }
+      ],
+      onDestroyed: () => {
+        this.markTutorialAsSeen('food_tour');
+      }
+    });
+
+    tour.drive();
+  }
+
+  public async showMovieTour() {
+    if (await this.hasSeenTutorial('movie_tour')) return;
+
+    const tour = driver({
+      showProgress: true,
+      doneBtnText: '¡A ver pelis!',
+      nextBtnText: 'Siguiente',
+      prevBtnText: 'Atrás',
+      steps: [
+        {
+          element: '#tour-movie-modal',
+          popover: {
+            title: 'Cine Pareja 🍿',
+            description: 'Vuestra lista compartida de películas y series pendientes o ya vistas.',
+            side: 'top',
+            align: 'center'
+          }
+        },
+        {
+          element: '#tour-movie-list',
+          popover: {
+            title: 'Catálogo 🎥',
+            description: 'Aquí aparecerán las portadas. Toca una para ver la nota que le pusisteis.',
+            side: 'top',
+            align: 'center'
+          }
+        },
+        {
+          element: '#tour-movie-add',
+          popover: {
+            title: 'Añadir Peli o Serie ➕',
+            description: 'Pulsa aquí para apuntar esa serie de la que todo el mundo habla.',
+            side: 'top',
+            align: 'center'
+          }
+        }
+      ],
+      onDestroyed: () => {
+        this.markTutorialAsSeen('movie_tour');
+      }
+    });
+
+    tour.drive();
+  }
+
+  public async showAddFoodTour() {
+    if (await this.hasSeenTutorial('add_food_tour')) return;
+
+    const tour = driver({
+      showProgress: false,
+      doneBtnText: '¡Entendido!',
+      steps: [
+        {
+          element: '#tour-food-location',
+          popover: {
+            title: '¡Búsqueda Mágica! 🪄',
+            description: 'Escribes tu ubicación aquí y en 2 segundos lo buscamos por ti automáticamente. ¡Sin esfuerzo!',
+            side: 'bottom',
+            align: 'center'
+          }
+        }
+      ],
+      onDestroyed: () => {
+        this.markTutorialAsSeen('add_food_tour');
+      }
+    });
+
+    tour.drive();
+  }
 }
