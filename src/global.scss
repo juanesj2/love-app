@@ -1,12 +1,7 @@
 /*
  * App Global CSS
  * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
+ * Put style rules here that you want to apply globally.
  */
 
 /* Core CSS required for Ionic components to work properly */
@@ -30,13 +25,7 @@
 
 /**
  * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
  */
-
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
 
 /* Leaflet CSS */
@@ -85,7 +74,6 @@
     box-shadow: 0 0 0 3px rgba(255, 77, 109, 0.1) !important;
   }
 
-  /* Fix for the password eye icon */
   .alert-input-wrapper {
     button, ion-icon, svg {
       color: #590D22 !important;
@@ -93,202 +81,6 @@
     }
   }
 
-  /* Native browser eye icon fallback */
-  .alert-input::-ms-reveal,
-  .alert-input::-webkit-reveal {
-    filter: brightness(0.2) sepia(1) hue-rotate(300deg) saturate(3);
-  }
-
-  .alert-button-group {
-    justify-content: space-around !important;
-    padding: 10px 10px 15px !important;
-    border-top: 1px solid rgba(255, 77, 109, 0.1) !important;
-  }
-
-  .alert-button {
-    font-weight: 700 !important;
-    color: white !important;
-    background: linear-gradient(135deg, #FF4D6D, #c9184a) !important;
-    border-radius: 10px !important;
-    margin: 0 5px !important;
-    padding: 10px !important;
-  }
-
-  .alert-button.alert-button-role-cancel {
-    background: transparent !important;
-    color: #888 !important;
-    border: 1px solid #ddd !important;
-  }
-}
-
-/* Premium Action Sheet Styling */
-.premium-action-sheet {
-  --background: rgba(255, 255, 255, 0.95);
-  --backdrop-opacity: 0.4;
-  --color: #FF4D6D;
-  --button-color: #590D22;
-  --button-color-cancel: #FF4D6D;
-  
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-
-  .action-sheet-wrapper {
-    border-top-left-radius: 28px !important;
-    border-top-right-radius: 28px !important;
-    box-shadow: 0 -10px 40px rgba(255, 77, 109, 0.15) !important;
-  }
-
-  .action-sheet-title {
-    font-weight: 800 !important;
-    font-size: 1.3rem !important;
-    text-align: center !important;
-    padding: 25px 10px 15px !important;
-  }
-
-  .action-sheet-button {
-    font-weight: 600 !important;
-    font-size: 1.15rem !important;
-    justify-content: center !important;
-    text-align: center !important;
-    padding: 18px !important;
-  }
-
-  .action-sheet-button.action-sheet-cancel {
-    font-weight: 800 !important;
-    margin-top: 10px !important;
-  }
-}
-
-/* Premium Mood Alert Styling */
-.premium-mood-alert {
-  --backdrop-opacity: 0.5;
-  --background: rgba(255, 245, 247, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-
-  .alert-wrapper {
-    border-radius: 28px !important;
-    border: 1px solid rgba(255, 77, 109, 0.2) !important;
-    box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15) !important;
-    padding-bottom: 10px !important;
-  }
-  
-  .alert-title {
-    font-weight: 800 !important;
-    color: #FF4D6D !important;
-    font-size: 1.4rem !important;
-    text-align: center !important;
-    padding-top: 20px !important;
-  }
-
-  .alert-button-group {
-    display: flex !important;
-    flex-direction: column !important;
-    padding: 10px 20px 20px !important;
-    gap: 12px !important;
-  }
-
-  .alert-button {
-    width: 100% !important;
-    text-transform: none !important;
-    font-weight: 600 !important;
-    font-size: 1.15rem !important;
-    color: #590D22 !important;
-    background: white !important;
-    border-radius: 16px !important;
-    border: 1px solid rgba(255, 77, 109, 0.1) !important;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.03) !important;
-    margin: 0 !important;
-    padding: 16px 0 !important;
-    display: flex !important;
-    justify-content: center !important;
-  }
-
-  .alert-button .alert-button-inner {
-    justify-content: center !important;
-    width: 100% !important;
-  }
-
-  .alert-button.mood-cancel-btn {
-    background: transparent !important;
-    color: #FF4D6D !important;
-    border: none !important;
-    box-shadow: none !important;
-    margin-top: 5px !important;
-    font-weight: 800 !important;
-    padding: 10px 0 !important;
-    text-transform: uppercase !important;
-  }
-}
-
-/* Premium Action Sheet Styling */
-.premium-action-sheet {
-  --background: rgba(255, 255, 255, 0.9);
-  --backdrop-opacity: 0.5;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-
-  .action-sheet-wrapper {
-    border-top-left-radius: 24px !important;
-    border-top-right-radius: 24px !important;
-    box-shadow: 0 -8px 32px rgba(255, 77, 109, 0.15) !important;
-    background: rgba(255, 255, 255, 0.8) !important;
-  }
-
-  .action-sheet-group {
-    background: transparent !important;
-  }
-
-  .action-sheet-group-cancel {
-    background: transparent !important;
-  }
-
-  .action-sheet-title {
-    font-weight: 800 !important;
-    color: #590D22 !important;
-    font-size: 1.3rem !important;
-    text-align: center !important;
-    padding: 20px 10px 10px !important;
-  }
-
-  .action-sheet-button {
-    font-weight: 600 !important;
-    color: #a4133c !important;
-    font-size: 1.1rem !important;
-    width: calc(100% - 30px) !important;
-    margin: 5px auto !important;
-    border-radius: 14px !important;
-    background: rgba(255, 255, 255, 0.6) !important;
-    border: 1px solid rgba(255, 255, 255, 0.8) !important;
-    padding: 15px !important;
-    justify-content: flex-start !important;
-    padding-left: 20px !important;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03) !important;
-
-    .action-sheet-icon {
-      color: #FF4D6D !important;
-    border-radius: 12px !important;
-    color: #590D22 !important;
-    padding: 12px 16px !important;
-    margin-top: 15px !important;
-    font-size: 1.1rem !important;
-    text-align: center !important;
-  }
-
-  .alert-input:focus {
-    border-color: #FF4D6D !important;
-    box-shadow: 0 0 0 3px rgba(255, 77, 109, 0.1) !important;
-  }
-
-  /* Fix for the password eye icon */
-  .alert-input-wrapper {
-    button, ion-icon, svg {
-      color: #590D22 !important;
-      fill: #590D22 !important;
-    }
-  }
-
-  /* Native browser eye icon fallback */
   .alert-input::-ms-reveal,
   .alert-input::-webkit-reveal {
     filter: brightness(0.2) sepia(1) hue-rotate(300deg) saturate(3);
