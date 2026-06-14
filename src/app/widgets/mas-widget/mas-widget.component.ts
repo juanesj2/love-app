@@ -988,10 +988,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     this.showToast('Configuración guardada. El widget tardará unos minutos en actualizarse.', 'success');
   }
 
-  ngOnInit() {
-    this.loadData();
-    this.startLocationTracking();
-  }
+
 
   openFoodListModal() {
     this.isFoodListModalOpen = true;
