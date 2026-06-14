@@ -16,7 +16,7 @@ import { LoveApiService } from '../../services/love-api.service';
           <button class="back-btn" (click)="goBack()">
             <ion-icon name="arrow-back"></ion-icon>
           </button>
-          <h2>Logros y Secretos <span class="secret-trophy" (click)="unlockTrophySecret()">🏆</span></h2>
+          <h2 (click)="onTitleClick()">Logros y Secretos <span class="secret-trophy" (click)="unlockTrophySecret(); $event.stopPropagation()">🏆</span></h2>
           <p>Explora la app para descubrirlos todos</p>
         </div>
 
@@ -145,8 +145,12 @@ export class AchievementsWidgetComponent implements OnInit {
   achievementsList: any[] = [];
   displayedAchievements: any[] = [];
   unlockedHintsList: any[] = [];
-  isLoading = true;
-  filterMode: string = 'all';
+  filterMode: 'all' | 'unlocked' | 'locked' = 'all';
+  isLoading: boolean = true;
+  
+  // Variables para secretos
+  titleClickCount: number = 0;
+  titleClickTimer: any;
 
   constructor() {
     addIcons({ 
@@ -158,8 +162,17 @@ export class AchievementsWidgetComponent implements OnInit {
 
   ngOnInit() {
     this.loadAchievements();
+    this.checkNightSecret();
     // Intenta desbloquear curious_click (si falla no pasa nada)
-    this.api.unlockAchievement('curious_click').then(() => this.loadAchievements());
+    this.api.unlockAchievement('curious_click').then(() => this.loadAchievements()).catch(() => {});
+  }
+
+  checkNightSecret() {
+    const hour = new Date().getHours();
+    // Entre las 2:00 AM y las 4:59 AM
+    if (hour >= 2 && hour < 5) {
+      this.unlockSecretSilent('secret_owl', '🦉 ¡Logro Secreto Descubierto! Eres todo un búho nocturno.');
+    }
   }
 
   async loadAchievements() {
@@ -251,14 +264,32 @@ export class AchievementsWidgetComponent implements OnInit {
   }
 
   async unlockTrophySecret() {
-    const hasTrophy = this.achievementsList.find(a => a.id === 'trophy_secret')?.unlocked;
-    if (hasTrophy) return;
+    this.unlockSecretSilent('trophy_secret', '🏆 ¡Logro Secreto Descubierto! Ahora puedes pedir 2 pistas al día.');
+  }
+
+  onTitleClick() {
+    this.titleClickCount++;
+    clearTimeout(this.titleClickTimer);
+    
+    if (this.titleClickCount >= 10) {
+      this.titleClickCount = 0;
+      this.unlockSecretSilent('secret_spammer', '👆 ¡Dedo Inquieto! Has descubierto un logro secreto por tocar tanto la pantalla.');
+    } else {
+      this.titleClickTimer = setTimeout(() => {
+        this.titleClickCount = 0;
+      }, 1500); // 1.5s para seguir tocando
+    }
+  }
+
+  async unlockSecretSilent(achievementId: string, successMessage: string) {
+    const hasSecret = this.achievementsList.find(a => a.id === achievementId)?.unlocked;
+    if (hasSecret) return;
 
     try {
-      const res = await this.api.unlockAchievement('trophy_secret');
+      const res = await this.api.unlockAchievement(achievementId);
       if (res && res.newly_unlocked) {
         const toast = await this.toastCtrl.create({
-          message: '🏆 ¡Logro Secreto Descubierto! Ahora puedes pedir 2 pistas al día.',
+          message: successMessage,
           duration: 5000,
           color: 'tertiary',
           position: 'top'
@@ -267,8 +298,8 @@ export class AchievementsWidgetComponent implements OnInit {
         this.loadAchievements();
       }
     } catch (e) {
-      // Si falla, es que o no existe en BD o hubo otro error
-      console.error('Error unlocking trophy secret', e);
+      // Ignorar
+      console.error('Error unlocking secret', achievementId, e);
     }
   }
 
