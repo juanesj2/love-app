@@ -382,6 +382,11 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
               Ninguno ha subido foto hoy. ¡La racha está en peligro! 🚨
             </p>
           </div>
+          
+          <div class="streak-timer-box" *ngIf="timeToMidnight">
+            <ion-icon name="time-outline"></ion-icon>
+            <span>Quedan <strong>{{ timeToMidnight }}</strong> para no perderla</span>
+          </div>
 
           <button class="streak-remind-btn" *ngIf="coupleInfo?.my_photo_today && !coupleInfo?.partner_photo_today" (click)="sendStreakReminder()">
             <ion-icon name="notifications"></ion-icon> Recordar a mi pareja
@@ -577,6 +582,8 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
     .streak-modal-icon { font-size: 4rem; margin-bottom: 10px; }
     .streak-modal-content h3 { font-size: 1.5rem; font-weight: 800; color: #590D22; margin-top: 0; margin-bottom: 15px; }
     .streak-status p { font-size: 1rem; color: #555; line-height: 1.5; margin-bottom: 20px; }
+    .streak-timer-box { background: rgba(255, 77, 109, 0.1); color: #FF4D6D; padding: 10px 15px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 0.95rem; margin-bottom: 20px; }
+    .streak-timer-box ion-icon { font-size: 1.2rem; }
     .streak-remind-btn { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none; padding: 12px 20px; border-radius: 20px; font-weight: bold; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4); transition: transform 0.2s; }
     .streak-remind-btn:active { transform: scale(0.95); }
     @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
@@ -644,6 +651,8 @@ export class PhotoWidgetComponent implements OnInit {
   uploading = false;
   
   showStreakModal = false;
+  timeToMidnight: string = '';
+  midnightTimer: any;
 
   avatars: { [key: string]: string } = {};
 
@@ -708,6 +717,7 @@ export class PhotoWidgetComponent implements OnInit {
 
   async ngOnInit() {
     this.loadAvatars();
+    this.startMidnightTimer();
     
     const albumIntent = await Preferences.get({ key: 'open_album_id_intent' });
     if (albumIntent.value) {
@@ -720,6 +730,28 @@ export class PhotoWidgetComponent implements OnInit {
   
   ngOnDestroy() {
     if (this.observer) this.observer.disconnect();
+    if (this.midnightTimer) clearInterval(this.midnightTimer);
+  }
+
+  startMidnightTimer() {
+    this.updateTimeToMidnight();
+    this.midnightTimer = setInterval(() => {
+      this.updateTimeToMidnight();
+    }, 1000);
+  }
+
+  updateTimeToMidnight() {
+    const now = new Date();
+    const midnight = new Date();
+    midnight.setHours(23, 59, 59, 999);
+    
+    const diff = midnight.getTime() - now.getTime();
+    
+    const h = Math.floor(diff / (1000 * 60 * 60));
+    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const s = Math.floor((diff % (1000 * 60)) / 1000);
+    
+    this.timeToMidnight = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   }
 
   setupObserver() {
