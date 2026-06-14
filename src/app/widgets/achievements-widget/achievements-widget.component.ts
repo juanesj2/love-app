@@ -16,7 +16,7 @@ import { LoveApiService } from '../../services/love-api.service';
           <button class="back-btn" (click)="goBack()">
             <ion-icon name="arrow-back"></ion-icon>
           </button>
-          <h2>Logros y Secretos 🏆</h2>
+          <h2>Logros y Secretos <span class="secret-trophy" (click)="unlockTrophySecret()">🏆</span></h2>
           <p>Explora la app para descubrirlos todos</p>
         </div>
 
@@ -85,6 +85,8 @@ import { LoveApiService } from '../../services/love-api.service';
     .header { text-align: center; margin-bottom: 20px; margin-top: 10px; position: relative; padding-top: 45px; }
     .header h2 { font-size: 2rem; font-weight: 800; color: #800f2f; margin: 0; }
     .header p { color: #a4133c; margin-top: 5px; font-weight: 500; }
+    .secret-trophy { display: inline-block; cursor: pointer; transition: transform 0.2s; user-select: none; }
+    .secret-trophy:active { transform: scale(0.8); }
     .back-btn { position: absolute; left: 0; top: 0; background: rgba(255, 143, 163, 0.2); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #800f2f; font-size: 1.5rem; backdrop-filter: blur(5px); z-index: 10; cursor: pointer; transition: background 0.3s ease; }
     .back-btn:active { background: rgba(255, 143, 163, 0.4); }
 
@@ -224,7 +226,7 @@ export class AchievementsWidgetComponent implements OnInit {
       if (res && res.success) {
         this.unlockedHintsList.push(res.hint);
         const toast = await this.toastCtrl.create({
-          message: '¡Nueva pista revelada! 👀',
+          message: '💡 ¡Nueva pista revelada!',
           duration: 3000,
           color: 'success',
           position: 'top'
@@ -245,6 +247,28 @@ export class AchievementsWidgetComponent implements OnInit {
         icon: 'lock-closed-outline'
       });
       toast.present();
+    }
+  }
+
+  async unlockTrophySecret() {
+    const hasTrophy = this.achievementsList.find(a => a.id === 'trophy_secret')?.unlocked;
+    if (hasTrophy) return;
+
+    try {
+      const res = await this.api.unlockAchievement('trophy_secret');
+      if (res && res.newly_unlocked) {
+        const toast = await this.toastCtrl.create({
+          message: '🏆 ¡Logro Secreto Descubierto! Ahora puedes pedir 2 pistas al día.',
+          duration: 5000,
+          color: 'tertiary',
+          position: 'top'
+        });
+        toast.present();
+        this.loadAchievements();
+      }
+    } catch (e) {
+      // Si falla, es que o no existe en BD o hubo otro error
+      console.error('Error unlocking trophy secret', e);
     }
   }
 
