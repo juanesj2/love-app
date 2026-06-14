@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { LoveApiService } from '../../services/love-api.service';
+import { TutorialService } from '../../services/tutorial.service';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arrowBack, apertureOutline } from 'ionicons/icons';
@@ -17,7 +18,7 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
       </div>
 
       <div class="games-list">
-        <div class="game-card test-card" (click)="goTo('questions')">
+        <div class="game-card test-card" id="tour-game-test" (click)="goTo('questions')">
           <div class="game-icon-bg"><ion-icon name="game-controller-outline"></ion-icon></div>
           <div class="game-info">
             <h3>Test de Pareja</h3>
@@ -29,7 +30,7 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
           </div>
         </div>
 
-        <div class="game-card swipe-card" (click)="goTo('games/swipe')">
+        <div class="game-card swipe-card" id="tour-game-swipe" (click)="goTo('games/swipe')">
           <div class="game-icon-bg"><ion-icon name="swap-horizontal-outline"></ion-icon></div>
           <div class="game-info">
             <h3>Tinder de Pareja</h3>
@@ -41,7 +42,7 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
           </div>
         </div>
 
-        <div class="game-card draw-card" (click)="goTo('games/draw')">
+        <div class="game-card draw-card" id="tour-game-draw" (click)="goTo('games/draw')">
           <div class="game-icon-bg"><ion-icon name="color-palette-outline"></ion-icon></div>
           <div class="game-info">
             <h3>Reto de Dibujo</h3>
@@ -53,7 +54,7 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
           </div>
         </div>
 
-        <div class="game-card roulette-card" (click)="goTo('games/roulette')">
+        <div class="game-card roulette-card" id="tour-game-roulette" (click)="goTo('games/roulette')">
           <div class="game-icon-bg"><ion-icon name="aperture-outline"></ion-icon></div>
           <div class="game-info">
             <h3>Tarro de Citas</h3>
@@ -111,6 +112,7 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
 export class GamesHubComponent implements OnInit {
   progress: any = null;
   private api = inject(LoveApiService);
+  private tutorialService = inject(TutorialService);
 
   constructor(private router: Router) {
     addIcons({ gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arrowBack, apertureOutline });
@@ -122,6 +124,10 @@ export class GamesHubComponent implements OnInit {
     } catch (e) {
       console.error('Error fetching games progress', e);
     }
+    
+    setTimeout(() => {
+      this.tutorialService.showGamesHubTour();
+    }, 500);
   }
 
   goBack() {

@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoveApiService, API_BASE_URL } from '../../services/love-api.service';
+import { TutorialService } from '../../services/tutorial.service';
 import { IonIcon, ToastController, IonContent, IonRefresher, IonRefresherContent } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { arrowBack, trashOutline, checkmarkCircleOutline, arrowUndoOutline } from 'ionicons/icons';
@@ -26,7 +27,7 @@ import { Location } from '@angular/common';
 
       <!-- VISTA DE CATEGORIAS O LISTA DE COMPLETADAS -->
       <ng-container *ngIf="gameState === 'categories' || gameState === 'completed_list'">
-        <div class="custom-toggle-container">
+        <div class="custom-toggle-container" id="tour-draw-filters">
           <div class="toggle-pill" [class.active]="gameState === 'categories'" (click)="gameState = 'categories'">
             <ion-icon name="play-circle-outline"></ion-icon> Jugar
           </div>
@@ -254,6 +255,7 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
   private api = inject(LoveApiService);
   private toastCtrl = inject(ToastController);
   private location = inject(Location);
+  private tutorialService = inject(TutorialService);
 
   constructor() {
     addIcons({ arrowBack, trashOutline, checkmarkCircleOutline, arrowUndoOutline, 'play-circle-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M112 111v290c0 17.44 17 28.52 31 20.16l247.9-148.37c12.12-7.25 12.12-26.33 0-33.58L143 90.84c-14-8.36-31 2.72-31 20.16z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/></svg>', 'lock-closed-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M336 208v-95a80 80 0 00-160 0v95" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="96" y="208" width="320" height="272" rx="48" ry="48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>', 'infinite-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M256 256s-48-96-126-96c-54.12 0-98 43-98 96s43.88 96 98 96c37.51 0 71-22.41 94-48M256 256s48 96 126 96c54.12 0 98-43 98-96s-43.88-96-98-96c-37.51 0-71 22.41-94 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="48"/></svg>' });
@@ -266,6 +268,9 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
     } catch (e) {
       console.error('Error fetching progress', e);
     }
+    setTimeout(() => {
+      this.tutorialService.showDrawTour();
+    }, 500);
   }
 
   async handleRefresh(event: any) {

@@ -2,6 +2,7 @@ import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoveApiService } from '../../services/love-api.service';
+import { TutorialService } from '../../services/tutorial.service';
 import { IonIcon, ToastController, IonContent, IonRefresher, IonRefresherContent } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { helpCircleOutline, checkmarkCircleOutline, lockClosedOutline, alertCircleOutline, arrowBack, arrowUp } from 'ionicons/icons';
@@ -25,7 +26,7 @@ import { Location } from '@angular/common';
         </div>
       </div>
 
-      <div class="custom-toggle-container">
+      <div class="custom-toggle-container" id="tour-test-filters">
         <div class="toggle-pill" [class.active]="viewMode === 'pending'" (click)="viewMode = 'pending'">
           <ion-icon name="help-circle-outline"></ion-icon> Por responder
         </div>
@@ -207,6 +208,7 @@ export class QuestionsWidgetComponent implements OnInit {
   private api = inject(LoveApiService);
   private toastCtrl = inject(ToastController);
   private location = inject(Location);
+  private tutorialService = inject(TutorialService);
 
   constructor() {
     addIcons({ helpCircleOutline, checkmarkCircleOutline, lockClosedOutline, alertCircleOutline, arrowBack, arrowUp });
@@ -214,6 +216,9 @@ export class QuestionsWidgetComponent implements OnInit {
 
   ngOnInit() {
     this.loadQuestions();
+    setTimeout(() => {
+      this.tutorialService.showTestTour();
+    }, 500);
   }
 
   goBack() {

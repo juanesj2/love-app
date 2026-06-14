@@ -438,4 +438,180 @@ export class TutorialService {
 
     tour.drive();
   }
+
+  public async showGamesHubTour() {
+    if (await this.hasSeenTutorial('games_hub_tour')) return;
+
+    const tour = driver({
+      showProgress: true,
+      doneBtnText: '¡A jugar!',
+      nextBtnText: 'Siguiente',
+      prevBtnText: 'Atrás',
+      steps: [
+        {
+          element: '#tour-game-test',
+          popover: {
+            title: 'Test de Pareja 📝',
+            description: 'Responded a preguntas de todo tipo para ver cuánto os conocéis.',
+            side: 'bottom',
+            align: 'center'
+          }
+        },
+        {
+          element: '#tour-game-swipe',
+          popover: {
+            title: 'Tinder de Pareja 🔥',
+            description: 'Deslizad rápido para descubrir vuestra afinidad en diferentes temas candentes.',
+            side: 'bottom',
+            align: 'center'
+          }
+        },
+        {
+          element: '#tour-game-draw',
+          popover: {
+            title: 'Reto de Dibujo 🎨',
+            description: 'Sacad vuestro lado creativo y atrevido dibujando retos al mismo tiempo.',
+            side: 'bottom',
+            align: 'center'
+          }
+        },
+        {
+          element: '#tour-game-roulette',
+          popover: {
+            title: 'Tarro de Citas 🎡',
+            description: '¿No sabéis qué hacer hoy? Girad la ruleta y dejad que decida por vosotros.',
+            side: 'bottom',
+            align: 'center'
+          }
+        }
+      ],
+      onDestroyed: () => {
+        this.markTutorialAsSeen('games_hub_tour');
+      }
+    });
+
+    tour.drive();
+  }
+
+  public async showTestTour() {
+    if (await this.hasSeenTutorial('test_tour')) return;
+
+    const tour = driver({
+      showProgress: true,
+      doneBtnText: '¡Empezar test!',
+      steps: [
+        {
+          element: '#tour-test-filters',
+          popover: {
+            title: 'Filtros 🔎',
+            description: 'Aquí podéis filtrar las preguntas para ver cuáles os faltan por responder, o ver las que ya habéis completado juntos.',
+            side: 'bottom',
+            align: 'center'
+          }
+        }
+      ],
+      onDestroyed: () => {
+        this.markTutorialAsSeen('test_tour');
+      }
+    });
+
+    tour.drive();
+  }
+
+  public async showSwipeTour() {
+    if (await this.hasSeenTutorial('swipe_tour')) return;
+
+    const tour = driver({
+      showProgress: true,
+      doneBtnText: '¡A deslizar!',
+      nextBtnText: 'Siguiente',
+      prevBtnText: 'Atrás',
+      steps: [
+        {
+          element: '#tour-swipe-categories',
+          popover: {
+            title: 'Categorías 🗂️',
+            description: 'Elegid un tema. Tenéis desde preguntas normales hasta cosas más picantes.',
+            side: 'bottom',
+            align: 'center'
+          }
+        },
+        {
+          element: '#tour-swipe-stats',
+          popover: {
+            title: 'Estadísticas 📊',
+            description: 'Aquí podéis ver vuestro nivel de afinidad en base a lo que habéis respondido.',
+            side: 'left',
+            align: 'center'
+          }
+        }
+      ],
+      onDestroyed: () => {
+        this.markTutorialAsSeen('swipe_tour');
+      }
+    });
+
+    tour.drive();
+  }
+
+  public async showDrawTour() {
+    if (await this.hasSeenTutorial('draw_tour')) return;
+
+    const tour = driver({
+      showProgress: true,
+      doneBtnText: '¡A dibujar!',
+      steps: [
+        {
+          element: '#tour-draw-filters',
+          popover: {
+            title: 'Tus dibujos 🎨',
+            description: 'Puedes empezar a jugar ahora mismo o echar un vistazo a la galería con todas las obras de arte que habéis creado.',
+            side: 'bottom',
+            align: 'center'
+          }
+        }
+      ],
+      onDestroyed: () => {
+        this.markTutorialAsSeen('draw_tour');
+      }
+    });
+
+    tour.drive();
+  }
+
+  public async showRouletteTour() {
+    if (await this.hasSeenTutorial('roulette_tour')) return;
+
+    const tour = driver({
+      showProgress: true,
+      doneBtnText: '¡A rodar!',
+      nextBtnText: 'Siguiente',
+      prevBtnText: 'Atrás',
+      steps: [
+        {
+          element: '#tour-roulette-wheel',
+          popover: {
+            title: 'La Ruleta 🎡',
+            description: 'Dale al botón GIRAR cuando no os pongáis de acuerdo en qué plan hacer.',
+            side: 'bottom',
+            align: 'center'
+          }
+        },
+        {
+          element: '#tour-roulette-options',
+          popover: {
+            title: 'Añadir opciones ✍️',
+            description: 'Podéis borrar o añadir vuestros propios planes (ej: "Ir al cine", "Pedir pizza", "Maratón de Netflix").',
+            side: 'top',
+            align: 'center'
+          }
+        }
+      ],
+      onDestroyed: () => {
+        this.markTutorialAsSeen('roulette_tour');
+      }
+    });
+
+    tour.drive();
+  }
 }

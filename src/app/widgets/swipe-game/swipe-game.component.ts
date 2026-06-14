@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoveApiService } from '../../services/love-api.service';
+import { TutorialService } from '../../services/tutorial.service';
 import { IonIcon, ToastController, IonContent, IonRefresher, IonRefresherContent } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { heartDislikeOutline, heartOutline, arrowBack, statsChartOutline, playCircleOutline, alertCircleOutline, checkmarkCircleOutline, searchOutline, lockClosedOutline } from 'ionicons/icons';
@@ -23,7 +24,7 @@ import { Location } from '@angular/common';
             <div class="progress-fill" [style.width.%]="progress.swipe?.percentage || 0"></div>
           </div>
         </div>
-        <button class="stats-btn" *ngIf="viewMode !== 'categories'" (click)="subViewMode = subViewMode === 'completed' ? 'pending' : 'completed'">
+        <button class="stats-btn" id="tour-swipe-stats" *ngIf="viewMode !== 'categories'" (click)="subViewMode = subViewMode === 'completed' ? 'pending' : 'completed'">
           <ion-icon [name]="subViewMode === 'completed' ? 'play-circle-outline' : 'stats-chart-outline'"></ion-icon>
         </button>
       </div>
@@ -33,7 +34,7 @@ import { Location } from '@angular/common';
         <div class="categories-area">
           <p class="subtitle">Elige un tema para empezar a deslizar y descubrir vuestra afinidad</p>
           
-          <div class="category-grid">
+          <div class="category-grid" id="tour-swipe-categories">
             <div class="cat-card all-card" (click)="selectCategory('')">
               <ion-icon name="infinite-outline"></ion-icon>
               <h3>Todas</h3>
@@ -278,6 +279,7 @@ export class SwipeGameComponent implements OnInit {
   private api = inject(LoveApiService);
   private toastCtrl = inject(ToastController);
   private location = inject(Location);
+  private tutorialService = inject(TutorialService);
 
   // Touch logic
   private startX = 0;
@@ -291,6 +293,9 @@ export class SwipeGameComponent implements OnInit {
   async ngOnInit() {
     this.loadCategories();
     this.loadProgress();
+    setTimeout(() => {
+      this.tutorialService.showSwipeTour();
+    }, 500);
   }
 
   async loadProgress() {

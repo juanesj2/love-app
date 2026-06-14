@@ -7,6 +7,7 @@ import { addIcons } from 'ionicons';
 import { closeCircle, addCircleOutline, syncOutline, arrowBack } from 'ionicons/icons';
 import { Location } from '@angular/common';
 import { LoveApiService } from '../../services/love-api.service';
+import { TutorialService } from '../../services/tutorial.service';
 
 @Component({
   selector: 'app-roulette-widget',
@@ -18,14 +19,14 @@ import { LoveApiService } from '../../services/love-api.service';
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
       
-      <div class="header">
+      <div class="header" id="tour-roulette-header">
         <button class="back-btn" (click)="goBack()"><ion-icon name="arrow-back"></ion-icon></button>
         <h2>Tarro de Citas</h2>
         <p>¿Qué hacemos hoy?</p>
         <button class="fill-btn" (click)="fillSampleDates()"><ion-icon name="sync-outline"></ion-icon></button>
       </div>
 
-      <div class="roulette-container">
+      <div class="roulette-container" id="tour-roulette-wheel">
         <div class="roulette-wheel" [style.transform]="'rotate(' + currentRotation + 'deg)'" [style.transition]="isSpinning ? 'transform 4s cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none'">
           <div class="roulette-slice" *ngFor="let option of options; let i = index">
             <svg viewBox="0 0 100 100" class="slice-svg">
@@ -44,7 +45,7 @@ import { LoveApiService } from '../../services/love-api.service';
         <h3 class="bounce-in">¡{{ winner }}!</h3>
       </div>
 
-      <div class="options-manager">
+      <div class="options-manager" id="tour-roulette-options">
         <div class="section-title">Opciones de la Ruleta</div>
         
         <div class="options-list">
@@ -109,6 +110,7 @@ export class RouletteWidgetComponent implements OnInit, OnDestroy {
   private toastCtrl = inject(ToastController);
   private location = inject(Location);
   private api = inject(LoveApiService);
+  private tutorialService = inject(TutorialService);
   
   options: string[] = ['Peli y Manta', 'Cena Fuera', 'Cocinar Juntos', 'Masajes', 'Noche de Juegos', 'Paseo Nocturno'];
   newOption = '';
@@ -127,6 +129,9 @@ export class RouletteWidgetComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadOptions();
+    setTimeout(() => {
+      this.tutorialService.showRouletteTour();
+    }, 500);
   }
 
   ngOnDestroy() {
