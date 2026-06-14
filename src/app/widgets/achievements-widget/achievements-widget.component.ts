@@ -1,6 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonContent, IonIcon, ToastController } from '@ionic/angular/standalone';
+import { FormsModule } from '@angular/forms';
+import { IonContent, IonIcon, ToastController, IonSegment, IonSegmentButton, IonLabel } from '@ionic/angular/standalone';
 import { Location } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { arrowBack, trophyOutline, lockClosedOutline, sparklesOutline, helpCircleOutline, alertCircleOutline, searchOutline, heartCircleOutline, colorPaletteOutline, flameOutline, cameraOutline, moonOutline, restaurantOutline, filmOutline, chatbubblesOutline, apertureOutline, happyOutline, earthOutline } from 'ionicons/icons';
@@ -19,8 +20,22 @@ import { LoveApiService } from '../../services/love-api.service';
           <p>Explora la app para descubrirlos todos</p>
         </div>
 
-        <div class="achievements-grid" *ngIf="!isLoading && achievementsList.length > 0">
-          <div class="achievement-card" *ngFor="let act of achievementsList" [class.unlocked]="act.unlocked" [class.locked]="!act.unlocked">
+        <div class="filter-container" *ngIf="!isLoading && achievementsList.length > 0">
+          <ion-segment [(ngModel)]="filterMode" (ionChange)="applyFilter()" mode="ios">
+            <ion-segment-button value="all">
+              <ion-label>Todos</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="unlocked">
+              <ion-label>Logrados</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="locked">
+              <ion-label>Secretos</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+        </div>
+
+        <div class="achievements-grid" *ngIf="!isLoading && displayedAchievements.length > 0">
+          <div class="achievement-card" *ngFor="let act of displayedAchievements" [class.unlocked]="act.unlocked" [class.locked]="!act.unlocked">
             <div class="icon-container">
               <ion-icon [name]="act.unlocked ? act.icon : 'lock-closed-outline'"></ion-icon>
             </div>
@@ -43,6 +58,12 @@ import { LoveApiService } from '../../services/love-api.service';
           </div>
         </div>
 
+        <div class="empty-state" *ngIf="!isLoading && achievementsList.length > 0 && displayedAchievements.length === 0">
+          <ion-icon name="search-outline" style="font-size: 3rem; color: #ff4d6d;"></ion-icon>
+          <h3 style="color: #800f2f;">No hay logros aquí</h3>
+          <p style="color: #800f2f; opacity: 0.8;">Sigue explorando para rellenar esta sección.</p>
+        </div>
+
         <div class="empty-state" *ngIf="!isLoading && achievementsList.length === 0">
           <ion-icon name="alert-circle-outline"></ion-icon>
           <h3>No se pudieron cargar los logros</h3>
@@ -61,11 +82,14 @@ import { LoveApiService } from '../../services/love-api.service';
     .scroll-content { --background: #fff0f3; }
     .achievements-container { padding: 20px; padding-bottom: 80px; min-height: 100vh; position: relative; }
     
-    .header { text-align: center; margin-bottom: 30px; margin-top: 10px; position: relative; }
-    .header h2 { font-size: 2rem; font-weight: 800; color: #800f2f; margin: 0; margin-top: 15px; }
+    .header { text-align: center; margin-bottom: 20px; margin-top: 10px; position: relative; padding-top: 45px; }
+    .header h2 { font-size: 2rem; font-weight: 800; color: #800f2f; margin: 0; }
     .header p { color: #a4133c; margin-top: 5px; font-weight: 500; }
     .back-btn { position: absolute; left: 0; top: 0; background: rgba(255, 143, 163, 0.2); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #800f2f; font-size: 1.5rem; backdrop-filter: blur(5px); z-index: 10; cursor: pointer; transition: background 0.3s ease; }
     .back-btn:active { background: rgba(255, 143, 163, 0.4); }
+
+    .filter-container { margin-bottom: 20px; padding: 0 5px; }
+    ion-segment { --background: rgba(255, 255, 255, 0.6); --ion-color-base: #ff4d6d; border-radius: 12px; }
 
     .achievements-grid { display: flex; flex-direction: column; gap: 15px; }
     .achievement-card { display: flex; gap: 15px; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); border-radius: 16px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.3s ease; }
@@ -98,7 +122,7 @@ import { LoveApiService } from '../../services/love-api.service';
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   `],
   standalone: true,
-  imports: [CommonModule, IonContent, IonIcon]
+  imports: [CommonModule, FormsModule, IonContent, IonIcon, IonSegment, IonSegmentButton, IonLabel]
 })
 export class AchievementsWidgetComponent implements OnInit {
   private api = inject(LoveApiService);
@@ -106,8 +130,10 @@ export class AchievementsWidgetComponent implements OnInit {
   private toastCtrl = inject(ToastController);
 
   achievementsList: any[] = [];
+  displayedAchievements: any[] = [];
   unlockedHintsList: any[] = [];
   isLoading = true;
+  filterMode: string = 'all';
 
   constructor() {
     addIcons({ 
@@ -141,11 +167,30 @@ export class AchievementsWidgetComponent implements OnInit {
             unlockedAt: found ? found.unlocked_at : null
           };
         });
+        
+        this.applyFilter();
       }
     } catch (e) {
       console.error('Error fetching achievements', e);
     } finally {
       this.isLoading = false;
+    }
+  }
+
+  applyFilter() {
+    let sorted = [...this.achievementsList].sort((a, b) => {
+      // Unlocked first
+      if (a.unlocked && !b.unlocked) return -1;
+      if (!a.unlocked && b.unlocked) return 1;
+      return 0;
+    });
+
+    if (this.filterMode === 'unlocked') {
+      this.displayedAchievements = sorted.filter(a => a.unlocked);
+    } else if (this.filterMode === 'locked') {
+      this.displayedAchievements = sorted.filter(a => !a.unlocked);
+    } else {
+      this.displayedAchievements = sorted;
     }
   }
 
