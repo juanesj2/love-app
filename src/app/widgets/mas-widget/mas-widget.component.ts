@@ -83,7 +83,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
         </div>
 
         <!-- Próximos Eventos -->
-        <div class="glass-card">
+        <div class="glass-card" id="mas-eventos">
           <div class="section-title">
             <ion-icon name="calendar"></ion-icon>
             <h3>Próximos Eventos Especiales</h3>
@@ -116,7 +116,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
         </div>
 
         <!-- Hitos -->
-        <div class="glass-card">
+        <div class="glass-card" id="mas-hitos">
           <div class="section-title">
             <ion-icon name="flag-outline"></ion-icon>
             <h3>Hitos Importantes</h3>
@@ -142,7 +142,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
         </div>
 
         <!-- Cubo de Deseos -->
-        <div class="glass-card">
+        <div class="glass-card" id="mas-deseos">
           <div class="section-title">
             <ion-icon name="star-outline"></ion-icon>
             <h3>Cubo de Deseos</h3>
@@ -166,7 +166,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
         <!-- Quick Actions Grid -->
         <div class="quick-actions-grid">
           <!-- Widget Config (Spans full width) -->
-          <div class="grid-card full-width">
+          <div class="grid-card full-width" id="mas-coleccion">
             <h4><ion-icon name="settings-outline" class="text-pink"></ion-icon> Colección del Widget</h4>
             <select [(ngModel)]="selectedAlbumId" (change)="saveSelectedAlbum()" class="glass-select">
               <option value="feed">Todas las fotos</option>
@@ -175,7 +175,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
           </div>
 
           <!-- Tour Gastronómico -->
-          <div class="grid-card interactive" (click)="isFoodListModalOpen = true">
+          <div class="grid-card interactive" id="mas-gastro" (click)="isFoodListModalOpen = true">
             <div class="icon-circle" style="background: linear-gradient(135deg, #FF9A9E, #FECFEF); box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3); color: #c9184a;">
               <ion-icon name="restaurant-outline"></ion-icon>
             </div>
@@ -184,7 +184,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
           </div>
 
           <!-- Cine en Pareja -->
-          <div class="grid-card interactive" (click)="isMovieListModalOpen = true">
+          <div class="grid-card interactive" id="mas-cine" (click)="isMovieListModalOpen = true">
             <div class="icon-circle" style="background: linear-gradient(135deg, #a2d2ff, #bde0fe); box-shadow: 0 4px 15px rgba(162, 210, 255, 0.3); color: #023e8a;">
               <ion-icon name="film-outline"></ion-icon>
             </div>
@@ -193,7 +193,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
           </div>
 
           <!-- Minijuego -->
-          <div class="grid-card interactive" (click)="openGame()">
+          <div class="grid-card interactive" id="mas-test" (click)="openGame()">
             <div class="icon-circle bg-purple">
               <ion-icon name="game-controller-outline"></ion-icon>
             </div>

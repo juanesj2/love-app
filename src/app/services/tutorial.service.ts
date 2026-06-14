@@ -236,15 +236,80 @@ export class TutorialService {
     if (await this.hasSeenTutorial('mas')) return;
 
     const tour = driver({
-      showProgress: false,
+      showProgress: true,
       doneBtnText: '¡A explorar!',
+      nextBtnText: 'Siguiente',
+      prevBtnText: 'Atrás',
       steps: [
         {
-          element: '.grid-card',
+          element: '#mas-nuestro-tiempo',
           popover: {
-            title: 'Panel de Control ⚙️',
-            description: 'Aquí tienes un montón de herramientas extras: notas compartidas, hitos, y todo lo demás.',
+            title: 'Nuestro Tiempo ⏳',
+            description: 'Aquí podéis ver cuánto tiempo lleváis juntos y configurar las fechas de vuestros cumpleaños.',
             side: 'bottom',
+            align: 'center'
+          }
+        },
+        {
+          element: '#mas-eventos',
+          popover: {
+            title: 'Próximos Eventos 📅',
+            description: 'Llevamos la cuenta atrás de vuestro aniversario, cumpleaños y días como San Valentín automáticamente.',
+            side: 'top',
+            align: 'center'
+          }
+        },
+        {
+          element: '#mas-hitos',
+          popover: {
+            title: 'Hitos Importantes 🚩',
+            description: '¿Vuestro primer viaje? ¿El día que adoptasteis al gato? Añadid aquí vuestras fechas especiales.',
+            side: 'top',
+            align: 'center'
+          }
+        },
+        {
+          element: '#mas-deseos',
+          popover: {
+            title: 'Cubo de Deseos ✨',
+            description: 'Una lista compartida con todo lo que soñáis hacer juntos. ¡Marcadlos cuando los cumpláis!',
+            side: 'top',
+            align: 'center'
+          }
+        },
+        {
+          element: '#mas-coleccion',
+          popover: {
+            title: 'Colección del Widget 🖼️',
+            description: 'Elige qué álbum de fotos quieres que aparezca en el widget de inicio de tu móvil.',
+            side: 'top',
+            align: 'center'
+          }
+        },
+        {
+          element: '#mas-gastro',
+          popover: {
+            title: 'Tour Gastro 🍔',
+            description: 'Guardad vuestros restaurantes favoritos o los que queréis probar en el futuro.',
+            side: 'top',
+            align: 'center'
+          }
+        },
+        {
+          element: '#mas-cine',
+          popover: {
+            title: 'Cine Pareja 🍿',
+            description: 'Haced una lista de las pelis y series pendientes para que no haya peleas al elegir.',
+            side: 'top',
+            align: 'center'
+          }
+        },
+        {
+          element: '#mas-test',
+          popover: {
+            title: 'Test Pareja 🎮',
+            description: 'Un minijuego divertido para ver cuánto os conocéis.',
+            side: 'top',
             align: 'center'
           }
         }
