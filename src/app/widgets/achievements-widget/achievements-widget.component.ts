@@ -89,7 +89,18 @@ import { LoveApiService } from '../../services/love-api.service';
     .back-btn:active { background: rgba(255, 143, 163, 0.4); }
 
     .filter-container { margin-bottom: 20px; padding: 0 5px; }
-    ion-segment { --background: rgba(255, 255, 255, 0.6); --ion-color-base: #ff4d6d; border-radius: 12px; }
+    ion-segment { 
+      background: rgba(255, 255, 255, 0.8); 
+      border-radius: 12px; 
+      padding: 4px;
+    }
+    ion-segment-button {
+      --color: #800f2f;
+      --color-checked: #ffffff;
+      --indicator-color: #ff4d6d;
+      font-weight: 600;
+      min-height: 40px;
+    }
 
     .achievements-grid { display: flex; flex-direction: column; gap: 15px; }
     .achievement-card { display: flex; gap: 15px; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); border-radius: 16px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.3s ease; }
