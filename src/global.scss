@@ -576,3 +576,11 @@ button.action-sheet-cancel.premium-cancel-btn::after {
   font-weight: 600 !important;
 }
 
+
+/* Fix for driver.js clipping overflowing elements due to backdrop-filter */
+body:has(.driver-popover) .custom-tab-bar {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+}
+

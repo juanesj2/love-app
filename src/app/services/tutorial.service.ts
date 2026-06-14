@@ -57,7 +57,7 @@ export class TutorialService {
           }
         },
         {
-          element: '.center-btn',
+          element: '.plus-circle',
           popover: {
             title: 'Sube Momentos 📸',
             description: 'Toca aquí para hacer una foto o subirla de tu galería y compartirla al instante.',
