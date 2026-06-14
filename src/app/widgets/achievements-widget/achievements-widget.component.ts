@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { IonContent, IonIcon, ToastController } from '@ionic/angular/standalone';
 import { Location } from '@angular/common';
 import { addIcons } from 'ionicons';
-import { arrowBack, trophyOutline, lockClosedOutline, sparklesOutline, helpCircleOutline } from 'ionicons/icons';
+import { arrowBack, trophyOutline, lockClosedOutline, sparklesOutline, helpCircleOutline, alertCircleOutline, searchOutline, heartCircleOutline, colorPaletteOutline, flameOutline, cameraOutline, moonOutline, restaurantOutline, filmOutline, chatbubblesOutline, apertureOutline, happyOutline, earthOutline } from 'ionicons/icons';
 import { LoveApiService } from '../../services/love-api.service';
 
 @Component({
@@ -110,7 +110,11 @@ export class AchievementsWidgetComponent implements OnInit {
   isLoading = true;
 
   constructor() {
-    addIcons({ arrowBack, trophyOutline, lockClosedOutline, sparklesOutline, helpCircleOutline });
+    addIcons({ 
+      arrowBack, trophyOutline, lockClosedOutline, sparklesOutline, helpCircleOutline, alertCircleOutline,
+      searchOutline, heartCircleOutline, colorPaletteOutline, flameOutline, cameraOutline, moonOutline,
+      restaurantOutline, filmOutline, chatbubblesOutline, apertureOutline, happyOutline, earthOutline
+    });
   }
 
   ngOnInit() {
