@@ -112,21 +112,30 @@ export class TutorialService {
       doneBtnText: '¡Entendido!',
       steps: [
         {
-          element: '#photo-album-selector',
+          element: '.floating-toggles',
           popover: {
-            title: 'Feed o Álbumes',
-            description: 'Pulsa aquí para cambiar entre la vista de Feed (todas las fotos mezcladas) o ver tus álbumes específicos.',
+            title: 'Vista Feed o Galería 🖼️',
+            description: 'Cambia entre la vista inmersiva tipo Feed (una a una) o la vista de Galería compacta.',
             side: 'bottom',
             align: 'center'
           }
         },
         {
-          element: '#upload-fab-button',
+          element: '#photo-album-selector',
           popover: {
-            title: 'Sube un Recuerdo',
-            description: 'Usa este botón flotante para subir nuevas fotos y compartirlas.',
-            side: 'left',
-            align: 'center'
+            title: 'Tus Álbumes 🗂️',
+            description: 'Aquí puedes crear y organizar tus recuerdos en álbumes temáticos.',
+            side: 'bottom',
+            align: 'end'
+          }
+        },
+        {
+          element: '.streak-badge',
+          popover: {
+            title: 'Vuestra Racha 🔥',
+            description: 'Si ambos subís al menos una foto hoy, la racha aumenta. ¡Mantened viva la llama y no rompáis la cadena!',
+            side: 'bottom',
+            align: 'start'
           }
         }
       ],
@@ -137,7 +146,7 @@ export class TutorialService {
 
     setTimeout(() => {
       // Validar si los elementos existen antes de lanzar
-      if (document.getElementById('photo-album-selector')) {
+      if (document.querySelector('.floating-toggles')) {
         tour.drive();
       }
     }, 800);
