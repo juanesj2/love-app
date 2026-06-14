@@ -71,7 +71,7 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
     .games-hub-container::before { content: ''; position: absolute; top: -100px; right: -100px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,189,203,0.6) 0%, rgba(255,189,203,0) 70%); border-radius: 50%; z-index: 0; pointer-events: none; }
     .games-hub-container::after { content: ''; position: absolute; bottom: 100px; left: -100px; width: 250px; height: 250px; background: radial-gradient(circle, rgba(255,143,163,0.3) 0%, rgba(255,143,163,0) 70%); border-radius: 50%; z-index: 0; pointer-events: none; }
 
-    .header { text-align: center; margin-bottom: 35px; position: relative; z-index: 1; }
+    .header { text-align: center; margin-bottom: 35px; position: relative; z-index: 1; padding: 0 45px; }
     .back-btn { position: absolute; left: 0; top: 0; background: white; border: 1px solid rgba(255,77,109,0.2); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: transform 0.2s; }
     .back-btn:active { transform: scale(0.9); }
     .header h2 { color: #590D22; margin: 0 0 8px; font-weight: 900; font-size: 2rem; padding-top: 5px; letter-spacing: -0.5px; }
