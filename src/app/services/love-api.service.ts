@@ -56,9 +56,14 @@ export class LoveApiService {
 
   // --- Achievements ---
 
-  async getAchievements(): Promise<any[]> {
+  async getAchievements(): Promise<any> {
     const headers = await this.getHeaders();
-    return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/achievements`, { headers }));
+    return firstValueFrom(this.http.get<any>(`${API_BASE_URL}/love-album/achievements`, { headers }));
+  }
+
+  async unlockHint(achievementId: string): Promise<any> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/achievements/hints/unlock`, { achievement_id: achievementId }, { headers }));
   }
 
   async unlockAchievement(achievementId: string): Promise<any> {

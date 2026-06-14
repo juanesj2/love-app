@@ -1,11 +1,10 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonContent, IonIcon, ToastController } from '@ionic/angular/standalone';
-import { Router } from '@angular/router';
-import { LoveApiService } from '../../services/love-api.service';
 import { Location } from '@angular/common';
 import { addIcons } from 'ionicons';
-import { arrowBack, trophyOutline, lockClosedOutline, sparklesOutline } from 'ionicons/icons';
+import { arrowBack, trophyOutline, lockClosedOutline, sparklesOutline, helpCircleOutline } from 'ionicons/icons';
+import { LoveApiService } from '../../services/love-api.service';
 
 @Component({
   selector: 'app-achievements-widget',
@@ -29,6 +28,17 @@ import { arrowBack, trophyOutline, lockClosedOutline, sparklesOutline } from 'io
               <h3>{{ act.unlocked ? act.title : '???' }}</h3>
               <p>{{ act.unlocked ? act.description : 'Sigue explorando para descubrir este logro secreto.' }}</p>
               <span class="date" *ngIf="act.unlocked">{{ act.unlockedAt | date:'mediumDate' }}</span>
+              
+              <!-- Hints Area (Only if locked) -->
+              <div class="hints-section" *ngIf="!act.unlocked && act.hints?.length > 0">
+                <div class="hint-item" *ngFor="let hint of act.hints; let i = index">
+                  <p *ngIf="isHintUnlocked(act.id, i)">💡 Pista {{ i + 1 }}: {{ hint }}</p>
+                </div>
+                
+                <button class="hint-btn" *ngIf="!hasUnlockedAllHints(act)" (click)="requestHint(act.id)">
+                  <ion-icon name="help-circle-outline"></ion-icon> Revelar Pista ({{ getUnlockedHintsCount(act.id) }}/{{ act.hints.length }})
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -46,18 +56,24 @@ import { arrowBack, trophyOutline, lockClosedOutline, sparklesOutline } from 'io
     .back-btn:active { background: rgba(255, 143, 163, 0.4); }
 
     .achievements-grid { display: flex; flex-direction: column; gap: 15px; }
-    .achievement-card { display: flex; gap: 15px; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); border-radius: 16px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.05); align-items: center; transition: all 0.3s ease; }
-    .achievement-card.locked { opacity: 0.7; background: rgba(255, 255, 255, 0.3); border: 1px dashed rgba(164, 19, 60, 0.3); }
-    .achievement-card.unlocked { background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,228,235,0.9)); border: 1px solid rgba(255, 143, 163, 0.5); }
+    .achievement-card { display: flex; gap: 15px; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); border-radius: 16px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.3s ease; }
+    .achievement-card.locked { opacity: 0.85; background: rgba(255, 255, 255, 0.3); border: 1px dashed rgba(164, 19, 60, 0.3); }
+    .achievement-card.unlocked { background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,228,235,0.9)); border: 1px solid rgba(255, 143, 163, 0.5); align-items: center; }
     
-    .icon-container { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
+    .icon-container { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; margin-top: 5px; }
     .locked .icon-container { background: rgba(0,0,0,0.05); color: #888; }
-    .unlocked .icon-container { background: #ff4d6d; color: white; box-shadow: 0 4px 10px rgba(255, 77, 109, 0.4); }
+    .unlocked .icon-container { background: #ff4d6d; color: white; box-shadow: 0 4px 10px rgba(255, 77, 109, 0.4); margin-top: 0; }
     
     .info { flex-grow: 1; display: flex; flex-direction: column; }
     .info h3 { margin: 0; font-size: 1.1rem; color: #800f2f; font-weight: 700; }
     .info p { margin: 4px 0 0; font-size: 0.85rem; color: #555; line-height: 1.3; }
     .date { font-size: 0.75rem; color: #ff4d6d; margin-top: 5px; font-weight: 600; }
+
+    /* Hints Section */
+    .hints-section { margin-top: 15px; border-top: 1px dashed rgba(164, 19, 60, 0.2); padding-top: 10px; }
+    .hint-item p { margin: 0 0 5px 0; font-size: 0.85rem; color: #800f2f; background: rgba(255, 255, 255, 0.5); padding: 5px 10px; border-radius: 8px; font-weight: 500; font-style: italic; }
+    .hint-btn { margin-top: 5px; background: rgba(255, 77, 109, 0.1); color: #ff4d6d; border: 1px solid rgba(255, 77, 109, 0.3); border-radius: 20px; padding: 6px 15px; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 5px; cursor: pointer; transition: all 0.2s; }
+    .hint-btn:active { background: rgba(255, 77, 109, 0.2); transform: scale(0.95); }
   `],
   standalone: true,
   imports: [CommonModule, IonContent, IonIcon]
@@ -67,36 +83,82 @@ export class AchievementsWidgetComponent implements OnInit {
   private location = inject(Location);
   private toastCtrl = inject(ToastController);
 
-  achievementsList = [
-    { id: 'curious_click', title: 'Curioso', description: 'Has encontrado el menú de logros.', icon: 'sparkles-outline', unlocked: false, unlockedAt: null },
-    { id: 'explorer_poke', title: 'Explorador', description: 'Has mandado un zumbido intenso (10 toques).', icon: 'sparkles-outline', unlocked: false, unlockedAt: null },
-    { id: 'first_drawing', title: 'Artista', description: 'Has jugado al reto de dibujo por primera vez.', icon: 'sparkles-outline', unlocked: false, unlockedAt: null },
-    { id: 'cupid_swipe', title: 'Cupido', description: 'Has completado 5 rondas del Tinder de pareja.', icon: 'sparkles-outline', unlocked: false, unlockedAt: null }
-  ];
+  achievementsList: any[] = [];
+  unlockedHintsList: any[] = [];
 
   constructor() {
-    addIcons({ arrowBack, trophyOutline, lockClosedOutline, sparklesOutline });
+    addIcons({ arrowBack, trophyOutline, lockClosedOutline, sparklesOutline, helpCircleOutline });
   }
 
   ngOnInit() {
     this.loadAchievements();
-    this.api.unlockAchievement('curious_click');
+    // Intenta desbloquear curious_click (si falla no pasa nada)
+    this.api.unlockAchievement('curious_click').then(() => this.loadAchievements());
   }
 
   async loadAchievements() {
     try {
-      const unlocked = await this.api.getAchievements();
-      if (Array.isArray(unlocked)) {
-        this.achievementsList = this.achievementsList.map(act => {
-          const found = unlocked.find((u: any) => u.achievement_id === act.id);
-          if (found) {
-            return { ...act, unlocked: true, unlockedAt: found.unlocked_at };
-          }
-          return act;
+      const data = await this.api.getAchievements();
+      if (data && data.achievements) {
+        // Mapear los datos que vienen del backend
+        const all = data.achievements;
+        const unlockedActs = data.unlocked_achievements || [];
+        this.unlockedHintsList = data.unlocked_hints || [];
+
+        this.achievementsList = all.map((act: any) => {
+          const found = unlockedActs.find((u: any) => u.achievement_id === act.id);
+          return {
+            ...act,
+            unlocked: !!found,
+            unlockedAt: found ? found.unlocked_at : null
+          };
         });
       }
     } catch (e) {
       console.error('Error fetching achievements', e);
+    }
+  }
+
+  isHintUnlocked(achievementId: string, index: number): boolean {
+    return this.unlockedHintsList.some(h => h.achievement_id === achievementId && h.hint_index === index);
+  }
+
+  getUnlockedHintsCount(achievementId: string): number {
+    return this.unlockedHintsList.filter(h => h.achievement_id === achievementId).length;
+  }
+
+  hasUnlockedAllHints(act: any): boolean {
+    if (!act.hints) return true;
+    return this.getUnlockedHintsCount(act.id) >= act.hints.length;
+  }
+
+  async requestHint(achievementId: string) {
+    try {
+      const res = await this.api.unlockHint(achievementId);
+      if (res && res.success) {
+        this.unlockedHintsList.push(res.hint);
+        const toast = await this.toastCtrl.create({
+          message: '¡Nueva pista revelada! 👀',
+          duration: 3000,
+          color: 'success',
+          position: 'top'
+        });
+        toast.present();
+      }
+    } catch (e: any) {
+      console.error('Error requesting hint', e);
+      let msg = 'Hubo un error al pedir la pista.';
+      if (e.error && e.error.message) {
+        msg = e.error.message;
+      }
+      const toast = await this.toastCtrl.create({
+        message: msg,
+        duration: 4000,
+        color: 'warning',
+        position: 'top',
+        icon: 'lock-closed-outline'
+      });
+      toast.present();
     }
   }
 
