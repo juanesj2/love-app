@@ -19,7 +19,7 @@ import { LoveApiService } from '../../services/love-api.service';
           <p>Explora la app para descubrirlos todos</p>
         </div>
 
-        <div class="achievements-grid">
+        <div class="achievements-grid" *ngIf="!isLoading && achievementsList.length > 0">
           <div class="achievement-card" *ngFor="let act of achievementsList" [class.unlocked]="act.unlocked" [class.locked]="!act.unlocked">
             <div class="icon-container">
               <ion-icon [name]="act.unlocked ? act.icon : 'lock-closed-outline'"></ion-icon>
@@ -41,6 +41,18 @@ import { LoveApiService } from '../../services/love-api.service';
               </div>
             </div>
           </div>
+        </div>
+
+        <div class="empty-state" *ngIf="!isLoading && achievementsList.length === 0">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <h3>No se pudieron cargar los logros</h3>
+          <p>¿Seguro que el backend está actualizado? Asegúrate de haber hecho git pull y de haber insertado los logros en la base de datos.</p>
+          <button class="primary-btn" (click)="loadAchievements()">Reintentar</button>
+        </div>
+
+        <div class="loading-state" *ngIf="isLoading">
+          <div class="spinner"></div>
+          <p>Cargando secretos...</p>
         </div>
       </div>
     </ion-content>
@@ -74,6 +86,16 @@ import { LoveApiService } from '../../services/love-api.service';
     .hint-item p { margin: 0 0 5px 0; font-size: 0.85rem; color: #800f2f; background: rgba(255, 255, 255, 0.5); padding: 5px 10px; border-radius: 8px; font-weight: 500; font-style: italic; }
     .hint-btn { margin-top: 5px; background: rgba(255, 77, 109, 0.1); color: #ff4d6d; border: 1px solid rgba(255, 77, 109, 0.3); border-radius: 20px; padding: 6px 15px; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 5px; cursor: pointer; transition: all 0.2s; }
     .hint-btn:active { background: rgba(255, 77, 109, 0.2); transform: scale(0.95); }
+
+    .empty-state { text-align: center; margin-top: 50px; color: #800f2f; }
+    .empty-state ion-icon { font-size: 3rem; color: #ff4d6d; margin-bottom: 10px; }
+    .empty-state h3 { font-weight: 800; font-size: 1.2rem; }
+    .empty-state p { font-size: 0.9rem; opacity: 0.8; max-width: 80%; margin: 10px auto 20px; }
+    .primary-btn { background: #ff4d6d; color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+    
+    .loading-state { text-align: center; margin-top: 50px; color: #ff4d6d; }
+    .spinner { border: 4px solid rgba(255, 77, 109, 0.2); border-top: 4px solid #ff4d6d; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   `],
   standalone: true,
   imports: [CommonModule, IonContent, IonIcon]
@@ -85,6 +107,7 @@ export class AchievementsWidgetComponent implements OnInit {
 
   achievementsList: any[] = [];
   unlockedHintsList: any[] = [];
+  isLoading = true;
 
   constructor() {
     addIcons({ arrowBack, trophyOutline, lockClosedOutline, sparklesOutline, helpCircleOutline });
@@ -97,6 +120,7 @@ export class AchievementsWidgetComponent implements OnInit {
   }
 
   async loadAchievements() {
+    this.isLoading = true;
     try {
       const data = await this.api.getAchievements();
       if (data && data.achievements) {
@@ -116,6 +140,8 @@ export class AchievementsWidgetComponent implements OnInit {
       }
     } catch (e) {
       console.error('Error fetching achievements', e);
+    } finally {
+      this.isLoading = false;
     }
   }
 
