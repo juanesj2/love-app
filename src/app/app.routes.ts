@@ -37,5 +37,9 @@ export const routes: Routes = [
     path: 'pairing',
     loadComponent: () => import('./pairing/pairing.page').then( m => m.PairingPage)
   },
+  {
+    path: 'achievements',
+    loadComponent: () => import('./widgets/achievements-widget/achievements-widget.component').then(m => m.AchievementsWidgetComponent)
+  },
 
 ];

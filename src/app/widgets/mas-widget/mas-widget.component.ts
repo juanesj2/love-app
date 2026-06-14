@@ -11,7 +11,7 @@ import { Preferences } from '@capacitor/preferences';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { LocationService } from '../../services/location.service';
 import { addIcons } from 'ionicons';
-import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add } from 'ionicons/icons';
+import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, trophyOutline, sparklesOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-mas-widget',
@@ -166,6 +166,12 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 
         <!-- Quick Actions Grid -->
         <div class="quick-actions-grid">
+          <!-- Logros y Secretos (Spans full width) -->
+          <div class="grid-card full-width interactive" id="mas-logros" (click)="goTo('achievements')">
+            <h4><ion-icon name="trophy-outline" class="text-pink"></ion-icon> Logros y Secretos</h4>
+            <p style="margin: 0; font-size: 0.85rem; color: #a4133c; font-weight: 500;">Descubre y desbloquea los secretitos de la app.</p>
+          </div>
+
           <!-- Widget Config (Spans full width) -->
           <div class="grid-card full-width" id="mas-coleccion">
             <h4><ion-icon name="settings-outline" class="text-pink"></ion-icon> Colección del Widget</h4>
@@ -728,7 +734,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   selectedMovie: any = null;
 
   constructor() {
-    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add });
+    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, trophyOutline, sparklesOutline });
   }
 
   async ngOnInit() {
@@ -1275,6 +1281,10 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
       ]
     });
     await alert.present();
+  }
+
+  goTo(path: string) {
+    this.router.navigate(['/' + path]);
   }
 
   // --- FOOD PLACES & MOVIES API LOGIC ---

@@ -497,6 +497,7 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
 
     try {
       await this.api.uploadDrawing(this.prompt.id, base64);
+      this.api.unlockAchievement('first_drawing');
       this.checkResult();
     } catch (e) {
       console.error(e);

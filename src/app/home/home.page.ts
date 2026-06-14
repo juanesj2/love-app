@@ -217,6 +217,7 @@ export class HomePage implements OnInit, OnDestroy {
   selectedWidget: 'location' | 'photo' | 'chat' | 'mas' | 'game' = 'photo';
   uploading = false;
   pokeAnimation = false;
+  pokeCount = 0;
   private appStateListener?: PluginListenerHandle;
   private subscriptions: Subscription[] = [];
 
@@ -425,6 +426,11 @@ export class HomePage implements OnInit, OnDestroy {
 
   async sendPoke() {
     this.pokeAnimation = true;
+    this.pokeCount++;
+    if (this.pokeCount === 10) {
+      this.api.unlockAchievement('explorer_poke');
+    }
+    
     try {
       await Haptics.impact({ style: ImpactStyle.Heavy });
       await this.api.sendPoke();

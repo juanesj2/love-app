@@ -523,6 +523,12 @@ export class SwipeGameComponent implements OnInit {
         }
       }
 
+      // Check for achievement
+      const totalMyAnswers = this.allCards.filter(c => c.my_answer !== null && c.my_answer !== undefined).length;
+      if (totalMyAnswers >= 50) {
+        this.api.unlockAchievement('cupid_swipe');
+      }
+
       // Si nos quedamos sin cartas y veníamos de jugar el stack normal, rellenamos
       if (this.cards.length === 0) {
          if (this.isPlayingSpecific) {

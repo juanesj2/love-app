@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { ToastController } from '@ionic/angular/standalone';
 import { Preferences } from '@capacitor/preferences';
 import { firstValueFrom, BehaviorSubject } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -11,6 +12,7 @@ export const API_BASE_URL = environment.apiUrl;
 })
 export class LoveApiService {
   private http = inject(HttpClient);
+  private toastCtrl = inject(ToastController);
   public token$ = new BehaviorSubject<string | null>(null);
   
   constructor() {
@@ -50,6 +52,34 @@ export class LoveApiService {
   async sendCustomNotification(title: string, body: string): Promise<any> {
     const headers = await this.getHeaders();
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/custom-notification`, { title, body }, { headers }));
+  }
+
+  // --- Achievements ---
+
+  async getAchievements(): Promise<any[]> {
+    const headers = await this.getHeaders();
+    return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/achievements`, { headers }));
+  }
+
+  async unlockAchievement(achievementId: string): Promise<any> {
+    const headers = await this.getHeaders();
+    try {
+      const res: any = await firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/achievements/unlock`, { achievement_id: achievementId }, { headers }));
+      if (res && res.newly_unlocked) {
+        const toast = await this.toastCtrl.create({
+          message: `🏆 ¡Logro Desbloqueado! Ve a 'Más' para verlo.`,
+          duration: 4000,
+          position: 'top',
+          color: 'warning',
+          cssClass: 'achievement-toast'
+        });
+        await toast.present();
+      }
+      return res;
+    } catch (e) {
+      console.error('Error unlocking achievement', e);
+      return null;
+    }
   }
 
   // --- AUTH ---
