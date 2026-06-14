@@ -103,6 +103,14 @@ export class TutorialService {
             align: 'center',
             popoverClass: 'tour-bottom-tab'
           }
+        },
+        {
+          popover: {
+            title: 'Secretos y Logros 🏆',
+            description: 'Esta app está hecha con mucho cariño y tiene secretitos escondidos. Te invitamos a interactuar con todo, mantener pulsados emojis y explorar. ¡Implementaremos un sistema de logros para que los encuentres todos!',
+            side: 'bottom',
+            align: 'center'
+          }
         }
       ],
       onDestroyed: () => {
