@@ -30,10 +30,28 @@ export class TutorialService {
       steps: [
         {
           popover: {
-            title: '¡Bienvenido/a a Love Widget! ❤️',
+            title: '¡Bienvenido/a a Love Widget! 👋',
             description: 'Este es vuestro rincón privado. Hemos preparado un pequeño tour para enseñarte las cosas más chulas que podéis hacer.',
             side: 'bottom',
             align: 'start'
+          }
+        },
+        {
+          element: '.custom-header .avatar-container:not(.partner-container)',
+          popover: {
+            title: 'Tu Estado de Ánimo 🎭',
+            description: 'Toca tu foto de perfil en cualquier momento para actualizar cómo te sientes y que tu pareja lo vea al instante.',
+            side: 'bottom',
+            align: 'start'
+          }
+        },
+        {
+          element: '.poke-btn',
+          popover: {
+            title: '¡Zumbidos! 💘',
+            description: 'Toca el corazón central para mandar un "zumbido". Le llegará una notificación a tu pareja y le vibrará el móvil.',
+            side: 'bottom',
+            align: 'center'
           }
         },
         {
