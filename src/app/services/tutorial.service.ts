@@ -524,8 +524,6 @@ export class TutorialService {
     const tour = driver({
       showProgress: true,
       doneBtnText: '¡A deslizar!',
-      nextBtnText: 'Siguiente',
-      prevBtnText: 'Atrás',
       steps: [
         {
           element: '#tour-swipe-categories',
@@ -533,15 +531,6 @@ export class TutorialService {
             title: 'Categorías 🗂️',
             description: 'Elegid un tema. Tenéis desde preguntas normales hasta cosas más picantes.',
             side: 'bottom',
-            align: 'center'
-          }
-        },
-        {
-          element: '#tour-swipe-stats',
-          popover: {
-            title: 'Estadísticas 📊',
-            description: 'Aquí podéis ver vuestro nivel de afinidad en base a lo que habéis respondido.',
-            side: 'left',
             align: 'center'
           }
         }
