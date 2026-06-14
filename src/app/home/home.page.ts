@@ -470,7 +470,8 @@ export class HomePage implements OnInit, OnDestroy {
         {
           text: 'Cancelar',
           icon: 'close',
-          role: 'cancel'
+          role: 'cancel',
+          cssClass: 'premium-cancel-btn'
         }
       ]
     });
