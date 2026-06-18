@@ -28,14 +28,26 @@ import { App } from '@capacitor/app';
     <ion-header class="ion-no-border">
       <ion-toolbar>
         <div class="custom-header" *ngIf="selectedWidget !== 'location'">
-          <div class="avatar-container" (click)="openMoodSelector()">
-            <img *ngIf="myAvatarUrl" [src]="myAvatarUrl" class="avatar" />
-            <div *ngIf="!myAvatarUrl" class="avatar my-avatar">TÚ</div>
+          <div class="avatar-container"
+               (mousedown)="startGoldenPress()" (mouseup)="endGoldenPress()" (mouseleave)="endGoldenPress()"
+               (touchstart)="startGoldenPress()" (touchend)="endGoldenPress()">
+            <img *ngIf="myAvatarUrl" [src]="myAvatarUrl" class="avatar" [class.golden-frame]="hasGoldenFrame" />
+            <div *ngIf="!myAvatarUrl" class="avatar my-avatar" [class.golden-frame]="hasGoldenFrame">Tú</div>
             <div class="mood-badge" *ngIf="myMood">{{ myMood }}</div>
           </div>
           
-          <div class="poke-btn" (click)="sendPoke()">
-            <ion-icon name="heart" [class.poking]="pokeAnimation"></ion-icon>
+          <div class="header-center-actions">
+            <!-- Moon icon for Night Mode if unlocked -->
+            <div class="moon-btn" [class.dark-active]="isDarkMode" *ngIf="hasNightOwlSecret" (click)="toggleDarkMode()">
+              <span style="font-size: 1.3rem; line-height: 1;">{{ isDarkMode ? '🌕' : '🌙' }}</span>
+            </div>
+            
+            <div class="poke-btn"
+              (click)="onPokeClick()"
+              (mousedown)="startPokeHold()" (mouseup)="endPokeHold()" (mouseleave)="endPokeHold()"
+              (touchstart)="startPokeHold()" (touchend)="endPokeHold()" (touchcancel)="endPokeHold()">
+              <ion-icon name="heart" [class.poking]="pokeAnimation" [class.super-poking]="superPokeAnimation"></ion-icon>
+            </div>
           </div>
 
           <div class="avatar-container partner-container"
@@ -152,7 +164,7 @@ import { App } from '@capacitor/app';
   `,
   styles: [`
       ion-toolbar { --background: transparent; position: absolute; top: 0; width: 100%; }
-      .custom-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); border-radius: 0 0 25px 25px; margin-bottom: 10px; }
+      .custom-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); border-radius: 0 0 25px 25px; margin-bottom: 10px; position: relative; z-index: 20; }
       .avatar-container { position: relative; cursor: pointer; z-index: 2; }
       .avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.15); object-fit: cover; border: 2px solid white; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
       .avatar-container:active .avatar { transform: scale(0.9); }
@@ -164,11 +176,19 @@ import { App } from '@capacitor/app';
       
       .mood-badge { position: absolute; bottom: -5px; right: -5px; background: white; border-radius: 50%; padding: 2px; font-size: 1.2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.3s; }
       
-      .poke-btn { position: absolute; left: 50%; transform: translateX(-50%); width: 55px; height: 55px; border-radius: 50%; background: linear-gradient(135deg, #fff0f3, #ffe5ec); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #FF4D6D; cursor: pointer; box-shadow: 0 8px 20px rgba(255,77,109,0.2), inset 0 2px 5px rgba(255,255,255,0.8); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 10; border: 2px solid white; }
-      .poke-btn:active { transform: translateX(-50%) scale(0.85); box-shadow: 0 4px 10px rgba(255,77,109,0.2); }
+      .header-center-actions { display: flex; align-items: center; gap: 15px; position: absolute; left: 50%; transform: translateX(-50%); }
+      .moon-btn { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, rgba(108,99,255,0.15), rgba(162,155,254,0.2)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 2px solid rgba(108,99,255,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(108,99,255,0.2); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+      .moon-btn:active { transform: scale(0.88); }
+      .moon-btn.dark-active { background: linear-gradient(135deg, rgba(108,99,255,0.4), rgba(76,70,201,0.5)); border-color: rgba(108,99,255,0.6); box-shadow: 0 4px 20px rgba(108,99,255,0.4); }
+      .moon-btn.dark-active ion-icon { color: #fff !important; }
+      
+      .poke-btn { width: 55px; height: 55px; border-radius: 50%; background: linear-gradient(135deg, #fff0f3, #ffe5ec); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #FF4D6D; cursor: pointer; box-shadow: 0 8px 20px rgba(255,77,109,0.2), inset 0 2px 5px rgba(255,255,255,0.8); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid white; }
+      .poke-btn:active { transform: scale(0.85); box-shadow: 0 4px 10px rgba(255,77,109,0.2); }
       .poke-btn ion-icon { filter: drop-shadow(0 2px 4px rgba(255,77,109,0.3)); transition: transform 0.3s; }
-      .poke-btn ion-icon.poking { animation: heartbeat 0.8s infinite; color: #c9184a; filter: drop-shadow(0 4px 8px rgba(201,24,74,0.5)); }
-      @keyframes heartbeat { 0% { transform: scale(1); } 25% { transform: scale(1.3); } 50% { transform: scale(1); } 75% { transform: scale(1.3); } 100% { transform: scale(1); } }
+      .poke-btn ion-icon.poking { animation: heartbeat 0.8s ease-in-out 2; color: #c9184a; filter: drop-shadow(0 4px 8px rgba(201,24,74,0.5)); }
+      .poke-btn ion-icon.super-poking { animation: superheartbeat 0.3s ease-in-out infinite; color: #c9184a; filter: drop-shadow(0 6px 14px rgba(201,24,74,0.7)); }
+      @keyframes heartbeat { 0% { transform: scale(1); } 25% { transform: scale(1.4); } 50% { transform: scale(1); } 75% { transform: scale(1.4); } 100% { transform: scale(1); } }
+      @keyframes superheartbeat { 0% { transform: scale(1); } 30% { transform: scale(1.5) rotate(-5deg); } 60% { transform: scale(0.9) rotate(5deg); } 100% { transform: scale(1); } }
   
       .custom-footer { background: transparent; border: none; padding: 0 15px calc(env(safe-area-inset-bottom) + 15px) 15px; position: absolute; bottom: 0; width: 100%; pointer-events: none; z-index: 1000; }
       .custom-tab-bar { pointer-events: auto; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; padding: 5px 15px; height: 70px; border-radius: 35px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.5); position: relative; margin-bottom: 5px; }
@@ -217,7 +237,14 @@ export class HomePage implements OnInit, OnDestroy {
   selectedWidget: 'location' | 'photo' | 'chat' | 'mas' | 'game' = 'photo';
   uploading = false;
   pokeAnimation = false;
+  superPokeAnimation = false;
   pokeCount = 0;
+  private pokeHoldTimer: any = null;
+  private pokeHoldFired = false;
+  hasNightOwlSecret = false;
+  isDarkMode = false;
+  hasGoldenFrame = false;
+  goldenTimeout: any;
   private appStateListener?: PluginListenerHandle;
   private subscriptions: Subscription[] = [];
 
@@ -282,6 +309,13 @@ export class HomePage implements OnInit, OnDestroy {
   async ngOnInit() {
     await this.loadHeaderData();
 
+    // Suscribirse a los logros para el búho nocturno y marco dorado
+    // Usar una suscripción separada que NO se cancela en loadHeaderData
+    this.api.unlockedAchievements$.subscribe(achievements => {
+      this.hasNightOwlSecret = achievements.includes('secret_owl');
+      this.hasGoldenFrame = achievements.includes('secret_golden_frame');
+    });
+
     // Widget Intent listener & Background Polling replacement
     this.appStateListener = await App.addListener('appStateChange', async ({ isActive }) => {
       if (isActive) {
@@ -327,9 +361,27 @@ export class HomePage implements OnInit, OnDestroy {
 
   async openSurpriseModal() {
     try { navigator.vibrate?.(50); } catch(e){}
+    this.api.unlockAchievement('secret_notification');
     this.surpriseTitle = '';
     this.surpriseBody = '';
     this.showSurpriseModal = true;
+  }
+
+  startGoldenPress() {
+    this.goldenTimeout = setTimeout(() => {
+      try { navigator.vibrate?.([50, 50, 50]); } catch(e){}
+      this.api.unlockAchievement('secret_golden_frame');
+      this.openMoodSelector(); // Abre el selector de mood de todas formas
+    }, 1000); // 1s
+  }
+
+  endGoldenPress() {
+    if (this.goldenTimeout) {
+      clearTimeout(this.goldenTimeout);
+      this.goldenTimeout = null;
+      // Si se suelta antes, es un click normal
+      this.openMoodSelector();
+    }
   }
 
   async sendSurprise() {
@@ -377,6 +429,11 @@ export class HomePage implements OnInit, OnDestroy {
 
         // No need to listen to locations here just for the avatars anymore
       }
+
+      // Leer logros siempre despues de getCoupleInfo (por si la suscripcion fue antes)
+      const achievements = this.api.unlockedAchievements$.getValue();
+      this.hasNightOwlSecret = achievements.includes('secret_owl');
+      this.hasGoldenFrame = achievements.includes('secret_golden_frame');
     } catch (e: any) {
       console.log('No se pudo cargar la info de la cabecera', e);
       if (e.status === 403 || e.error?.message?.includes('No estás vinculado')) {
@@ -424,6 +481,50 @@ export class HomePage implements OnInit, OnDestroy {
     }
   }
 
+  onPokeClick() {
+    // Si el long press ya disparó el super poke, ignorar el click
+    if (this.pokeHoldFired) {
+      this.pokeHoldFired = false;
+      return;
+    }
+    this.sendPoke();
+  }
+
+  startPokeHold() {
+    this.pokeHoldFired = false;
+    this.pokeHoldTimer = setTimeout(() => {
+      this.pokeHoldFired = true;
+      this.sendSuperPoke();
+    }, 700);
+  }
+
+  endPokeHold() {
+    if (this.pokeHoldTimer) {
+      clearTimeout(this.pokeHoldTimer);
+      this.pokeHoldTimer = null;
+    }
+  }
+
+  async sendSuperPoke() {
+    this.superPokeAnimation = true;
+    this.api.unlockAchievement('secret_spammer');
+    try {
+      // Vibrar de forma larga y continua
+      await Haptics.vibrate({ duration: 800 });
+      await this.api.sendPoke();
+      const toast = await this.toastController.create({
+        message: '¡SUPER ZUMBIDO enviado! 💚💥',
+        duration: 2000,
+        color: 'danger',
+        position: 'top'
+      });
+      toast.present();
+    } catch (e) {
+      console.error(e);
+    }
+    setTimeout(() => { this.superPokeAnimation = false; }, 1500);
+  }
+
   async sendPoke() {
     this.pokeAnimation = true;
     this.pokeCount++;
@@ -453,6 +554,12 @@ export class HomePage implements OnInit, OnDestroy {
     }
     setTimeout(() => { this.pokeAnimation = false; }, 1500);
   }
+
+  toggleDarkMode() {
+    this.isDarkMode = !this.isDarkMode;
+    document.body.classList.toggle('night-owl-mode', this.isDarkMode);
+  }
+
 
   async presentPhotoOptions(callback: (source: CameraSource) => void) {
     const actionSheet = await this.actionSheetCtrl.create({

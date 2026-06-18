@@ -470,7 +470,10 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
         <!-- Add Movie Modal -->
         <div class="custom-overlay" *ngIf="isAddingMovie" (click)="isAddingMovie = false">
           <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
-            <h2 style="color: #590D22; margin-bottom: 20px; font-weight: 900;">Nueva Peli/Serie 🎬</h2>
+            <h2 style="color: #590D22; margin-bottom: 20px; font-weight: 900;">
+              Nueva Peli/Serie
+              <span (click)="unlockPopcorn($event)" style="cursor: pointer; display: inline-block; transition: transform 0.2s; user-select: none;" title="">🍿</span>
+            </h2>
             
             <div *ngIf="newMovie.imageBase64" class="milestone-cover" style="width: 120px; height: 180px; border-radius: 12px; margin: 0 auto 20px; overflow: hidden; position: relative;">
               <img [src]="newMovie.imageBase64" style="width: 100%; height: 100%; object-fit: cover;" />
@@ -484,7 +487,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             </button>
             
             <input type="text" placeholder="Título" [(ngModel)]="newMovie.title" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
-            <input type="text" placeholder="¿Quién se quedó dormido primero?" [(ngModel)]="newMovie.who_fell_asleep" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
+            <input #dormidoInput type="text" placeholder="¿Quién se quedó dormido primero?" [(ngModel)]="newMovie.who_fell_asleep" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
             <textarea placeholder="Nuestra frase favorita / Momento top" [(ngModel)]="newMovie.favorite_quote" class="glass-input" style="width: 100%; min-height: 80px; margin-bottom: 10px; resize: vertical;"></textarea>
             
             <div style="margin-bottom: 20px;">
@@ -1001,6 +1004,23 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.tutorialService.showFoodTour();
     }, 500);
+  }
+
+  unlockPopcorn(event: Event) {
+    event.stopPropagation();
+    this.api.unlockAchievement('secret_popcorn');
+    // Abrir directamente el modal de añadir peli
+    this.isAddingMovie = true;
+    // Esperar a que el DOM renderice y hacer focus en el campo "dormido"
+    setTimeout(() => {
+      const dormidoInput = document.querySelector('input[placeholder="¿Quién se quedó dormido primero?"]') as HTMLInputElement;
+      if (dormidoInput) {
+        dormidoInput.focus();
+        dormidoInput.style.borderColor = '#FF4D6D';
+        dormidoInput.style.boxShadow = '0 0 0 3px rgba(255,77,109,0.25)';
+        dormidoInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 300);
   }
 
   openMovieListModal() {

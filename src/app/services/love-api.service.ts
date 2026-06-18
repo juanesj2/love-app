@@ -14,6 +14,7 @@ export class LoveApiService {
   private http = inject(HttpClient);
   private toastCtrl = inject(ToastController);
   public token$ = new BehaviorSubject<string | null>(null);
+  public unlockedAchievements$ = new BehaviorSubject<string[]>([]);
   
   constructor() {
     this.loadToken();
@@ -130,7 +131,12 @@ export class LoveApiService {
     const headers = await this.getHeaders();
     const date = new Date();
     const localDate = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
-    return firstValueFrom(this.http.get<any>(`${API_BASE_URL}/love-album/info?local_date=${localDate}`, { headers }));
+    
+    const res = await firstValueFrom(this.http.get<any>(`${API_BASE_URL}/love-album/info?local_date=${localDate}`, { headers }));
+    if (res && res.unlocked_achievements) {
+      this.unlockedAchievements$.next(res.unlocked_achievements);
+    }
+    return res;
   }
 
   async uploadAvatar(base64Image: string): Promise<any> {

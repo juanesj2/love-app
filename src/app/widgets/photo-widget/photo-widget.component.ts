@@ -408,7 +408,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
     }
     .photo-widget-container { padding: 0; position: relative; height: 100%; display: flex; flex-direction: column; background: linear-gradient(135deg, #fff5f8 0%, #ffe3e9 100%); font-family: 'Inter', sans-serif; }
     
-    .floating-top-bar { position: absolute; top: calc(env(safe-area-inset-top) + 85px); left: 15px; right: 15px; z-index: 50; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
+    .floating-top-bar { position: absolute; top: calc(env(safe-area-inset-top) + 105px); left: 15px; right: 15px; z-index: 50; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
     .floating-top-bar > * { pointer-events: auto; }
     
     .floating-toggles { position: absolute; left: 50%; transform: translateX(-50%); display: flex; background: rgba(255,255,255,0.85); backdrop-filter: blur(10px); padding: 4px; border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); gap: 5px; }
@@ -432,8 +432,8 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     
     .scroll-content { flex: 1; --background: transparent; --padding-bottom: 95px; }
-    .photos-list { padding-top: 155px; padding-bottom: 95px; }
-    .grid-wrapper { padding-top: 155px; padding-bottom: 95px; }
+    .photos-list { padding-top: 170px; padding-bottom: 95px; }
+    .grid-wrapper { padding-top: 170px; padding-bottom: 95px; }
     
     .global-date-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; visibility: hidden; transition: opacity 0.8s ease-in-out, visibility 0.8s; pointer-events: none; border-radius: inherit; }
     .global-date-overlay.show { opacity: 1; visibility: visible; }
