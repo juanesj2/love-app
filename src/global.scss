@@ -510,7 +510,11 @@ body.night-owl-mode {
   }
 
   .floating-toggles button { color: rgba(200,195,240,0.5) !important; }
-  .floating-toggles button.active { background: rgba(124,58,237,0.3) !important; color: #a78bfa !important; }
+  .floating-toggles button.active { 
+    background: rgba(124,58,237,0.3) !important; 
+    color: #a78bfa !important; 
+    box-shadow: 0 2px 8px rgba(124,58,237,0.3) !important;
+  }
 
   /* ---- Overlays y modales ---- */
   .custom-overlay {
@@ -526,6 +530,10 @@ body.night-owl-mode {
   /* ---- Colores de texto secundario rosa → lavanda ---- */
   .text-pink, [style*="color: #FF4D6D"], [style*="color: #590D22"],
   [style*="color: #a4133c"], [style*="color: #800f2f"] {
+    color: #a78bfa !important;
+  }
+  
+  [style*="color: #FFB703"] {
     color: #a78bfa !important;
   }
 
@@ -544,7 +552,7 @@ body.night-owl-mode {
     color: #a78bfa !important;
   }
   ion-action-sheet .action-sheet-cancel {
-    color: #ff4d6d !important;
+    color: #a78bfa !important;
   }
 
   /* ---- Píldoras, Badges y Botones de acción ---- */
@@ -558,6 +566,16 @@ body.night-owl-mode {
     background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
     color: #fff !important;
     border-color: #a78bfa !important;
+  }
+
+  /* Botones cancelar y eliminar en modales */
+  [style*="rgba(128,15,47,0.1)"] {
+    background: rgba(167, 139, 250, 0.1) !important;
+    color: #a78bfa !important;
+  }
+  [style*="color: red"], [style*="rgba(255,0,0,0.1)"] {
+    background: rgba(239, 68, 68, 0.1) !important;
+    color: #ef4444 !important;
   }
 
   /* ---- Mapa y sus controles ---- */
@@ -576,7 +594,7 @@ body.night-owl-mode {
   }
 
   /* ---- Cards y elementos de "Más" ---- */
-  .milestone-item, .bucket-item, .grid-card {
+  .milestone-item, .bucket-item, .grid-card, .food-place-item, .movie-item, .dish-item {
     background: rgba(30, 27, 50, 0.6) !important;
     border: 1px solid rgba(167, 139, 250, 0.1) !important;
   }
@@ -586,9 +604,52 @@ body.night-owl-mode {
   .milestone-item .m-date, .bucket-item .label {
     color: rgba(200, 195, 240, 0.6) !important;
   }
-  .milestone-item .m-days {
+  .milestone-item .m-days, .milestone-indicator {
     background: rgba(167, 139, 250, 0.15) !important;
     color: #d4d0f0 !important;
+  }
+
+  /* ---- Corazón y Tiempo Juntos ---- */
+  .heart-pulse ion-icon {
+    color: #a78bfa !important;
+    filter: drop-shadow(0 0 15px rgba(167, 139, 250, 0.6)) !important;
+    animation: night-pulse 1s infinite alternate cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+  @keyframes night-pulse { 
+    0% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(167, 139, 250, 0.4)); } 
+    100% { transform: scale(1.2); filter: drop-shadow(0 0 25px rgba(167, 139, 250, 0.8)); } 
+  }
+  
+  .time-block {
+    background: rgba(30, 27, 50, 0.8) !important;
+    border-color: rgba(167, 139, 250, 0.2) !important;
+  }
+  .time-block.highlight {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.3) !important;
+  }
+
+  /* ---- Albums y Fotos ---- */
+  .album-cover {
+    background-color: rgba(167, 139, 250, 0.2) !important;
+  }
+  .album-cover.empty {
+    border-color: rgba(167, 139, 250, 0.5) !important;
+    color: #a78bfa !important;
+    background: transparent !important;
+  }
+  .change-cover-btn {
+    color: #a78bfa !important;
+    background: rgba(30, 27, 50, 0.8) !important;
+  }
+  .albums-sheet {
+    background: #161426 !important;
+  }
+  .prompt-preview-container {
+    background: rgba(30, 27, 50, 0.8) !important;
+  }
+  [style*="background: rgba(255,77,109,0.05)"] {
+    background: rgba(167, 139, 250, 0.05) !important;
   }
 
   /* ---- Scrollbars ---- */
