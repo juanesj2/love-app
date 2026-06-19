@@ -18,7 +18,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
   template: `
     <ion-content class="scroll-content">
       <ng-template #staticStars let-rating="rating">
-        <div style="display: flex; gap: 2px;">
+        <div style="display: flex; gap: 2px; justify-content: center;">
           <div class="star" [class.is-active]="s <= rating" *ngFor="let s of [1,2,3,4,5]" style="width: 24px; height: 24px; cursor: default;">
             <div class="svg-container">
               <svg xmlns="http://www.w3.org/2000/svg" class="svg-outline" viewBox="0 0 24 24"><path d="M12 2.5L9.45 8.5L3 9.06L7.725 13.39L6.25 19.82L12 16.5L17.75 19.82L16.275 13.39L21 9.06L14.55 8.5L12 2.5ZM12 4.75L14 9.33L18.7 9.75L15 13.07L16.18 17.75L12 15.16L7.82 17.75L9 13.07L5.3 9.75L10 9.33L12 4.75Z"></path></svg>

@@ -536,6 +536,10 @@ body.night-owl-mode {
   [style*="color: #FFB703"] {
     color: #a78bfa !important;
   }
+  
+  .star {
+    --star-color: #a78bfa !important;
+  }
 
   /* ---- Menús nativos y Action Sheets ---- */
   ion-action-sheet {
