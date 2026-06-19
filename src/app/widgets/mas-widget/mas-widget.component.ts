@@ -3,6 +3,7 @@ import { App } from '@capacitor/app';
 import { PluginListenerHandle } from '@capacitor/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { IonContent, IonRefresher, IonRefresherContent, IonIcon, ToastController, ActionSheetController, AlertController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { LoveApiService } from '../../services/love-api.service';
@@ -251,7 +252,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 
       <!-- Modal for Milestone Details -->
       <div class="custom-overlay" *ngIf="isMilestoneModalOpen" (click)="isMilestoneModalOpen = false">
-        <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+        <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: calc(100vh - 140px); overflow-y: auto;" (click)="$event.stopPropagation()">
           
           <!-- Portada del Hito -->
           <div *ngIf="selectedMilestone?.image_url_full || selectedMilestone?.newImageBase64" class="milestone-cover" style="width: 100%; height: 180px; border-radius: 18px; margin-bottom: 20px; overflow: hidden; position: relative;">
@@ -309,7 +310,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 
         <!-- Food List Modal -->
         <div class="custom-overlay" *ngIf="isFoodListModalOpen" (click)="isFoodListModalOpen = false">
-          <div class="modal-content glass-card" id="tour-food-modal" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" id="tour-food-modal" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: calc(100vh - 140px); overflow-y: auto;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="restaurant-outline"></ion-icon> Tour Gastronómico</h2>
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Restaurantes y platos que hemos probado</p>
             
@@ -332,7 +333,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 
         <!-- Movies List Modal -->
         <div class="custom-overlay" *ngIf="isMovieListModalOpen" (click)="isMovieListModalOpen = false">
-          <div class="modal-content glass-card" id="tour-movie-modal" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" id="tour-movie-modal" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: calc(100vh - 140px); overflow-y: auto;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="film-outline"></ion-icon> Cine en Pareja</h2>
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Películas y series que vemos juntos</p>
             
@@ -355,7 +356,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 
         <!-- Add Food Place Modal -->
         <div class="custom-overlay" *ngIf="isAddingFoodPlace" (click)="isAddingFoodPlace = false">
-          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: calc(100vh - 140px); overflow-y: auto;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 20px; font-weight: 900;">Nuevo Restaurante 🍔</h2>
             
             <div *ngIf="newFoodPlace.imageBase64" class="milestone-cover" style="width: 100%; height: 150px; border-radius: 18px; margin-bottom: 20px; overflow: hidden; position: relative;">
@@ -370,7 +371,12 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             </button>
             
             <input type="text" placeholder="Nombre del sitio" [(ngModel)]="newFoodPlace.name" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
-            <input type="text" placeholder="Ubicación (ej: Madrid)" [(ngModel)]="newFoodPlace.location" class="glass-input" id="tour-food-location" style="width: 100%; margin-bottom: 10px;" />
+            <input type="text" placeholder="Ubicación (ej: Madrid)" [(ngModel)]="newFoodPlace.location" (ngModelChange)="onLocationChange($event)" class="glass-input" id="tour-food-location" style="width: 100%; margin-bottom: 10px;" />
+            
+            <div *ngIf="foodPlaceMapUrl" style="width: 100%; height: 150px; border-radius: 14px; overflow: hidden; margin-bottom: 15px; border: 2px solid rgba(255,77,109,0.3);">
+              <iframe [src]="foodPlaceMapUrl" width="100%" height="100%" style="border:0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+            
             <textarea placeholder="¿Qué tal estaba? Plato estrella, etc." [(ngModel)]="newFoodPlace.description" class="glass-input" style="width: 100%; min-height: 80px; margin-bottom: 10px; resize: vertical;"></textarea>
             
             <div style="margin-bottom: 20px;">
@@ -395,7 +401,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 
         <!-- View Food Place Modal -->
         <div class="custom-overlay" *ngIf="isFoodPlaceModalOpen" (click)="isFoodPlaceModalOpen = false">
-          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: calc(100vh - 140px); overflow-y: auto;" (click)="$event.stopPropagation()">
             
             <div *ngIf="selectedFoodPlace?.image_url_full" class="milestone-cover" style="width: 100%; height: 180px; border-radius: 18px; margin-bottom: 20px; overflow: hidden; position: relative;">
               <img [src]="selectedFoodPlace?.image_url_full" style="width: 100%; height: 100%; object-fit: cover;" />
@@ -469,7 +475,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 
         <!-- Add Movie Modal -->
         <div class="custom-overlay" *ngIf="isAddingMovie" (click)="isAddingMovie = false">
-          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: calc(100vh - 140px); overflow-y: auto;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 20px; font-weight: 900;">
               Nueva Peli/Serie
               <span (click)="unlockPopcorn($event)" style="cursor: pointer; display: inline-block; transition: transform 0.2s; user-select: none;" title="">🍿</span>
@@ -512,7 +518,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 
         <!-- View Movie Modal -->
         <div class="custom-overlay" *ngIf="isMovieModalOpen" (click)="isMovieModalOpen = false">
-          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 90vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: calc(100vh - 140px); overflow-y: auto;" (click)="$event.stopPropagation()">
             
             <div *ngIf="selectedMovie?.image_url_full" class="milestone-cover" style="width: 140px; height: 210px; border-radius: 12px; margin: 0 auto 20px; overflow: hidden; position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
               <img [src]="selectedMovie?.image_url_full" style="width: 100%; height: 100%; object-fit: cover;" />
@@ -686,6 +692,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private alertCtrl = inject(AlertController);
   private locationService = inject(LocationService);
+  private sanitizer = inject(DomSanitizer);
 
   startDate: string = '';
   selectedAlbumId: number | string = 'feed';
@@ -727,6 +734,9 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   newFoodPlace: any = { name: '', location: '', description: '', rating: 5, imageBase64: null };
   isFoodPlaceModalOpen = false;
   selectedFoodPlace: any = null;
+  
+  foodPlaceMapUrl: SafeResourceUrl | null = null;
+  locationTimeout: any;
   
   isAddingDish = false;
   newDish: any = { name: '', description: '', rating: 5, imageBase64: null };
@@ -1322,6 +1332,17 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     this.selectedFoodPlace = place;
     this.isFoodPlaceModalOpen = true;
     this.isAddingDish = false;
+  }
+
+  onLocationChange(value: string) {
+    if (this.locationTimeout) clearTimeout(this.locationTimeout);
+    this.foodPlaceMapUrl = null;
+    if (!value || value.trim() === '') return;
+
+    this.locationTimeout = setTimeout(() => {
+      const url = `https://maps.google.com/maps?q=${encodeURIComponent(value)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+      this.foodPlaceMapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    }, 2000);
   }
 
   async uploadNewFoodPlacePhoto() {

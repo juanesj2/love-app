@@ -99,7 +99,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
                       </div>
                       <span class="duration" *ngIf="audioEl.duration && audioEl.duration !== Infinity">{{ formatDuration(audioEl.duration) }}</span>
                     </div>
-                    <audio [src]="environment.storageUrl + msg.photo?.image_path" 
+                    <audio [src]="getAudioSrc(msg)" 
                            (ended)="msg.playing = false" 
                            (pause)="msg.playing = false" 
                            (play)="msg.playing = true" 
@@ -1165,28 +1165,43 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   async processAudio() {
     this.isRecording = false;
     clearInterval(this.recordingInterval);
+    this.cdr.detectChanges();
     const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' }); // Default for MediaRecorder in most browsers
     if (audioBlob.size === 0) return;
     
     this.sending = true;
     try {
-      const file = new File([audioBlob], 'audio.webm', { type: 'audio/webm' });
-      // We reuse uploadPhoto endpoint which just expects a file. 
-      // The backend saves the file and returns a photo object.
-      const res = await this.api.uploadPhoto(file, '[AUDIO]');
-      if (res && res.photo && res.photo.id) {
-        const replyPayload = this.replyingTo ? { id: this.replyingTo.id, user: this.replyingTo.user?.name, text: '🎤 Audio' } : undefined;
-        await this.api.sendMessage('[AUDIO]', res.photo.id, replyPayload);
-        this.replyingTo = null;
-        await this.loadMessages();
-        this.safeTimeout(() => this.scrollToBottom(), 100);
-      }
+      const reader = new FileReader();
+      reader.readAsDataURL(audioBlob);
+      reader.onloadend = async () => {
+        try {
+          const base64Audio = reader.result as string;
+          const replyPayload = this.replyingTo ? { id: this.replyingTo.id, user: this.replyingTo.user?.name, text: '🎤 Audio' } : undefined;
+          await this.api.sendMessage('[AUDIO]' + base64Audio, undefined, replyPayload);
+          this.replyingTo = null;
+          await this.loadMessages();
+          this.safeTimeout(() => this.scrollToBottom(), 100);
+        } catch (e) {
+          console.error('Error sending base64 audio', e);
+          this.showError('Error al enviar audio. Puede ser demasiado largo.');
+        } finally {
+          this.sending = false;
+          this.cdr.detectChanges();
+        }
+      };
     } catch (e) {
-      console.error('Error sending audio', e);
-      this.showError('Error al enviar audio');
-    } finally {
+      console.error('Error preparing audio', e);
+      this.showError('Error al preparar audio');
       this.sending = false;
+      this.cdr.detectChanges();
     }
+  }
+
+  getAudioSrc(msg: any): string {
+    if (msg.mensaje && msg.mensaje.length > 20 && msg.mensaje.includes('data:audio')) {
+      return msg.mensaje.replace('[AUDIO]', '');
+    }
+    return this.environment.storageUrl + msg.photo?.image_path;
   }
 
   // --- Audio Player Logic ---
@@ -1326,12 +1341,14 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   swipeStartX = 0;
   swipeStartY = 0;
   swipingMsgId: number | null = null;
+  swipeDirection: 'horizontal' | 'vertical' | null = null;
 
   ts(event: any, msg: any) {
     if (event.touches && event.touches.length > 0) {
       this.swipeStartX = event.touches[0].clientX;
       this.swipeStartY = event.touches[0].clientY;
       this.swipingMsgId = msg.id;
+      this.swipeDirection = null;
     }
     this.startPress(event, msg);
   }
@@ -1344,6 +1361,18 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     const deltaX = x - this.swipeStartX;
     const deltaY = y - this.swipeStartY;
     
+    if (!this.swipeDirection) {
+      if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) {
+        if (Math.abs(deltaY) > Math.abs(deltaX) * 1.2) {
+           this.swipeDirection = 'vertical';
+        } else {
+           this.swipeDirection = 'horizontal';
+        }
+      }
+    }
+
+    if (this.swipeDirection === 'vertical') return;
+    
     if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) {
       this.endPress();
     }
@@ -1353,8 +1382,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     if (!isMine && deltaX < 0) return;
 
     let move = deltaX;
-    if (move > 60) move = 60 + (move - 60) * 0.2;
-    if (move < -60) move = -60 + (move + 60) * 0.2;
+    if (move > 80) move = 80 + (move - 80) * 0.2;
+    if (move < -80) move = -80 + (move + 80) * 0.2;
 
     const el = document.getElementById('slide-el-' + msg.id);
     const iconEl = document.getElementById('swipe-icon-' + msg.id);
@@ -1365,7 +1394,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     }
 
     if (iconEl) {
-      const progress = Math.min(Math.abs(move) / 60, 1);
+      const progress = Math.min(Math.abs(move) / 80, 1);
       iconEl.style.opacity = progress.toString();
       iconEl.style.transform = `translateY(-50%) scale(${progress})`;
       iconEl.style.transition = 'none';
@@ -1401,10 +1430,10 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     }
 
     const isMine = this.isMine(msg);
-    if (isMine && move <= -50) {
+    if (isMine && move <= -70) {
       this.replyToMessage(msg);
       Haptics.impact({ style: ImpactStyle.Light }).catch(()=>{});
-    } else if (!isMine && move >= 50) {
+    } else if (!isMine && move >= 70) {
       this.replyToMessage(msg);
       Haptics.impact({ style: ImpactStyle.Light }).catch(()=>{});
     }

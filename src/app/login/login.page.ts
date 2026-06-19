@@ -4,12 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonIcon, AlertController, ToastController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { eyeOutline, eyeOffOutline, heart, mailOutline, lockClosedOutline, personOutline, shieldCheckmarkOutline } from 'ionicons/icons';
+import { eyeOutline, eyeOffOutline, heart, mailOutline, lockClosedOutline, personOutline, shieldCheckmarkOutline, logoGoogle } from 'ionicons/icons';
 import { LocationService } from '../services/location.service';
 import { LoveApiService } from '../services/love-api.service';
 import { NotificationService } from '../services/notification.service';
 import { Browser } from '@capacitor/browser';
 import { Preferences } from '@capacitor/preferences';
+import { GoogleSignIn } from '@capawesome/capacitor-google-sign-in';
 
 @Component({
   selector: 'app-login',
@@ -49,10 +50,27 @@ export class LoginPage implements OnInit {
   };
 
   constructor() {
-    addIcons({ eyeOutline, eyeOffOutline, heart, mailOutline, lockClosedOutline, personOutline, shieldCheckmarkOutline });
+    addIcons({ eyeOutline, eyeOffOutline, heart, mailOutline, lockClosedOutline, personOutline, shieldCheckmarkOutline, logoGoogle });
   }
 
   async ngOnInit() {
+    // Manejar callback de Google en Web si redirige con parámetros state/code
+    if (window.location.search.includes('state=')) {
+      try {
+        this.isLoading = true;
+        const result = await GoogleSignIn.handleRedirectCallback();
+        if (result && result.email && result.userId) {
+          await this.loveApi.googleLogin(result.email, result.givenName || result.displayName || 'Google User', result.userId);
+          await this.handleSuccessfulAuth(result.email);
+          return; // No continuamos con auto-login si entramos por Google
+        }
+      } catch (e) {
+        console.error('Error Google Redirect:', e);
+      } finally {
+        this.isLoading = false;
+      }
+    }
+
     // Auto-login si ya hay token y usuario
     const storedUser = localStorage.getItem('love_widget_user');
     const { value: token } = await Preferences.get({ key: 'auth_token' });
@@ -134,6 +152,25 @@ export class LoginPage implements OnInit {
       console.log('Error registro:', e);
       const msg = e.error?.message || 'Error al crear la cuenta. Inténtalo de nuevo.';
       this.showToast(msg, 'danger');
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  async onGoogleLogin() {
+    this.isLoading = true;
+    try {
+      const result = await GoogleSignIn.signIn();
+      
+      if (result && result.email && result.userId) {
+        await this.loveApi.googleLogin(result.email, result.givenName || result.displayName || 'Google User', result.userId);
+        await this.handleSuccessfulAuth(result.email);
+      } else {
+        this.showToast('No se pudo obtener información de Google.', 'danger');
+      }
+    } catch (e: any) {
+      console.log('Error Google Login:', e);
+      this.showToast('Error al iniciar sesión con Google.', 'danger');
     } finally {
       this.isLoading = false;
     }

@@ -103,6 +103,21 @@ import { TutorialService } from '../../services/tutorial.service';
     .add-option input { flex: 1; background: #f8f9fa; border: 1px solid rgba(0,0,0,0.05); border-radius: 12px; padding: 0 15px; font-size: 1rem; color: #333; outline: none; }
     .add-option input:focus { border-color: #FF4D6D; }
     .add-option button { width: 50px; height: 50px; border-radius: 12px; background: #FF4D6D; color: white; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; }
+
+    :host-context(body.night-owl-mode) .roulette-content { --background: #121212; }
+    :host-context(body.night-owl-mode) .header h2 { color: #fdfdfd; }
+    :host-context(body.night-owl-mode) .header p { color: #ccc; }
+    :host-context(body.night-owl-mode) .back-btn, :host-context(body.night-owl-mode) .fill-btn { background: #222; color: #fdfdfd; }
+    :host-context(body.night-owl-mode) .winner-display h3 { color: #fdfdfd; }
+    :host-context(body.night-owl-mode) .options-manager { background: #1a1a1a; box-shadow: 0 -10px 20px rgba(0,0,0,0.5); }
+    :host-context(body.night-owl-mode) .section-title { color: #fdfdfd; }
+    :host-context(body.night-owl-mode) .option-item { background: #222; color: #fdfdfd; }
+    :host-context(body.night-owl-mode) .delete-icon { color: #a78bfa; }
+    :host-context(body.night-owl-mode) .add-option input { background: #222; border-color: #333; color: #fdfdfd; }
+    :host-context(body.night-owl-mode) .add-option input:focus { border-color: #a78bfa; }
+    :host-context(body.night-owl-mode) .add-option button { background: #a78bfa; }
+    :host-context(body.night-owl-mode) .spin-btn { background: #1a1a1a; border-color: #a78bfa; color: #a78bfa; }
+    :host-context(body.night-owl-mode) .roulette-wheel { border-color: #1a1a1a; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
   `]
 })
 export class RouletteWidgetComponent implements OnInit, OnDestroy {

@@ -5,6 +5,7 @@ import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalo
 // Importaciones de Firebase
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+import { GoogleSignIn } from '@capawesome/capacitor-google-sign-in';
 
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
@@ -30,3 +31,9 @@ bootstrapApplication(AppComponent, {
 
 // Inicializar elementos de interfaz de cámara para web
 defineCustomElements(window);
+
+// Inicializar Google Sign In para web
+GoogleSignIn.initialize({
+  clientId: '598297080553-h6sfq42rfibl91g88usbaqb91r56gbbp.apps.googleusercontent.com',
+  redirectUrl: window.location.origin + '/login',
+});

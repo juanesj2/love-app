@@ -46,6 +46,15 @@
           <span *ngIf="!isLoading">Iniciar Sesión</span>
           <div class="spinner" *ngIf="isLoading"></div>
         </button>
+
+        <div class="divider">
+          <span>o</span>
+        </div>
+
+        <button type="button" class="glass-btn google-btn" (click)="onGoogleLogin()" [disabled]="isLoading">
+          <ion-icon name="logo-google" style="margin-right: 8px;"></ion-icon>
+          <span>Iniciar con Google</span>
+        </button>
       </form>
 
       <!-- Formulario Registro -->
@@ -75,6 +84,15 @@
         <button type="submit" class="glass-btn primary" [disabled]="isLoading">
           <span *ngIf="!isLoading">Registrarse</span>
           <div class="spinner" *ngIf="isLoading"></div>
+        </button>
+
+        <div class="divider">
+          <span>o</span>
+        </div>
+
+        <button type="button" class="glass-btn google-btn" (click)="onGoogleLogin()" [disabled]="isLoading">
+          <ion-icon name="logo-google" style="margin-right: 8px;"></ion-icon>
+          <span>Registrarse con Google</span>
         </button>
       </form>
 

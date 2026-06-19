@@ -101,10 +101,21 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
     .progress-fill { height: 100%; border-radius: 4px; transition: width 1s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: inset 0 2px 4px rgba(255,255,255,0.3); }
     .progress-text { font-size: 0.8rem; font-weight: 800; color: #a4133c; white-space: nowrap; }
 
-    /* Progress fills specific per game */
     .test-card .progress-fill { background: linear-gradient(90deg, #FF9A9E, #ff758c); }
     .swipe-card .progress-fill { background: linear-gradient(90deg, #FF4D6D, #c9184a); }
     .draw-card .progress-fill { background: linear-gradient(90deg, #a2d2ff, #0077b6); }
+
+    :host-context(body.night-owl-mode) .games-hub-container { background: #121212; }
+    :host-context(body.night-owl-mode) .games-hub-container::before { background: radial-gradient(circle, rgba(167,139,250,0.15) 0%, rgba(167,139,250,0) 70%); }
+    :host-context(body.night-owl-mode) .games-hub-container::after { background: radial-gradient(circle, rgba(124,58,237,0.1) 0%, rgba(124,58,237,0) 70%); }
+    :host-context(body.night-owl-mode) .header h2 { color: #fdfdfd; }
+    :host-context(body.night-owl-mode) .header p { color: #ccc; }
+    :host-context(body.night-owl-mode) .back-btn { background: #222; border-color: #333; color: #fdfdfd; }
+    :host-context(body.night-owl-mode) .game-card { background: rgba(30, 30, 30, 0.85); border-color: rgba(255, 255, 255, 0.05); }
+    :host-context(body.night-owl-mode) .game-info h3 { color: #fdfdfd; }
+    :host-context(body.night-owl-mode) .game-info p { color: #aaa; }
+    :host-context(body.night-owl-mode) .progress-container { background: rgba(0, 0, 0, 0.4); border-color: rgba(255, 255, 255, 0.05); }
+    :host-context(body.night-owl-mode) .progress-text { color: #c4b5fd; }
   `],
   standalone: true,
   imports: [CommonModule, IonIcon]

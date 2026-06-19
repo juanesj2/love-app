@@ -98,6 +98,15 @@ export class LoveApiService {
     return res;
   }
 
+  async googleLogin(email: string, name: string, uid: string): Promise<any> {
+    const res: any = await firstValueFrom(this.http.post(`${API_BASE_URL}/google-login`, { email, name, uid }));
+    if (res && res.access_token) {
+      await Preferences.set({ key: 'auth_token', value: res.access_token });
+      this.token$.next(res.access_token);
+    }
+    return res;
+  }
+
   async register(data: {name: string, email: string, password: string, password_confirmation: string, app: string}): Promise<any> {
     const res: any = await firstValueFrom(this.http.post(`${API_BASE_URL}/register`, data));
     if (res && res.access_token) {

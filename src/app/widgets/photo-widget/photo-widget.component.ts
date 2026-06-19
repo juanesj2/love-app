@@ -78,7 +78,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
           <div class="photo-card" *ngFor="let photo of group.photos; let i = index" [attr.data-date]="group.date" #photoCards>
             
             <div class="image-wrapper">
-              <img [src]="environment.storageUrl + photo.image_path" class="main-photo" loading="lazy" />
+              <img [src]="environment.storageUrl + photo.image_path" class="main-photo" loading="lazy" (click)="openLightbox(photo)" style="cursor: pointer;" />
               
               <div class="photo-overlay-bottom">
                 <div class="card-user-info">
