@@ -652,6 +652,83 @@ body.night-owl-mode {
     background: rgba(167, 139, 250, 0.05) !important;
   }
 
+  /* ---- Chat y Grabación ---- */
+  .recording-indicator {
+    background: rgba(167, 139, 250, 0.1) !important;
+    color: #a78bfa !important;
+  }
+  .pulse-dot {
+    background: #a78bfa !important;
+    box-shadow: 0 0 10px rgba(167, 139, 250, 0.6) !important;
+  }
+  .cancel-record-btn {
+    color: #a78bfa !important;
+  }
+
+  /* ---- Estados Vacíos ---- */
+  .empty-icon { color: rgba(167, 139, 250, 0.5) !important; }
+  .empty-upload-btn { 
+    background: linear-gradient(135deg, #7c3aed, #6d28d9) !important; 
+    box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3) !important; 
+  }
+
+  /* ---- Premium Action Sheet Forzado Modo Noche ---- */
+  .premium-action-sheet {
+    --background: rgba(30, 32, 35, 0.85) !important;
+  }
+  .premium-action-sheet .action-sheet-title { color: #a78bfa !important; }
+  .premium-action-sheet .action-sheet-button {
+    background: rgba(255, 255, 255, 0.15) !important;
+    --background: rgba(255, 255, 255, 0.15) !important;
+    --button-background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: white !important;
+    --color: white !important;
+  }
+  .premium-action-sheet .action-sheet-button.premium-main-btn {
+    color: #a78bfa !important;
+    --color: #a78bfa !important;
+    background: rgba(167, 139, 250, 0.25) !important;
+    --background: rgba(167, 139, 250, 0.25) !important;
+    --button-background: rgba(167, 139, 250, 0.25) !important;
+    border-color: #a78bfa !important;
+  }
+  .premium-action-sheet .action-sheet-button.premium-cancel-btn {
+    background: rgba(239, 68, 68, 0.15) !important;
+    --background: rgba(239, 68, 68, 0.15) !important;
+    --button-background: rgba(239, 68, 68, 0.15) !important;
+    color: #ef4444 !important;
+    --color: #ef4444 !important;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2) !important;
+  }
+  .premium-action-sheet .action-sheet-icon { color: #a78bfa !important; }
+
+  /* ---- Menú Adjuntar (Chat) ---- */
+  .attach-menu {
+    background: rgba(30, 27, 50, 0.95) !important;
+    border: 1px solid rgba(167, 139, 250, 0.15) !important;
+  }
+  .attach-menu-item { color: #a78bfa !important; }
+  .attach-menu-item:hover { background: rgba(167, 139, 250, 0.1) !important; }
+
+  /* ---- Inputs Focus ---- */
+  .premium-input:focus, .premium-textarea:focus, .glass-input:focus, .glass-select:focus { 
+    border-color: #a78bfa !important; 
+    box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1) !important; 
+  }
+
+  /* ---- Location Widget ---- */
+  .avatar-container { border-color: #7c3aed !important; }
+  .heart-drop { color: #a78bfa !important; }
+  .pulse-marker::before { border-color: #a78bfa !important; }
+  .text-info-together p { color: #a78bfa !important; }
+  .nm-icon { background: linear-gradient(135deg, #7c3aed, #6d28d9) !important; box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3) !important; }
+  .nm-days { color: #a78bfa !important; }
+  .poke-btn-mini { background: linear-gradient(135deg, #7c3aed, #6d28d9) !important; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4) !important; }
+  [style*="background: #FF4D6D; color: white"], [style*="background: #ff4d6d; color: white"] { background: linear-gradient(135deg, #7c3aed, #6d28d9) !important; border-color: #a78bfa !important; }
+  [style*="border: 2px solid #FF4D6D"], [style*="border: 2px solid #ff4d6d"] { border-color: #a78bfa !important; }
+  path[stroke="#FF4D6D"], path[stroke="#ff4d6d"] { stroke: #a78bfa !important; }
+
   /* ---- Scrollbars ---- */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: #0f0f14; }
