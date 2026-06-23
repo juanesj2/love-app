@@ -29,7 +29,7 @@ public class PokeWorker extends Worker {
         }
 
         try {
-            URL url = new URL("https://enfoca.alwaysdata.net/api/love-album/poke");
+            URL url = new URL("https://j2api.alwaysdata.net/api/love-album/poke");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Authorization", "Bearer " + token);

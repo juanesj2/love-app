@@ -33,8 +33,8 @@ import android.text.TextUtils;
 public class DailyPhotoWidgetWorker extends Worker {
 
     private static final String TAG = "DailyPhotoWidget";
-    private static final String API_BASE = "https://enfoca.alwaysdata.net/api";
-    private static final String STORAGE_BASE = "https://enfoca.alwaysdata.net/storage/";
+    private static final String API_BASE = "https://j2api.alwaysdata.net/api";
+    private static final String STORAGE_BASE = "https://j2api.alwaysdata.net/storage/";
 
     public DailyPhotoWidgetWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);

@@ -98,7 +98,7 @@ public class CounterWidgetWorker extends Worker {
             String photoUrl = fetchLatestPhotoUrl(albumId);
             Bitmap photoBitmap = null;
             if (photoUrl != null && !photoUrl.isEmpty()) {
-                photoBitmap = fetchBitmap("https://enfoca.alwaysdata.net/storage/" + photoUrl);
+                photoBitmap = fetchBitmap("https://j2api.alwaysdata.net/storage/" + photoUrl);
             }
             
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
@@ -173,7 +173,7 @@ public class CounterWidgetWorker extends Worker {
     
     private String fetchLatestPhotoUrl(String albumId) {
         try {
-            String urlStr = "https://enfoca.alwaysdata.net/api/love-album/photos";
+            String urlStr = "https://j2api.alwaysdata.net/api/love-album/photos";
             if (albumId != null && !albumId.isEmpty() && !albumId.equals("feed")) {
                 urlStr += "?album_id=" + albumId;
             }

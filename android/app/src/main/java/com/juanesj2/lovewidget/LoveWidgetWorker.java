@@ -32,7 +32,7 @@ import java.util.Locale;
 
 public class LoveWidgetWorker extends Worker {
 
-    private static final String API_BASE = "https://enfoca.alwaysdata.net/api";
+    private static final String API_BASE = "https://j2api.alwaysdata.net/api";
 
     public LoveWidgetWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
