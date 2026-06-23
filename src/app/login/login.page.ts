@@ -11,6 +11,7 @@ import { NotificationService } from '../services/notification.service';
 import { Browser } from '@capacitor/browser';
 import { Preferences } from '@capacitor/preferences';
 import { GoogleSignIn } from '@capawesome/capacitor-google-sign-in';
+import { SecureStoragePlugin } from 'capacitor-secure-storage-plugin';
 
 @Component({
   selector: 'app-login',
@@ -73,7 +74,13 @@ export class LoginPage implements OnInit {
 
     // Auto-login si ya hay token y usuario
     const storedUser = localStorage.getItem('love_widget_user');
-    const { value: token } = await Preferences.get({ key: 'auth_token' });
+    let token = null;
+    try {
+      const res = await SecureStoragePlugin.get({ key: 'auth_token' }).catch(async () => await Preferences.get({ key: 'auth_token' }));
+      token = res.value;
+    } catch (e) {
+      token = null;
+    }
     if (storedUser && token) {
       try {
         await this.loveApi.getCoupleInfo();

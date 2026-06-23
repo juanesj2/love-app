@@ -14,14 +14,15 @@ import { environment } from './environments/environment';
 // PWA Elements para la cámara en web
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
 
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { authInterceptor } from './app/interceptors/auth.interceptor';
 
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
     provideRouter(routes, withPreloading(PreloadAllModules)),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([authInterceptor])),
     
     // Inicialización de Firebase
     provideFirebaseApp(() => initializeApp(environment.firebase)),

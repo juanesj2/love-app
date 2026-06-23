@@ -2,17 +2,19 @@ import { Component, inject, OnInit, OnDestroy, Output, EventEmitter } from '@ang
 import { App } from '@capacitor/app';
 import { PluginListenerHandle } from '@capacitor/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { IonContent, IonRefresher, IonRefresherContent, IonIcon, ToastController, ActionSheetController, AlertController } from '@ionic/angular/standalone';
+import { FormsModule } from '@angular/forms';
+import { IonContent, IonRefresher, IonRefresherContent, IonIcon, ToastController, ActionSheetController, AlertController, IonSelect, IonSelectOption, IonSearchbar } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { LoveApiService } from '../../services/love-api.service';
-import { TutorialService } from '../../services/tutorial.service';
 import { Preferences } from '@capacitor/preferences';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { LocationService } from '../../services/location.service';
 import { addIcons } from 'ionicons';
-import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, trophyOutline, sparklesOutline } from 'ionicons/icons';
+import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline } from 'ionicons/icons';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-mas-widget',
@@ -85,7 +87,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
         </div>
 
         <!-- Próximos Eventos -->
-        <div class="glass-card" id="mas-eventos">
+        <div class="glass-card">
           <div class="section-title">
             <ion-icon name="calendar"></ion-icon>
             <h3>Próximos Eventos Especiales</h3>
@@ -118,20 +120,20 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
         </div>
 
         <!-- Hitos -->
-        <div class="glass-card" id="mas-hitos">
+        <div class="glass-card">
           <div class="section-title">
             <ion-icon name="flag-outline"></ion-icon>
             <h3>Hitos Importantes</h3>
           </div>
           
           <div class="milestone-list">
-            <div class="milestone-item" *ngFor="let m of milestones" (click)="openMilestoneModal(m)">
+            <div class="milestone-item" *ngFor="let m of milestones" (click)="openMilestoneModal(m)" [class.is-past]="isPast(m.date)">
               <div class="milestone-indicator"></div>
               <div class="milestone-info">
                 <span class="m-title">{{ m.title }}</span>
                 <span class="m-date">{{ m.date | date:'longDate' }}</span>
               </div>
-              <div class="m-days">{{ calculateDays(m.date) }} d</div>
+              <div class="m-days">{{ isPast(m.date) ? 'Hace ' + calculateDays(m.date) + ' d' : calculateDays(m.date) + ' d' }}</div>
               <ion-icon name="close-circle" class="delete-icon" (click)="deleteMilestone(m.id); $event.stopPropagation()"></ion-icon>
             </div>
           </div>
@@ -144,7 +146,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
         </div>
 
         <!-- Cubo de Deseos -->
-        <div class="glass-card" id="mas-deseos">
+        <div class="glass-card">
           <div class="section-title">
             <ion-icon name="star-outline"></ion-icon>
             <h3>Cubo de Deseos</h3>
@@ -167,23 +169,17 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 
         <!-- Quick Actions Grid -->
         <div class="quick-actions-grid">
-          <!-- Logros y Secretos (Spans full width) -->
-          <div class="grid-card full-width interactive" id="mas-logros" (click)="goTo('achievements')">
-            <h4><ion-icon name="trophy-outline" class="text-pink"></ion-icon> Logros y Secretos</h4>
-            <p style="margin: 0; font-size: 0.85rem; color: #a4133c; font-weight: 500;">Descubre y desbloquea los secretitos de la app.</p>
-          </div>
-
           <!-- Widget Config (Spans full width) -->
-          <div class="grid-card full-width" id="mas-coleccion">
+          <div class="grid-card full-width">
             <h4><ion-icon name="settings-outline" class="text-pink"></ion-icon> Colección del Widget</h4>
-            <select [(ngModel)]="selectedAlbumId" (change)="saveSelectedAlbum()" class="glass-select">
-              <option value="feed">Todas las fotos</option>
-              <option *ngFor="let album of albums" [value]="album.id">{{ album.name }}</option>
-            </select>
+            <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedAlbumId" (ionChange)="saveSelectedAlbum()" class="glass-select" style="--padding-start: 16px; --padding-end: 16px; --padding-top: 14px; --padding-bottom: 14px;">
+              <ion-select-option value="feed">Todas las fotos</ion-select-option>
+              <ion-select-option *ngFor="let album of albums" [value]="album.id">{{ album.name }}</ion-select-option>
+            </ion-select>
           </div>
 
           <!-- Tour Gastronómico -->
-          <div class="grid-card interactive" id="mas-gastro" (click)="openFoodListModal()">
+          <div class="grid-card interactive" (click)="isFoodListModalOpen = true">
             <div class="icon-circle" style="background: linear-gradient(135deg, #FF9A9E, #FECFEF); box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3); color: #c9184a;">
               <ion-icon name="restaurant-outline"></ion-icon>
             </div>
@@ -192,7 +188,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
           </div>
 
           <!-- Cine en Pareja -->
-          <div class="grid-card interactive" id="mas-cine" (click)="openMovieListModal()">
+          <div class="grid-card interactive" (click)="isMovieListModalOpen = true">
             <div class="icon-circle" style="background: linear-gradient(135deg, #a2d2ff, #bde0fe); box-shadow: 0 4px 15px rgba(162, 210, 255, 0.3); color: #023e8a;">
               <ion-icon name="film-outline"></ion-icon>
             </div>
@@ -201,7 +197,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
           </div>
 
           <!-- Minijuego -->
-          <div class="grid-card interactive" id="mas-test" (click)="openGame()">
+          <div class="grid-card interactive" (click)="openGame()">
             <div class="icon-circle bg-purple">
               <ion-icon name="game-controller-outline"></ion-icon>
             </div>
@@ -221,7 +217,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
         </div>
 
         <!-- Logout -->
-        <button class="logout-btn" (click)="confirmLogout()">
+        <button class="logout-btn" (click)="isLogoutModalOpen = true">
           <ion-icon name="log-out-outline"></ion-icon> Cerrar sesión
         </button>
       </div>
@@ -252,7 +248,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 
       <!-- Modal for Milestone Details -->
       <div class="custom-overlay" *ngIf="isMilestoneModalOpen" (click)="isMilestoneModalOpen = false">
-        <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: calc(100vh - 140px); overflow-y: auto;" (click)="$event.stopPropagation()">
+        <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
           
           <!-- Portada del Hito -->
           <div *ngIf="selectedMilestone?.image_url_full || selectedMilestone?.newImageBase64" class="milestone-cover" style="width: 100%; height: 180px; border-radius: 18px; margin-bottom: 20px; overflow: hidden; position: relative;">
@@ -310,21 +306,45 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 
         <!-- Food List Modal -->
         <div class="custom-overlay" *ngIf="isFoodListModalOpen" (click)="isFoodListModalOpen = false">
-          <div class="modal-content glass-card" id="tour-food-modal" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: calc(100vh - 140px); overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 85vh; overflow-y: hidden; z-index: 1000;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="restaurant-outline"></ion-icon> Tour Gastronómico</h2>
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Restaurantes y platos que hemos probado</p>
             
-            <div class="food-places-grid" id="tour-food-list" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
-              <div class="food-place-item" *ngFor="let place of foodPlaces" (click)="openFoodPlaceModal(place)" style="background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
+            <ion-searchbar animated="true" [(ngModel)]="searchQueryFoodPlaces" placeholder="Buscar restaurante..." class="custom-searchbar" style="--border-radius: 14px; --background: rgba(255,255,255,0.8); --box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 0; margin-bottom: 15px;"></ion-searchbar>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
+              <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedFoodCategory" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todas las categorías">
+                <ion-select-option value="">Todas las categorías</ion-select-option>
+                <ion-select-option *ngFor="let cat of foodCategories" [value]="cat">{{ cat }}</ion-select-option>
+              </ion-select>
+              
+              <button class="glass-btn" style="padding: 8px 15px; font-size: 1.5rem; width: auto; flex: 0 0 auto; box-shadow: none;" [style.color]="showFavoritesOnlyFoodPlaces ? '#FF4D6D' : '#888'" [style.background]="showFavoritesOnlyFoodPlaces ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="showFavoritesOnlyFoodPlaces = !showFavoritesOnlyFoodPlaces">
+                <ion-icon [name]="showFavoritesOnlyFoodPlaces ? 'heart' : 'heart-outline'"></ion-icon>
+              </button>
+            </div>
+            
+            <div style="max-height: 35vh; overflow-y: auto; overflow-x: hidden; padding-right: 5px; margin-bottom: 20px;">
+              <div class="food-places-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+              <div class="food-place-item" *ngFor="let place of filteredFoodPlaces" (click)="openFoodPlaceModal(place)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
+                
+                <div *ngIf="place.is_favorite" style="position: absolute; top: 8px; left: 8px; z-index: 5;">
+                  <ion-icon name="heart" style="color: #FF4D6D; font-size: 1.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));"></ion-icon>
+                </div>
+                
+                <div style="position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5;" (click)="$event.stopPropagation(); editFoodPlace(place)">
+                  <ion-icon name="pencil-outline" style="font-size: 1.1rem; color: #FF4D6D;"></ion-icon>
+                </div>
                 <div class="place-image" [style.backgroundImage]="'url(' + (place.image_url_full || 'assets/default-food.png') + ')'" style="width: 100%; aspect-ratio: 1; border-radius: 10px; background-size: cover; background-position: center; margin: 0 auto 10px;"></div>
                 <span class="p-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ place.name }}</span>
+                <span *ngIf="place.category" style="display: block; font-size: 0.7rem; color: #a4133c; margin-bottom: 2px;">{{ place.category }}</span>
                 <span class="p-rating" style="color: #FFB703; font-size: 0.8rem;">
                   <ng-container *ngTemplateOutlet="staticStars; context: { rating: place.rating }"></ng-container>
                 </span>
               </div>
+              </div>
             </div>
             
-            <button class="glass-btn" id="tour-food-add" style="width: 100%; margin-bottom: 10px;" (click)="openAddFoodPlaceModal()">
+            <button class="glass-btn" style="width: 100%; margin-bottom: 10px;" (click)="openAddFoodPlaceModal()">
               <ion-icon name="add-circle-outline"></ion-icon> Añadir Restaurante
             </button>
             <button class="glass-btn" style="width: 100%; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="isFoodListModalOpen = false">Cerrar</button>
@@ -333,21 +353,39 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 
         <!-- Movies List Modal -->
         <div class="custom-overlay" *ngIf="isMovieListModalOpen" (click)="isMovieListModalOpen = false">
-          <div class="modal-content glass-card" id="tour-movie-modal" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: calc(100vh - 140px); overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 85vh; overflow-y: hidden;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="film-outline"></ion-icon> Cine en Pareja</h2>
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Películas y series que vemos juntos</p>
             
-            <div class="movies-grid" id="tour-movie-list" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
-              <div class="movie-item" *ngFor="let movie of movies" (click)="openMovieModal(movie)" style="background: rgba(255,255,255,0.8); border-radius: 10px; padding: 8px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
-                <div class="movie-image" [style.backgroundImage]="'url(' + (movie.image_url_full || 'assets/default-movie.png') + ')'" style="width: 100%; aspect-ratio: 0.7; border-radius: 8px; background-size: cover; background-position: center; margin: 0 auto 8px;"></div>
-                <span class="m-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ movie.title }}</span>
+            <ion-searchbar animated="true" [(ngModel)]="searchQueryMovies" placeholder="Buscar pel�cula o serie..." class="custom-searchbar" style="--border-radius: 14px; --background: rgba(255,255,255,0.8); --box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 0; margin-bottom: 15px;"></ion-searchbar>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 15px; width: 100%;">
+              <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedMovieGenre" class="glass-input" style="flex: 1; margin: 0; border: 2px solid #FF4D6D; background: white; font-weight: 600; color: #590D22; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todas las categorías">
+                <ion-select-option value="">Todas las categorías</ion-select-option>
+                <ion-select-option *ngFor="let cat of movieGenres" [value]="cat">{{ cat }}</ion-select-option>
+              </ion-select>
+              <button class="glass-btn" style="padding: 0 15px; font-size: 1.5rem; width: auto; flex: 0 0 auto; box-shadow: none; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 77, 109, 0.2);" [style.color]="showFavoritesOnlyMovies ? '#FF4D6D' : '#888'" [style.background]="showFavoritesOnlyMovies ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="showFavoritesOnlyMovies = !showFavoritesOnlyMovies">
+                <ion-icon [name]="showFavoritesOnlyMovies ? 'heart' : 'heart-outline'"></ion-icon>
+              </button>
+            </div>
+            
+            <div style="max-height: 35vh; overflow-y: auto; overflow-x: hidden; padding-right: 5px; margin-bottom: 20px;">
+              <div class="movies-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+              <div class="movie-item" *ngFor="let movie of filteredMovies" (click)="openMovieModal(movie)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
+                <div *ngIf="movie.is_favorite" style="position: absolute; top: 8px; left: 8px; width: 26px; height: 26px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5;"><ion-icon name="heart" style="font-size: 1.1rem; color: #FF4D6D;"></ion-icon></div>
+                <div style="position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5;" (click)="$event.stopPropagation(); editMovie(movie)">
+                  <ion-icon name="pencil-outline" style="font-size: 1.1rem; color: #FF4D6D;"></ion-icon>
+                </div>
+                <div class="movie-image" [style.backgroundImage]="'url(' + (movie.image_url_full || movie.image_url || 'assets/default-movie.png') + ')'" style="width: 100%; aspect-ratio: 0.7; border-radius: 10px; background-size: cover; background-position: center; margin: 0 auto 10px;"></div>
+                <span class="m-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ movie.title }}</span>
                 <span class="p-rating" style="color: #FFB703; font-size: 0.7rem;">
                   <ng-container *ngTemplateOutlet="staticStars; context: { rating: movie.rating }"></ng-container>
                 </span>
               </div>
+              </div>
             </div>
             
-            <button class="glass-btn" id="tour-movie-add" style="width: 100%; margin-bottom: 10px;" (click)="isAddingMovie = true">
+            <button class="glass-btn" style="width: 100%; margin-bottom: 10px;" (click)="isAddingMovie = true">
               <ion-icon name="add-circle-outline"></ion-icon> Añadir Película/Serie
             </button>
             <button class="glass-btn" style="width: 100%; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="isMovieListModalOpen = false">Cerrar</button>
@@ -356,25 +394,35 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 
         <!-- Add Food Place Modal -->
         <div class="custom-overlay" *ngIf="isAddingFoodPlace" (click)="isAddingFoodPlace = false">
-          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: calc(100vh - 140px); overflow-y: auto;" (click)="$event.stopPropagation()">
-            <h2 style="color: #590D22; margin-bottom: 20px; font-weight: 900;">Nuevo Restaurante 🍔</h2>
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+            <h2 style="color: #590D22; margin-bottom: 20px; font-weight: 900;">{{ newFoodPlace.id ? 'Editar Restaurante' : 'Nuevo Restaurante' }} 🍔</h2>
             
-            <div *ngIf="newFoodPlace.imageBase64" class="milestone-cover" style="width: 100%; height: 150px; border-radius: 18px; margin-bottom: 20px; overflow: hidden; position: relative;">
-              <img [src]="newFoodPlace.imageBase64" style="width: 100%; height: 100%; object-fit: cover;" />
+            <div *ngIf="newFoodPlace.imageBase64 || newFoodPlace.image_url_full" class="milestone-cover" style="width: 100%; height: 150px; border-radius: 18px; margin-bottom: 20px; overflow: hidden; position: relative;">
+              <img [src]="newFoodPlace.imageBase64 || newFoodPlace.image_url_full" style="width: 100%; height: 100%; object-fit: cover;" />
               <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="uploadNewFoodPlacePhoto()">
                  <ion-icon name="camera-outline" style="color: white; font-size: 3rem;"></ion-icon>
               </div>
             </div>
             
-            <button *ngIf="!newFoodPlace.imageBase64" class="glass-btn" style="margin-bottom: 15px;" (click)="uploadNewFoodPlacePhoto()">
+            <button *ngIf="!newFoodPlace.imageBase64 && !newFoodPlace.image_url_full" class="glass-btn" style="margin-bottom: 15px;" (click)="uploadNewFoodPlacePhoto()">
               <ion-icon name="camera-outline"></ion-icon> Añadir Foto
             </button>
             
             <input type="text" placeholder="Nombre del sitio" [(ngModel)]="newFoodPlace.name" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
-            <input type="text" placeholder="Ubicación (ej: Madrid)" [(ngModel)]="newFoodPlace.location" (ngModelChange)="onLocationChange($event)" class="glass-input" id="tour-food-location" style="width: 100%; margin-bottom: 10px;" />
+            <input type="text" placeholder="Ubicación (ej: Madrid)" [(ngModel)]="newFoodPlace.location" (ngModelChange)="onLocationChange($event)" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
+            <div *ngIf="previewMapUrl" style="width: 100%; height: 150px; border-radius: 12px; overflow: hidden; margin-bottom: 10px;">
+              <iframe [src]="previewMapUrl" width="100%" height="100%" frameborder="0" style="border:0;" allowfullscreen></iframe>
+            </div>
             
-            <div *ngIf="foodPlaceMapUrl" style="width: 100%; height: 150px; border-radius: 14px; overflow: hidden; margin-bottom: 15px; border: 2px solid rgba(255,77,109,0.3);">
-              <iframe [src]="foodPlaceMapUrl" width="100%" height="100%" style="border:0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+              <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="newFoodPlace.category" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 14px; --padding-bottom: 14px;" placeholder="(Sin categoría)">
+                <ion-select-option value="">(Sin categoría)</ion-select-option>
+                <ion-select-option *ngFor="let cat of foodCategories" [value]="cat">{{ cat }}</ion-select-option>
+              </ion-select>
+              
+              <button class="glass-btn" style="padding: 0 15px; font-size: 1.5rem; width: auto; flex: 0 0 auto; box-shadow: none; display: flex; align-items: center; justify-content: center;" [style.color]="newFoodPlace.is_favorite ? '#FF4D6D' : '#888'" [style.background]="newFoodPlace.is_favorite ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="newFoodPlace.is_favorite = !newFoodPlace.is_favorite">
+                <ion-icon [name]="newFoodPlace.is_favorite ? 'heart' : 'heart-outline'"></ion-icon>
+              </button>
             </div>
             
             <textarea placeholder="¿Qué tal estaba? Plato estrella, etc." [(ngModel)]="newFoodPlace.description" class="glass-input" style="width: 100%; min-height: 80px; margin-bottom: 10px; resize: vertical;"></textarea>
@@ -393,6 +441,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             </div>
             
             <div style="display: flex; gap: 10px;">
+              <button *ngIf="newFoodPlace?.id" class="glass-btn" style="flex: 1; background: rgba(255,0,0,0.1); color: red; font-size: 0.9rem;" (click)="deleteFoodPlace(newFoodPlace.id)">Eliminar</button>
               <button class="glass-btn" style="flex: 1; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="isAddingFoodPlace = false">Cancelar</button>
               <button class="glass-btn" style="flex: 1;" (click)="saveFoodPlace()">Guardar</button>
             </div>
@@ -401,16 +450,31 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 
         <!-- View Food Place Modal -->
         <div class="custom-overlay" *ngIf="isFoodPlaceModalOpen" (click)="isFoodPlaceModalOpen = false">
-          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: calc(100vh - 140px); overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" style="position: relative; margin: 10px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+            
+            <div style="position: absolute; top: 15px; left: 15px; width: 36px; height: 36px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 10; cursor: pointer;" (click)="editFoodPlace(selectedFoodPlace)">
+              <ion-icon name="pencil-outline" style="font-size: 1.5rem; color: #FF4D6D;"></ion-icon>
+            </div>
+            
+            <div style="position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 10; cursor: pointer;" (click)="isFoodPlaceModalOpen = false">
+              <ion-icon name="close-outline" style="font-size: 1.8rem; color: #590D22;"></ion-icon>
+            </div>
             
             <div *ngIf="selectedFoodPlace?.image_url_full" class="milestone-cover" style="width: 100%; height: 180px; border-radius: 18px; margin-bottom: 20px; overflow: hidden; position: relative;">
               <img [src]="selectedFoodPlace?.image_url_full" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
             
-            <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;">{{ selectedFoodPlace?.name }}</h2>
-            <p style="color: #a4133c; font-size: 1.1rem; font-weight: 700; margin-bottom: 10px;">
-              {{ selectedFoodPlace?.location }}
-            </p>
+            <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;">
+              {{ selectedFoodPlace?.name }}
+              <ion-icon *ngIf="selectedFoodPlace?.is_favorite" name="heart" style="color: #FF4D6D; font-size: 1.2rem; vertical-align: middle; margin-left: 5px;"></ion-icon>
+            </h2>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+              <button class="glass-btn" style="padding: 6px 12px; font-size: 1rem; display: inline-flex; align-items: center; gap: 5px; color: #590D22; background: rgba(255,255,255,0.9); border: 1px solid rgba(255,77,109,0.3);" (click)="openMap(selectedFoodPlace?.location)">
+                <ion-icon name="location-outline" style="font-size: 1.2rem; color: #FF4D6D;"></ion-icon> 
+                <span style="font-weight: 800;">{{ selectedFoodPlace?.location }}</span>
+              </button>
+              <span *ngIf="selectedFoodPlace?.category" style="background: rgba(255,77,109,0.1); padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 700; color: #FF4D6D;">{{ selectedFoodPlace.category }}</span>
+            </div>
             <div style="color: #FFB703; font-size: 1.5rem; margin-bottom: 15px;">
                 <ng-container *ngTemplateOutlet="staticStars; context: { rating: selectedFoodPlace?.rating }"></ng-container>
             </div>
@@ -419,11 +483,19 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
               "{{ selectedFoodPlace.description }}"
             </p>
             
-            <div class="dishes-section" style="text-align: left; margin-bottom: 20px;">
+            <div class="dishes-section" style="text-align: left; margin-bottom: 20px; max-height: 40vh; overflow-y: auto; padding-right: 5px;">
               <h4 style="color: #800f2f; font-weight: 800; border-bottom: 2px solid rgba(255,77,109,0.2); padding-bottom: 5px; margin-bottom: 15px;">Platos</h4>
               
               <div class="dish-item" *ngFor="let dish of selectedFoodPlace?.dishes" style="display: flex; gap: 10px; background: rgba(255,255,255,0.6); padding: 10px; border-radius: 12px; margin-bottom: 10px; align-items: center;">
-                <div *ngIf="dish.image_url_full" style="width: 60px; height: 60px; border-radius: 8px; background-size: cover; background-position: center;" [style.backgroundImage]="'url(' + dish.image_url_full + ')'"></div>
+                <div style="position: relative;">
+                  <div *ngIf="dish.image_url_full" style="width: 60px; height: 60px; border-radius: 8px; background-size: cover; background-position: center;" [style.backgroundImage]="'url(' + dish.image_url_full + ')'"></div>
+                  <div *ngIf="!dish.image_url_full" style="width: 60px; height: 60px; border-radius: 8px; background: rgba(255,77,109,0.1); display: flex; align-items: center; justify-content: center;">
+                    <ion-icon name="restaurant-outline" style="font-size: 1.5rem; color: rgba(255,77,109,0.5);"></ion-icon>
+                  </div>
+                  <div style="position: absolute; top: -6px; left: -6px; width: 22px; height: 22px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; z-index: 2;" (click)="editFoodDish(dish)">
+                    <ion-icon name="pencil-outline" style="font-size: 0.9rem; color: #FF4D6D;"></ion-icon>
+                  </div>
+                </div>
                 <div style="flex: 1;">
                   <span style="display: block; font-weight: 700; color: #590D22;">{{ dish.name }}</span>
                   <span style="color: #FFB703; font-size: 0.8rem;">
@@ -452,9 +524,9 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
                     <ion-icon name="camera" style="font-size: 1.8rem; color: #FF4D6D;" (click)="uploadNewDishPhoto()"></ion-icon>
                  </div>
                  
-                 <div *ngIf="newDish.imageBase64" style="height: 100px; border-radius: 8px; background-size: cover; background-position: center; margin-bottom: 10px;" [style.backgroundImage]="'url(' + newDish.imageBase64 + ')'"></div>
+                 <div *ngIf="newDish.imageBase64 || newDish.image_url_full" style="height: 100px; border-radius: 8px; background-size: cover; background-position: center; margin-bottom: 10px;" [style.backgroundImage]="'url(' + (newDish.imageBase64 || newDish.image_url_full) + ')'"></div>
                  
-                 <div style="display: flex; gap: 10px;">
+                 <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                     <button class="glass-btn" style="flex: 1; padding: 10px; font-size: 0.9rem;" (click)="isAddingDish = false">Cancelar</button>
                     <button class="glass-btn" style="flex: 1; padding: 10px; font-size: 0.9rem;" (click)="saveFoodDish()">Guardar Plato</button>
                  </div>
@@ -465,35 +537,43 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
               </button>
             </div>
 
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-              <button class="glass-btn" style="flex: 1; padding: 12px; font-size: 0.9rem;" (click)="editFoodPlace(selectedFoodPlace)">Editar</button>
-              <button class="glass-btn" style="background: rgba(255,0,0,0.1); color: red; flex: 1; padding: 12px; font-size: 0.9rem;" (click)="deleteFoodPlace(selectedFoodPlace.id)">Eliminar</button>
-              <button class="glass-btn" style="flex: 1; padding: 12px;" (click)="isFoodPlaceModalOpen = false">Cerrar</button>
-            </div>
+
           </div>
         </div>
 
         <!-- Add Movie Modal -->
         <div class="custom-overlay" *ngIf="isAddingMovie" (click)="isAddingMovie = false">
-          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: calc(100vh - 140px); overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 20px; font-weight: 900;">
-              Nueva Peli/Serie
-              <span (click)="unlockPopcorn($event)" style="cursor: pointer; display: inline-block; transition: transform 0.2s; user-select: none;" title="">🍿</span>
+              {{ newMovie.id ? 'Editar Peli/Serie' : 'Nueva Peli/Serie' }} 
+              <span (click)="showWhoFellAsleep = !showWhoFellAsleep" style="cursor: pointer; user-select: none;" title="Haz clic para revelar una opción secreta 😉">🍿</span>
             </h2>
             
-            <div *ngIf="newMovie.imageBase64" class="milestone-cover" style="width: 120px; height: 180px; border-radius: 12px; margin: 0 auto 20px; overflow: hidden; position: relative;">
-              <img [src]="newMovie.imageBase64" style="width: 100%; height: 100%; object-fit: cover;" />
+            <div *ngIf="newMovie.imageBase64 || newMovie.image_url_full || newMovie.image_url" class="milestone-cover" style="width: 120px; height: 180px; border-radius: 12px; margin: 0 auto 20px; overflow: hidden; position: relative;">
+              <img [src]="newMovie.imageBase64 || newMovie.image_url_full || newMovie.image_url" style="width: 100%; height: 100%; object-fit: cover;" />
               <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="uploadNewMoviePhoto()">
                  <ion-icon name="camera-outline" style="color: white; font-size: 3rem;"></ion-icon>
               </div>
             </div>
             
-            <button *ngIf="!newMovie.imageBase64" class="glass-btn" style="margin-bottom: 15px;" (click)="uploadNewMoviePhoto()">
+            <button *ngIf="!newMovie.imageBase64 && !newMovie.image_url_full && !newMovie.image_url" class="glass-btn" style="margin-bottom: 15px;" (click)="uploadNewMoviePhoto()">
               <ion-icon name="camera-outline"></ion-icon> Cartel / Foto
             </button>
             
             <input type="text" placeholder="Título" [(ngModel)]="newMovie.title" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
-            <input #dormidoInput type="text" placeholder="¿Quién se quedó dormido primero?" [(ngModel)]="newMovie.who_fell_asleep" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
+            <textarea placeholder="¿De qué iba la peli/serie?" [(ngModel)]="newMovie.description" class="glass-input" style="width: 100%; min-height: 60px; margin-bottom: 10px; resize: vertical;"></textarea>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+              <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="newMovie.genre" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 14px; --padding-bottom: 14px;" placeholder="(Sin categoría)">
+                <ion-select-option value="">(Sin categoría)</ion-select-option>
+                <ion-select-option *ngFor="let cat of movieGenres" [value]="cat">{{ cat }}</ion-select-option>
+              </ion-select>
+              
+              <button class="glass-btn" style="padding: 0 15px; font-size: 1.5rem; width: auto; flex: 0 0 auto; box-shadow: none; display: flex; align-items: center; justify-content: center;" [style.color]="newMovie.is_favorite ? '#FF4D6D' : '#888'" [style.background]="newMovie.is_favorite ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="newMovie.is_favorite = !newMovie.is_favorite">
+                <ion-icon [name]="newMovie.is_favorite ? 'heart' : 'heart-outline'"></ion-icon>
+              </button>
+            </div>
+            <input *ngIf="showWhoFellAsleep" type="text" placeholder="¿Quién se quedó dormido primero?" [(ngModel)]="newMovie.who_fell_asleep" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
             <textarea placeholder="Nuestra frase favorita / Momento top" [(ngModel)]="newMovie.favorite_quote" class="glass-input" style="width: 100%; min-height: 80px; margin-bottom: 10px; resize: vertical;"></textarea>
             
             <div style="margin-bottom: 20px;">
@@ -510,6 +590,7 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
             </div>
             
             <div style="display: flex; gap: 10px;">
+              <button *ngIf="newMovie?.id" class="glass-btn" style="flex: 1; background: rgba(255,0,0,0.1); color: red; font-size: 0.9rem;" (click)="deleteMovie(newMovie.id)">Eliminar</button>
               <button class="glass-btn" style="flex: 1; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="isAddingMovie = false">Cancelar</button>
               <button class="glass-btn" style="flex: 1;" (click)="saveMovie()">Guardar</button>
             </div>
@@ -518,17 +599,35 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
 
         <!-- View Movie Modal -->
         <div class="custom-overlay" *ngIf="isMovieModalOpen" (click)="isMovieModalOpen = false">
-          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: calc(100vh - 140px); overflow-y: auto;" (click)="$event.stopPropagation()">
+          <div class="modal-content glass-card" style="position: relative; margin: 10px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
             
-            <div *ngIf="selectedMovie?.image_url_full" class="milestone-cover" style="width: 140px; height: 210px; border-radius: 12px; margin: 0 auto 20px; overflow: hidden; position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
-              <img [src]="selectedMovie?.image_url_full" style="width: 100%; height: 100%; object-fit: cover;" />
+            <div style="position: absolute; top: 15px; left: 15px; width: 36px; height: 36px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 10; cursor: pointer;" (click)="editMovie(selectedMovie)">
+              <ion-icon name="pencil-outline" style="font-size: 1.5rem; color: #FF4D6D;"></ion-icon>
             </div>
             
-            <h2 style="color: #590D22; margin-bottom: 10px; font-weight: 900; font-size: 1.6rem;">{{ selectedMovie?.title }}</h2>
+            <div style="position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 10; cursor: pointer;" (click)="isMovieModalOpen = false">
+              <ion-icon name="close-outline" style="font-size: 1.8rem; color: #590D22;"></ion-icon>
+            </div>
+            
+            <div *ngIf="selectedMovie?.image_url_full || selectedMovie?.image_url" class="milestone-cover" style="width: 140px; height: 210px; border-radius: 12px; margin: 0 auto 20px; overflow: hidden; position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
+              <img [src]="selectedMovie?.image_url_full || selectedMovie?.image_url" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            
+            <h2 style="color: #590D22; margin-bottom: 10px; font-weight: 900; font-size: 1.6rem;">
+              {{ selectedMovie?.title }}
+              <ion-icon *ngIf="selectedMovie?.is_favorite" name="heart" style="color: #FF4D6D; font-size: 1.2rem; vertical-align: middle; margin-left: 5px;"></ion-icon>
+            </h2>
+            <div *ngIf="selectedMovie?.genre" style="margin-bottom: 10px;">
+              <span style="display: inline-block; background: rgba(255,77,109,0.1); padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; color: #FF4D6D;">{{ selectedMovie.genre }}</span>
+            </div>
             
             <div style="color: #FFB703; font-size: 1.8rem; margin-bottom: 20px;">
                 <ng-container *ngTemplateOutlet="staticStars; context: { rating: selectedMovie?.rating }"></ng-container>
             </div>
+            
+            <p *ngIf="selectedMovie?.description" style="color: #590D22; font-size: 0.95rem; line-height: 1.4; margin-bottom: 20px; text-align: center; white-space: pre-wrap;">
+              {{ selectedMovie.description }}
+            </p>
             
             <div *ngIf="selectedMovie?.who_fell_asleep" style="background: rgba(255,77,109,0.05); border-radius: 14px; padding: 15px; margin-bottom: 15px; text-align: center;">
               <p style="margin: 0; color: #a4133c; font-size: 0.95rem;">
@@ -541,17 +640,51 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
               "{{ selectedMovie.favorite_quote }}"
             </p>
             
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-              <button class="glass-btn" style="flex: 1; padding: 12px; font-size: 0.9rem;" (click)="editMovie(selectedMovie)">Editar</button>
-              <button class="glass-btn" style="background: rgba(255,0,0,0.1); color: red; flex: 1; padding: 12px; font-size: 0.9rem;" (click)="deleteMovie(selectedMovie.id)">Eliminar</button>
-              <button class="glass-btn" style="flex: 1; padding: 12px;" (click)="isMovieModalOpen = false">Cerrar</button>
-            </div>
+
           </div>
         </div>
 
-    </ion-content>
-  `,
-  styles: [`
+        <!-- Logout Confirmation Modal -->
+        <div class="custom-overlay" *ngIf="isLogoutModalOpen" (click)="isLogoutModalOpen = false">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 30px; text-align: center; width: 85%; max-width: 350px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15);" (click)="$event.stopPropagation()">
+            <ion-icon name="log-out-outline" style="font-size: 4rem; color: #FF4D6D; margin-bottom: 15px; background: rgba(255,77,109,0.1); padding: 15px; border-radius: 50%;"></ion-icon>
+            <h2 style="color: #590D22; margin-bottom: 10px; font-weight: 900; font-size: 1.5rem;">Cerrar Sesión</h2>
+            <p style="color: #a4133c; font-size: 1.05rem; font-weight: 500; margin-bottom: 25px;">
+              ¿Estás seguro de que quieres salir?
+            </p>
+            
+            <div style="display: flex; gap: 10px;">
+              <button class="glass-btn" style="flex: 1; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="isLogoutModalOpen = false">Cancelar</button>
+              <button class="glass-btn" style="flex: 1; background: #FF4D6D; color: white;" (click)="doLogout()">Salir</button>
+            </div>
+          </div>
+        </div>
+          
+        <!-- Map Modal -->
+        <div class="custom-overlay" *ngIf="isMapModalOpen" style="z-index: 9999999;" (click)="isMapModalOpen = false">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+            <h2 style="color: #590D22; margin-bottom: 15px; font-weight: 900;">Ubicación 📍</h2>
+            <div style="width: 100%; height: 300px; border-radius: 12px; overflow: hidden; margin-bottom: 20px;">
+              <iframe *ngIf="safeMapUrl" [src]="safeMapUrl" width="100%" height="100%" frameborder="0" style="border:0;" allowfullscreen></iframe>
+            </div>
+            <button class="glass-btn" style="width: 100%; padding: 12px;" (click)="isMapModalOpen = false">Cerrar</button>
+          </div>
+        </div>
+        
+          <!-- Confirm Modal -->
+        <div class="custom-overlay" *ngIf="isConfirmModalOpen" style="z-index: 100000;" (click)="isConfirmModalOpen = false">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+            <h2 style="color: #590D22; margin-bottom: 15px; font-weight: 900;">{{ confirmTitle }}</h2>
+            <p style="color: #a4133c; font-size: 1.1rem; margin-bottom: 25px; font-weight: 500;">{{ confirmMessage }}</p>
+            <div style="display: flex; gap: 10px;">
+              <button class="glass-btn" style="flex: 1; background: rgba(128,15,47,0.1); color: #800f2f; box-shadow: none;" (click)="isConfirmModalOpen = false">Cancelar</button>
+              <button class="glass-btn" style="flex: 1; box-shadow: none;" (click)="executeConfirm()">Sí, eliminar</button>
+            </div>
+          </div>
+        </div>
+      </ion-content>
+    `,
+    styles: [`
     :host { display: block; height: 100%; }
     .scroll-content { --background: transparent; }
     .mas-container { padding: calc(env(safe-area-inset-top) + 85px) 20px 20px; font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #fff0f3 0%, #ffccd5 100%); min-height: 100%; padding-bottom: 100px; }
@@ -577,6 +710,18 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
     
     .glass-select { width: 100%; padding: 14px 16px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); font-family: 'Inter', sans-serif; font-size: 1rem; color: #590D22; font-weight: 700; outline: none; appearance: none; cursor: pointer; }
     .glass-select:focus { border-color: #FF4D6D; background: #fff; }
+    ion-select.glass-input, ion-select.glass-select { 
+      padding: 0 !important; 
+      --padding-top: 12px !important; 
+      --padding-bottom: 12px !important; 
+      --padding-start: 16px !important; 
+      --padding-end: 16px !important; 
+      --highlight-color-valid: #FF4D6D !important; 
+      --highlight-color-invalid: #FF4D6D !important; 
+      --highlight-color-focused: #FF4D6D !important; 
+      --icon-color: #FF4D6D; 
+      min-height: unset; 
+    }
 
     .glass-btn { width: 100%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none; padding: 14px; border-radius: 14px; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3); }
     .glass-btn:active { transform: scale(0.98); box-shadow: 0 2px 8px rgba(255, 77, 109, 0.2); }
@@ -604,6 +749,11 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
     .m-title { display: block; font-weight: 800; color: #590D22; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .m-date { font-size: 0.8rem; color: #a4133c; font-weight: 600; margin-top: 2px; display: block; }
     .m-days { font-weight: 900; color: #FF4D6D; background: rgba(255,77,109,0.1); padding: 6px 12px; border-radius: 12px; font-size: 0.85rem; }
+    
+    .milestone-item.is-past { opacity: 0.85; }
+    .milestone-item.is-past .milestone-indicator { background: #b0b0b0; }
+    .milestone-item.is-past .m-days { color: #6c757d; background: rgba(108,117,125,0.15); }
+    
     
     .bucket-item.is-done { opacity: 0.6; background: rgba(255,255,255,0.4); }
     .bucket-item.is-done .b-text { text-decoration: line-through; color: #a4133c; }
@@ -680,19 +830,24 @@ import { logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCir
       @keyframes particle-8 { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 45% { transform: translate(0, -35px) scale(0.6); opacity: 0.6; } 100% { transform: translate(0, 45px) scale(0); opacity: 0; } }
   `],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonIcon, IonContent, IonRefresher, IonRefresherContent]
+  imports: [CommonModule, FormsModule, IonIcon, IonContent, IonRefresher, IonRefresherContent, IonSelect, IonSelectOption, IonSearchbar]
 })
 export class MasWidgetComponent implements OnInit, OnDestroy {
   @Output() openGameEvent = new EventEmitter<void>();
 
   private api = inject(LoveApiService);
-  private tutorialService = inject(TutorialService);
   private toastCtrl = inject(ToastController);
   private actionSheetCtrl = inject(ActionSheetController);
   private router = inject(Router);
   private alertCtrl = inject(AlertController);
   private locationService = inject(LocationService);
   private sanitizer = inject(DomSanitizer);
+
+  isMapModalOpen = false;
+  safeMapUrl: SafeResourceUrl | null = null;
+  
+  previewMapUrl: SafeResourceUrl | null = null;
+  locationSubject = new Subject<string>();
 
   startDate: string = '';
   selectedAlbumId: number | string = 'feed';
@@ -728,29 +883,94 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   movies: any[] = [];
   
   isFoodListModalOpen = false;
+  isLogoutModalOpen = false;
   isMovieListModalOpen = false;
 
   isAddingFoodPlace = false;
-  newFoodPlace: any = { name: '', location: '', description: '', rating: 5, imageBase64: null };
+  newFoodPlace: any = { name: '', location: '', description: '', rating: 5, category: '', is_favorite: false, imageBase64: null };
+
+  openMap(location: string) {
+    if (!location) return;
+    const url = `https://maps.google.com/maps?q=${encodeURIComponent(location)}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
+    this.safeMapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    this.isMapModalOpen = true;
+  }
+
+  onLocationChange(value: string) {
+    this.locationSubject.next(value);
+  }
   isFoodPlaceModalOpen = false;
   selectedFoodPlace: any = null;
   
-  foodPlaceMapUrl: SafeResourceUrl | null = null;
-  locationTimeout: any;
+  foodCategories = ['Española', 'Italiana', 'Árabe', 'Asiática', 'Mexicana', 'Americana', 'Comida Rápida', 'Desayunos/Brunch', 'Postres', 'Otro'];
+  selectedFoodCategory = '';
+  searchQueryFoodPlaces = '';
+  showFavoritesOnlyFoodPlaces = false;
+
+  get filteredFoodPlaces() {
+    return this.foodPlaces.filter(p => {
+      const matchFav = this.showFavoritesOnlyFoodPlaces ? p.is_favorite : true;
+      const matchCat = this.selectedFoodCategory ? p.category === this.selectedFoodCategory : true;
+      const matchSearch = this.searchQueryFoodPlaces ? p.name.toLowerCase().includes(this.searchQueryFoodPlaces.toLowerCase()) : true;
+      return matchFav && matchCat && matchSearch;
+    });
+  }
   
   isAddingDish = false;
-  newDish: any = { name: '', description: '', rating: 5, imageBase64: null };
+  newDish: any = { id: null, name: '', description: '', rating: 5, imageBase64: null };
   
   isAddingMovie = false;
-  newMovie: any = { title: '', who_fell_asleep: '', favorite_quote: '', rating: 5, imageBase64: null };
+  showWhoFellAsleep = false;
+  newMovie: any = { title: '', description: '', who_fell_asleep: '', favorite_quote: '', rating: 5, genre: '', is_favorite: false, imageBase64: null };
   isMovieModalOpen = false;
   selectedMovie: any = null;
+  
+  movieGenres = ['Acción', 'Comedia', 'Drama', 'Terror', 'Ciencia Ficción', 'Fantasía', 'Romance', 'Animación', 'Documental', 'Thriller', 'Otro'];
+  selectedMovieGenre = '';
+  searchQueryMovies = '';
+  showFavoritesOnlyMovies = false;
+
+  get filteredMovies() {
+    return this.movies.filter(m => {
+      const matchFav = this.showFavoritesOnlyMovies ? m.is_favorite : true;
+      const matchGenre = this.selectedMovieGenre ? m.genre === this.selectedMovieGenre : true;
+      const matchSearch = this.searchQueryMovies ? m.title.toLowerCase().includes(this.searchQueryMovies.toLowerCase()) : true;
+      return matchFav && matchGenre && matchSearch;
+    });
+  }
+
+  
+  isConfirmModalOpen = false;
+  confirmTitle = '';
+  confirmMessage = '';
+  confirmAction: () => void = () => {};
+
+  showConfirm(title: string, message: string, action: () => void) {
+    this.confirmTitle = title;
+    this.confirmMessage = message;
+    this.confirmAction = action;
+    this.isConfirmModalOpen = true;
+  }
+
+  executeConfirm() {
+    this.confirmAction();
+    this.isConfirmModalOpen = false;
+  }
 
   constructor() {
-    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, trophyOutline, sparklesOutline });
+    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, add, pencilOutline, locationOutline, restaurantOutline, filmOutline, star, cameraOutline });
   }
 
   async ngOnInit() {
+    this.locationSubject.pipe(debounceTime(2000)).subscribe(location => {
+      if (location && location.trim().length > 0) {
+        const url = `https://maps.google.com/maps?q=${encodeURIComponent(location)}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
+        this.previewMapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+      } else {
+        this.previewMapUrl = null;
+      }
+    });
+
     // 1. Sync Date from API
     try {
       const info = await this.api.getCoupleInfo();
@@ -973,9 +1193,11 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
   calculateDays(dateStr: string): number {
     if (!dateStr) return 0;
-    const d = new Date(dateStr).getTime();
-    const now = new Date().getTime();
-    return Math.floor(Math.abs(now - d) / (1000 * 60 * 60 * 24));
+    const d = new Date(dateStr);
+    const now = new Date();
+    d.setHours(0,0,0,0);
+    now.setHours(0,0,0,0);
+    return Math.round(Math.abs(now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
   }
 
   isPast(dateStr: string): boolean {
@@ -1005,46 +1227,6 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     await Preferences.set({ key: 'widgetAlbumName', value: albumName });
     
     this.showToast('Configuración guardada. El widget tardará unos minutos en actualizarse.', 'success');
-  }
-
-
-
-  openFoodListModal() {
-    this.isFoodListModalOpen = true;
-    setTimeout(() => {
-      this.tutorialService.showFoodTour();
-    }, 500);
-  }
-
-  unlockPopcorn(event: Event) {
-    event.stopPropagation();
-    this.api.unlockAchievement('secret_popcorn');
-    // Abrir directamente el modal de añadir peli
-    this.isAddingMovie = true;
-    // Esperar a que el DOM renderice y hacer focus en el campo "dormido"
-    setTimeout(() => {
-      const dormidoInput = document.querySelector('input[placeholder="¿Quién se quedó dormido primero?"]') as HTMLInputElement;
-      if (dormidoInput) {
-        dormidoInput.focus();
-        dormidoInput.style.borderColor = '#FF4D6D';
-        dormidoInput.style.boxShadow = '0 0 0 3px rgba(255,77,109,0.25)';
-        dormidoInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 300);
-  }
-
-  openMovieListModal() {
-    this.isMovieListModalOpen = true;
-    setTimeout(() => {
-      this.tutorialService.showMovieTour();
-    }, 500);
-  }
-
-  openAddFoodPlaceModal() {
-    this.isAddingFoodPlace = true;
-    setTimeout(() => {
-      this.tutorialService.showAddFoodTour();
-    }, 500);
   }
 
   startTimer() {
@@ -1292,29 +1474,10 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     });
   }
 
-  async confirmLogout() {
-    const alert = await this.alertCtrl.create({
-      header: 'Cerrar Sesión',
-      message: '¿Estás seguro de que quieres salir?',
-      cssClass: 'premium-alert',
-      buttons: [
-        { text: 'Cancelar', role: 'cancel', cssClass: 'alert-btn-cancel' },
-        { 
-          text: 'Salir', 
-          role: 'destructive',
-          cssClass: 'alert-btn-confirm',
-          handler: () => {
-            this.api.logout();
-            this.router.navigate(['/login']);
-          }
-        }
-      ]
-    });
-    await alert.present();
-  }
-
-  goTo(path: string) {
-    this.router.navigate(['/' + path]);
+  doLogout() {
+    this.isLogoutModalOpen = false;
+    this.api.logout();
+    this.router.navigate(['/login']);
   }
 
   // --- FOOD PLACES & MOVIES API LOGIC ---
@@ -1334,17 +1497,6 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     this.isAddingDish = false;
   }
 
-  onLocationChange(value: string) {
-    if (this.locationTimeout) clearTimeout(this.locationTimeout);
-    this.foodPlaceMapUrl = null;
-    if (!value || value.trim() === '') return;
-
-    this.locationTimeout = setTimeout(() => {
-      const url = `https://maps.google.com/maps?q=${encodeURIComponent(value)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
-      this.foodPlaceMapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-    }, 2000);
-  }
-
   async uploadNewFoodPlacePhoto() {
     this.presentPhotoOptions(async (source) => {
       try {
@@ -1358,34 +1510,46 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     if (!this.newFoodPlace.name) return this.showToast('Ponle nombre al sitio', 'warning');
     try {
       if (this.newFoodPlace.id) {
-        await this.api.updateFoodPlace(this.newFoodPlace.id, this.newFoodPlace.name, this.newFoodPlace.location, this.newFoodPlace.rating, this.newFoodPlace.description, this.newFoodPlace.imageBase64);
+        await this.api.updateFoodPlace(this.newFoodPlace.id, this.newFoodPlace.name, this.newFoodPlace.location, this.newFoodPlace.rating, this.newFoodPlace.description, this.newFoodPlace.imageBase64, this.newFoodPlace.category, this.newFoodPlace.is_favorite);
         this.showToast('Restaurante actualizado', 'success');
       } else {
-        await this.api.addFoodPlace(this.newFoodPlace.name, this.newFoodPlace.location, this.newFoodPlace.rating, this.newFoodPlace.description, this.newFoodPlace.imageBase64);
+        await this.api.addFoodPlace(this.newFoodPlace.name, this.newFoodPlace.location, this.newFoodPlace.rating, this.newFoodPlace.description, this.newFoodPlace.imageBase64, this.newFoodPlace.category, this.newFoodPlace.is_favorite);
         this.showToast('Restaurante añadido', 'success');
       }
       this.isAddingFoodPlace = false;
-      this.newFoodPlace = { name: '', location: '', description: '', rating: 5, imageBase64: null };
+      this.newFoodPlace = { name: '', location: '', description: '', rating: 5, category: '', is_favorite: false, imageBase64: null };
       this.loadFoodAndMovies();
     } catch (e) {
       this.showToast('Error al guardar restaurante', 'danger');
     }
   }
 
+  openAddFoodPlaceModal() {
+    this.newFoodPlace = { name: '', location: '', description: '', rating: 5, category: '', is_favorite: false, imageBase64: null };
+    this.previewMapUrl = null;
+    this.isAddingFoodPlace = true;
+  }
+
   editFoodPlace(place: any) {
     this.newFoodPlace = { ...place, imageBase64: null };
+    this.previewMapUrl = null;
+    if (this.newFoodPlace.location) {
+        this.onLocationChange(this.newFoodPlace.location);
+    }
     this.isFoodPlaceModalOpen = false;
     this.isAddingFoodPlace = true;
   }
 
-  async deleteFoodPlace(id: number) {
-    if(!confirm('¿Eliminar este restaurante?')) return;
-    try {
-      await this.api.deleteFoodPlace(id);
-      this.isFoodPlaceModalOpen = false;
-      this.loadFoodAndMovies();
-      this.showToast('Eliminado', 'success');
-    } catch (e) {}
+  deleteFoodPlace(id: number) {
+    this.showConfirm('Eliminar restaurante', '¿Seguro que quieres eliminar este restaurante de la lista?', async () => {
+      try {
+        await this.api.deleteFoodPlace(id);
+        this.isFoodPlaceModalOpen = false;
+        this.isAddingFoodPlace = false;
+        this.loadFoodAndMovies();
+        this.showToast('Eliminado', 'success');
+      } catch (e) {}
+    });
   }
 
   // Food Dishes
@@ -1401,25 +1565,50 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   async saveFoodDish() {
     if (!this.newDish.name) return this.showToast('Ponle nombre al plato', 'warning');
     try {
-      const dish = await this.api.addFoodDish(this.selectedFoodPlace.id, this.newDish.name, this.newDish.rating, this.newDish.description, this.newDish.imageBase64);
-      if(!this.selectedFoodPlace.dishes) this.selectedFoodPlace.dishes = [];
-      this.selectedFoodPlace.dishes.push(dish);
+      if (this.newDish.id) {
+        // Update existing
+        const updated = await this.api.updateFoodDish(this.selectedFoodPlace.id, this.newDish.id, this.newDish.name, this.newDish.rating, this.newDish.description, this.newDish.imageBase64);
+        const index = this.selectedFoodPlace.dishes.findIndex((d: any) => d.id === this.newDish.id);
+        if (index !== -1) {
+          this.selectedFoodPlace.dishes[index] = updated;
+        }
+        this.showToast('Plato actualizado', 'success');
+      } else {
+        // Create new
+        const dish = await this.api.addFoodDish(this.selectedFoodPlace.id, this.newDish.name, this.newDish.rating, this.newDish.description, this.newDish.imageBase64);
+        if(!this.selectedFoodPlace.dishes) this.selectedFoodPlace.dishes = [];
+        this.selectedFoodPlace.dishes.push(dish);
+        this.showToast('Plato añadido', 'success');
+      }
       this.isAddingDish = false;
-      this.newDish = { name: '', description: '', rating: 5, imageBase64: null };
+      this.newDish = { id: null, name: '', description: '', rating: 5, imageBase64: null };
       this.loadFoodAndMovies();
-      this.showToast('Plato añadido', 'success');
     } catch (e) {
-      this.showToast('Error al añadir plato', 'danger');
+      this.showToast('Error al guardar plato', 'danger');
     }
   }
 
-  async deleteFoodDish(dishId: number) {
-    if(!confirm('¿Eliminar este plato?')) return;
-    try {
-      await this.api.deleteFoodDish(this.selectedFoodPlace.id, dishId);
-      this.selectedFoodPlace.dishes = this.selectedFoodPlace.dishes.filter((d:any) => d.id !== dishId);
-      this.loadFoodAndMovies();
-    } catch (e) {}
+  editFoodDish(dish: any) {
+    this.newDish = {
+      id: dish.id,
+      name: dish.name,
+      description: dish.description || '',
+      rating: dish.rating || 5,
+      imageBase64: dish.image_url_full || null
+    };
+    this.isAddingDish = true;
+  }
+
+  deleteFoodDish(dishId: number) {
+    this.showConfirm('Eliminar plato', '¿Seguro que quieres eliminar este plato?', async () => {
+      try {
+        await this.api.deleteFoodDish(this.selectedFoodPlace.id, dishId);
+        if (this.selectedFoodPlace) {
+          this.selectedFoodPlace.dishes = this.selectedFoodPlace.dishes.filter((d: any) => d.id !== dishId);
+        }
+        this.showToast('Plato eliminado', 'success');
+      } catch (e) {}
+    });
   }
 
   // Movies
@@ -1432,23 +1621,32 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     this.presentPhotoOptions(async (source) => {
       try {
         const image = await Camera.getPhoto({ quality: 80, allowEditing: true, resultType: CameraResultType.DataUrl, source });
-        if (image.dataUrl) this.newMovie.imageBase64 = image.dataUrl;
-      } catch (e) { console.log(e); }
+        if (image.dataUrl) {
+          this.newMovie.imageBase64 = image.dataUrl;
+          console.log('[PHOTO] Movie photo set, dataUrl length:', image.dataUrl.length);
+        } else {
+          console.warn('[PHOTO] Camera returned no dataUrl');
+        }
+      } catch (e) {
+        console.error('[PHOTO] Error getting movie photo:', e);
+      }
     });
   }
 
   async saveMovie() {
     if (!this.newMovie.title) return this.showToast('Ponle título', 'warning');
     try {
+      console.log('[SAVE] imageBase64 presente:', !!this.newMovie.imageBase64, 'length:', this.newMovie.imageBase64?.length);
       if (this.newMovie.id) {
-        await this.api.updateMovie(this.newMovie.id, this.newMovie.title, this.newMovie.rating, this.newMovie.who_fell_asleep, this.newMovie.favorite_quote, this.newMovie.imageBase64);
+        await this.api.updateMovie(this.newMovie.id, this.newMovie.title, this.newMovie.rating, this.newMovie.who_fell_asleep, this.newMovie.favorite_quote, this.newMovie.imageBase64, this.newMovie.description, this.newMovie.genre, this.newMovie.is_favorite);
         this.showToast('Peli actualizada', 'success');
       } else {
-        await this.api.addMovie(this.newMovie.title, this.newMovie.rating, this.newMovie.who_fell_asleep, this.newMovie.favorite_quote, this.newMovie.imageBase64);
+        await this.api.addMovie(this.newMovie.title, this.newMovie.rating, this.newMovie.who_fell_asleep, this.newMovie.favorite_quote, this.newMovie.imageBase64, this.newMovie.description, this.newMovie.genre, this.newMovie.is_favorite);
         this.showToast('Peli añadida', 'success');
       }
       this.isAddingMovie = false;
-      this.newMovie = { title: '', who_fell_asleep: '', favorite_quote: '', rating: 5, imageBase64: null };
+      this.newMovie = { title: '', description: '', who_fell_asleep: '', favorite_quote: '', rating: 5, genre: '', is_favorite: false, imageBase64: null };
+      this.showWhoFellAsleep = false;
       this.loadFoodAndMovies();
     } catch (e) {
       this.showToast('Error al guardar', 'danger');
@@ -1461,13 +1659,15 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     this.isAddingMovie = true;
   }
 
-  async deleteMovie(id: number) {
-    if(!confirm('¿Eliminar esta peli?')) return;
-    try {
-      await this.api.deleteMovie(id);
-      this.isMovieModalOpen = false;
-      this.loadFoodAndMovies();
-      this.showToast('Eliminada', 'success');
-    } catch (e) {}
+  deleteMovie(id: number) {
+    this.showConfirm('Eliminar película', '¿Seguro que quieres eliminar esta peli?', async () => {
+      try {
+        await this.api.deleteMovie(id);
+        this.isMovieModalOpen = false;
+        this.isAddingMovie = false;
+        this.loadFoodAndMovies();
+        this.showToast('Eliminada', 'success');
+      } catch (e) {}
+    });
   }
 }

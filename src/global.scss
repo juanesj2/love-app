@@ -1,7 +1,12 @@
 /*
  * App Global CSS
  * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally.
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
  */
 
 /* Core CSS required for Ionic components to work properly */
@@ -13,9 +18,6 @@
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
 
-/* Driver.js (Tutorials) CSS */
-@import "driver.js/dist/driver.css";
-
 /* Optional CSS utils that can be commented out */
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/float-elements.css";
@@ -25,7 +27,13 @@
 
 /**
  * Ionic Dark Mode
+ * -----------------------------------------------------
+ * For more info, please see:
+ * https://ionicframework.com/docs/theming/dark-mode
  */
+
+/* @import "@ionic/angular/css/palettes/dark.always.css"; */
+/* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
 
 /* Leaflet CSS */
@@ -74,6 +82,7 @@
     box-shadow: 0 0 0 3px rgba(255, 77, 109, 0.1) !important;
   }
 
+  /* Fix for the password eye icon */
   .alert-input-wrapper {
     button, ion-icon, svg {
       color: #590D22 !important;
@@ -81,6 +90,7 @@
     }
   }
 
+  /* Native browser eye icon fallback */
   .alert-input::-ms-reveal,
   .alert-input::-webkit-reveal {
     filter: brightness(0.2) sepia(1) hue-rotate(300deg) saturate(3);
@@ -111,13 +121,13 @@
 /* Premium Action Sheet Styling */
 .premium-action-sheet {
   --background: rgba(255, 255, 255, 0.95);
-  --backdrop-opacity: 0.5;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-
-  @media (prefers-color-scheme: dark) {
-    --background: rgba(30, 32, 35, 0.85);
-  }
+  --backdrop-opacity: 0.4;
+  --color: #FF4D6D;
+  --button-color: #590D22;
+  --button-color-cancel: #FF4D6D;
+  
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 
   .action-sheet-wrapper {
     border-top-left-radius: 28px !important;
@@ -125,23 +135,11 @@
     box-shadow: 0 -10px 40px rgba(255, 77, 109, 0.15) !important;
   }
 
-  .action-sheet-group {
-    background: transparent !important;
-  }
-  .action-sheet-group-cancel {
-    background: transparent !important;
-  }
-
   .action-sheet-title {
     font-weight: 800 !important;
-    color: #590D22 !important;
     font-size: 1.3rem !important;
     text-align: center !important;
     padding: 25px 10px 15px !important;
-
-    @media (prefers-color-scheme: dark) {
-      color: #ffb3c1 !important;
-    }
   }
 
   .action-sheet-button {
@@ -150,71 +148,11 @@
     justify-content: center !important;
     text-align: center !important;
     padding: 18px !important;
-    background: rgba(255, 77, 109, 0.08) !important;
-    --background: rgba(255, 77, 109, 0.08) !important;
-    --button-background: rgba(255, 77, 109, 0.08) !important;
-    margin: 5px 15px !important;
-    border-radius: 14px !important;
-    width: calc(100% - 30px) !important;
-    color: #590D22 !important;
-    --color: #590D22 !important;
-    border: 1px solid rgba(255, 77, 109, 0.15) !important;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03) !important;
-
-    @media (prefers-color-scheme: dark) {
-      background: rgba(255, 255, 255, 0.15) !important;
-      --background: rgba(255, 255, 255, 0.15) !important;
-      --button-background: rgba(255, 255, 255, 0.15) !important;
-      border: 1px solid rgba(255, 255, 255, 0.08) !important;
-      color: white !important;
-      --color: white !important;
-    }
   }
 
-  .action-sheet-button.premium-main-btn {
-    color: #a4133c !important;
-    --color: #a4133c !important;
-    border: 1px solid #FF4D6D !important;
-    background: rgba(255, 77, 109, 0.1) !important;
-    --background: rgba(255, 77, 109, 0.1) !important;
-    --button-background: rgba(255, 77, 109, 0.1) !important;
-    
-    @media (prefers-color-scheme: dark) {
-      color: #ffb3c1 !important;
-      --color: #ffb3c1 !important;
-      background: rgba(255, 77, 109, 0.25) !important;
-      --background: rgba(255, 77, 109, 0.25) !important;
-      --button-background: rgba(255, 77, 109, 0.25) !important;
-    }
-  }
-
-  .action-sheet-button.premium-cancel-btn {
-    background: linear-gradient(135deg, #FF4D6D, #c9184a) !important;
-    --background: linear-gradient(135deg, #FF4D6D, #c9184a) !important;
-    --button-background: linear-gradient(135deg, #FF4D6D, #c9184a) !important;
-    color: white !important;
-    --color: white !important;
+  .action-sheet-button.action-sheet-cancel {
     font-weight: 800 !important;
-    margin-top: 15px !important;
-    margin-bottom: 20px !important;
-    border: none !important;
-    box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3) !important;
-  }
-
-  .action-sheet-button.premium-cancel-btn::after {
-    display: none !important;
-    opacity: 0 !important;
-    background: transparent !important;
-  }
-
-  .action-sheet-icon {
-    color: #a4133c !important;
-    margin-right: 10px !important;
-    font-size: 1.5rem !important;
-
-    @media (prefers-color-scheme: dark) {
-      color: #ffb3c1 !important;
-    }
+    margin-top: 10px !important;
   }
 }
 
@@ -224,10 +162,6 @@
   --background: rgba(255, 245, 247, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-
-  @media (prefers-color-scheme: dark) {
-    --background: rgba(30, 32, 35, 0.95);
-  }
 
   .alert-wrapper {
     border-radius: 28px !important;
@@ -265,12 +199,6 @@
     padding: 16px 0 !important;
     display: flex !important;
     justify-content: center !important;
-
-    @media (prefers-color-scheme: dark) {
-      background: rgba(255, 255, 255, 0.1) !important;
-      color: white !important;
-      border: 1px solid rgba(255, 255, 255, 0.05) !important;
-    }
   }
 
   .alert-button .alert-button-inner {
@@ -290,471 +218,124 @@
   }
 }
 
-/* Shift bottom tabs popover up so it doesn't overlap */
-.tour-bottom-tab {
-  transform: translateY(-20px) !important;
-}
+/* Premium Action Sheet Styling */
+.premium-action-sheet {
+  --background: rgba(255, 255, 255, 0.9);
+  --backdrop-opacity: 0.5;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 
-/* Custom Driver.js Theme */
-.driver-popover {
-  border-radius: 20px !important;
-  border: none !important;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
-  padding: 20px !important;
-  background: rgba(255, 255, 255, 0.95) !important;
-  backdrop-filter: blur(10px) !important;
-}
-
-.driver-popover-title {
-  color: #590D22 !important;
-  font-weight: 800 !important;
-  font-size: 1.2rem !important;
-  margin-bottom: 8px !important;
-}
-
-.driver-popover-description {
-  color: #a08c92 !important;
-  font-size: 0.95rem !important;
-  line-height: 1.4 !important;
-}
-
-.driver-popover-footer button {
-  border-radius: 12px !important;
-  text-shadow: none !important;
-  font-weight: 600 !important;
-  transition: transform 0.2s !important;
-}
-
-.driver-popover-footer button:active {
-  transform: scale(0.95) !important;
-}
-
-.driver-popover-next-btn, .driver-popover-done-btn {
-  background: linear-gradient(135deg, #FF4D6D, #c9184a) !important;
-  color: white !important;
-  border: none !important;
-  box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3) !important;
-}
-
-.driver-popover-prev-btn {
-  background: #f8f9fa !important;
-  color: #a08c92 !important;
-  border: 1px solid #e9ecef !important;
-}
-
-.driver-popover-progress-text {
-  color: #a4133c !important;
-  font-weight: 600 !important;
-}
-
-/* =============================================
-   NIGHT OWL MODE — Dark Mode Completo
-   ============================================= */
-body.night-owl-mode {
-  --ion-background-color: #0f0f14 !important;
-  --ion-text-color: #e8e8f0 !important;
-  --ion-color-primary: #a78bfa !important;
-  background: #0f0f14 !important;
-
-  /* ---- Ionic base ---- */
-  ion-content, ion-page, ion-app {
-    --background: #0f0f14 !important;
-    background: #0f0f14 !important;
+  .action-sheet-wrapper {
+    border-top-left-radius: 24px !important;
+    border-top-right-radius: 24px !important;
+    box-shadow: 0 -8px 32px rgba(255, 77, 109, 0.15) !important;
+    background: rgba(255, 255, 255, 0.8) !important;
   }
 
-  /* ---- Header ---- */
-  .custom-header {
-    background: rgba(20, 20, 30, 0.85) !important;
-    border-color: rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important;
+  .action-sheet-title {
+    font-weight: 800 !important;
+    color: #590D22 !important;
+    font-size: 1.3rem !important;
+    text-align: center !important;
+    padding: 20px 10px 10px !important;
   }
 
-  ion-toolbar {
-    --background: transparent !important;
+  .action-sheet-button {
+    font-weight: 600 !important;
+    color: #a4133c !important;
+    font-size: 1.1rem !important;
+    width: calc(100% - 30px) !important;
+    margin: 5px auto !important;
+    border-radius: 14px !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.8) !important;
+    padding: 15px !important;
+    justify-content: flex-start !important;
+    padding-left: 20px !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03) !important;
+
+    .action-sheet-icon {
+      color: #FF4D6D !important;
+      margin-right: 15px !important;
+      font-size: 1.5rem !important;
+    }
   }
 
-  /* ---- Barra de navegacion inferior ---- */
-  .custom-tab-bar {
-    background: rgba(18, 18, 28, 0.95) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 -4px 30px rgba(0,0,0,0.5) !important;
-  }
-
-  .tab-btn {
-    color: rgba(180, 180, 200, 0.5) !important;
-  }
-
-  .tab-btn.active {
-    color: #a78bfa !important;
-  }
-
-  .tab-btn.active ion-icon {
-    filter: drop-shadow(0 4px 8px rgba(167,139,250,0.5)) !important;
-  }
-
-  .tab-btn.active::after {
-    background: #a78bfa !important;
-  }
-
-  .tab-btn span {
-    color: inherit !important;
-  }
-
-  /* ---- Botón + central ---- */
-  .plus-circle {
-    background: linear-gradient(135deg, #7c3aed, #a78bfa) !important;
-    box-shadow: 0 10px 25px rgba(124,58,237,0.5) !important;
-    border-color: rgba(167,139,250,0.3) !important;
-  }
-
-  /* ---- Botón poke/corazón ---- */
-  .poke-btn {
-    background: linear-gradient(135deg, #1e1b3a, #2d2060) !important;
-    border-color: rgba(167,139,250,0.4) !important;
-    box-shadow: 0 8px 20px rgba(124,58,237,0.3) !important;
-    color: #a78bfa !important;
-  }
-
-  /* ---- Fondo general de widgets ---- */
-  .scroll-content, .mas-container, .photo-widget-container,
-  .chat-wrapper, .achievements-container, .main-container {
-    --background: #0f0f14 !important;
-    background: linear-gradient(135deg, #0f0f14 0%, #14121f 100%) !important;
-  }
-
-  /* ---- Cards y glass ---- */
-  .glass-card, .achievement-card, .modal-content {
-    background: rgba(25, 23, 40, 0.85) !important;
-    border-color: rgba(167,139,250,0.12) !important;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
-  }
-
-  /* ---- Textos generales ---- */
-  h1, h2, h3, h4, h5, h6, p, span, label, .desc, .subtitle {
-    color: #e8e8f0 !important;
-  }
-
-  .title { color: #e8e8f0 !important; }
-  .section-title h3 { color: #d4d0f0 !important; }
-  .section-title ion-icon { color: #a78bfa !important; background: rgba(167,139,250,0.12) !important; }
-
-  /* ---- Inputs y selects ---- */
-  .glass-input, .glass-select, .premium-input {
-    background: rgba(30, 27, 50, 0.8) !important;
-    border-color: rgba(167,139,250,0.2) !important;
-    color: #e8e8f0 !important;
-    &::placeholder { color: rgba(200, 195, 240, 0.4) !important; }
-    &:focus { border-color: #a78bfa !important; box-shadow: 0 4px 15px rgba(167,139,250,0.2) !important; }
-  }
-
-  /* ---- Botones ---- */
-  .glass-btn {
-    background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
-    box-shadow: 0 4px 15px rgba(124,58,237,0.4) !important;
-  }
-
-  /* ---- Chat ---- */
-  .bubble {
-    background: rgba(30, 27, 50, 0.9) !important;
-    color: #e8e8f0 !important;
-  }
-
-  .mine .bubble {
-    background: linear-gradient(135deg, #5b21b6, #7c3aed) !important;
-    color: #fff !important;
-  }
-
-  .input-area, .input-container {
-    background: rgba(20, 18, 35, 0.95) !important;
-    border-color: rgba(167,139,250,0.15) !important;
-  }
-
-  .input-area .premium-input {
-    color: #e8e8f0 !important;
-    &::placeholder { color: rgba(200,195,240,0.4) !important; }
-  }
-
-  .send-btn {
-    background: linear-gradient(135deg, #7c3aed, #a78bfa) !important;
-  }
-
-  .attach-btn { color: #a78bfa !important; }
-
-  .insta-context-menu {
-    background: rgba(22, 20, 38, 0.98) !important;
-    border-color: rgba(167,139,250,0.15) !important;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.7) !important;
-  }
-
-  .menu-action { color: #d4d0f0 !important; }
-  .menu-username { color: #e8e8f0 !important; }
-  .menu-time { color: rgba(200,195,240,0.5) !important; }
-
-  .reply-preview-container {
-    background: rgba(25, 23, 40, 0.95) !important;
-    border-color: #7c3aed !important;
-  }
-
-  .reply-title { color: #a78bfa !important; }
-  .reply-text { color: rgba(200,195,240,0.7) !important; }
-
-  /* ---- Foto / grid widget ---- */
-  .photo-card {
-    background: rgba(22, 20, 38, 0.95) !important;
-    border-color: rgba(167,139,250,0.1) !important;
-  }
-
-  .floating-toggles {
-    background: rgba(25, 23, 40, 0.9) !important;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
-  }
-
-  .floating-toggles button { color: rgba(200,195,240,0.5) !important; }
-  .floating-toggles button.active { 
-    background: rgba(124,58,237,0.3) !important; 
-    color: #a78bfa !important; 
-    box-shadow: 0 2px 8px rgba(124,58,237,0.3) !important;
-  }
-
-  /* ---- Overlays y modales ---- */
-  .custom-overlay {
-    background: rgba(0, 0, 0, 0.75) !important;
-  }
-
-  /* ---- Logros ---- */
-  .achievement-card {
-    background: rgba(22, 20, 38, 0.9) !important;
-    border-color: rgba(167,139,250,0.15) !important;
-  }
-
-  /* ---- Colores de texto secundario rosa → lavanda ---- */
-  .text-pink, [style*="color: #FF4D6D"], [style*="color: #590D22"],
-  [style*="color: #a4133c"], [style*="color: #800f2f"] {
-    color: #a78bfa !important;
-  }
-  
-  [style*="color: #FFB703"] {
-    color: #a78bfa !important;
-  }
-  
-  .star {
-    --star-color: #a78bfa !important;
-  }
-
-  /* ---- Menús nativos y Action Sheets ---- */
-  ion-action-sheet {
-    --background: #161426 !important;
-    --button-background: #161426 !important;
-    --button-background-activated: rgba(167, 139, 250, 0.15) !important;
-    --button-color: #e8e8f0 !important;
-    --color: #e8e8f0 !important;
-  }
-  ion-action-sheet .action-sheet-group {
-    background: #161426 !important;
-  }
-  ion-action-sheet .action-sheet-title {
-    color: #a78bfa !important;
-  }
-  ion-action-sheet .action-sheet-cancel {
-    color: #a78bfa !important;
-  }
-
-  /* ---- Píldoras, Badges y Botones de acción ---- */
-  .streak-badge, .filter-chip, .albums-btn-small, .header-upload-btn, .albums-btn, .header-icon-btn {
-    background: rgba(30, 27, 50, 0.85) !important;
-    border-color: rgba(167, 139, 250, 0.2) !important;
-    color: #e8e8f0 !important;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
-  }
-  .filter-chip.active {
-    background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
-    color: #fff !important;
-    border-color: #a78bfa !important;
-  }
-
-  /* Botones cancelar y eliminar en modales */
-  [style*="rgba(128,15,47,0.1)"] {
-    background: rgba(167, 139, 250, 0.1) !important;
-    color: #a78bfa !important;
-  }
-  [style*="color: red"], [style*="rgba(255,0,0,0.1)"] {
-    background: rgba(239, 68, 68, 0.1) !important;
-    color: #ef4444 !important;
-  }
-
-  /* ---- Mapa y sus controles ---- */
-  .leaflet-tile-pane {
-    filter: invert(1) hue-rotate(180deg) brightness(0.7) contrast(1.2) sepia(0.2) !important;
-  }
-  .privacy-map-btn, .center-map-btn, .ghost-box {
-    background: rgba(25, 23, 40, 0.95) !important;
-    border: 1px solid rgba(167, 139, 250, 0.2) !important;
-    color: #a78bfa !important;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.4) !important;
-  }
-  .ghost-box.active {
-    background: rgba(167, 139, 250, 0.2) !important;
-    border-color: #a78bfa !important;
-  }
-
-  /* ---- Cards y elementos de "Más" ---- */
-  .milestone-item, .bucket-item, .grid-card, .food-place-item, .movie-item, .dish-item {
-    background: rgba(30, 27, 50, 0.6) !important;
-    border: 1px solid rgba(167, 139, 250, 0.1) !important;
-  }
-  .milestone-item .m-title, .bucket-item .b-text {
-    color: #e8e8f0 !important;
-  }
-  .milestone-item .m-date, .bucket-item .label {
-    color: rgba(200, 195, 240, 0.6) !important;
-  }
-  .milestone-item .m-days, .milestone-indicator {
-    background: rgba(167, 139, 250, 0.15) !important;
-    color: #d4d0f0 !important;
-  }
-
-  /* ---- Corazón y Tiempo Juntos ---- */
-  .heart-pulse ion-icon {
-    color: #a78bfa !important;
-    filter: drop-shadow(0 0 15px rgba(167, 139, 250, 0.6)) !important;
-    animation: night-pulse 1s infinite alternate cubic-bezier(0.4, 0, 0.2, 1) !important;
-  }
-  @keyframes night-pulse { 
-    0% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(167, 139, 250, 0.4)); } 
-    100% { transform: scale(1.2); filter: drop-shadow(0 0 25px rgba(167, 139, 250, 0.8)); } 
-  }
-  
-  .time-block {
-    background: rgba(30, 27, 50, 0.8) !important;
-    border-color: rgba(167, 139, 250, 0.2) !important;
-  }
-  .time-block.highlight {
-    background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
-    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.3) !important;
-  }
-
-  /* ---- Albums y Fotos ---- */
-  .album-cover {
-    background-color: rgba(167, 139, 250, 0.2) !important;
-  }
-  .album-cover.empty {
-    border-color: rgba(167, 139, 250, 0.5) !important;
-    color: #a78bfa !important;
-    background: transparent !important;
-  }
-  .change-cover-btn {
-    color: #a78bfa !important;
-    background: rgba(30, 27, 50, 0.8) !important;
-  }
-  .albums-sheet {
-    background: #161426 !important;
-  }
-  .prompt-preview-container {
-    background: rgba(30, 27, 50, 0.8) !important;
-  }
-  [style*="background: rgba(255,77,109,0.05)"] {
-    background: rgba(167, 139, 250, 0.05) !important;
-  }
-
-  /* ---- Chat y Grabación ---- */
-  .recording-indicator {
-    background: rgba(167, 139, 250, 0.1) !important;
-    color: #a78bfa !important;
-  }
-  .pulse-dot {
-    background: #a78bfa !important;
-    box-shadow: 0 0 10px rgba(167, 139, 250, 0.6) !important;
-  }
-  .cancel-record-btn {
-    color: #a78bfa !important;
-  }
-
-  /* ---- Estados Vacíos ---- */
-  .empty-icon { color: rgba(167, 139, 250, 0.5) !important; }
-  .empty-upload-btn { 
-    background: linear-gradient(135deg, #7c3aed, #6d28d9) !important; 
-    box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3) !important; 
-  }
-
-  /* ---- Premium Action Sheet Forzado Modo Noche ---- */
-  .premium-action-sheet {
-    --background: rgba(30, 32, 35, 0.85) !important;
-  }
-  .premium-action-sheet .action-sheet-title { color: #a78bfa !important; }
-  .premium-action-sheet .action-sheet-button {
-    background: rgba(255, 255, 255, 0.15) !important;
-    --background: rgba(255, 255, 255, 0.15) !important;
-    --button-background: rgba(255, 255, 255, 0.15) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  .action-sheet-button.action-sheet-cancel {
+    background: linear-gradient(135deg, #FF4D6D, #c9184a) !important;
     color: white !important;
-    --color: white !important;
-  }
-  .premium-action-sheet .action-sheet-button.premium-main-btn {
-    color: #a78bfa !important;
-    --color: #a78bfa !important;
-    background: rgba(167, 139, 250, 0.25) !important;
-    --background: rgba(167, 139, 250, 0.25) !important;
-    --button-background: rgba(167, 139, 250, 0.25) !important;
-    border-color: #a78bfa !important;
-  }
-  .premium-action-sheet .action-sheet-button.premium-cancel-btn {
-    background: rgba(239, 68, 68, 0.15) !important;
-    --background: rgba(239, 68, 68, 0.15) !important;
-    --button-background: rgba(239, 68, 68, 0.15) !important;
-    color: #ef4444 !important;
-    --color: #ef4444 !important;
-    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2) !important;
-  }
-  .premium-action-sheet .action-sheet-icon { color: #a78bfa !important; }
+    font-weight: 700 !important;
+    width: calc(100% - 30px) !important;
+    margin: 15px auto 20px !important;
+    border: none !important;
+    justify-content: center !important;
+    padding: 15px !important; /* Proper internal margin/padding */
+    box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3) !important;
 
-  /* ---- Menú Adjuntar (Chat) ---- */
-  .attach-menu {
-    background: rgba(30, 27, 50, 0.95) !important;
-    border: 1px solid rgba(167, 139, 250, 0.15) !important;
+    .action-sheet-icon {
+      color: white !important;
+      margin-right: 10px !important; /* slightly tighter margin for centered items */
+    }
   }
-  .attach-menu-item { color: #a78bfa !important; }
-  .attach-menu-item:hover { background: rgba(167, 139, 250, 0.1) !important; }
-
-  /* ---- Inputs Focus ---- */
-  .premium-input:focus, .premium-textarea:focus, .glass-input:focus, .glass-select:focus { 
-    border-color: #a78bfa !important; 
-    box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1) !important; 
-  }
-
-  /* ---- Location Widget ---- */
-  .avatar-container { border-color: #7c3aed !important; }
-  .heart-drop { color: #a78bfa !important; }
-  .pulse-marker::before { border-color: #a78bfa !important; }
-  .text-info-together p { color: #a78bfa !important; }
-  .nm-icon { background: linear-gradient(135deg, #7c3aed, #6d28d9) !important; box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3) !important; }
-  .nm-days { color: #a78bfa !important; }
-  .poke-btn-mini { background: linear-gradient(135deg, #7c3aed, #6d28d9) !important; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4) !important; }
-  [style*="background: #FF4D6D; color: white"], [style*="background: #ff4d6d; color: white"] { background: linear-gradient(135deg, #7c3aed, #6d28d9) !important; border-color: #a78bfa !important; }
-  [style*="border: 2px solid #FF4D6D"], [style*="border: 2px solid #ff4d6d"] { border-color: #a78bfa !important; }
-  path[stroke="#FF4D6D"], path[stroke="#ff4d6d"] { stroke: #a78bfa !important; }
-
-  /* ---- Scrollbars ---- */
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: #0f0f14; }
-  ::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.3); border-radius: 2px; }
 }
 
+/* Custom Pink Love Select Popover */
+ion-popover.love-popover {
+  --background: rgba(255, 248, 250, 0.98) !important;
+  --color: #590D22 !important;
 
+  &::part(content) {
+    background: rgba(255, 248, 250, 0.98) !important;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 77, 109, 0.15);
+    box-shadow: 0 10px 40px rgba(255, 77, 109, 0.2);
+  }
 
-/* Golden Frame Powerup */
-.golden-frame {
-  border-radius: 50% !important;
-  border: 3px solid #ffd700 !important;
-  box-shadow:
-    0 0 0 2px rgba(255, 215, 0, 0.5),
-    0 0 18px rgba(255, 215, 0, 0.7),
-    0 0 35px rgba(255, 180, 0, 0.3) !important;
-  animation: gold-pulse 2s infinite alternate ease-in-out !important;
+  ion-content, ion-list, ion-item {
+    --background: transparent !important;
+    background: transparent !important;
+    --color: #590D22 !important;
+    color: #590D22 !important;
+  }
+  
+  ion-item {
+    font-weight: 600;
+    --border-color: rgba(255, 77, 109, 0.1) !important;
+    --background-hover: rgba(255, 77, 109, 0.1) !important;
+    --background-hover-opacity: 1 !important;
+    --background-focused: rgba(255, 77, 109, 0.15) !important;
+    --background-focused-opacity: 1 !important;
+    --background-activated: rgba(255, 77, 109, 0.15) !important;
+    --background-activated-opacity: 1 !important;
+  }
+  
+  ion-item.item-radio-checked {
+    --background: rgba(255, 77, 109, 0.08) !important;
+  }
+  
+  ion-radio {
+    --color: #a4133c !important;
+    --color-checked: #FF4D6D !important;
+  }
 }
 
-@keyframes gold-pulse {
-  0%   { box-shadow: 0 0 0 2px rgba(255,215,0,0.4), 0 0 12px rgba(255,215,0,0.5), 0 0 25px rgba(255,180,0,0.2); }
-  100% { box-shadow: 0 0 0 3px rgba(255,215,0,0.8), 0 0 28px rgba(255,215,0,0.9), 0 0 50px rgba(255,180,0,0.5); }
+/* Remove tab bar shadow */
+ion-tab-bar {
+  box-shadow: none !important;
+  --border: none !important;
+  border-top: none !important;
+  --box-shadow: none !important;
+  filter: none !important;
 }
 
+ion-tab-bar::part(native) {
+  box-shadow: none !important;
+  border-top: none !important;
+}
 
+.tab-bar-shadow,
+.tabbar {
+  box-shadow: none !important;
+}

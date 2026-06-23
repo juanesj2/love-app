@@ -7,7 +7,6 @@ import { addIcons } from 'ionicons';
 import { closeCircle, addCircleOutline, syncOutline, arrowBack } from 'ionicons/icons';
 import { Location } from '@angular/common';
 import { LoveApiService } from '../../services/love-api.service';
-import { TutorialService } from '../../services/tutorial.service';
 
 @Component({
   selector: 'app-roulette-widget',
@@ -19,14 +18,14 @@ import { TutorialService } from '../../services/tutorial.service';
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
       
-      <div class="header" id="tour-roulette-header">
+      <div class="header">
         <button class="back-btn" (click)="goBack()"><ion-icon name="arrow-back"></ion-icon></button>
         <h2>Tarro de Citas</h2>
         <p>¿Qué hacemos hoy?</p>
         <button class="fill-btn" (click)="fillSampleDates()"><ion-icon name="sync-outline"></ion-icon></button>
       </div>
 
-      <div class="roulette-container" id="tour-roulette-wheel">
+      <div class="roulette-container">
         <div class="roulette-wheel" [style.transform]="'rotate(' + currentRotation + 'deg)'" [style.transition]="isSpinning ? 'transform 4s cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none'">
           <div class="roulette-slice" *ngFor="let option of options; let i = index">
             <svg viewBox="0 0 100 100" class="slice-svg">
@@ -45,7 +44,7 @@ import { TutorialService } from '../../services/tutorial.service';
         <h3 class="bounce-in">¡{{ winner }}!</h3>
       </div>
 
-      <div class="options-manager" id="tour-roulette-options">
+      <div class="options-manager">
         <div class="section-title">Opciones de la Ruleta</div>
         
         <div class="options-list">
@@ -64,7 +63,7 @@ import { TutorialService } from '../../services/tutorial.service';
   `,
   styles: [`
     .roulette-content { --background: #fdf5f7; }
-    .header { text-align: center; padding: 20px 65px 10px; position: relative; }
+    .header { text-align: center; padding: calc(env(safe-area-inset-top) + 40px) 20px 10px; position: relative; }
     .back-btn { position: absolute; left: 20px; top: 20px; background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; z-index: 10; }
     .fill-btn { position: absolute; right: 20px; top: 20px; background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; z-index: 10; }
     .header h2 { color: #590D22; margin: 0 0 5px; font-weight: 800; font-size: 1.8rem; padding-top: 5px; }
@@ -103,21 +102,6 @@ import { TutorialService } from '../../services/tutorial.service';
     .add-option input { flex: 1; background: #f8f9fa; border: 1px solid rgba(0,0,0,0.05); border-radius: 12px; padding: 0 15px; font-size: 1rem; color: #333; outline: none; }
     .add-option input:focus { border-color: #FF4D6D; }
     .add-option button { width: 50px; height: 50px; border-radius: 12px; background: #FF4D6D; color: white; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; }
-
-    :host-context(body.night-owl-mode) .roulette-content { --background: #121212; }
-    :host-context(body.night-owl-mode) .header h2 { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .header p { color: #ccc; }
-    :host-context(body.night-owl-mode) .back-btn, :host-context(body.night-owl-mode) .fill-btn { background: #222; color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .winner-display h3 { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .options-manager { background: #1a1a1a; box-shadow: 0 -10px 20px rgba(0,0,0,0.5); }
-    :host-context(body.night-owl-mode) .section-title { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .option-item { background: #222; color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .delete-icon { color: #a78bfa; }
-    :host-context(body.night-owl-mode) .add-option input { background: #222; border-color: #333; color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .add-option input:focus { border-color: #a78bfa; }
-    :host-context(body.night-owl-mode) .add-option button { background: #a78bfa; }
-    :host-context(body.night-owl-mode) .spin-btn { background: #1a1a1a; border-color: #a78bfa; color: #a78bfa; }
-    :host-context(body.night-owl-mode) .roulette-wheel { border-color: #1a1a1a; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
   `]
 })
 export class RouletteWidgetComponent implements OnInit, OnDestroy {
@@ -125,7 +109,6 @@ export class RouletteWidgetComponent implements OnInit, OnDestroy {
   private toastCtrl = inject(ToastController);
   private location = inject(Location);
   private api = inject(LoveApiService);
-  private tutorialService = inject(TutorialService);
   
   options: string[] = ['Peli y Manta', 'Cena Fuera', 'Cocinar Juntos', 'Masajes', 'Noche de Juegos', 'Paseo Nocturno'];
   newOption = '';
@@ -142,13 +125,8 @@ export class RouletteWidgetComponent implements OnInit, OnDestroy {
     addIcons({ closeCircle, addCircleOutline, syncOutline, arrowBack });
   }
 
-  ngOnInit() {}
-
-  ionViewDidEnter() {
+  ngOnInit() {
     this.loadOptions();
-    setTimeout(() => {
-      this.tutorialService.showRouletteTour();
-    }, 500);
   }
 
   ngOnDestroy() {

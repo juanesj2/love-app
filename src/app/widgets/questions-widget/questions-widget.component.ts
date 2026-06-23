@@ -2,7 +2,6 @@ import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoveApiService } from '../../services/love-api.service';
-import { TutorialService } from '../../services/tutorial.service';
 import { IonIcon, ToastController, IonContent, IonRefresher, IonRefresherContent } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { helpCircleOutline, checkmarkCircleOutline, lockClosedOutline, alertCircleOutline, arrowBack, arrowUp } from 'ionicons/icons';
@@ -26,7 +25,7 @@ import { Location } from '@angular/common';
         </div>
       </div>
 
-      <div class="custom-toggle-container" id="tour-test-filters">
+      <div class="custom-toggle-container">
         <div class="toggle-pill" [class.active]="viewMode === 'pending'" (click)="viewMode = 'pending'">
           <ion-icon name="help-circle-outline"></ion-icon> Por responder
         </div>
@@ -122,8 +121,8 @@ import { Location } from '@angular/common';
       height: 100%;
     }
     .scroll-content { --background: transparent; }
-    .questions-container { padding: calc(env(safe-area-inset-top) + 85px) 20px 20px; background: #fff0f3; min-height: 100%; padding-bottom: 100px; box-sizing: border-box; }
-    .q-header { text-align: center; margin-bottom: 20px; position: relative; padding: 0 45px; }
+    .questions-container { padding: calc(env(safe-area-inset-top) + 40px) 20px 20px; background: #fff0f3; min-height: 100%; padding-bottom: 100px; box-sizing: border-box; }
+    .q-header { text-align: center; margin-bottom: 20px; position: relative; }
     .back-btn { position: absolute; left: 0; top: 0; background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; }
     .q-header h2 { color: #590D22; margin: 0 0 5px; font-weight: 800; font-size: 1.8rem; padding-top: 5px; }
     .q-header p { color: #a4133c; margin: 0; font-size: 0.95rem; }
@@ -166,28 +165,6 @@ import { Location } from '@angular/common';
     .scroll-top-btn { position: fixed; bottom: 30px; right: 20px; width: 50px; height: 50px; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4); cursor: pointer; z-index: 1000; opacity: 0; transform: translateY(20px) scale(0.8); pointer-events: none; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
     .scroll-top-btn.visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
     .scroll-top-btn:active { transform: scale(0.9); }
-
-    :host-context(body.night-owl-mode) .questions-container { background: #121212; }
-    :host-context(body.night-owl-mode) .q-header h2 { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .q-header p { color: #ccc; }
-    :host-context(body.night-owl-mode) .back-btn { background: #222; color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .progress-bar { background: rgba(255,255,255,0.1); }
-    :host-context(body.night-owl-mode) .progress-text { color: #c4b5fd; }
-    :host-context(body.night-owl-mode) .custom-toggle-container { background: rgba(30, 30, 30, 0.8); box-shadow: none; }
-    :host-context(body.night-owl-mode) .toggle-pill { color: #999; }
-    :host-context(body.night-owl-mode) .toggle-pill.active { background: #222; color: #a78bfa; }
-    :host-context(body.night-owl-mode) .category-pill { background: rgba(255, 255, 255, 0.1); color: #ccc; }
-    :host-context(body.night-owl-mode) .category-pill.active { background: #a78bfa; color: white; }
-    :host-context(body.night-owl-mode) .q-card { background: rgba(30,30,30, 0.85); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-    :host-context(body.night-owl-mode) .q-text { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .q-answer-box textarea { background: #1a1a1a; color: #fdfdfd; border-color: rgba(167,139,250,0.5); }
-    :host-context(body.night-owl-mode) .q-answer-box textarea::placeholder { color: #888; }
-    :host-context(body.night-owl-mode) .q-waiting { background: rgba(255,255,255,0.05); color: #bbb; }
-    :host-context(body.night-owl-mode) .answer-row { background: rgba(167,139,250, 0.1); }
-    :host-context(body.night-owl-mode) .answer-row.partner { background: rgba(167,139,250, 0.25); }
-    :host-context(body.night-owl-mode) .a-label { color: #c4b5fd; }
-    :host-context(body.night-owl-mode) .a-text { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .empty-state { color: #c4b5fd; }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonIcon, IonContent, IonRefresher, IonRefresherContent]
@@ -230,20 +207,13 @@ export class QuestionsWidgetComponent implements OnInit {
   private api = inject(LoveApiService);
   private toastCtrl = inject(ToastController);
   private location = inject(Location);
-  private tutorialService = inject(TutorialService);
 
   constructor() {
     addIcons({ helpCircleOutline, checkmarkCircleOutline, lockClosedOutline, alertCircleOutline, arrowBack, arrowUp });
   }
 
   ngOnInit() {
-  }
-
-  ionViewDidEnter() {
     this.loadQuestions();
-    setTimeout(() => {
-      this.tutorialService.showTestTour();
-    }, 500);
   }
 
   goBack() {
@@ -252,20 +222,9 @@ export class QuestionsWidgetComponent implements OnInit {
 
   async loadQuestions() {
     try {
-      const response: any = await this.api.getQuestions();
-      let q: any[] = [];
-      
-      if (Array.isArray(response)) {
-        q = response;
-      } else if (response && Array.isArray(response.data)) {
-        q = response.data;
-      } else if (response && typeof response === 'object') {
-        q = Object.values(response).find(val => Array.isArray(val)) as any[] || [];
-      }
-      this.questions = q;
+      this.questions = await this.api.getQuestions();
     } catch (e) {
       console.error(e);
-      this.questions = [];
     }
   }
 
