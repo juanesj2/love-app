@@ -828,7 +828,24 @@ import { debounceTime } from 'rxjs/operators';
       @keyframes particle-6 { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 35% { transform: translate(-35px, -15px) scale(0.6); opacity: 0.6; } 100% { transform: translate(-60px, 50px) scale(0); opacity: 0; } }
       @keyframes particle-7 { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 35% { transform: translate(35px, -15px) scale(0.6); opacity: 0.6; } 100% { transform: translate(60px, 50px) scale(0); opacity: 0; } }
       @keyframes particle-8 { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 45% { transform: translate(0, -35px) scale(0.6); opacity: 0.6; } 100% { transform: translate(0, 45px) scale(0); opacity: 0; } }
-  `],
+      
+      :host-context(body.night-owl-mode) .mas-container { background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%); }
+      :host-context(body.night-owl-mode) .glass-card { background: rgba(30, 30, 30, 0.85); border-color: rgba(255, 255, 255, 0.05); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+      :host-context(body.night-owl-mode) .title, :host-context(body.night-owl-mode) .section-title h3, :host-context(body.night-owl-mode) .food-info h4, :host-context(body.night-owl-mode) .movie-info h4 { color: #fdfdfd; text-shadow: none; }
+      :host-context(body.night-owl-mode) .subtitle, :host-context(body.night-owl-mode) .desc { color: #ccc; }
+      :host-context(body.night-owl-mode) .glass-input, :host-context(body.night-owl-mode) .glass-select { background: rgba(0,0,0,0.4); border-color: #333; color: #fdfdfd; color-scheme: dark; }
+      :host-context(body.night-owl-mode) .glass-input:focus { border-color: #a78bfa; background: #111; box-shadow: 0 4px 15px rgba(167,139,250,0.2); }
+      :host-context(body.night-owl-mode) .glass-btn { background: linear-gradient(135deg, #a78bfa, #8b5cf6); box-shadow: 0 4px 15px rgba(167,139,250,0.3); }
+      :host-context(body.night-owl-mode) .date-picker-glass label { color: #ccc; }
+      :host-context(body.night-owl-mode) .heart-pulse ion-icon, :host-context(body.night-owl-mode) .section-title ion-icon { color: #a78bfa; filter: drop-shadow(0 0 15px rgba(167,139,250,0.6)); background: rgba(167,139,250,0.1); }
+      :host-context(body.night-owl-mode) .time-block { background: rgba(0,0,0,0.5); border-color: #333; }
+      :host-context(body.night-owl-mode) .time-val { color: #fdfdfd; }
+      :host-context(body.night-owl-mode) .time-lbl { color: #a78bfa; }
+      :host-context(body.night-owl-mode) .food-card, :host-context(body.night-owl-mode) .movie-card { background: rgba(0,0,0,0.4); border-color: #333; }
+      :host-context(body.night-owl-mode) .add-btn { background: rgba(167,139,250,0.1); color: #a78bfa; border-color: rgba(167,139,250,0.3); }
+      :host-context(body.night-owl-mode) .modal-content.glass-card { background: rgba(30,30,30,0.95); }
+      :host-context(body.night-owl-mode) .modal-content h2 { color: #fdfdfd !important; }
+    `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonIcon, IonContent, IonRefresher, IonRefresherContent, IonSelect, IonSelectOption, IonSearchbar]
 })

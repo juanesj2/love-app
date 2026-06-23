@@ -165,6 +165,24 @@ import { Location } from '@angular/common';
     .scroll-top-btn { position: fixed; bottom: 30px; right: 20px; width: 50px; height: 50px; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4); cursor: pointer; z-index: 1000; opacity: 0; transform: translateY(20px) scale(0.8); pointer-events: none; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
     .scroll-top-btn.visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
     .scroll-top-btn:active { transform: scale(0.9); }
+
+    :host-context(body.night-owl-mode) .questions-container { background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%); }
+    :host-context(body.night-owl-mode) .glass-card { background: rgba(30, 30, 30, 0.85); border-color: rgba(255, 255, 255, 0.05); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+    :host-context(body.night-owl-mode) .title { color: #fdfdfd; text-shadow: none; }
+    :host-context(body.night-owl-mode) .subtitle { color: #ccc; }
+    :host-context(body.night-owl-mode) .glass-input { background: rgba(0,0,0,0.4); border-color: #333; color: #fdfdfd; }
+    :host-context(body.night-owl-mode) .glass-input:focus { border-color: #a78bfa; background: #111; box-shadow: 0 4px 15px rgba(167,139,250,0.2); }
+    :host-context(body.night-owl-mode) .glass-btn { background: linear-gradient(135deg, #a78bfa, #8b5cf6); box-shadow: 0 4px 15px rgba(167,139,250,0.3); }
+    :host-context(body.night-owl-mode) .question-card { background: rgba(0,0,0,0.4); border-color: #333; }
+    :host-context(body.night-owl-mode) .q-text { color: #fdfdfd; }
+    :host-context(body.night-owl-mode) .my-answer textarea { background: rgba(0,0,0,0.5); border-color: #444; color: #fdfdfd; }
+    :host-context(body.night-owl-mode) .my-answer textarea:focus { border-color: #a78bfa; background: #111; }
+    :host-context(body.night-owl-mode) .save-btn { background: rgba(167,139,250,0.1); color: #a78bfa; border-color: rgba(167,139,250,0.3); }
+    :host-context(body.night-owl-mode) .answered-state { background: rgba(0,0,0,0.3); border-color: #333; }
+    :host-context(body.night-owl-mode) .answer-text { color: #fdfdfd; }
+    :host-context(body.night-owl-mode) .empty-state h3 { color: #fdfdfd; }
+    :host-context(body.night-owl-mode) .empty-state p { color: #ccc; }
+    :host-context(body.night-owl-mode) .scroll-top-btn { background: linear-gradient(135deg, #a78bfa, #8b5cf6); box-shadow: 0 4px 15px rgba(167,139,250,0.4); }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonIcon, IonContent, IonRefresher, IonRefresherContent]
