@@ -35,7 +35,12 @@
                 "output": "assets"
               }
             ],
-            "styles": ["node_modules/leaflet/dist/leaflet.css", "src/global.scss", "src/theme/variables.scss"],
+            "styles": [
+              "node_modules/leaflet/dist/leaflet.css",
+              "node_modules/driver.js/dist/driver.css",
+              "src/global.scss",
+              "src/theme/variables.scss"
+            ],
             "scripts": [],
             "allowedCommonJsDependencies": [
               "leaflet"
@@ -112,7 +117,12 @@
                 "output": "assets"
               }
             ],
-            "styles": ["node_modules/leaflet/dist/leaflet.css", "src/global.scss", "src/theme/variables.scss"],
+            "styles": [
+              "node_modules/leaflet/dist/leaflet.css",
+              "node_modules/driver.js/dist/driver.css",
+              "src/global.scss",
+              "src/theme/variables.scss"
+            ],
             "scripts": []
           },
           "configurations": {

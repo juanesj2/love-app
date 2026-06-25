@@ -10,8 +10,9 @@ import { LoveApiService } from '../../services/love-api.service';
 import { Preferences } from '@capacitor/preferences';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { LocationService } from '../../services/location.service';
+import { TutorialService } from '../../services/tutorial.service';
 import { addIcons } from 'ionicons';
-import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline } from 'ionicons/icons';
+import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline, trophyOutline, sparklesOutline } from 'ionicons/icons';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
@@ -40,7 +41,7 @@ import { debounceTime } from 'rxjs/operators';
         </div>
 
         <!-- Nuestro Tiempo -->
-        <div class="glass-card" id="nuestro-tiempo">
+        <div class="glass-card" id="mas-nuestro-tiempo">
           <div class="section-title">
             <ion-icon name="time-outline"></ion-icon>
             <h3>Nuestro Tiempo Juntos</h3>
@@ -87,7 +88,7 @@ import { debounceTime } from 'rxjs/operators';
         </div>
 
         <!-- Próximos Eventos -->
-        <div class="glass-card">
+        <div class="glass-card" id="mas-eventos">
           <div class="section-title">
             <ion-icon name="calendar"></ion-icon>
             <h3>Próximos Eventos Especiales</h3>
@@ -131,7 +132,7 @@ import { debounceTime } from 'rxjs/operators';
         </div>
 
         <!-- Hitos -->
-        <div class="glass-card">
+        <div class="glass-card" id="mas-hitos">
           <div class="section-title">
             <ion-icon name="flag-outline"></ion-icon>
             <h3>Hitos Importantes</h3>
@@ -157,7 +158,7 @@ import { debounceTime } from 'rxjs/operators';
         </div>
 
         <!-- Cubo de Deseos -->
-        <div class="glass-card">
+        <div class="glass-card" id="mas-deseos">
           <div class="section-title">
             <ion-icon name="star-outline"></ion-icon>
             <h3>Cubo de Deseos</h3>
@@ -180,8 +181,14 @@ import { debounceTime } from 'rxjs/operators';
 
         <!-- Quick Actions Grid -->
         <div class="quick-actions-grid">
+          <!-- Logros y Secretos (Spans full width) -->
+          <div class="grid-card full-width interactive" id="mas-logros" (click)="goTo('achievements')">
+            <h4><ion-icon name="trophy-outline" class="text-pink"></ion-icon> Logros y Secretos</h4>
+            <p style="margin: 0; font-size: 0.85rem; color: #a4133c; font-weight: 500;">Descubre y desbloquea los secretitos de la app.</p>
+          </div>
+
           <!-- Widget Config (Spans full width) -->
-          <div class="grid-card full-width">
+          <div class="grid-card full-width" id="mas-coleccion">
             <h4><ion-icon name="settings-outline" class="text-pink"></ion-icon> Colección del Widget</h4>
             <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedAlbumId" (ionChange)="saveSelectedAlbum()" class="glass-select" style="--padding-start: 16px; --padding-end: 16px; --padding-top: 14px; --padding-bottom: 14px;">
               <ion-select-option value="feed">Todas las fotos</ion-select-option>
@@ -190,7 +197,7 @@ import { debounceTime } from 'rxjs/operators';
           </div>
 
           <!-- Tour Gastronómico -->
-          <div class="grid-card interactive" (click)="isFoodListModalOpen = true">
+          <div class="grid-card interactive" id="mas-gastro" (click)="openGastroModal()">
             <div class="icon-circle" style="background: linear-gradient(135deg, #FF9A9E, #FECFEF); box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3); color: #c9184a;">
               <ion-icon name="restaurant-outline"></ion-icon>
             </div>
@@ -199,7 +206,7 @@ import { debounceTime } from 'rxjs/operators';
           </div>
 
           <!-- Cine en Pareja -->
-          <div class="grid-card interactive" (click)="isMovieListModalOpen = true">
+          <div class="grid-card interactive" id="mas-cine" (click)="openCineModal()">
             <div class="icon-circle" style="background: linear-gradient(135deg, #a2d2ff, #bde0fe); box-shadow: 0 4px 15px rgba(162, 210, 255, 0.3); color: #023e8a;">
               <ion-icon name="film-outline"></ion-icon>
             </div>
@@ -208,7 +215,7 @@ import { debounceTime } from 'rxjs/operators';
           </div>
 
           <!-- Minijuego -->
-          <div class="grid-card interactive" (click)="openGame()">
+          <div class="grid-card interactive" id="mas-test" (click)="openGame()">
             <div class="icon-circle bg-purple">
               <ion-icon name="game-controller-outline"></ion-icon>
             </div>
@@ -321,9 +328,9 @@ import { debounceTime } from 'rxjs/operators';
             <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="restaurant-outline"></ion-icon> Tour Gastronómico</h2>
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Restaurantes y platos que hemos probado</p>
             
-            <ion-searchbar animated="true" [(ngModel)]="searchQueryFoodPlaces" placeholder="Buscar restaurante..." class="custom-searchbar" style="--border-radius: 14px; --background: rgba(255,255,255,0.8); --box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 0; margin-bottom: 15px;"></ion-searchbar>
+            <ion-searchbar id="gastro-search" animated="true" [(ngModel)]="searchQueryFoodPlaces" placeholder="Buscar restaurante..." class="custom-searchbar" style="--border-radius: 14px; --background: rgba(255,255,255,0.8); --box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 0; margin-bottom: 15px;"></ion-searchbar>
 
-            <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
+            <div id="gastro-filters" style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
               <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedFoodCategory" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todas las categorías">
                 <ion-select-option value="">Todas las categorías</ion-select-option>
                 <ion-select-option *ngFor="let cat of foodCategories" [value]="cat">{{ cat }}</ion-select-option>
@@ -334,7 +341,7 @@ import { debounceTime } from 'rxjs/operators';
               </button>
             </div>
             
-            <div style="max-height: 35vh; overflow-y: auto; overflow-x: hidden; padding-right: 5px; margin-bottom: 20px;">
+            <div id="gastro-list" style="max-height: 35vh; overflow-y: auto; overflow-x: hidden; padding-right: 5px; margin-bottom: 20px;">
               <div class="food-places-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
               <div class="food-place-item" *ngFor="let place of filteredFoodPlaces" (click)="openFoodPlaceModal(place)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
                 
@@ -355,7 +362,7 @@ import { debounceTime } from 'rxjs/operators';
               </div>
             </div>
             
-            <button class="glass-btn" style="width: 100%; margin-bottom: 10px;" (click)="openAddFoodPlaceModal()">
+            <button id="gastro-add" class="glass-btn" style="width: 100%; margin-bottom: 10px;" (click)="openAddFoodPlaceModal()">
               <ion-icon name="add-circle-outline"></ion-icon> Añadir Restaurante
             </button>
             <button class="glass-btn" style="width: 100%; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="isFoodListModalOpen = false">Cerrar</button>
@@ -363,14 +370,14 @@ import { debounceTime } from 'rxjs/operators';
         </div>
 
         <!-- Movies List Modal -->
-        <div class="custom-overlay" *ngIf="isMovieListModalOpen" (click)="isMovieListModalOpen = false">
+        <div class="custom-overlay" id="cine-modal" *ngIf="isMovieListModalOpen" (click)="isMovieListModalOpen = false">
           <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 85vh; overflow-y: hidden;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="film-outline"></ion-icon> Cine en Pareja</h2>
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Películas y series que vemos juntos</p>
             
-            <ion-searchbar animated="true" [(ngModel)]="searchQueryMovies" placeholder="Buscar pel�cula o serie..." class="custom-searchbar" style="--border-radius: 14px; --background: rgba(255,255,255,0.8); --box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 0; margin-bottom: 15px;"></ion-searchbar>
+            <ion-searchbar id="cine-search" animated="true" [(ngModel)]="searchQueryMovies" placeholder="Buscar película o serie..." class="custom-searchbar" style="--border-radius: 14px; --background: rgba(255,255,255,0.8); --box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 0; margin-bottom: 15px;"></ion-searchbar>
 
-            <div style="display: flex; gap: 10px; margin-bottom: 15px; width: 100%;">
+            <div id="cine-filters" style="display: flex; gap: 10px; margin-bottom: 15px; width: 100%;">
               <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedMovieGenre" class="glass-input" style="flex: 1; margin: 0; border: 2px solid #FF4D6D; background: white; font-weight: 600; color: #590D22; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todas las categorías">
                 <ion-select-option value="">Todas las categorías</ion-select-option>
                 <ion-select-option *ngFor="let cat of movieGenres" [value]="cat">{{ cat }}</ion-select-option>
@@ -380,7 +387,7 @@ import { debounceTime } from 'rxjs/operators';
               </button>
             </div>
             
-            <div style="max-height: 35vh; overflow-y: auto; overflow-x: hidden; padding-right: 5px; margin-bottom: 20px;">
+            <div id="cine-list" style="max-height: 35vh; overflow-y: auto; overflow-x: hidden; padding-right: 5px; margin-bottom: 20px;">
               <div class="movies-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
               <div class="movie-item" *ngFor="let movie of filteredMovies" (click)="openMovieModal(movie)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
                 <div *ngIf="movie.is_favorite" style="position: absolute; top: 8px; left: 8px; width: 26px; height: 26px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5;"><ion-icon name="heart" style="font-size: 1.1rem; color: #FF4D6D;"></ion-icon></div>
@@ -396,7 +403,7 @@ import { debounceTime } from 'rxjs/operators';
               </div>
             </div>
             
-            <button class="glass-btn" style="width: 100%; margin-bottom: 10px;" (click)="isAddingMovie = true">
+            <button id="cine-add" class="glass-btn" style="width: 100%; margin-bottom: 10px;" (click)="openAddMovieModal()">
               <ion-icon name="add-circle-outline"></ion-icon> Añadir Película/Serie
             </button>
             <button class="glass-btn" style="width: 100%; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="isMovieListModalOpen = false">Cerrar</button>
@@ -419,14 +426,14 @@ import { debounceTime } from 'rxjs/operators';
               <ion-icon name="camera-outline"></ion-icon> Añadir Foto
             </button>
             
-            <input type="text" placeholder="Nombre del sitio" [(ngModel)]="newFoodPlace.name" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
-            <input type="text" placeholder="Ubicación (ej: Madrid)" [(ngModel)]="newFoodPlace.location" (ngModelChange)="onLocationChange($event)" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
+            <input id="gastro-add-name" type="text" placeholder="Nombre del sitio" [(ngModel)]="newFoodPlace.name" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
+            <input id="gastro-add-location" type="text" placeholder="Ubicación (ej: Madrid)" [(ngModel)]="newFoodPlace.location" (ngModelChange)="onLocationChange($event)" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
             <div *ngIf="previewMapUrl" style="width: 100%; height: 150px; border-radius: 12px; overflow: hidden; margin-bottom: 10px;">
               <iframe [src]="previewMapUrl" width="100%" height="100%" frameborder="0" style="border:0;" allowfullscreen></iframe>
             </div>
             
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-              <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="newFoodPlace.category" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 14px; --padding-bottom: 14px;" placeholder="(Sin categoría)">
+              <ion-select id="gastro-add-category" interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="newFoodPlace.category" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 14px; --padding-bottom: 14px;" placeholder="(Sin categoría)">
                 <ion-select-option value="">(Sin categoría)</ion-select-option>
                 <ion-select-option *ngFor="let cat of foodCategories" [value]="cat">{{ cat }}</ion-select-option>
               </ion-select>
@@ -436,11 +443,11 @@ import { debounceTime } from 'rxjs/operators';
               </button>
             </div>
             
-            <textarea placeholder="¿Qué tal estaba? Plato estrella, etc." [(ngModel)]="newFoodPlace.description" class="glass-input" style="width: 100%; min-height: 80px; margin-bottom: 10px; resize: vertical;"></textarea>
+            <textarea id="gastro-add-desc" placeholder="¿Qué tal estaba? Plato estrella, etc." [(ngModel)]="newFoodPlace.description" class="glass-input" style="width: 100%; min-height: 80px; margin-bottom: 10px; resize: vertical;"></textarea>
             
             <div style="margin-bottom: 20px;">
               <p style="margin: 0 0 5px; color: #a4133c; font-weight: 600;">Puntuación:</p>
-              <div style="display: flex; justify-content: center; gap: 5px;">
+              <div id="gastro-add-rating" style="display: flex; justify-content: center; gap: 5px;">
                 <label title="Star" class="star" [class.is-active]="s <= newFoodPlace.rating" *ngFor="let s of [1,2,3,4,5]" (click)="newFoodPlace.rating = s; $event.preventDefault()">
                   <div class="svg-container">
                     <svg xmlns="http://www.w3.org/2000/svg" class="svg-outline" viewBox="0 0 24 24"><path d="M12 2.5L9.45 8.5L3 9.06L7.725 13.39L6.25 19.82L12 16.5L17.75 19.82L16.275 13.39L21 9.06L14.55 8.5L12 2.5ZM12 4.75L14 9.33L18.7 9.75L15 13.07L16.18 17.75L12 15.16L7.82 17.75L9 13.07L5.3 9.75L10 9.33L12 4.75Z"></path></svg>
@@ -571,11 +578,11 @@ import { debounceTime } from 'rxjs/operators';
               <ion-icon name="camera-outline"></ion-icon> Cartel / Foto
             </button>
             
-            <input type="text" placeholder="Título" [(ngModel)]="newMovie.title" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
-            <textarea placeholder="¿De qué iba la peli/serie?" [(ngModel)]="newMovie.description" class="glass-input" style="width: 100%; min-height: 60px; margin-bottom: 10px; resize: vertical;"></textarea>
+            <input id="cine-add-name" type="text" placeholder="Título" [(ngModel)]="newMovie.title" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
+            <textarea id="cine-add-desc" placeholder="¿De qué iba la peli/serie?" [(ngModel)]="newMovie.description" class="glass-input" style="width: 100%; min-height: 60px; margin-bottom: 10px; resize: vertical;"></textarea>
             
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-              <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="newMovie.genre" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 14px; --padding-bottom: 14px;" placeholder="(Sin categoría)">
+              <ion-select id="cine-add-category" interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="newMovie.genre" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 14px; --padding-bottom: 14px;" placeholder="(Sin categoría)">
                 <ion-select-option value="">(Sin categoría)</ion-select-option>
                 <ion-select-option *ngFor="let cat of movieGenres" [value]="cat">{{ cat }}</ion-select-option>
               </ion-select>
@@ -585,11 +592,11 @@ import { debounceTime } from 'rxjs/operators';
               </button>
             </div>
             <input *ngIf="showWhoFellAsleep" type="text" placeholder="¿Quién se quedó dormido primero?" [(ngModel)]="newMovie.who_fell_asleep" class="glass-input" style="width: 100%; margin-bottom: 10px;" />
-            <textarea placeholder="Nuestra frase favorita / Momento top" [(ngModel)]="newMovie.favorite_quote" class="glass-input" style="width: 100%; min-height: 80px; margin-bottom: 10px; resize: vertical;"></textarea>
+            <textarea id="cine-add-quote" placeholder="Nuestra frase favorita / Momento top" [(ngModel)]="newMovie.favorite_quote" class="glass-input" style="width: 100%; min-height: 80px; margin-bottom: 10px; resize: vertical;"></textarea>
             
             <div style="margin-bottom: 20px;">
               <p style="margin: 0 0 5px; color: #a4133c; font-weight: 600;">Puntuación:</p>
-              <div style="display: flex; justify-content: center; gap: 5px;">
+              <div id="cine-add-rating" style="display: flex; justify-content: center; gap: 5px;">
                 <label title="Star" class="star" [class.is-active]="s <= newMovie.rating" *ngFor="let s of [1,2,3,4,5]" (click)="newMovie.rating = s; $event.preventDefault()">
                   <div class="svg-container">
                     <svg xmlns="http://www.w3.org/2000/svg" class="svg-outline" viewBox="0 0 24 24"><path d="M12 2.5L9.45 8.5L3 9.06L7.725 13.39L6.25 19.82L12 16.5L17.75 19.82L16.275 13.39L21 9.06L14.55 8.5L12 2.5ZM12 4.75L14 9.33L18.7 9.75L15 13.07L16.18 17.75L12 15.16L7.82 17.75L9 13.07L5.3 9.75L10 9.33L12 4.75Z"></path></svg>
@@ -870,6 +877,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   private alertCtrl = inject(AlertController);
   private locationService = inject(LocationService);
   private sanitizer = inject(DomSanitizer);
+  private tutorialService = inject(TutorialService);
 
   isMapModalOpen = false;
   safeMapUrl: SafeResourceUrl | null = null;
@@ -988,7 +996,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   }
 
   constructor() {
-    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, add, pencilOutline, locationOutline, restaurantOutline, filmOutline, star, cameraOutline });
+    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, add, pencilOutline, locationOutline, restaurantOutline, filmOutline, star, cameraOutline, trophyOutline, sparklesOutline });
   }
 
   async ngOnInit() {
@@ -1144,6 +1152,16 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
   async loadMilestones() {
     this.milestones = await this.api.getMilestones();
+  }
+
+  async openGastroModal() {
+    this.isFoodListModalOpen = true;
+    setTimeout(() => this.tutorialService.showGastroTour(), 600);
+  }
+
+  openCineModal() {
+    this.isMovieListModalOpen = true;
+    setTimeout(() => this.tutorialService.showCineTour(), 600);
   }
 
   async handleRefresh(event: any) {
@@ -1525,6 +1543,10 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     this.router.navigate(['/login']);
   }
 
+  goTo(path: string) {
+    this.router.navigate(['/' + path]);
+  }
+
   // --- FOOD PLACES & MOVIES API LOGIC ---
   async loadFoodAndMovies() {
     try {
@@ -1573,6 +1595,13 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     this.newFoodPlace = { name: '', location: '', description: '', rating: 5, category: '', is_favorite: false, imageBase64: null };
     this.previewMapUrl = null;
     this.isAddingFoodPlace = true;
+    setTimeout(() => this.tutorialService.showGastroAddTour(), 600);
+  }
+
+  openAddMovieModal() {
+    this.newMovie = { title: '', description: '', rating: 5, genre: '', who_fell_asleep: '', favorite_quote: '', is_favorite: false, imageBase64: null };
+    this.isAddingMovie = true;
+    setTimeout(() => this.tutorialService.showCineAddTour(), 600);
   }
 
   editFoodPlace(place: any) {

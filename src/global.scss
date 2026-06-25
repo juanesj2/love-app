@@ -339,3 +339,93 @@ ion-tab-bar::part(native) {
 .tabbar {
   box-shadow: none !important;
 }
+
+/* -----------------------------------------------------
+ * Tutorial (driver.js) Premium Custom Styling
+ * ----------------------------------------------------- */
+.driver-popover {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border-radius: 20px !important;
+  border: 1px solid rgba(255, 77, 109, 0.2) !important;
+  box-shadow: 0 12px 40px rgba(255, 77, 109, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+  padding: 20px !important;
+  color: #590D22 !important;
+  font-family: inherit !important;
+  max-width: 340px !important;
+}
+
+.driver-popover-title {
+  font-weight: 800 !important;
+  font-size: 1.35rem !important;
+  color: #FF4D6D !important;
+  margin-bottom: 10px !important;
+}
+
+.driver-popover-description {
+  font-size: 1.05rem !important;
+  color: #a4133c !important;
+  line-height: 1.5 !important;
+  font-weight: 500 !important;
+}
+
+/* Footer que contiene los botones y el progreso */
+.driver-popover-footer {
+  margin-top: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.driver-popover-progress-text {
+  color: #ff8fa3 !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+}
+
+/* Estilo Base Botones */
+.driver-popover-footer button {
+  border-radius: 12px !important;
+  padding: 8px 16px !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  text-shadow: none !important;
+  transition: all 0.2s ease !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+
+/* Botón Siguiente / Empezar */
+.driver-popover-next-btn {
+  background: linear-gradient(135deg, #FF4D6D, #c9184a) !important;
+  color: white !important;
+  box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3) !important;
+}
+
+.driver-popover-next-btn:active {
+  transform: scale(0.95) !important;
+  box-shadow: 0 2px 8px rgba(255, 77, 109, 0.2) !important;
+}
+
+/* Botón Atrás / Cerrar */
+.driver-popover-prev-btn, .driver-popover-close-btn {
+  background: rgba(255, 77, 109, 0.1) !important;
+  color: #c9184a !important;
+  margin-right: 10px !important;
+}
+
+.driver-popover-prev-btn:active, .driver-popover-close-btn:active {
+  background: rgba(255, 77, 109, 0.2) !important;
+}
+
+/* Botón de cerrar de la esquina (X) */
+.driver-popover-close-btn.driver-popover-close-btn-top {
+  background: transparent !important;
+  color: #ffb3c1 !important;
+  font-size: 1.5rem !important;
+  top: 10px !important;
+  right: 10px !important;
+  padding: 5px !important;
+}
+

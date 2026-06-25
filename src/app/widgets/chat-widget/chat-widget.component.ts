@@ -25,7 +25,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
           <ng-container *ngIf="graffitisByAnchorId[msg.id]">
             <ng-container *ngFor="let graf of graffitisByAnchorId[msg.id]">
               <img *ngIf="!hiddenGraffitis[graf.id]"
-                   [src]="environment.storageUrl + graf.photo?.image_path" 
+                   [src]="environment.storageUrl + (graf.custom_image_path || graf.photo?.image_path)" 
                    class="graffiti-overlay" 
                    (touchstart)="startGraffitiPress(graf, $event)"
                    (mousedown)="startGraffitiPress(graf, $event)"
@@ -289,7 +289,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
     <!-- Graffiti Context Menu Overlay -->
     <div class="graffiti-context-overlay" *ngIf="selectedGraffiti" (click)="closeGraffitiOptions()">
       <!-- Resaltar el graffiti seleccionado -->
-      <img [src]="environment.storageUrl + selectedGraffiti.photo?.image_path" 
+      <img [src]="environment.storageUrl + (selectedGraffiti.custom_image_path || selectedGraffiti.photo?.image_path)" 
            class="highlighted-graffiti"
            [style.left.px]="graffitiRect.left"
            [style.top.px]="graffitiRect.top"
@@ -669,7 +669,12 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
           msg.offsetX = parseInt(parts[2], 10);
           msg.offsetY = parseInt(parts[3], 10);
           msg.width = parseInt(parts[4], 10);
-          msg.height = parseInt(parts[5].replace(']', ''), 10);
+          if (parts.length >= 7) {
+            msg.height = parseInt(parts[5], 10);
+            msg.custom_image_path = parts[6].replace(']', '');
+          } else {
+            msg.height = parseInt(parts[5].replace(']', ''), 10);
+          }
           
           if (!this.graffitisByAnchorId[msg.anchorMsgId]) {
             this.graffitisByAnchorId[msg.anchorMsgId] = [];
@@ -977,8 +982,9 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       const description = `[GRAFFITI:${anchorMsgId}:${Math.round(offsetX)}:${Math.round(offsetY)}:${cropResult.w}:${cropResult.h}]`;
       const res = await this.api.uploadPhoto(file, description);
       if (res && res.photo && res.photo.id) {
+        const messageContent = `[GRAFFITI:${anchorMsgId}:${Math.round(offsetX)}:${Math.round(offsetY)}:${cropResult.w}:${cropResult.h}:${res.photo.image_path}]`;
         const replyPayload = this.replyingTo ? { id: this.replyingTo.id, user: this.replyingTo.user?.name, text: '🎨 Graffiti' } : undefined;
-        await this.api.sendMessage(description, res.photo.id, replyPayload);
+        await this.api.sendMessage(messageContent, undefined, replyPayload);
         this.replyingTo = null;
         await this.loadMessages();
         this.safeTimeout(() => this.scrollToBottom(), 100);

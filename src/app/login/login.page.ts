@@ -55,6 +55,14 @@ export class LoginPage implements OnInit {
   }
 
   async ngOnInit() {
+    try {
+      await GoogleSignIn.initialize({
+        clientId: '292953977993-6528i8ggjvsporn2kq5fjvmoa6td1a9c.apps.googleusercontent.com',
+      });
+    } catch (e) {
+      console.log('Error initializing GoogleSignIn', e);
+    }
+
     // Manejar callback de Google en Web si redirige con parámetros state/code
     if (window.location.search.includes('state=')) {
       try {

@@ -12,7 +12,20 @@
           "package_name": "com.juanesj2.lovewidget"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "292953977993-jm1koo4l75li55k0mnnsjktb2rnltt96.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.juanesj2.lovewidget",
+            "certificate_hash": "df1c7fd073501d021f15cd481d41f04e8818baea"
+          }
+        },
+        {
+          "client_id": "292953977993-6528i8ggjvsporn2kq5fjvmoa6td1a9c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAVj3NrWKBjApNK4z25EDvO1b4jViSH5y8"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "292953977993-6528i8ggjvsporn2kq5fjvmoa6td1a9c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

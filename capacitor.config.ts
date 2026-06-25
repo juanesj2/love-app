@@ -14,8 +14,11 @@ const config: CapacitorConfig = {
       showSpinner: false
     },
     GoogleSignIn: {
-      clientId: '598297080553-h6sfq42rfibl91g88usbaqb91r56gbbp.apps.googleusercontent.com',
+      clientId: '292953977993-6528i8ggjvsporn2kq5fjvmoa6td1a9c.apps.googleusercontent.com',
       forceCodeForRefreshToken: true,
+    },
+    CapacitorHttp: {
+      enabled: true,
     }
   }
 };

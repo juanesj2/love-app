@@ -256,6 +256,9 @@ export class TutorialService {
             description: 'Aquí podéis ver cuánto tiempo lleváis juntos y configurar las fechas de vuestros cumpleaños.',
             side: 'bottom',
             align: 'center'
+          },
+          onHighlightStarted: () => {
+            document.querySelector('#mas-nuestro-tiempo')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         },
         {
@@ -265,6 +268,9 @@ export class TutorialService {
             description: 'Llevamos la cuenta atrás de vuestro aniversario, cumpleaños y días como San Valentín automáticamente.',
             side: 'top',
             align: 'center'
+          },
+          onHighlightStarted: () => {
+            document.querySelector('#mas-eventos')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         },
         {
@@ -274,6 +280,9 @@ export class TutorialService {
             description: '¿Vuestro primer viaje? ¿El día que adoptasteis al gato? Añadid aquí vuestras fechas especiales.',
             side: 'top',
             align: 'center'
+          },
+          onHighlightStarted: () => {
+            document.querySelector('#mas-hitos')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         },
         {
@@ -283,6 +292,9 @@ export class TutorialService {
             description: 'Una lista compartida con todo lo que soñáis hacer juntos. ¡Marcadlos cuando los cumpláis!',
             side: 'top',
             align: 'center'
+          },
+          onHighlightStarted: () => {
+            document.querySelector('#mas-deseos')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         },
         {
@@ -292,6 +304,9 @@ export class TutorialService {
             description: 'Elige qué álbum de fotos quieres que aparezca en el widget de inicio de tu móvil.',
             side: 'top',
             align: 'center'
+          },
+          onHighlightStarted: () => {
+            document.querySelector('#mas-coleccion')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         },
         {
@@ -301,6 +316,9 @@ export class TutorialService {
             description: 'Guardad vuestros restaurantes favoritos o los que queréis probar en el futuro.',
             side: 'top',
             align: 'center'
+          },
+          onHighlightStarted: () => {
+            document.querySelector('#mas-gastro')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         },
         {
@@ -310,6 +328,9 @@ export class TutorialService {
             description: 'Haced una lista de las pelis y series pendientes para que no haya peleas al elegir.',
             side: 'top',
             align: 'center'
+          },
+          onHighlightStarted: () => {
+            document.querySelector('#mas-cine')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         },
         {
@@ -319,6 +340,9 @@ export class TutorialService {
             description: 'Un minijuego divertido para ver cuánto os conocéis.',
             side: 'top',
             align: 'center'
+          },
+          onHighlightStarted: () => {
+            document.querySelector('#mas-test')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         }
       ],
@@ -606,6 +630,238 @@ export class TutorialService {
       ],
       onDestroyed: () => {
         this.markTutorialAsSeen('roulette_tour');
+      }
+    });
+
+    tour.drive();
+  }
+  public async showGastroTour() {
+    if (await this.hasSeenTutorial('gastro_tour')) return;
+
+    const tour = driver({
+      showProgress: true,
+      doneBtnText: '¡A comer!',
+      nextBtnText: 'Siguiente',
+      prevBtnText: 'Atrás',
+      steps: [
+        {
+          element: '#gastro-search',
+          popover: {
+            title: 'Búsqueda rápida 🔍',
+            description: 'Encuentra tus restaurantes favoritos en un segundo por su nombre.',
+            side: 'bottom',
+            align: 'start'
+          }
+        },
+        {
+          element: '#gastro-filters',
+          popover: {
+            title: 'Filtros mágicos ✨',
+            description: 'Filtra por categoría de comida o muestra solo tus lugares favoritos tocando el corazón.',
+            side: 'bottom',
+            align: 'start'
+          }
+        },
+        {
+          element: '#gastro-list',
+          popover: {
+            title: 'Tu colección 🍽️',
+            description: 'Aquí aparecerán los restaurantes. Toca en ellos para ver detalles y los platos que habéis probado.',
+            side: 'top',
+            align: 'center'
+          }
+        },
+        {
+          element: '#gastro-add',
+          popover: {
+            title: 'Añadir restaurante 🍔',
+            description: 'Guarda los sitios a los que vayáis para no olvidarlos nunca y dales una puntuación.',
+            side: 'top',
+            align: 'center'
+          }
+        }
+      ],
+      onDestroyed: () => {
+        this.markTutorialAsSeen('gastro_tour');
+      }
+    });
+
+    tour.drive();
+  }
+
+  public async showCineTour() {
+    if (await this.hasSeenTutorial('cine_tour')) return;
+
+    const tour = driver({
+      showProgress: true,
+      doneBtnText: '¡Acción! 🎬',
+      nextBtnText: 'Siguiente',
+      prevBtnText: 'Atrás',
+      steps: [
+        {
+          element: '#cine-search',
+          popover: {
+            title: 'Buscador de pelis 🍿',
+            description: 'Encuentra rápidamente esa película o serie que queréis ver o ya habéis visto.',
+            side: 'bottom',
+            align: 'start'
+          }
+        },
+        {
+          element: '#cine-filters',
+          popover: {
+            title: 'Categorías y Favoritos ⭐',
+            description: 'Filtra por género o selecciona el corazón para ver vuestras obras maestras preferidas.',
+            side: 'bottom',
+            align: 'start'
+          }
+        },
+        {
+          element: '#cine-list',
+          popover: {
+            title: 'Nuestra Cartelera 📺',
+            description: 'Todas vuestras pelis y series guardadas. ¡Incluso podréis apuntar quién se quedó dormido primero!',
+            side: 'top',
+            align: 'center'
+          }
+        },
+        {
+          element: '#cine-add',
+          popover: {
+            title: 'Nueva Peli/Serie 🎥',
+            description: 'Añadid vuestras próximas películas a ver o las que acabáis de terminar.',
+            side: 'top',
+            align: 'center'
+          }
+        }
+      ],
+      onDestroyed: () => {
+        this.markTutorialAsSeen('cine_tour');
+      }
+    });
+
+    tour.drive();
+  }
+  public async showGastroAddTour() {
+    if (await this.hasSeenTutorial('gastro_add_tour')) return;
+
+    const tour = driver({
+      showProgress: true,
+      doneBtnText: '¡A puntuar!',
+      nextBtnText: 'Siguiente',
+      prevBtnText: 'Atrás',
+      steps: [
+        {
+          element: '#gastro-add-name',
+          popover: {
+            title: 'Nombre del sitio 📝',
+            description: '¿Cómo se llama este templo de la comida?',
+            side: 'bottom',
+            align: 'start'
+          }
+        },
+        {
+          element: '#gastro-add-location',
+          popover: {
+            title: 'Ubicación 📍',
+            description: 'Pon la ciudad o el barrio, así sabréis adónde volver cuando haya hambre.',
+            side: 'bottom',
+            align: 'start'
+          }
+        },
+        {
+          element: '#gastro-add-category',
+          popover: {
+            title: 'Categoría 🌮',
+            description: '¿Es comida italiana, mexicana, o un kebab de madrugada?',
+            side: 'top',
+            align: 'start'
+          }
+        },
+        {
+          element: '#gastro-add-desc',
+          popover: {
+            title: 'La reseña ✍️',
+            description: 'Apunta qué pedisteis, qué plato es la estrella y si merece la pena volver.',
+            side: 'top',
+            align: 'center'
+          }
+        },
+        {
+          element: '#gastro-add-rating',
+          popover: {
+            title: 'Veredicto final ⭐',
+            description: '¿Le dais 5 estrellas Michelin o se queda en 1?',
+            side: 'top',
+            align: 'center'
+          }
+        }
+      ],
+      onDestroyed: () => {
+        this.markTutorialAsSeen('gastro_add_tour');
+      }
+    });
+
+    tour.drive();
+  }
+
+  public async showCineAddTour() {
+    if (await this.hasSeenTutorial('cine_add_tour')) return;
+
+    const tour = driver({
+      showProgress: true,
+      doneBtnText: '¡Guardar peli!',
+      nextBtnText: 'Siguiente',
+      prevBtnText: 'Atrás',
+      steps: [
+        {
+          element: '#cine-add-name',
+          popover: {
+            title: 'Título 🎬',
+            description: 'El nombre de la peli o serie que os acaba de robar el tiempo.',
+            side: 'bottom',
+            align: 'start'
+          }
+        },
+        {
+          element: '#cine-add-desc',
+          popover: {
+            title: 'Sinopsis 📜',
+            description: '¿De qué iba? Resumidlo a vuestra manera.',
+            side: 'bottom',
+            align: 'start'
+          }
+        },
+        {
+          element: '#cine-add-category',
+          popover: {
+            title: 'Género 🎭',
+            description: 'Romántica, terror, o "no sé de qué iba pero me he reído".',
+            side: 'top',
+            align: 'start'
+          }
+        },
+        {
+          element: '#cine-add-quote',
+          popover: {
+            title: 'Momento Top 💬',
+            description: 'Aquella frase mítica que os hizo reír o llorar.',
+            side: 'top',
+            align: 'center'
+          }
+        },
+        {
+          element: '#cine-add-rating',
+          popover: {
+            title: 'Puntuación ⭐',
+            description: '¿Ha sido un peliculón o un tostón infumable?',
+            side: 'top',
+            align: 'center'
+          }
+        }
+      ],
+      onDestroyed: () => {
+        this.markTutorialAsSeen('cine_add_tour');
       }
     });
 
