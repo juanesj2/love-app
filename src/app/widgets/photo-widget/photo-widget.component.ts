@@ -57,9 +57,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
             <button class="header-icon-btn" (click)="openAlbumOptions()">
               <ion-icon name="settings-outline"></ion-icon>
             </button>
-            <button class="header-icon-btn" (click)="activateSelectionMode()" *ngIf="photos.length > 0">
-              <ion-icon name="checkmark-done-outline"></ion-icon>
-            </button>
+
             <button class="header-upload-btn" (click)="uploadNewPhoto()">
               <ion-icon name="add"></ion-icon>
             </button>
