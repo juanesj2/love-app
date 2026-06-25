@@ -93,8 +93,8 @@ import { debounceTime } from 'rxjs/operators';
             <h3>Próximos Eventos Especiales</h3>
           </div>
           
-          <div class="milestone-list" *ngIf="annualEvents.length > 0">
-            <div class="milestone-item" *ngFor="let ev of annualEvents" (click)="openEventModal(ev)">
+          <div class="milestone-list" *ngIf="visibleEvents.length > 0">
+            <div class="milestone-item" *ngFor="let ev of visibleEvents" (click)="openEventModal(ev)">
               <ion-icon [name]="ev.icon" class="event-icon text-pink"></ion-icon>
               <div class="milestone-info" style="margin-left: 10px;">
                 <span class="m-title">{{ ev.name }}</span>
@@ -104,9 +104,16 @@ import { debounceTime } from 'rxjs/operators';
               <div class="m-days" *ngIf="ev.daysLeft === 0">¡Hoy!</div>
             </div>
           </div>
-          <div *ngIf="annualEvents.length === 0" style="text-align: center; color: #888; padding: 15px 0;">
+          
+          <div *ngIf="visibleEvents.length === 0" style="text-align: center; color: #888; padding: 15px 0;">
             <ion-icon name="calendar-clear-outline" style="font-size: 2rem; opacity: 0.5;"></ion-icon>
             <p style="margin: 5px 0 0; font-size: 0.9rem;">No hay eventos en los próximos 7 días</p>
+          </div>
+
+          <div style="text-align: center; margin-top: 10px;" *ngIf="annualEvents.length > visibleEvents.length || showAllEvents">
+            <button class="glass-btn" style="font-size: 0.85rem; padding: 6px 12px; margin: auto;" (click)="toggleAllEvents()">
+              {{ showAllEvents ? 'Ocultar eventos lejanos' : 'Ver todos los eventos' }}
+            </button>
           </div>
 
 
@@ -883,6 +890,8 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   timeTogether = { years: 0, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
   
   annualEvents: { name: string, daysLeft: number, dateStr: string, icon: string, alwaysShow?: boolean }[] = [];
+  visibleEvents: { name: string, daysLeft: number, dateStr: string, icon: string, alwaysShow?: boolean }[] = [];
+  showAllEvents = false;
   
   isEventModalOpen = false;
   selectedEvent: any = null;
@@ -1439,8 +1448,21 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     }
 
     this.annualEvents.sort((a, b) => a.daysLeft - b.daysLeft);
-    // Filtrar para mostrar solo los que faltan 7 días o menos, EXCEPTO los marcados con alwaysShow
-    this.annualEvents = this.annualEvents.filter((ev: any) => ev.daysLeft <= 7 || ev.alwaysShow);
+    this.filterEvents();
+  }
+
+  filterEvents() {
+    if (this.showAllEvents) {
+      this.visibleEvents = [...this.annualEvents];
+    } else {
+      // Filtrar para mostrar solo los que faltan 7 días o menos, EXCEPTO los marcados con alwaysShow
+      this.visibleEvents = this.annualEvents.filter((ev: any) => ev.daysLeft <= 7 || ev.alwaysShow);
+    }
+  }
+
+  toggleAllEvents() {
+    this.showAllEvents = !this.showAllEvents;
+    this.filterEvents();
   }
 
   async presentPhotoOptions(callback: (source: CameraSource) => void) {
