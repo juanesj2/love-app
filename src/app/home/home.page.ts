@@ -309,7 +309,21 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    this.isDarkMode = document.body.classList.contains('dark');
+    const nightPref = await Preferences.get({ key: 'night_owl_enabled' });
+    if (nightPref.value === 'true') {
+      this.isDarkMode = true;
+      document.body.classList.add('night-owl-mode');
+    } else {
+      this.isDarkMode = false;
+      document.body.classList.remove('night-owl-mode');
+    }
+
+    // Still sync with ThemeService for the standard generic dark theme base if needed
+    if (!nightPref.value && this.themeService.currentTheme === 'dark') {
+      this.isDarkMode = true;
+      document.body.classList.add('night-owl-mode');
+    }
+
     await this.loadHeaderData();
 
     // Suscribirse a los logros para el búho nocturno y marco dorado
@@ -558,11 +572,18 @@ export class HomePage implements OnInit, OnDestroy {
     setTimeout(() => { this.pokeAnimation = false; }, 1500);
   }
 
-  toggleDarkMode() {
+  async toggleDarkMode() {
     this.isDarkMode = !this.isDarkMode;
+    
+    // Toggle the custom Night Owl CSS
+    document.body.classList.toggle('night-owl-mode', this.isDarkMode);
+    
+    // Save to preferences so it persists
+    await Preferences.set({ key: 'night_owl_enabled', value: this.isDarkMode ? 'true' : 'false' });
+
+    // Also toggle the standard Ionic dark mode so generic components adapt correctly
     const newTheme = this.isDarkMode ? 'dark' : 'light';
     this.themeService.setTheme(newTheme);
-    // Remove night-owl-mode since ThemeService uses the standard .dark class
   }
 
 
