@@ -1410,6 +1410,7 @@ export class PhotoWidgetComponent implements OnInit {
 
   openAlbum(album: any) {
     this.currentAlbum = album;
+    this.viewMode = 'grid';
     this.closeAlbumsModal();
     this.loadData();
   }
