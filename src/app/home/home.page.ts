@@ -313,15 +313,18 @@ export class HomePage implements OnInit, OnDestroy {
     if (nightPref.value === 'true') {
       this.isDarkMode = true;
       document.body.classList.add('night-owl-mode');
+      document.documentElement.classList.add('night-owl-mode');
     } else {
       this.isDarkMode = false;
       document.body.classList.remove('night-owl-mode');
+      document.documentElement.classList.remove('night-owl-mode');
     }
 
     // Still sync with ThemeService for the standard generic dark theme base if needed
     if (!nightPref.value && this.themeService.currentTheme === 'dark') {
       this.isDarkMode = true;
       document.body.classList.add('night-owl-mode');
+      document.documentElement.classList.add('night-owl-mode');
     }
 
     await this.loadHeaderData();
@@ -577,6 +580,7 @@ export class HomePage implements OnInit, OnDestroy {
     
     // Toggle the custom Night Owl CSS
     document.body.classList.toggle('night-owl-mode', this.isDarkMode);
+    document.documentElement.classList.toggle('night-owl-mode', this.isDarkMode);
     
     // Save to preferences so it persists
     await Preferences.set({ key: 'night_owl_enabled', value: this.isDarkMode ? 'true' : 'false' });

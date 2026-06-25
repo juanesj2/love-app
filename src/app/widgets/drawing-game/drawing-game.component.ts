@@ -232,33 +232,33 @@ import { Location } from '@angular/common';
     .empty-state h3 { color: #590D22; font-size: 1.5rem; }
     .empty-state p { color: #a4133c; margin-bottom: 20px; }
 
-    :host-context(body.night-owl-mode) .drawing-container { background: #121212; }
-    :host-context(body.night-owl-mode) .header-titles h2 { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .back-btn { background: #222; color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .progress-bar-small { background: rgba(255,255,255,0.1); }
-    :host-context(body.night-owl-mode) .subtitle { color: #ccc; }
-    :host-context(body.night-owl-mode) .custom-toggle-container { background: rgba(30, 30, 30, 0.8); box-shadow: none; }
-    :host-context(body.night-owl-mode) .toggle-pill { color: #999; }
-    :host-context(body.night-owl-mode) .toggle-pill.active { background: #222; color: #a78bfa; }
-    :host-context(body.night-owl-mode) .cat-card { background: rgba(30,30,30,0.85); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-    :host-context(body.night-owl-mode) .cat-card h3 { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .prompt-card { background: rgba(30,30,30,0.85); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-    :host-context(body.night-owl-mode) .prompt-card p { color: #ccc; }
-    :host-context(body.night-owl-mode) .prompt-card h3 { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .canvas-wrapper { border-color: rgba(255,255,255,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-    :host-context(body.night-owl-mode) .color-picker { background: #1a1a1a; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-    :host-context(body.night-owl-mode) .tools { background: #1a1a1a; box-shadow: 0 -2px 10px rgba(0,0,0,0.5); }
-    :host-context(body.night-owl-mode) .waiting-state h3 { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .waiting-state p { color: #ccc; }
-    :host-context(body.night-owl-mode) .results-view h3 { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .drawing-col { background: #1a1a1a; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-    :host-context(body.night-owl-mode) .d-img { background: #222; }
-    :host-context(body.night-owl-mode) .empty-state h3 { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .empty-state p { color: #ccc; }
-    :host-context(body.night-owl-mode) .section-title { color: #fdfdfd; border-bottom-color: rgba(255,255,255,0.1); }
-    :host-context(body.night-owl-mode) .drawing-item { background: rgba(30,30,30,0.85); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-    :host-context(body.night-owl-mode) .d-title { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .d-col span { color: #ccc; }
+    :host-context(.night-owl-mode) .drawing-container { background: #121212; }
+    :host-context(.night-owl-mode) .header-titles h2 { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .back-btn { background: #222; color: #fdfdfd; }
+    :host-context(.night-owl-mode) .progress-bar-small { background: rgba(255,255,255,0.1); }
+    :host-context(.night-owl-mode) .subtitle { color: #ccc; }
+    :host-context(.night-owl-mode) .custom-toggle-container { background: rgba(30, 30, 30, 0.8); box-shadow: none; }
+    :host-context(.night-owl-mode) .toggle-pill { color: #999; }
+    :host-context(.night-owl-mode) .toggle-pill.active { background: #222; color: #a78bfa; }
+    :host-context(.night-owl-mode) .cat-card { background: rgba(30,30,30,0.85); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .cat-card h3 { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .prompt-card { background: rgba(30,30,30,0.85); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .prompt-card p { color: #ccc; }
+    :host-context(.night-owl-mode) .prompt-card h3 { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .canvas-wrapper { border-color: rgba(255,255,255,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .color-picker { background: #1a1a1a; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .tools { background: #1a1a1a; box-shadow: 0 -2px 10px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .waiting-state h3 { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .waiting-state p { color: #ccc; }
+    :host-context(.night-owl-mode) .results-view h3 { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .drawing-col { background: #1a1a1a; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .d-img { background: #222; }
+    :host-context(.night-owl-mode) .empty-state h3 { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .empty-state p { color: #ccc; }
+    :host-context(.night-owl-mode) .section-title { color: #fdfdfd; border-bottom-color: rgba(255,255,255,0.1); }
+    :host-context(.night-owl-mode) .drawing-item { background: rgba(30,30,30,0.85); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .d-title { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .d-col span { color: #ccc; }
   `],
   standalone: true,
   imports: [CommonModule, IonIcon, IonContent, IonRefresher, IonRefresherContent]

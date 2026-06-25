@@ -260,31 +260,31 @@ import { Location } from '@angular/common';
     .partner-waiting { color: #888; display: flex; align-items: center; gap: 3px; justify-content: flex-end; }
     .no-data { text-align: center; color: #888; font-style: italic; padding: 20px; }
 
-    :host-context(body.night-owl-mode) .swipe-container { background: #121212; }
-    :host-context(body.night-owl-mode) .header-titles h2 { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .back-btn, :host-context(body.night-owl-mode) .stats-btn { background: #222; color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .progress-bar-small { background: rgba(255,255,255,0.1); }
-    :host-context(body.night-owl-mode) .subtitle { color: #ccc; }
-    :host-context(body.night-owl-mode) .cat-card { background: rgba(30, 30, 30, 0.85); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-    :host-context(body.night-owl-mode) .cat-card h3 { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .custom-toggle-container { background: rgba(30, 30, 30, 0.8); box-shadow: none; }
-    :host-context(body.night-owl-mode) .toggle-pill { color: #999; }
-    :host-context(body.night-owl-mode) .toggle-pill.active { background: #222; color: #a78bfa; }
-    :host-context(body.night-owl-mode) .search-bar { background: #222; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-    :host-context(body.night-owl-mode) .search-bar input { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .card { background: #1a1a1a; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-    :host-context(body.night-owl-mode) .card-content h3 { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .action-btn { background: #222; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-    :host-context(body.night-owl-mode) .q-card { background: rgba(30,30,30, 0.85); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-    :host-context(body.night-owl-mode) .q-text { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .q-hint { color: #aaa; }
-    :host-context(body.night-owl-mode) .empty-state h3 { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .empty-state-list { color: #c4b5fd; }
-    :host-context(body.night-owl-mode) .results-list h4 { color: #fdfdfd; border-bottom-color: rgba(196,181,253,0.2); }
-    :host-context(body.night-owl-mode) .result-item { background: #1a1a1a; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-    :host-context(body.night-owl-mode) .result-item.waiting { background: #222; border-left-color: #555; }
-    :host-context(body.night-owl-mode) .answers-badge .me { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .percentage-circle { box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .swipe-container { background: #121212; }
+    :host-context(.night-owl-mode) .header-titles h2 { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .back-btn, :host-context(.night-owl-mode) .stats-btn { background: #222; color: #fdfdfd; }
+    :host-context(.night-owl-mode) .progress-bar-small { background: rgba(255,255,255,0.1); }
+    :host-context(.night-owl-mode) .subtitle { color: #ccc; }
+    :host-context(.night-owl-mode) .cat-card { background: rgba(30, 30, 30, 0.85); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .cat-card h3 { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .custom-toggle-container { background: rgba(30, 30, 30, 0.8); box-shadow: none; }
+    :host-context(.night-owl-mode) .toggle-pill { color: #999; }
+    :host-context(.night-owl-mode) .toggle-pill.active { background: #222; color: #a78bfa; }
+    :host-context(.night-owl-mode) .search-bar { background: #222; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .search-bar input { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .card { background: #1a1a1a; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .card-content h3 { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .action-btn { background: #222; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .q-card { background: rgba(30,30,30, 0.85); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .q-text { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .q-hint { color: #aaa; }
+    :host-context(.night-owl-mode) .empty-state h3 { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .empty-state-list { color: #c4b5fd; }
+    :host-context(.night-owl-mode) .results-list h4 { color: #fdfdfd; border-bottom-color: rgba(196,181,253,0.2); }
+    :host-context(.night-owl-mode) .result-item { background: #1a1a1a; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .result-item.waiting { background: #222; border-left-color: #555; }
+    :host-context(.night-owl-mode) .answers-badge .me { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .percentage-circle { box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonIcon, IonContent, IonRefresher, IonRefresherContent]

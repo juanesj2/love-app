@@ -134,30 +134,30 @@ import { LoveApiService } from '../../services/love-api.service';
     .spinner { border: 4px solid rgba(255, 77, 109, 0.2); border-top: 4px solid #ff4d6d; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    :host-context(body.night-owl-mode) .scroll-content { --background: #121212; }
-    :host-context(body.night-owl-mode) .header h2 { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .header p { color: #ccc; }
-    :host-context(body.night-owl-mode) .back-btn { background: #222; color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .back-btn:active { background: #333; }
-    :host-context(body.night-owl-mode) ion-segment { background: rgba(30, 30, 30, 0.8); }
-    :host-context(body.night-owl-mode) ion-segment-button { --color: #999; --color-checked: #a78bfa; --indicator-color: #222; }
-    :host-context(body.night-owl-mode) .achievement-card { background: #1a1a1a; border-color: rgba(255,255,255,0.05); }
-    :host-context(body.night-owl-mode) .achievement-card.locked { background: rgba(30,30,30,0.5); border-color: rgba(167,139,250,0.3); }
-    :host-context(body.night-owl-mode) .achievement-card.unlocked { background: rgba(30,30,30,0.85); border-color: rgba(167,139,250,0.5); }
-    :host-context(body.night-owl-mode) .locked .icon-container { background: #222; color: #555; }
-    :host-context(body.night-owl-mode) .unlocked .icon-container { background: #a78bfa; box-shadow: 0 4px 10px rgba(167,139,250,0.4); color: white; }
-    :host-context(body.night-owl-mode) .info h3 { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .info p { color: #aaa; }
-    :host-context(body.night-owl-mode) .date { color: #c4b5fd; }
-    :host-context(body.night-owl-mode) .hint-item p { color: #fdfdfd; background: #222; }
-    :host-context(body.night-owl-mode) .hint-btn { background: #1a1a1a; color: #a78bfa; border-color: #a78bfa; }
-    :host-context(body.night-owl-mode) .hint-btn:active { background: #222; }
-    :host-context(body.night-owl-mode) .empty-state ion-icon { color: #a78bfa; }
-    :host-context(body.night-owl-mode) .empty-state h3 { color: #fdfdfd; }
-    :host-context(body.night-owl-mode) .empty-state p { color: #ccc; }
-    :host-context(body.night-owl-mode) .primary-btn { background: #a78bfa; }
-    :host-context(body.night-owl-mode) .loading-state { color: #a78bfa; }
-    :host-context(body.night-owl-mode) .spinner { border-color: rgba(167,139,250,0.2); border-top-color: #a78bfa; }
+    :host-context(.night-owl-mode) .scroll-content { --background: #121212; }
+    :host-context(.night-owl-mode) .header h2 { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .header p { color: #ccc; }
+    :host-context(.night-owl-mode) .back-btn { background: #222; color: #fdfdfd; }
+    :host-context(.night-owl-mode) .back-btn:active { background: #333; }
+    :host-context(.night-owl-mode) ion-segment { background: rgba(30, 30, 30, 0.8); }
+    :host-context(.night-owl-mode) ion-segment-button { --color: #999; --color-checked: #a78bfa; --indicator-color: #222; }
+    :host-context(.night-owl-mode) .achievement-card { background: #1a1a1a; border-color: rgba(255,255,255,0.05); }
+    :host-context(.night-owl-mode) .achievement-card.locked { background: rgba(30,30,30,0.5); border-color: rgba(167,139,250,0.3); }
+    :host-context(.night-owl-mode) .achievement-card.unlocked { background: rgba(30,30,30,0.85); border-color: rgba(167,139,250,0.5); }
+    :host-context(.night-owl-mode) .locked .icon-container { background: #222; color: #555; }
+    :host-context(.night-owl-mode) .unlocked .icon-container { background: #a78bfa; box-shadow: 0 4px 10px rgba(167,139,250,0.4); color: white; }
+    :host-context(.night-owl-mode) .info h3 { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .info p { color: #aaa; }
+    :host-context(.night-owl-mode) .date { color: #c4b5fd; }
+    :host-context(.night-owl-mode) .hint-item p { color: #fdfdfd; background: #222; }
+    :host-context(.night-owl-mode) .hint-btn { background: #1a1a1a; color: #a78bfa; border-color: #a78bfa; }
+    :host-context(.night-owl-mode) .hint-btn:active { background: #222; }
+    :host-context(.night-owl-mode) .empty-state ion-icon { color: #a78bfa; }
+    :host-context(.night-owl-mode) .empty-state h3 { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .empty-state p { color: #ccc; }
+    :host-context(.night-owl-mode) .primary-btn { background: #a78bfa; }
+    :host-context(.night-owl-mode) .loading-state { color: #a78bfa; }
+    :host-context(.night-owl-mode) .spinner { border-color: rgba(167,139,250,0.2); border-top-color: #a78bfa; }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonContent, IonIcon, IonSegment, IonSegmentButton, IonLabel]
