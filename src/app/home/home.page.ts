@@ -13,6 +13,7 @@ import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { LocationWidgetComponent } from '../widgets/location-widget/location-widget.component';
 import { PhotoWidgetComponent } from '../widgets/photo-widget/photo-widget.component';
 import { ChatWidgetComponent } from '../widgets/chat-widget/chat-widget.component';
+import { ThemeService } from '../services/theme.service';
 import { MasWidgetComponent } from '../widgets/mas-widget/mas-widget.component';
 import { QuestionsWidgetComponent } from '../widgets/questions-widget/questions-widget.component';
 import { LoveApiService } from '../services/love-api.service';
@@ -272,6 +273,7 @@ export class HomePage implements OnInit, OnDestroy {
   private actionSheetCtrl = inject(ActionSheetController);
   private router = inject(Router);
   private tutorialService = inject(TutorialService);
+  private themeService = inject(ThemeService);
 
   @ViewChild('photoWidget') photoWidgetComp?: PhotoWidgetComponent;
   @ViewChild('chatWidget') chatWidgetComp?: ChatWidgetComponent;
@@ -307,6 +309,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    this.isDarkMode = document.body.classList.contains('dark');
     await this.loadHeaderData();
 
     // Suscribirse a los logros para el búho nocturno y marco dorado
@@ -557,7 +560,9 @@ export class HomePage implements OnInit, OnDestroy {
 
   toggleDarkMode() {
     this.isDarkMode = !this.isDarkMode;
-    document.body.classList.toggle('night-owl-mode', this.isDarkMode);
+    const newTheme = this.isDarkMode ? 'dark' : 'light';
+    this.themeService.setTheme(newTheme);
+    // Remove night-owl-mode since ThemeService uses the standard .dark class
   }
 
 
