@@ -280,6 +280,10 @@ export class LoveApiService {
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/albums/${albumId}/photos`, { photo_ids: photoIds }));
   }
 
+  async removePhotosFromAlbum(photoIds: number[]): Promise<any> {
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/albums/photos/remove`, { photo_ids: photoIds }));
+  }
+
   async reactToPhoto(photoId: number, emoji: string): Promise<any> {
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/photos/${photoId}/reactions`, { content: emoji }));
   }

@@ -93,7 +93,7 @@ import { debounceTime } from 'rxjs/operators';
             <h3>Próximos Eventos Especiales</h3>
           </div>
           
-          <div class="milestone-list">
+          <div class="milestone-list" *ngIf="annualEvents.length > 0">
             <div class="milestone-item" *ngFor="let ev of annualEvents" (click)="openEventModal(ev)">
               <ion-icon [name]="ev.icon" class="event-icon text-pink"></ion-icon>
               <div class="milestone-info" style="margin-left: 10px;">
@@ -103,6 +103,10 @@ import { debounceTime } from 'rxjs/operators';
               <div class="m-days" *ngIf="ev.daysLeft > 0">Faltan {{ ev.daysLeft }} d</div>
               <div class="m-days" *ngIf="ev.daysLeft === 0">¡Hoy!</div>
             </div>
+          </div>
+          <div *ngIf="annualEvents.length === 0" style="text-align: center; color: #888; padding: 15px 0;">
+            <ion-icon name="calendar-clear-outline" style="font-size: 2rem; opacity: 0.5;"></ion-icon>
+            <p style="margin: 5px 0 0; font-size: 0.9rem;">No hay eventos en los próximos 7 días</p>
           </div>
 
 
@@ -878,7 +882,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
   timeTogether = { years: 0, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
   
-  annualEvents: { name: string, daysLeft: number, dateStr: string, icon: string }[] = [];
+  annualEvents: { name: string, daysLeft: number, dateStr: string, icon: string, alwaysShow?: boolean }[] = [];
   
   isEventModalOpen = false;
   selectedEvent: any = null;
@@ -1380,7 +1384,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     const currentYear = now.getFullYear();
     const nowUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
 
-    const addEvent = (name: string, month: number, day: number, icon: string, birthYear?: number) => {
+    const addEvent = (name: string, month: number, day: number, icon: string, birthYear?: number, alwaysShow?: boolean) => {
       let d = new Date(currentYear, month, day);
       let eventYear = currentYear;
       let dUTC = Date.UTC(currentYear, month, day);
@@ -1401,7 +1405,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
         displayName = `${name} (${age} años)`;
       }
 
-      this.annualEvents.push({ name: displayName, daysLeft, dateStr, icon });
+      this.annualEvents.push({ name: displayName, daysLeft, dateStr, icon, alwaysShow });
     };
 
     addEvent('San Valentín', 1, 14, 'heart'); // 1 is February (0-indexed)
@@ -1417,7 +1421,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
         eventYear = currentYear + 1;
       }
       const years = eventYear - start.getFullYear();
-      addEvent(`Aniversario (${years} años)`, start.getMonth(), start.getDate(), 'time-outline');
+      addEvent(`Aniversario (${years} años)`, start.getMonth(), start.getDate(), 'time-outline', undefined, true);
     }
 
     if (this.myBirthday) {
@@ -1435,6 +1439,8 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     }
 
     this.annualEvents.sort((a, b) => a.daysLeft - b.daysLeft);
+    // Filtrar para mostrar solo los que faltan 7 días o menos, EXCEPTO los marcados con alwaysShow
+    this.annualEvents = this.annualEvents.filter((ev: any) => ev.daysLeft <= 7 || ev.alwaysShow);
   }
 
   async presentPhotoOptions(callback: (source: CameraSource) => void) {

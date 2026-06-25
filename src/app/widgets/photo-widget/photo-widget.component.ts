@@ -143,7 +143,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
           </div>
 
           <!-- Filtros de Galería -->
-          <div class="filter-chips-container" *ngIf="!selectionMode">
+          <div class="filter-chips-container" *ngIf="!selectionMode && !currentAlbum">
             <button class="filter-chip" [class.active]="currentGalleryFilter === 'todas'" (click)="setGalleryFilter('todas')">Todas</button>
             <button class="filter-chip" [class.active]="currentGalleryFilter === 'ultimas'" (click)="setGalleryFilter('ultimas')">Último mes</button>
             <button class="filter-chip" [class.active]="currentGalleryFilter === 'solo_yo'" (click)="setGalleryFilter('solo_yo')">Tus fotos</button>
@@ -151,7 +151,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
           </div>
 
           <!-- Recuerdo Destacado -->
-          <div class="memory-highlight-container" *ngIf="highlightedMemory && !selectionMode && currentGalleryFilter === 'todas'" (click)="openLightbox(highlightedMemory)">
+          <div class="memory-highlight-container" *ngIf="highlightedMemory && !selectionMode && currentGalleryFilter === 'todas' && !currentAlbum" (click)="openLightbox(highlightedMemory)">
             <div class="memory-highlight">
               <img [src]="environment.storageUrl + highlightedMemory.image_path" class="memory-bg" />
               <div class="memory-overlay">
@@ -508,7 +508,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
     .empty-icon { font-size: 4rem; margin-bottom: 15px; color: #ffb3c1; opacity: 0.8; }
     .empty-upload-btn { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none; padding: 12px 24px; border-radius: 20px; font-weight: bold; margin-top: 15px; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3); }
 
-    .selection-actions { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); display: flex; align-items: center; gap: 15px; padding: 10px 20px; border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000; border: 1px solid rgba(255,77,109,0.2); }
+    .selection-actions { position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); display: flex; align-items: center; gap: 15px; padding: 10px 20px; border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000; border: 1px solid rgba(255,77,109,0.2); }
     .selection-count { font-weight: 700; color: #590D22; font-size: 1rem; }
     .selection-btn { background: none; border: none; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s; }
     .selection-btn:active { transform: scale(0.9); }
@@ -1050,6 +1050,11 @@ export class PhotoWidgetComponent implements OnInit {
   }
 
   openLightbox(photo: any) {
+    if (this.pickingCoverForAlbumId) {
+      this.setPhotoAsCover(this.pickingCoverForAlbumId, photo);
+      return;
+    }
+
     if (this.selectionMode) {
       this.toggleSelection(photo);
       return;
@@ -1917,23 +1922,35 @@ export class PhotoWidgetComponent implements OnInit {
     if (this.selectedPhotos.size === 0) return;
 
     const alert = await this.alertController.create({
-      header: 'Eliminar Fotos',
-      message: `¿Estás seguro de eliminar ${this.selectedPhotos.size} foto(s)?`,
+      header: this.currentAlbum ? 'Quitar del álbum' : 'Eliminar Fotos',
+      message: this.currentAlbum ? `¿Estás seguro de quitar ${this.selectedPhotos.size} foto(s) de este álbum?` : `¿Estás seguro de eliminar ${this.selectedPhotos.size} foto(s) por completo?`,
       cssClass: 'custom-love-alert',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
-          text: 'Eliminar',
+          text: this.currentAlbum ? 'Quitar' : 'Eliminar',
           role: 'destructive',
           handler: async () => {
             let successCount = 0;
-            for (const id of Array.from(this.selectedPhotos)) {
+            
+            if (this.currentAlbum) {
               try {
-                await this.api.deletePhoto(id);
-                this.photos = this.photos.filter(p => p.id !== id);
-                successCount++;
+                const idsArray = Array.from(this.selectedPhotos);
+                await this.api.removePhotosFromAlbum(idsArray);
+                this.photos = this.photos.filter(p => !this.selectedPhotos.has(p.id));
+                successCount = this.selectedPhotos.size;
               } catch (e) {
-                console.error('Error al borrar foto', id, e);
+                console.error('Error al quitar fotos del álbum', e);
+              }
+            } else {
+              for (const id of Array.from(this.selectedPhotos)) {
+                try {
+                  await this.api.deletePhoto(id);
+                  this.photos = this.photos.filter(p => p.id !== id);
+                  successCount++;
+                } catch (e) {
+                  console.error('Error al borrar foto', id, e);
+                }
               }
             }
             this.selectedPhotos.clear();
