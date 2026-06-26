@@ -157,7 +157,7 @@ import { Location } from '@angular/common';
       display: block;
       height: 100%;
     }
-    .drawing-container { padding: calc(env(safe-area-inset-top) + 40px) 20px 20px; background: #fff0f3; min-height: 100vh; display: flex; flex-direction: column; overflow-y: auto; height: 100vh; box-sizing: border-box; }
+    .drawing-container { padding: calc(env(safe-area-inset-top) + 40px) 20px calc(env(safe-area-inset-bottom) + 80px); background: #fff0f3; min-height: 100vh; display: flex; flex-direction: column; overflow-y: auto; height: 100vh; box-sizing: border-box; }
     .header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
     .back-btn { background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; flex-shrink: 0; }
     .header-titles { flex: 1; text-align: center; display: flex; flex-direction: column; align-items: center; margin-right: 40px; }
@@ -204,10 +204,10 @@ import { Location } from '@angular/common';
     .tools { display: flex; gap: 10px; margin-top: 20px; }
     .color-picker { display: flex; gap: 10px; justify-content: center; align-items: center; margin-top: 15px; }
     .color-btn { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-    .native-color-picker { width: 40px; height: 40px; border: none; border-radius: 50%; cursor: pointer; padding: 0; background: none; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-    .native-color-picker::-webkit-color-swatch-wrapper { padding: 0; }
+    .native-color-picker { width: 40px; height: 40px; border: none; border-radius: 50%; cursor: pointer; padding: 0; background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red); overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .native-color-picker::-webkit-color-swatch-wrapper { padding: 4px; }
     .native-color-picker::-webkit-color-swatch { border: 2px solid white; border-radius: 50%; }
-    .tool-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 10px; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; color: white; }
+    .tool-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 20px; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; color: white; }
     .tool-btn.warning { background: #f4a261; }
     .tool-btn.danger { background: #e63946; }
     .tool-btn.success { background: #2a9d8f; }
