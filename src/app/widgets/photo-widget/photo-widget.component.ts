@@ -435,8 +435,8 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     
     .scroll-content { flex: 1; --background: transparent; --padding-bottom: 95px; }
-    .photos-list { padding-top: 170px; padding-bottom: 95px; }
-    .grid-wrapper { padding-top: 170px; padding-bottom: 95px; }
+    .photos-list { padding-top: calc(env(safe-area-inset-top) + 170px); padding-bottom: 95px; }
+    .grid-wrapper { padding-top: calc(env(safe-area-inset-top) + 170px); padding-bottom: 95px; }
     
     .global-date-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; visibility: hidden; transition: opacity 0.8s ease-in-out, visibility 0.8s; pointer-events: none; border-radius: inherit; }
     .global-date-overlay.show { opacity: 1; visibility: visible; }
