@@ -363,7 +363,17 @@ export class LoveApiService {
   }
 
   async uploadDrawing(promptId: number, base64Image: string): Promise<any> {
-    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/games/drawing/upload`, { prompt_id: promptId, image: base64Image }));
+    const res = await fetch(base64Image);
+    const blob = await res.blob();
+    const file = new File([blob], 'drawing.png', { type: 'image/png' });
+    
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('photo', file);
+    formData.append('drawing', file);
+    formData.append('prompt_id', promptId.toString());
+    
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/games/drawing/upload`, formData));
   }
 
   async getDrawingResult(promptId: number): Promise<any> {
