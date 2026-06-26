@@ -522,7 +522,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
     
     /* Modals & Overlays */
     .albums-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 1000; display: flex; align-items: flex-end; }
-    .albums-sheet { background: #fff; width: 100%; border-radius: 25px 25px 0 0; padding: 20px 20px calc(env(safe-area-inset-bottom) + 95px) 20px; box-shadow: 0 -10px 20px rgba(0,0,0,0.1); max-height: 80vh; overflow-y: auto; }
+    .albums-sheet { background: #fff; width: 100%; border-radius: 25px 25px 0 0; padding: 20px 20px calc(env(safe-area-inset-bottom) + 140px) 20px; box-shadow: 0 -10px 20px rgba(0,0,0,0.1); max-height: 80vh; overflow-y: auto; }
     
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .modal-header h2 { margin: 0; font-size: 1.3rem; font-weight: 800; color: #590D22; }
