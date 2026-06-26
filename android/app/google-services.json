@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "292953977993-ef9livticavvpmjijfj5ea8hlddt6ncf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.juanesj2.lovewidget",
+            "certificate_hash": "5b5005f6b8fffdd0b50218ae212b60c4a33e1061"
+          }
+        },
+        {
           "client_id": "292953977993-jm1koo4l75li55k0mnnsjktb2rnltt96.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

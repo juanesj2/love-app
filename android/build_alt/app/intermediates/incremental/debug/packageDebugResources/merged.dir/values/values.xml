@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">#FFFFFF</color>
+    <string name="app_name">love-widget</string>
+    <string name="custom_url_scheme">com.juanesj2.lovewidget</string>
+    <string name="default_web_client_id" translatable="false">292953977993-6528i8ggjvsporn2kq5fjvmoa6td1a9c.apps.googleusercontent.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">292953977993</string>
+    <string name="google_api_key" translatable="false">AIzaSyAVj3NrWKBjApNK4z25EDvO1b4jViSH5y8</string>
+    <string name="google_app_id" translatable="false">1:292953977993:android:500c1e438536774cac8258</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyAVj3NrWKBjApNK4z25EDvO1b4jViSH5y8</string>
+    <string name="google_storage_bucket" translatable="false">love-widget-app-ec037.firebasestorage.app</string>
+    <string name="package_name">com.juanesj2.lovewidget</string>
+    <string name="project_id" translatable="false">love-widget-app-ec037</string>
+    <string name="title_activity_main">love-widget</string>
+    <string name="widget_counter_1x1_label">⏳ Días Juntos (1x1)</string>
+    <string name="widget_counter_photo_label">🖼️ Nuestra Foto y Días (2x2)</string>
+    <string name="widget_daily_photo_label">📸 Foto del Día Contigo (2x2)</string>
+    <string name="widget_love_label">❤️ Nuestro Amor (Mapa)</string>
+    <string name="widget_poke_label">👉 Enviar Zumbido de Amor</string>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:background">@null</item>
+    </style>
+    <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+        <item name="android:background">@drawable/splash</item>
+    </style>
+</resources>

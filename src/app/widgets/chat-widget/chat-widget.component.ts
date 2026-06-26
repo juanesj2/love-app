@@ -15,7 +15,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
   template: `
     <div class="chat-wrapper">
       <ion-content class="messages-content" #msgContainer>
-        <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+        <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)" [disabled]="isDoodling">
           <ion-refresher-content></ion-refresher-content>
         </ion-refresher>
         
@@ -821,6 +821,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   onDoodleStart(e: any) {
+    e.stopPropagation();
+    if (e.cancelable) e.preventDefault();
     if (!this.ctx) return;
     this.drawing = true;
     const touch = e.touches[0];
@@ -830,7 +832,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   onDoodleMove(e: any) {
     if (!this.drawing || !this.ctx) return;
-    e.preventDefault();
+    e.stopPropagation();
+    if (e.cancelable) e.preventDefault();
     const touch = e.touches[0];
     const rect = e.target.getBoundingClientRect();
     

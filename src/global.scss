@@ -39,6 +39,11 @@
 /* Leaflet CSS */
 @import 'leaflet/dist/leaflet.css';
 
+/* Prevent mobile pull-to-refresh globally (especially for drawing canvas) */
+body {
+  overscroll-behavior-y: none;
+}
+
 /* Custom Pink Love & Premium Alert Styling */
 .custom-love-alert, .premium-login-alert {
   --backdrop-opacity: 0.5;
