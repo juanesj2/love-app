@@ -125,39 +125,64 @@ body {
 
 /* Premium Action Sheet Styling */
 .premium-action-sheet {
-  --background: rgba(255, 255, 255, 0.95);
-  --backdrop-opacity: 0.4;
-  --color: #FF4D6D;
-  --button-color: #590D22;
-  --button-color-cancel: #FF4D6D;
+  --background: rgba(255, 255, 255, 0.85);
+  --backdrop-opacity: 0.5;
+  --color: #590D22;
+  --button-color: #FF4D6D;
+  --button-background: rgba(255, 255, 255, 0.95);
+  --button-background-selected: rgba(255, 77, 109, 0.1);
+  --button-color-cancel: #888;
   
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 
   .action-sheet-wrapper {
-    border-top-left-radius: 28px !important;
-    border-top-right-radius: 28px !important;
-    box-shadow: 0 -10px 40px rgba(255, 77, 109, 0.15) !important;
+    background: transparent !important;
+  }
+
+  .action-sheet-container {
+    padding: 10px !important;
+  }
+
+  .action-sheet-group {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(255, 77, 109, 0.2) !important;
+    box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15) !important;
+    margin-bottom: 10px !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
   .action-sheet-title {
     font-weight: 800 !important;
     font-size: 1.3rem !important;
+    color: #590D22 !important;
     text-align: center !important;
-    padding: 25px 10px 15px !important;
+    padding: 20px 10px 15px !important;
+    border-bottom: 1px solid rgba(255, 77, 109, 0.1) !important;
   }
 
   .action-sheet-button {
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     font-size: 1.15rem !important;
+    color: #FF4D6D !important;
     justify-content: center !important;
     text-align: center !important;
     padding: 18px !important;
+    background: transparent !important;
   }
 
-  .action-sheet-button.action-sheet-cancel {
-    font-weight: 800 !important;
-    margin-top: 10px !important;
+  .action-sheet-group-cancel {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-radius: 20px !important;
+    border: 1px solid #ddd !important;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05) !important;
+    
+    .action-sheet-button {
+      color: #888 !important;
+      font-weight: 800 !important;
+    }
   }
 }
 
