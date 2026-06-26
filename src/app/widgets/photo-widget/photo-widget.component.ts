@@ -381,9 +381,14 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
             </p>
           </div>
           
-          <div class="streak-timer-box" *ngIf="timeToMidnight">
+          <div class="streak-timer-box" *ngIf="timeToMidnight && !(coupleInfo?.my_photo_today && coupleInfo?.partner_photo_today)">
             <ion-icon name="time-outline"></ion-icon>
             <span>Quedan <strong>{{ timeToMidnight }}</strong> para perder la racha</span>
+          </div>
+          
+          <div class="streak-timer-box success" *ngIf="coupleInfo?.my_photo_today && coupleInfo?.partner_photo_today">
+            <ion-icon name="shield-checkmark-outline"></ion-icon>
+            <span>¡La racha está a salvo hoy!</span>
           </div>
 
           <button class="streak-remind-btn" *ngIf="coupleInfo?.my_photo_today && !coupleInfo?.partner_photo_today" (click)="sendStreakReminder()">
@@ -580,9 +585,9 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
     .streak-modal-icon { font-size: 4rem; margin-bottom: 10px; }
     .streak-modal-content h3 { font-size: 1.5rem; font-weight: 800; color: #590D22; margin-top: 0; margin-bottom: 15px; }
     .streak-status p { font-size: 1rem; color: #555; line-height: 1.5; margin-bottom: 20px; }
-    .streak-timer-box { background: rgba(255, 77, 109, 0.1); color: #FF4D6D; padding: 10px 15px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 0.95rem; margin-bottom: 20px; }
-    .streak-timer-box ion-icon { font-size: 1.2rem; }
-    .streak-remind-btn { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none; padding: 12px 20px; border-radius: 20px; font-weight: bold; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4); transition: transform 0.2s; }
+    .streak-timer-box { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: rgba(255, 77, 109, 0.1); color: #FF4D6D; padding: 12px 20px; border-radius: 12px; font-size: 0.95rem; margin-bottom: 20px; }
+    .streak-timer-box.success { background: rgba(46, 204, 113, 0.1); color: #2ecc71; font-weight: bold; }
+    .streak-remind-btn { background: #FF4D6D; color: white; border: none; padding: 12px 24px; border-radius: 25px; font-weight: 600; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3); transition: transform 0.2s; }
     .streak-remind-btn:active { transform: scale(0.95); }
     @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
