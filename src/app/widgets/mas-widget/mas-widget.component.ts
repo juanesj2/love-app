@@ -720,13 +720,15 @@ import { debounceTime } from 'rxjs/operators';
     .desc { font-size: 0.9rem; color: #800f2f; margin-bottom: 15px; line-height: 1.4; font-weight: 500; }
 
     /* Inputs */
-    .glass-input { width: 100%; padding: 14px 16px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); font-family: 'Inter', sans-serif; font-size: 0.95rem; color: #590D22; outline: none; transition: all 0.3s; font-weight: 600; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02); color-scheme: light; }
+    .glass-input { width: 100%; padding: 14px 16px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); font-family: 'Inter', sans-serif; font-size: 0.95rem; color: #590D22; outline: none; transition: all 0.3s; font-weight: 600; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02); color-scheme: light; -webkit-appearance: none; appearance: none; }
+    input[type="date"].glass-input, input[type="datetime-local"].glass-input { min-height: 50px; display: flex; align-items: center; justify-content: flex-start; }
     .glass-input:focus { border-color: #FF4D6D; background: #fff; box-shadow: 0 4px 15px rgba(255,77,109,0.1); }
-    .glass-input::placeholder { color: #b08a96; font-weight: normal; }
+    .glass-input::placeholder { color: #b08a96; font-weight: normal; opacity: 1; -webkit-text-fill-color: #b08a96; }
     .glass-input::-webkit-calendar-picker-indicator { cursor: pointer; filter: invert(20%) sepia(80%) saturate(300%) hue-rotate(310deg) brightness(60%) contrast(100%); opacity: 0.8; }
     .glass-input::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+    .glass-input::-webkit-datetime-edit { color: #590D22; }
     
-    .glass-select { width: 100%; padding: 14px 16px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); font-family: 'Inter', sans-serif; font-size: 1rem; color: #590D22; font-weight: 700; outline: none; appearance: none; cursor: pointer; }
+    .glass-select { width: 100%; padding: 14px 16px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); font-family: 'Inter', sans-serif; font-size: 1rem; color: #590D22; font-weight: 700; outline: none; appearance: none; -webkit-appearance: none; cursor: pointer; }
     .glass-select:focus { border-color: #FF4D6D; background: #fff; }
     ion-select.glass-input, ion-select.glass-select { 
       padding: 0 !important; 
@@ -852,6 +854,7 @@ import { debounceTime } from 'rxjs/operators';
       :host-context(.night-owl-mode) .title, :host-context(.night-owl-mode) .section-title h3, :host-context(.night-owl-mode) .food-info h4, :host-context(.night-owl-mode) .movie-info h4 { color: #fdfdfd; text-shadow: none; }
       :host-context(.night-owl-mode) .subtitle, :host-context(.night-owl-mode) .desc { color: #ccc; }
       :host-context(.night-owl-mode) .glass-input, :host-context(.night-owl-mode) .glass-select { background: rgba(0,0,0,0.4); border-color: #333; color: #fdfdfd; color-scheme: dark; }
+      :host-context(.night-owl-mode) .glass-input::-webkit-datetime-edit { color: #fdfdfd; }
       :host-context(.night-owl-mode) .glass-input:focus { border-color: #a78bfa; background: #111; box-shadow: 0 4px 15px rgba(167,139,250,0.2); }
       :host-context(.night-owl-mode) .glass-btn { background: linear-gradient(135deg, #a78bfa, #8b5cf6); box-shadow: 0 4px 15px rgba(167,139,250,0.3); }
       :host-context(.night-owl-mode) .date-picker-glass label { color: #ccc; }
