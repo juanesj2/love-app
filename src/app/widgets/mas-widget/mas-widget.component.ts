@@ -1187,6 +1187,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     const alert = await this.alertCtrl.create({
       header: '¿Eliminar Hito?',
       message: '¿Estás seguro de que quieres borrar este hito? Esta acción no se puede deshacer.',
+      cssClass: 'custom-love-alert',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         { 
@@ -1245,6 +1246,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     const alert = await this.alertCtrl.create({
       header: '¿Eliminar Deseo?',
       message: '¿Estás seguro de que quieres borrar este deseo de la lista?',
+      cssClass: 'custom-love-alert',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
