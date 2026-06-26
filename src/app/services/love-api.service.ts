@@ -341,7 +341,7 @@ export class LoveApiService {
   }
 
   async answerSwipe(questionId: number, answer: boolean): Promise<any> {
-    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/games/swipe/answer`, { question_id: questionId, answer }));
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/games/swipe/answer`, { card_id: questionId, answer }));
   }
 
   async getSwipeStats(category?: string): Promise<any> {
