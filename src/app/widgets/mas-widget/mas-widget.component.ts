@@ -1184,14 +1184,28 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   }
 
   async deleteMilestone(id: number) {
-    try {
-      await this.api.deleteMilestone(id);
-      this.loadMilestones();
-      this.showToast('Hito eliminado', 'medium');
-    } catch (e) {
-      console.error(e);
-      this.showToast('Error al eliminar hito', 'danger');
-    }
+    const alert = await this.alertCtrl.create({
+      header: '¿Eliminar Hito?',
+      message: '¿Estás seguro de que quieres borrar este hito? Esta acción no se puede deshacer.',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        { 
+          text: 'Eliminar', 
+          role: 'destructive',
+          handler: async () => {
+            try {
+              await this.api.deleteMilestone(id);
+              this.loadMilestones();
+              this.showToast('Hito eliminado', 'medium');
+            } catch (e) {
+              console.error(e);
+              this.showToast('Error al eliminar hito', 'danger');
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 
   async loadBucketList() {
@@ -1227,16 +1241,32 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
   async deleteBucketItem(index: number, event: Event) {
     event.stopPropagation();
-    const item = this.bucketList[index];
-    const originalList = [...this.bucketList];
-    this.bucketList.splice(index, 1);
     
-    try {
-      await this.api.deleteWish(item.id);
-    } catch (e) {
-      this.bucketList = originalList; // Revert on failure
-      this.showToast('Error al eliminar deseo', 'danger');
-    }
+    const alert = await this.alertCtrl.create({
+      header: '¿Eliminar Deseo?',
+      message: '¿Estás seguro de que quieres borrar este deseo de la lista?',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: async () => {
+            const item = this.bucketList[index];
+            const originalList = [...this.bucketList];
+            this.bucketList.splice(index, 1);
+            
+            try {
+              await this.api.deleteWish(item.id);
+            } catch (e) {
+              this.bucketList = originalList; // Revert on failure
+              this.showToast('Error al eliminar deseo', 'danger');
+            }
+          }
+        }
+      ]
+    });
+    
+    await alert.present();
   }
 
   calculateDays(dateStr: string): number {
