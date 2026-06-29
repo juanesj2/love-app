@@ -494,7 +494,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
     .close-reply { color: #999; font-size: 1.2rem; cursor: pointer; }
     .reply-text { font-size: 0.9rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .input-area { background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding-bottom: calc(env(safe-area-inset-bottom) + 115px); border-top: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; }
+    .input-area { background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding-bottom: calc(env(safe-area-inset-bottom) + 90px); border-top: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; }
     .input-container { padding: 10px 15px; display: flex; align-items: center; gap: 10px; position: relative; }
     
     .premium-input { flex: 1; background: #f8f9fa; border: 1px solid rgba(0,0,0,0.05); border-radius: 20px; padding: 12px 20px; font-size: 1rem; color: #333; outline: none; transition: all 0.3s ease; }
