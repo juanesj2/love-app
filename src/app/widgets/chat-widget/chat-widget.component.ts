@@ -541,6 +541,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
     .mine .restore-graffitis-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; }
 
     /* Night Owl Mode Overrides */
+    :host-context(.night-owl-mode) .chat-wrapper { background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%); }
     :host-context(.night-owl-mode) .chat-container { background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%); }
     :host-context(.night-owl-mode) .input-area { background: rgba(30,30,30,0.85); border-top-color: rgba(255,255,255,0.05); }
     :host-context(.night-owl-mode) .premium-input { background: rgba(0,0,0,0.4); border-color: #333; color: #fdfdfd; }
