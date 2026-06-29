@@ -651,6 +651,9 @@ import { Share } from '@capacitor/share';
     :host-context(.night-owl-mode) .comment-input { color: #fdfdfd; }
     :host-context(.night-owl-mode) .comment-input::placeholder { color: #666; }
     :host-context(.night-owl-mode) .comment-btn { color: #a78bfa; }
+    :host-context(.night-owl-mode) .send-comment-btn { background: #8b5cf6; }
+    :host-context(.night-owl-mode) .description { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .reaction-bubble { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); }
     :host-context(.night-owl-mode) .lightbox-content { background: rgba(0,0,0,0.9); }
     :host-context(.night-owl-mode) .prompt-sheet { background: rgba(30,30,30,0.98); }
     :host-context(.night-owl-mode) .premium-textarea { background: rgba(0,0,0,0.4); border-color: #333; color: #fdfdfd; }
