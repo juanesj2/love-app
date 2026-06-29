@@ -879,9 +879,9 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
       :host-context(.night-owl-mode) .time-block .label { color: #a78bfa; }
       :host-context(.night-owl-mode) .milestone-item, 
       :host-context(.night-owl-mode) .bucket-item { background: rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.05); }
-      :host-context(.night-owl-mode) .m-title { color: #fdfdfd; }
-      :host-context(.night-owl-mode) .m-date { color: #ccc; }
-      :host-context(.night-owl-mode) .m-days { background: rgba(167,139,250,0.2); color: #a78bfa; }
+      :host-context(.night-owl-mode) .m-title, :host-context(.night-owl-mode) .p-title { color: #fdfdfd !important; }
+      :host-context(.night-owl-mode) .m-date, :host-context(.night-owl-mode) .p-rating, :host-context(.night-owl-mode) .m-rating { color: #ccc !important; }
+      :host-context(.night-owl-mode) .m-days { background: rgba(167,139,250,0.2) !important; color: #a78bfa !important; }
       :host-context(.night-owl-mode) .food-card, :host-context(.night-owl-mode) .movie-card { background: rgba(0,0,0,0.4); border-color: #333; }
       :host-context(.night-owl-mode) .add-btn { background: rgba(167,139,250,0.1); color: #a78bfa; border-color: rgba(167,139,250,0.3); }
       :host-context(.night-owl-mode) .modal-content.glass-card { background: rgba(30,30,30,0.95) !important; }
