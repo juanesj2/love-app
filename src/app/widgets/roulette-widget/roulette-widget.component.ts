@@ -117,6 +117,7 @@ import { LoveApiService } from '../../services/love-api.service';
     :host-context(.night-owl-mode) .add-option input { background: rgba(0,0,0,0.4); border-color: #333; color: #fdfdfd; }
     :host-context(.night-owl-mode) .add-option input:focus { border-color: #a78bfa; }
     :host-context(.night-owl-mode) .add-option button { background: linear-gradient(135deg, #a78bfa, #8b5cf6); }
+    :host-context(.night-owl-mode) .roulette-pointer { border-top-color: #a78bfa; }
   `]
 })
 export class RouletteWidgetComponent implements OnInit, OnDestroy {
@@ -132,7 +133,12 @@ export class RouletteWidgetComponent implements OnInit, OnDestroy {
   currentRotation = 0;
   winner: string | null = null;
   
-  colors = ['#FF4D6D', '#FF8FA3', '#FFB3C1', '#c9184a', '#a4133c', '#ff758f', '#ffccd5', '#590D22'];
+  get colors() {
+    if (document.body.classList.contains('night-owl-mode')) {
+      return ['#8b5cf6', '#a78bfa', '#c4b5fd', '#7c3aed', '#6d28d9', '#9333ea', '#d8b4fe', '#5b21b6'];
+    }
+    return ['#FF4D6D', '#FF8FA3', '#FFB3C1', '#c9184a', '#a4133c', '#ff758f', '#ffccd5', '#590D22'];
+  }
   sliceData: any[] = [];
   private spinTimeout: any;
 
