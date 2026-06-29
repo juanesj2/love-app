@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, OnDestroy, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ToastController, AlertController } from '@ionic/angular';
@@ -246,7 +246,7 @@ import { Camera, CameraResultType } from '@capacitor/camera';
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
 })
-export class TimelineWidgetComponent implements OnInit {
+export class TimelineWidgetComponent implements OnInit, OnDestroy {
   @Output() close = new EventEmitter<void>();
 
   private api = inject(LoveApiService);
@@ -265,8 +265,13 @@ export class TimelineWidgetComponent implements OnInit {
   }
 
   ngOnInit() {
+    document.body.classList.add('hide-tabs');
     this.loadPlans();
     this.loadAlbums();
+  }
+
+  ngOnDestroy() {
+    document.body.classList.remove('hide-tabs');
   }
 
   get filteredPlans() {

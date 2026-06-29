@@ -459,3 +459,21 @@ ion-tab-bar::part(native) {
   padding: 5px !important;
 }
 
+/* Hide Tabs Animation */
+body.hide-tabs ion-footer.custom-footer {
+  transform: translateY(150%) !important;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+body:not(.hide-tabs) ion-footer.custom-footer {
+  transform: translateY(0) !important;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+body.hide-tabs .floating-center-wrapper {
+  transform: translate(-50%, 150%) !important;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+body:not(.hide-tabs) .floating-center-wrapper {
+  transform: translate(-50%, 0) !important;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
