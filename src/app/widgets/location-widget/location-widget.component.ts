@@ -11,9 +11,12 @@ import { Preferences } from '@capacitor/preferences';
 import { addIcons } from 'ionicons';
 import { locateOutline, flagOutline, camera, image, close, locationOutline, heart, eyeOutline, eyeOffOutline } from 'ionicons/icons';
 import { LoveApiService } from '../../services/love-api.service';
+import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.component';
 
 @Component({
   selector: 'app-location-widget',
+  standalone: true,
+  imports: [CommonModule, IonIcon, TimelineWidgetComponent],
   template: `
     <div class="location-container" [class.is-together]="areTogether">
       
@@ -52,7 +55,7 @@ import { LoveApiService } from '../../services/love-api.service';
         </div>
       
       <!-- Floating Next Milestone -->
-      <div class="next-milestone-card" *ngIf="nextMilestone" (click)="loadNextMilestone()">
+      <div class="next-milestone-card" *ngIf="nextMilestone" (click)="openTimeline()">
         <div class="nm-icon">
           <ion-icon name="flag-outline"></ion-icon>
         </div>
@@ -86,6 +89,9 @@ import { LoveApiService } from '../../services/love-api.service';
           <p>Disfrutad del momento</p>
         </div>
       </div>
+      
+      <!-- TIMELINE MODAL -->
+      <app-timeline-widget *ngIf="isTimelineModalOpen" [initialPlanId]="nextMilestone?.id" (close)="isTimelineModalOpen = false"></app-timeline-widget>
     </div>
   `,
   styles: [`
@@ -203,6 +209,11 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
   }
 
   private appStateListener?: PluginListenerHandle;
+  isTimelineModalOpen = false;
+
+  openTimeline() {
+    this.isTimelineModalOpen = true;
+  }
 
   async ngOnInit() {
     this.isGhostMode = await this.locationService.getPrivacyMode();
