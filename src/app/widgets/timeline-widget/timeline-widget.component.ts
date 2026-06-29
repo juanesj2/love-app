@@ -241,6 +241,7 @@ import { Camera, CameraResultType } from '@capacitor/camera';
     .inline-input { border: none; background: transparent; flex: 1; font-family: 'Inter', sans-serif; color: #590D22; font-weight: 500; font-size: 0.95rem; outline: none; }
     .packing-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
     .small-glass-btn { background: rgba(255,77,109,0.1); color: #FF4D6D; border: none; padding: 8px 15px; border-radius: 10px; font-weight: 700; margin-top: 10px; width: 100%; cursor: pointer; }
+    .dynamic-section h4 { color: #590D22; }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
