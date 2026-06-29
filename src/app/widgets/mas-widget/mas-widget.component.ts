@@ -882,12 +882,16 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
       :host-context(.night-owl-mode) .m-title, :host-context(.night-owl-mode) .p-title { color: #fdfdfd !important; }
       :host-context(.night-owl-mode) .m-date, :host-context(.night-owl-mode) .p-rating, :host-context(.night-owl-mode) .m-rating { color: #ccc !important; }
       :host-context(.night-owl-mode) .m-days { background: rgba(167,139,250,0.2) !important; color: #a78bfa !important; }
-      :host-context(.night-owl-mode) .food-card, :host-context(.night-owl-mode) .movie-card { background: rgba(0,0,0,0.4); border-color: #333; }
+      :host-context(.night-owl-mode) .food-card, :host-context(.night-owl-mode) .movie-card { background: rgba(0,0,0,0.4) !important; border-color: #333 !important; }
       :host-context(.night-owl-mode) .add-btn { background: rgba(167,139,250,0.1); color: #a78bfa; border-color: rgba(167,139,250,0.3); }
       :host-context(.night-owl-mode) .modal-content.glass-card { background: rgba(30,30,30,0.95) !important; }
       :host-context(.night-owl-mode) .modal-content h2, :host-context(.night-owl-mode) .bottom-sheet-header h2 { color: #fdfdfd !important; }
       :host-context(.night-owl-mode) .modal-content p, :host-context(.night-owl-mode) .bottom-sheet-header p { color: #ccc !important; }
-      :host-context(.night-owl-mode) .bottom-sheet-modal { background: rgba(30,30,30,0.98); }
+      :host-context(.night-owl-mode) .bottom-sheet-modal { background: rgba(30,30,30,0.98) !important; }
+      :host-context(.night-owl-mode) .bottom-sheet-header { background: #121212 !important; }
+      :host-context(.night-owl-mode) .bottom-sheet-footer { background: #121212 !important; }
+      :host-context(.night-owl-mode) .bottom-sheet-body input[type="text"] { background: rgba(0,0,0,0.4) !important; border-color: #333 !important; color: #fdfdfd !important; }
+      :host-context(.night-owl-mode) .bottom-sheet-body button { background: rgba(0,0,0,0.4) !important; border-color: #333 !important; }
       :host-context(.night-owl-mode) .sheet-close-btn { background: rgba(255,255,255,0.1); color: #fdfdfd; }
       :host-context(.night-owl-mode) .settings-item { background: rgba(0,0,0,0.4) !important; border: 1px solid #333; }
       :host-context(.night-owl-mode) .settings-item h4 { color: #fdfdfd !important; }
