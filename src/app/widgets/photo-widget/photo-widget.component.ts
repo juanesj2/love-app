@@ -618,6 +618,33 @@ import { Share } from '@capacitor/share';
     .prompt-btn.cancel { background: #f1f3f5; color: #888; }
     .prompt-btn.confirm { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3); }
     .prompt-btn:disabled { opacity: 0.7; pointer-events: none; }
+
+    /* Night Owl Mode Overrides */
+    :host-context(.night-owl-mode) .top-nav { background: rgba(30,30,30,0.85); border-color: rgba(255,255,255,0.05); }
+    :host-context(.night-owl-mode) .nav-btn { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .nav-btn.active { color: #a78bfa; background: rgba(167,139,250,0.1); }
+    :host-context(.night-owl-mode) .filter-bar { background: rgba(30,30,30,0.95); border-color: #333; }
+    :host-context(.night-owl-mode) .filter-chip { background: rgba(0,0,0,0.5); color: #ccc; border-color: #333; }
+    :host-context(.night-owl-mode) .filter-chip.active { background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: white; border-color: transparent; }
+    :host-context(.night-owl-mode) .gallery-month-title { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .photo-card { background: rgba(30,30,30,0.85); border-color: rgba(255,255,255,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .card-username { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .card-time { color: #aaa; }
+    :host-context(.night-owl-mode) .action-btn { color: #ccc; background: rgba(255,255,255,0.05); }
+    :host-context(.night-owl-mode) .action-btn.liked { color: #a78bfa; background: rgba(167,139,250,0.1); }
+    :host-context(.night-owl-mode) .comment-input-wrapper { background: rgba(0,0,0,0.4); border-color: #333; }
+    :host-context(.night-owl-mode) .comment-input { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .comment-input::placeholder { color: #666; }
+    :host-context(.night-owl-mode) .comment-btn { color: #a78bfa; }
+    :host-context(.night-owl-mode) .lightbox-content { background: rgba(0,0,0,0.9); }
+    :host-context(.night-owl-mode) .prompt-sheet { background: rgba(30,30,30,0.98); }
+    :host-context(.night-owl-mode) .premium-textarea { background: rgba(0,0,0,0.4); border-color: #333; color: #fdfdfd; }
+    :host-context(.night-owl-mode) .streak-modal-content { background: rgba(30,30,30,0.95); border: 1px solid #333; }
+    :host-context(.night-owl-mode) .streak-modal-content h3 { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .streak-status p { color: #ccc; }
+    :host-context(.night-owl-mode) .streak-timer-box { background: rgba(167,139,250,0.1); color: #a78bfa; }
+    :host-context(.night-owl-mode) .streak-timer-box.success { background: rgba(46,204,113,0.1); color: #2ecc71; }
+    :host-context(.night-owl-mode) .streak-close-btn { background: rgba(255,255,255,0.1); color: #fdfdfd; }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]

@@ -539,6 +539,39 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
     .restore-graffitis-btn:active { transform: scale(0.95); }
     .restore-graffitis-btn ion-icon { font-size: 1.1rem; }
     .mine .restore-graffitis-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; }
+
+    /* Night Owl Mode Overrides */
+    :host-context(.night-owl-mode) .input-area { background: rgba(30,30,30,0.85); border-top-color: rgba(255,255,255,0.05); }
+    :host-context(.night-owl-mode) .premium-input { background: rgba(0,0,0,0.4); border-color: #333; color: #fdfdfd; }
+    :host-context(.night-owl-mode) .premium-input:focus { background: rgba(0,0,0,0.6); border-color: #a78bfa; }
+    :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble { background: rgba(40,40,40,0.9); color: #fdfdfd; border-color: #333; }
+    :host-context(.night-owl-mode) .sender { color: #a78bfa; }
+    :host-context(.night-owl-mode) .attach-btn { color: #a78bfa; }
+    :host-context(.night-owl-mode) .empty-state { color: #ccc; }
+    :host-context(.night-owl-mode) .empty-icon { color: #8b5cf6; }
+    :host-context(.night-owl-mode) .reactions-container,
+    :host-context(.night-owl-mode) .attach-menu,
+    :host-context(.night-owl-mode) .reactions-popover-content,
+    :host-context(.night-owl-mode) .insta-context-menu { background: rgba(40,40,40,0.95); border-color: #333; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .attach-menu-item { color: #a78bfa; }
+    :host-context(.night-owl-mode) .attach-menu-item:hover { background: rgba(255,255,255,0.1); }
+    :host-context(.night-owl-mode) .reply-preview { background: rgba(40,40,40,0.95); border-left-color: #a78bfa; }
+    :host-context(.night-owl-mode) .reply-title { color: #a78bfa; }
+    :host-context(.night-owl-mode) .reply-text { color: #ccc; }
+    :host-context(.night-owl-mode) .gif-modal { background: rgba(30,30,30,0.98); border-top: 1px solid #333; }
+    :host-context(.night-owl-mode) .gif-search { background: rgba(0,0,0,0.4); border-color: #333; color: #fdfdfd; }
+    :host-context(.night-owl-mode) .gif-search-btn { background: linear-gradient(135deg, #a78bfa, #8b5cf6); }
+    :host-context(.night-owl-mode) .color-picker-modal { background: rgba(30,30,30,0.95); border-color: #333; }
+    :host-context(.night-owl-mode) .color-picker-modal h3 { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .cp-btn.cancel { background: rgba(255,255,255,0.1); color: #ccc; }
+    :host-context(.night-owl-mode) .cp-btn.accept { background: linear-gradient(135deg, #a78bfa, #8b5cf6); }
+    :host-context(.night-owl-mode) .menu-username { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .menu-action { color: #ccc; }
+    :host-context(.night-owl-mode) .menu-action ion-icon { color: #a78bfa; }
+    :host-context(.night-owl-mode) .menu-action:active { background: rgba(255,255,255,0.1); }
+    :host-context(.night-owl-mode) .recording-bar { background: rgba(167,139,250,0.15); }
+    :host-context(.night-owl-mode) .recording-indicator { color: #a78bfa; }
+    :host-context(.night-owl-mode) .pulse-dot { background: #a78bfa; }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]

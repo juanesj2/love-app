@@ -157,6 +157,20 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
 
     ::ng-deep .pulse-marker::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%; border: 3px solid #FF4D6D; animation: radarPulse 2s infinite; z-index: -1; }
     @keyframes radarPulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.6); opacity: 0; } }
+
+    /* Night Owl Mode Overrides */
+    :host-context(.night-owl-mode) .top-bar-overlay { background: linear-gradient(180deg, rgba(18,18,18,0.95) 0%, rgba(18,18,18,0) 100%); }
+    :host-context(.night-owl-mode) .hud-bar { background: rgba(30,30,30,0.85); border-color: rgba(255,255,255,0.05); }
+    :host-context(.night-owl-mode) .partner-name { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .partner-city { color: #ccc; }
+    :host-context(.night-owl-mode) .mood-btn { background: rgba(0,0,0,0.5); border-color: #333; }
+    :host-context(.night-owl-mode) .mood-btn .mood-icon { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .hud-bottom { background: linear-gradient(0deg, rgba(18,18,18,0.9) 0%, rgba(18,18,18,0) 100%); }
+    :host-context(.night-owl-mode) .hud-card { background: rgba(30,30,30,0.85); border-color: rgba(255,255,255,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .hud-card-title { color: #a78bfa; }
+    :host-context(.night-owl-mode) .hud-card-val { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .poke-btn { background: linear-gradient(135deg, #a78bfa, #8b5cf6); box-shadow: 0 4px 15px rgba(167,139,250,0.3); }
+    :host-context(.night-owl-mode) .avatar-ring { background: rgba(30,30,30,0.9); border-color: rgba(255,255,255,0.1); }
   `]
 })
 export class LocationWidgetComponent implements OnInit, OnDestroy {

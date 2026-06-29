@@ -183,6 +183,15 @@ import { Location } from '@angular/common';
     :host-context(.night-owl-mode) .empty-state h3 { color: #fdfdfd; }
     :host-context(.night-owl-mode) .empty-state p { color: #ccc; }
     :host-context(.night-owl-mode) .scroll-top-btn { background: linear-gradient(135deg, #a78bfa, #8b5cf6); box-shadow: 0 4px 15px rgba(167,139,250,0.4); }
+    :host-context(.night-owl-mode) .custom-toggle-container { background: rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .toggle-pill { color: #aaa; }
+    :host-context(.night-owl-mode) .toggle-pill.active { background: #333; color: #a78bfa; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .category-pill { background: rgba(255,255,255,0.05); color: #ccc; }
+    :host-context(.night-owl-mode) .category-pill.active { background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: white; }
+    :host-context(.night-owl-mode) .answer-row { background: rgba(0,0,0,0.4); border: 1px solid #333; }
+    :host-context(.night-owl-mode) .answer-row.partner { background: rgba(167,139,250,0.15); border-color: rgba(167,139,250,0.3); }
+    :host-context(.night-owl-mode) .a-label { color: #8b5cf6; }
+    :host-context(.night-owl-mode) .a-text { color: #fdfdfd; }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonIcon, IonContent, IonRefresher, IonRefresherContent]

@@ -854,6 +854,10 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
       
       :host-context(.night-owl-mode) .mas-container { background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%); }
       :host-context(.night-owl-mode) .glass-card { background: rgba(30, 30, 30, 0.85); border-color: rgba(255, 255, 255, 0.05); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+      :host-context(.night-owl-mode) .grid-card { background: rgba(30, 30, 30, 0.85); border-color: rgba(255, 255, 255, 0.05); }
+      :host-context(.night-owl-mode) .grid-card.interactive:active { background: rgba(50, 50, 50, 0.85); }
+      :host-context(.night-owl-mode) .grid-card h4 { color: #fdfdfd; }
+      :host-context(.night-owl-mode) .grid-card .sub { color: #a78bfa; }
       :host-context(.night-owl-mode) .title, :host-context(.night-owl-mode) .section-title h3, :host-context(.night-owl-mode) .food-info h4, :host-context(.night-owl-mode) .movie-info h4 { color: #fdfdfd; text-shadow: none; }
       :host-context(.night-owl-mode) .subtitle, :host-context(.night-owl-mode) .desc { color: #ccc; }
       :host-context(.night-owl-mode) .glass-input, :host-context(.night-owl-mode) .glass-select { background: rgba(0,0,0,0.4); border-color: #333; color: #fdfdfd; color-scheme: dark; }
@@ -868,7 +872,14 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
       :host-context(.night-owl-mode) .food-card, :host-context(.night-owl-mode) .movie-card { background: rgba(0,0,0,0.4); border-color: #333; }
       :host-context(.night-owl-mode) .add-btn { background: rgba(167,139,250,0.1); color: #a78bfa; border-color: rgba(167,139,250,0.3); }
       :host-context(.night-owl-mode) .modal-content.glass-card { background: rgba(30,30,30,0.95); }
-      :host-context(.night-owl-mode) .modal-content h2 { color: #fdfdfd !important; }
+      :host-context(.night-owl-mode) .modal-content h2, :host-context(.night-owl-mode) .bottom-sheet-header h2 { color: #fdfdfd !important; }
+      :host-context(.night-owl-mode) .bottom-sheet-header p { color: #ccc; }
+      :host-context(.night-owl-mode) .bottom-sheet-modal { background: rgba(30,30,30,0.98); }
+      :host-context(.night-owl-mode) .sheet-close-btn { background: rgba(255,255,255,0.1); color: #fdfdfd; }
+      :host-context(.night-owl-mode) .settings-item { background: rgba(0,0,0,0.4) !important; border: 1px solid #333; }
+      :host-context(.night-owl-mode) .settings-item h4 { color: #fdfdfd !important; }
+      :host-context(.night-owl-mode) .settings-item p { color: #aaa !important; }
+      :host-context(.night-owl-mode) .logout-btn { background: rgba(255,77,109,0.1); color: #FF4D6D; border-color: rgba(255,77,109,0.3); }
     `]
 })
 export class MasWidgetComponent implements OnInit, OnDestroy {
