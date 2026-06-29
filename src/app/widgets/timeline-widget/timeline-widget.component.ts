@@ -87,7 +87,7 @@ import { Camera, CameraResultType } from '@capacitor/camera';
             <input type="text" class="glass-input" [(ngModel)]="editingPlan.title" placeholder="Ej: Viaje a Roma">
             
             <label>Categoría</label>
-            <ion-select class="glass-select" [(ngModel)]="editingPlan.category" interface="popover">
+            <ion-select class="glass-select" [(ngModel)]="editingPlan.category" interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }">
               <ion-select-option value="trip">✈️ Viaje</ion-select-option>
               <ion-select-option value="date">🍷 Cita / Restaurante</ion-select-option>
               <ion-select-option value="music">🎵 Concierto / Festival</ion-select-option>
@@ -95,7 +95,7 @@ import { Camera, CameraResultType } from '@capacitor/camera';
             </ion-select>
 
             <label>Estado</label>
-            <ion-select class="glass-select" [(ngModel)]="editingPlan.status" interface="popover">
+            <ion-select class="glass-select" [(ngModel)]="editingPlan.status" interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }">
               <ion-select-option value="idea">💡 Solo es una idea</ion-select-option>
               <ion-select-option value="planned">📅 ¡Ya hay fecha!</ion-select-option>
               <ion-select-option value="completed">✅ Completado</ion-select-option>
@@ -139,7 +139,7 @@ import { Camera, CameraResultType } from '@capacitor/camera';
             <div class="dynamic-section" *ngIf="editingPlan.status === 'completed'">
               <h4 style="margin-top: 20px; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 5px;">📸 Vincular Álbum</h4>
               <p style="font-size: 0.8rem; color: #666;">Asocia las fotos de este plan a un álbum de la galería.</p>
-              <ion-select class="glass-select" [(ngModel)]="editingPlan.linked_album_id" interface="popover" placeholder="Seleccionar álbum">
+              <ion-select class="glass-select" [(ngModel)]="editingPlan.linked_album_id" interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" placeholder="Seleccionar álbum">
                 <ion-select-option [value]="null">Sin álbum vinculado</ion-select-option>
                 <ion-select-option *ngFor="let album of albums" [value]="album.id">{{ album.name }}</ion-select-option>
               </ion-select>
@@ -226,13 +226,13 @@ import { Camera, CameraResultType } from '@capacitor/camera';
       background: #fff0f3; z-index: 10; display: flex; flex-direction: column;
     }
     .editor-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; color: #590D22; font-weight: 900; font-size: 1.3rem; }
-    .editor-body { flex: 1; overflow-y: auto; padding: 0 20px 20px; }
+    .editor-body { flex: 1; overflow-y: auto; padding: 0 20px 100px; }
     .editor-body label { display: block; font-weight: 700; color: #800f2f; margin: 15px 0 5px; font-size: 0.9rem; }
     
     .glass-input, .glass-select {
       width: 100%; padding: 14px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.8);
       background: rgba(255,255,255,0.6); font-family: 'Inter', sans-serif; font-size: 0.95rem;
-      color: #590D22; outline: none; font-weight: 600;
+      color: #590D22; --color: #590D22; outline: none; font-weight: 600;
     }
     .editor-footer { padding: 20px; display: flex; gap: 10px; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); }
     .glass-btn { flex: 1; padding: 15px; border-radius: 15px; border: none; background: #FF4D6D; color: white; font-weight: 800; font-size: 1rem; }
