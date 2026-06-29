@@ -153,6 +153,28 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
           </div>
         </div>
 
+        <!-- Tour Gastronómico -->
+        <div class="glass-card timeline-banner" id="mas-gastro" (click)="openGastroModal()">
+          <div class="timeline-banner-content">
+            <div class="icon-circle" style="background: linear-gradient(135deg, #FF9A9E, #FECFEF); box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3); color: #c9184a; width: 60px; height: 60px; font-size: 1.8rem; margin-bottom: 10px;">
+              <ion-icon name="restaurant-outline"></ion-icon>
+            </div>
+            <h3 style="color: #590D22; margin: 0; font-weight: 900; font-size: 1.5rem;">Tour Gastro</h3>
+            <p style="color: #a4133c; margin: 5px 0 0; font-size: 0.95rem;">Explora los restaurantes y platos que hemos probado.</p>
+          </div>
+        </div>
+
+        <!-- Cine Pareja -->
+        <div class="glass-card timeline-banner" id="mas-cine" (click)="openCineModal()">
+          <div class="timeline-banner-content">
+            <div class="icon-circle" style="background: linear-gradient(135deg, #a2d2ff, #bde0fe); box-shadow: 0 4px 15px rgba(162, 210, 255, 0.3); color: #023e8a; width: 60px; height: 60px; font-size: 1.8rem; margin-bottom: 10px;">
+              <ion-icon name="film-outline"></ion-icon>
+            </div>
+            <h3 style="color: #590D22; margin: 0; font-weight: 900; font-size: 1.5rem;">Cine Pareja</h3>
+            <p style="color: #a4133c; margin: 5px 0 0; font-size: 0.95rem;">Nuestra lista de pelis, series y documentales favoritos.</p>
+          </div>
+        </div>
+
         <!-- Quick Actions Grid -->
         <div class="quick-actions-grid">
           <!-- Logros y Secretos (Spans full width) -->
@@ -168,24 +190,6 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
               <ion-select-option value="feed">Todas las fotos</ion-select-option>
               <ion-select-option *ngFor="let album of albums" [value]="album.id">{{ album.name }}</ion-select-option>
             </ion-select>
-          </div>
-
-          <!-- Tour Gastronómico -->
-          <div class="grid-card interactive" id="mas-gastro" (click)="openGastroModal()">
-            <div class="icon-circle" style="background: linear-gradient(135deg, #FF9A9E, #FECFEF); box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3); color: #c9184a;">
-              <ion-icon name="restaurant-outline"></ion-icon>
-            </div>
-            <h4>Tour Gastro</h4>
-            <span class="sub">Platos y sitios</span>
-          </div>
-
-          <!-- Cine en Pareja -->
-          <div class="grid-card interactive" id="mas-cine" (click)="openCineModal()">
-            <div class="icon-circle" style="background: linear-gradient(135deg, #a2d2ff, #bde0fe); box-shadow: 0 4px 15px rgba(162, 210, 255, 0.3); color: #023e8a;">
-              <ion-icon name="film-outline"></ion-icon>
-            </div>
-            <h4>Cine Pareja</h4>
-            <span class="sub">Pelis y series</span>
           </div>
 
           <!-- Minijuego -->
@@ -240,7 +244,7 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
 
 
         <!-- Food List Modal -->
-        <div class="custom-overlay" *ngIf="isFoodListModalOpen" (click)="isFoodListModalOpen = false">
+        <div class="custom-overlay" *ngIf="isFoodListModalOpen" (click)="closeGastroModal()">
           <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 85vh; overflow-y: hidden; z-index: 1000;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="restaurant-outline"></ion-icon> Tour Gastronómico</h2>
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Restaurantes y platos que hemos probado</p>
@@ -282,12 +286,12 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
             <button id="gastro-add" class="glass-btn" style="width: 100%; margin-bottom: 10px;" (click)="openAddFoodPlaceModal()">
               <ion-icon name="add-circle-outline"></ion-icon> Añadir Restaurante
             </button>
-            <button class="glass-btn" style="width: 100%; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="isFoodListModalOpen = false">Cerrar</button>
+            <button class="glass-btn" style="width: 100%; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="closeGastroModal()">Cerrar</button>
           </div>
         </div>
 
         <!-- Movies List Modal -->
-        <div class="custom-overlay" id="cine-modal" *ngIf="isMovieListModalOpen" (click)="isMovieListModalOpen = false">
+        <div class="custom-overlay" id="cine-modal" *ngIf="isMovieListModalOpen" (click)="closeCineModal()">
           <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 85vh; overflow-y: hidden;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="film-outline"></ion-icon> Cine en Pareja</h2>
             <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Películas y series que vemos juntos</p>
@@ -323,7 +327,7 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
             <button id="cine-add" class="glass-btn" style="width: 100%; margin-bottom: 10px;" (click)="openAddMovieModal()">
               <ion-icon name="add-circle-outline"></ion-icon> Añadir Película/Serie
             </button>
-            <button class="glass-btn" style="width: 100%; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="isMovieListModalOpen = false">Cerrar</button>
+            <button class="glass-btn" style="width: 100%; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="closeCineModal()">Cerrar</button>
           </div>
         </div>
 
@@ -1102,12 +1106,24 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
   async openGastroModal() {
     this.isFoodListModalOpen = true;
+    document.body.classList.add('hide-tabs');
     setTimeout(() => this.tutorialService.showGastroTour(), 600);
+  }
+
+  closeGastroModal() {
+    this.isFoodListModalOpen = false;
+    document.body.classList.remove('hide-tabs');
   }
 
   openCineModal() {
     this.isMovieListModalOpen = true;
+    document.body.classList.add('hide-tabs');
     setTimeout(() => this.tutorialService.showCineTour(), 600);
+  }
+
+  closeCineModal() {
+    this.isMovieListModalOpen = false;
+    document.body.classList.remove('hide-tabs');
   }
 
   async handleRefresh(event: any) {
