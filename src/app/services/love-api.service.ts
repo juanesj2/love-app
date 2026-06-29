@@ -135,6 +135,14 @@ export class LoveApiService {
     this.token$.next(null);
   }
 
+  async unpair(): Promise<any> {
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/unpair`, {}));
+  }
+
+  async deleteAccount(): Promise<any> {
+    return firstValueFrom(this.http.delete(`${API_BASE_URL}/usuario`));
+  }
+
   // --- INFO Y POKE ---
   async getCoupleInfo(): Promise<any> {
     const date = new Date();

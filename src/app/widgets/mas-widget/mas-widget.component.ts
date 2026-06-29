@@ -11,6 +11,7 @@ import { Preferences } from '@capacitor/preferences';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { LocationService } from '../../services/location.service';
 import { TutorialService } from '../../services/tutorial.service';
+import { OfflineSyncService } from '../../services/offline-sync.service';
 import { addIcons } from 'ionicons';
 import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline } from 'ionicons/icons';
 import { Subject } from 'rxjs';
@@ -206,6 +207,12 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
             <span class="sub" *ngIf="!uploadingAvatar">Cambiar foto</span>
             <span class="sub" *ngIf="uploadingAvatar">Actualizando...</span>
           </div>
+        <!-- Settings -->
+          <div class="grid-card full-width interactive" id="mas-ajustes" (click)="isSettingsModalOpen = true">
+            <h4><ion-icon name="settings-sharp" style="color: #6c757d;"></ion-icon> Ajustes de Cuenta</h4>
+            <p style="margin: 0; font-size: 0.85rem; color: #495057; font-weight: 500;">Modo Búho, Privacidad y Cuenta.</p>
+          </div>
+
         </div>
 
         <!-- Logout -->
@@ -238,6 +245,46 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
         </div>
       </div>
 
+      <!-- Settings Modal -->
+      <div class="custom-overlay" *ngIf="isSettingsModalOpen" (click)="isSettingsModalOpen = false" style="align-items: flex-end;">
+        <div class="bottom-sheet-modal" (click)="$event.stopPropagation()">
+          <div class="bottom-sheet-header">
+            <div class="sheet-close-btn" (click)="isSettingsModalOpen = false">
+              <ion-icon name="close-outline"></ion-icon>
+            </div>
+            <h2>Ajustes</h2>
+            <p>Configura tu cuenta y preferencias.</p>
+          </div>
+          
+          <div class="bottom-sheet-body">
+            <div class="settings-list">
+              <div class="settings-item" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.8); border-radius: 14px; margin-bottom: 10px;">
+                <div>
+                  <h4 style="margin: 0; color: #590D22; font-weight: 700;">🦉 Modo Búho</h4>
+                  <p style="margin: 0; font-size: 0.8rem; color: #6c757d;">Activa el modo oscuro global.</p>
+                </div>
+                <ion-toggle [(ngModel)]="isNightOwlEnabled" (ionChange)="toggleNightOwl()"></ion-toggle>
+              </div>
+
+              <div class="settings-item interactive" (click)="confirmUnpair()" style="display: flex; align-items: center; padding: 15px; background: rgba(255, 77, 109, 0.1); border-radius: 14px; margin-bottom: 10px;">
+                <ion-icon name="heart-dislike-outline" style="color: #FF4D6D; font-size: 1.5rem; margin-right: 15px;"></ion-icon>
+                <div>
+                  <h4 style="margin: 0; color: #FF4D6D; font-weight: 700;">Desvincular Pareja</h4>
+                  <p style="margin: 0; font-size: 0.8rem; color: #a4133c;">Romper el vínculo actual.</p>
+                </div>
+              </div>
+
+              <div class="settings-item interactive" (click)="confirmDeleteAccount()" style="display: flex; align-items: center; padding: 15px; background: rgba(200, 0, 0, 0.1); border-radius: 14px;">
+                <ion-icon name="trash-outline" style="color: #c80000; font-size: 1.5rem; margin-right: 15px;"></ion-icon>
+                <div>
+                  <h4 style="margin: 0; color: #c80000; font-weight: 700;">Eliminar mi Cuenta</h4>
+                  <p style="margin: 0; font-size: 0.8rem; color: #a4133c;">Borrar todos mis datos para siempre.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
         <!-- Food List Modal -->
         <div class="custom-overlay" *ngIf="isFoodListModalOpen" (click)="closeGastroModal()" style="align-items: flex-end;">
@@ -829,12 +876,12 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
   private api = inject(LoveApiService);
   private toastCtrl = inject(ToastController);
-  private actionSheetCtrl = inject(ActionSheetController);
-  private router = inject(Router);
   private alertCtrl = inject(AlertController);
+  private actionSheetCtrl = inject(ActionSheetController);
   private locationService = inject(LocationService);
   private sanitizer = inject(DomSanitizer);
   private tutorialService = inject(TutorialService);
+  private offlineSync = inject(OfflineSyncService);
 
   isMapModalOpen = false;
   safeMapUrl: SafeResourceUrl | null = null;
@@ -983,11 +1030,68 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     this.isConfirmModalOpen = false;
   }
 
+  isSettingsModalOpen = false;
+  isNightOwlEnabled = false;
+
   constructor() {
-    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, add, pencilOutline, locationOutline, restaurantOutline, filmOutline, star, cameraOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline });
+    addIcons({ bookOutline, imageOutline, logOutOutline, addCircleOutline, starOutline, star, closeOutline, checkmarkCircleOutline, restaurantOutline, locationOutline, pencilOutline, filmOutline, gameControllerOutline, personCircleOutline, informationCircleOutline, heartOutline, heart, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, timeOutline, settingsOutline, flagOutline, checkmarkCircle, ellipseOutline, moonOutline, closeCircle, calendar, add, cameraOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline });
+  }
+
+  async checkNightOwl() {
+    const pref = await Preferences.get({ key: 'night_owl_enabled' });
+    this.isNightOwlEnabled = pref.value === 'true';
+  }
+
+  async toggleNightOwl() {
+    await Preferences.set({ key: 'night_owl_enabled', value: this.isNightOwlEnabled ? 'true' : 'false' });
+    document.body.classList.toggle('night-owl-mode', this.isNightOwlEnabled);
+    document.documentElement.classList.toggle('night-owl-mode', this.isNightOwlEnabled);
+  }
+
+  async confirmUnpair() {
+    const alert = await this.alertCtrl.create({
+      header: '¿Desvincular pareja?',
+      message: 'Dejarás de ver toda la información compartida hasta que vuelvas a vincularte. ¿Estás seguro?',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        { 
+          text: 'Sí, desvincular', 
+          role: 'destructive',
+          handler: async () => {
+            await this.api.unpair();
+            this.showToast('Pareja desvinculada', 'success');
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  async confirmDeleteAccount() {
+    const alert = await this.alertCtrl.create({
+      header: '¿ELIMINAR CUENTA?',
+      message: 'Esta acción es IRREVERSIBLE. Se borrarán todos tus datos. ¿Estás absolutamente seguro?',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        { 
+          text: 'ELIMINAR', 
+          role: 'destructive',
+          handler: async () => {
+            await this.api.deleteAccount();
+            await this.api.logout();
+            window.location.reload();
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 
   async ngOnInit() {
+    this.checkNightOwl();
     this.locationSubject.pipe(debounceTime(2000)).subscribe(location => {
       if (location && location.trim().length > 0) {
         const url = `https://maps.google.com/maps?q=${encodeURIComponent(location)}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
@@ -1412,6 +1516,27 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
   async saveFoodPlace() {
     if (!this.newFoodPlace.name) return this.showToast('Ponle nombre al sitio', 'warning');
+    
+    if (!navigator.onLine) {
+      await this.offlineSync.enqueueAction({
+        id: Date.now().toString(),
+        type: 'food_place',
+        method: this.newFoodPlace.id ? 'PUT' : 'POST',
+        endpointId: this.newFoodPlace.id,
+        payload: { ...this.newFoodPlace }
+      });
+      // Añadir temporalmente a la lista para que se vea
+      if (this.newFoodPlace.id) {
+        const idx = this.foodPlaces.findIndex(p => p.id === this.newFoodPlace.id);
+        if (idx !== -1) this.foodPlaces[idx] = { ...this.newFoodPlace };
+      } else {
+        this.foodPlaces.unshift({ ...this.newFoodPlace, id: Date.now() });
+      }
+      this.isAddingFoodPlace = false;
+      this.newFoodPlace = { name: '', location: '', description: '', rating: 5, category: '', is_favorite: false, imageBase64: null };
+      return;
+    }
+
     try {
       if (this.newFoodPlace.id) {
         await this.api.updateFoodPlace(this.newFoodPlace.id, this.newFoodPlace.name, this.newFoodPlace.location, this.newFoodPlace.rating, this.newFoodPlace.description, this.newFoodPlace.imageBase64, this.newFoodPlace.category, this.newFoodPlace.is_favorite);
@@ -1546,6 +1671,27 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
   async saveMovie() {
     if (!this.newMovie.title) return this.showToast('Ponle título', 'warning');
+    
+    if (!navigator.onLine) {
+      await this.offlineSync.enqueueAction({
+        id: Date.now().toString(),
+        type: 'movie',
+        method: this.newMovie.id ? 'PUT' : 'POST',
+        endpointId: this.newMovie.id,
+        payload: { ...this.newMovie }
+      });
+      if (this.newMovie.id) {
+        const idx = this.movies.findIndex(m => m.id === this.newMovie.id);
+        if (idx !== -1) this.movies[idx] = { ...this.newMovie };
+      } else {
+        this.movies.unshift({ ...this.newMovie, id: Date.now() });
+      }
+      this.isAddingMovie = false;
+      this.newMovie = { title: '', description: '', who_fell_asleep: '', favorite_quote: '', rating: 5, genre: '', is_favorite: false, imageBase64: null };
+      this.showWhoFellAsleep = false;
+      return;
+    }
+
     try {
       console.log('[SAVE] imageBase64 presente:', !!this.newMovie.imageBase64, 'length:', this.newMovie.imageBase64?.length);
       if (this.newMovie.id) {

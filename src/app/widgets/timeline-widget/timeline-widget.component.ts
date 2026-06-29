@@ -20,6 +20,7 @@ import {
 import { NotificationService } from '../../services/notification.service';
 import { LoveApiService } from '../../services/love-api.service';
 import { Camera, CameraResultType } from '@capacitor/camera';
+import { OfflineSyncService } from '../../services/offline-sync.service';
 
 @Component({
   selector: 'app-timeline-widget',
@@ -260,6 +261,7 @@ export class TimelineWidgetComponent implements OnInit, OnDestroy {
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
   private notificationService = inject(NotificationService);
+  private offlineSync = inject(OfflineSyncService);
 
   activeTab: 'idea' | 'planned' | 'completed' = 'idea';
   plans: any[] = [];
@@ -353,6 +355,24 @@ export class TimelineWidgetComponent implements OnInit, OnDestroy {
       return;
     }
     
+    if (!navigator.onLine) {
+      await this.offlineSync.enqueueAction({
+        id: Date.now().toString(),
+        type: 'plan',
+        method: this.editingPlan.id ? 'PUT' : 'POST',
+        endpointId: this.editingPlan.id,
+        payload: { ...this.editingPlan }
+      });
+      if (this.editingPlan.id) {
+        const idx = this.plans.findIndex(p => p.id === this.editingPlan.id);
+        if (idx !== -1) this.plans[idx] = { ...this.editingPlan };
+      } else {
+        this.plans.push({ ...this.editingPlan, id: Date.now() });
+      }
+      this.isEditing = false;
+      return;
+    }
+
     try {
       if (this.editingPlan.id) {
         await this.api.updatePlan(this.editingPlan.id, this.editingPlan);
