@@ -150,31 +150,6 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
                 <div style="font-size: 0.95rem; color: #590D22; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ upcomingPlan.title }}</div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <!-- Tour Gastronómico -->
-        <div class="glass-card timeline-banner" id="mas-gastro" (click)="openGastroModal()">
-          <div class="timeline-banner-content">
-            <div class="icon-circle" style="background: linear-gradient(135deg, #FF9A9E, #FECFEF); box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3); color: #c9184a; width: 60px; height: 60px; font-size: 1.8rem; margin-bottom: 10px;">
-              <ion-icon name="restaurant-outline"></ion-icon>
-            </div>
-            <h3 style="color: #590D22; margin: 0; font-weight: 900; font-size: 1.5rem;">Tour Gastro</h3>
-            <p style="color: #a4133c; margin: 5px 0 0; font-size: 0.95rem;">Explora los restaurantes y platos que hemos probado.</p>
-          </div>
-        </div>
-
-        <!-- Cine Pareja -->
-        <div class="glass-card timeline-banner" id="mas-cine" (click)="openCineModal()">
-          <div class="timeline-banner-content">
-            <div class="icon-circle" style="background: linear-gradient(135deg, #a2d2ff, #bde0fe); box-shadow: 0 4px 15px rgba(162, 210, 255, 0.3); color: #023e8a; width: 60px; height: 60px; font-size: 1.8rem; margin-bottom: 10px;">
-              <ion-icon name="film-outline"></ion-icon>
-            </div>
-            <h3 style="color: #590D22; margin: 0; font-weight: 900; font-size: 1.5rem;">Cine Pareja</h3>
-            <p style="color: #a4133c; margin: 5px 0 0; font-size: 0.95rem;">Nuestra lista de pelis, series y documentales favoritos.</p>
-          </div>
-        </div>
-
         <!-- Quick Actions Grid -->
         <div class="quick-actions-grid">
           <!-- Logros y Secretos (Spans full width) -->
@@ -190,6 +165,24 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
               <ion-select-option value="feed">Todas las fotos</ion-select-option>
               <ion-select-option *ngFor="let album of albums" [value]="album.id">{{ album.name }}</ion-select-option>
             </ion-select>
+          </div>
+
+          <!-- Tour Gastronómico -->
+          <div class="grid-card interactive" id="mas-gastro" (click)="openGastroModal()">
+            <div class="icon-circle" style="background: linear-gradient(135deg, #FF9A9E, #FECFEF); box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3); color: #c9184a;">
+              <ion-icon name="restaurant-outline"></ion-icon>
+            </div>
+            <h4>Tour Gastro</h4>
+            <span class="sub">Platos y sitios</span>
+          </div>
+
+          <!-- Cine Pareja -->
+          <div class="grid-card interactive" id="mas-cine" (click)="openCineModal()">
+            <div class="icon-circle" style="background: linear-gradient(135deg, #a2d2ff, #bde0fe); box-shadow: 0 4px 15px rgba(162, 210, 255, 0.3); color: #023e8a;">
+              <ion-icon name="film-outline"></ion-icon>
+            </div>
+            <h4>Cine Pareja</h4>
+            <span class="sub">Pelis y series</span>
           </div>
 
           <!-- Minijuego -->
@@ -244,90 +237,108 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
 
 
         <!-- Food List Modal -->
-        <div class="custom-overlay" *ngIf="isFoodListModalOpen" (click)="closeGastroModal()">
-          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 85vh; overflow-y: hidden; z-index: 1000;" (click)="$event.stopPropagation()">
-            <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="restaurant-outline"></ion-icon> Tour Gastronómico</h2>
-            <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Restaurantes y platos que hemos probado</p>
+        <div class="custom-overlay" *ngIf="isFoodListModalOpen" (click)="closeGastroModal()" style="align-items: flex-end;">
+          <div class="bottom-sheet-modal glass-card" (click)="$event.stopPropagation()">
+            <div class="bottom-sheet-header">
+              <div class="sheet-close-btn" (click)="closeGastroModal()">
+                <ion-icon name="close-outline"></ion-icon>
+              </div>
+              <h2>Tour Gastronómico</h2>
+              <p>Restaurantes y platos que hemos probado.</p>
+            </div>
             
-            <ion-searchbar id="gastro-search" animated="true" [(ngModel)]="searchQueryFoodPlaces" placeholder="Buscar restaurante..." class="custom-searchbar" style="--border-radius: 14px; --background: rgba(255,255,255,0.8); --box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 0; margin-bottom: 15px;"></ion-searchbar>
+            <div class="bottom-sheet-body">
+              <ion-searchbar id="gastro-search" animated="true" [(ngModel)]="searchQueryFoodPlaces" placeholder="Buscar restaurante..." class="custom-searchbar" style="--border-radius: 14px; --background: rgba(255,255,255,0.8); --box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 0; margin-bottom: 15px;"></ion-searchbar>
 
-            <div id="gastro-filters" style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
-              <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedFoodCategory" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todas las categorías">
-                <ion-select-option value="">Todas las categorías</ion-select-option>
-                <ion-select-option *ngFor="let cat of foodCategories" [value]="cat">{{ cat }}</ion-select-option>
-              </ion-select>
+              <div id="gastro-filters" style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
+                <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedFoodCategory" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todas las categorías">
+                  <ion-select-option value="">Todas las categorías</ion-select-option>
+                  <ion-select-option *ngFor="let cat of foodCategories" [value]="cat">{{ cat }}</ion-select-option>
+                </ion-select>
+                
+                <button class="glass-btn" style="padding: 8px 15px; font-size: 1.5rem; width: auto; flex: 0 0 auto; box-shadow: none;" [style.color]="showFavoritesOnlyFoodPlaces ? '#FF4D6D' : '#888'" [style.background]="showFavoritesOnlyFoodPlaces ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="showFavoritesOnlyFoodPlaces = !showFavoritesOnlyFoodPlaces">
+                  <ion-icon [name]="showFavoritesOnlyFoodPlaces ? 'heart' : 'heart-outline'"></ion-icon>
+                </button>
+              </div>
               
-              <button class="glass-btn" style="padding: 8px 15px; font-size: 1.5rem; width: auto; flex: 0 0 auto; box-shadow: none;" [style.color]="showFavoritesOnlyFoodPlaces ? '#FF4D6D' : '#888'" [style.background]="showFavoritesOnlyFoodPlaces ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="showFavoritesOnlyFoodPlaces = !showFavoritesOnlyFoodPlaces">
-                <ion-icon [name]="showFavoritesOnlyFoodPlaces ? 'heart' : 'heart-outline'"></ion-icon>
-              </button>
-            </div>
-            
-            <div id="gastro-list" style="max-height: 35vh; overflow-y: auto; overflow-x: hidden; padding-right: 5px; margin-bottom: 20px;">
-              <div class="food-places-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-              <div class="food-place-item" *ngFor="let place of filteredFoodPlaces" (click)="openFoodPlaceModal(place)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
-                
-                <div *ngIf="place.is_favorite" style="position: absolute; top: 8px; left: 8px; z-index: 5;">
-                  <ion-icon name="heart" style="color: #FF4D6D; font-size: 1.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));"></ion-icon>
+              <div id="gastro-list" style="margin-bottom: 20px;">
+                <div class="food-places-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                  <div class="food-place-item" *ngFor="let place of filteredFoodPlaces" (click)="openFoodPlaceModal(place)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
+                    <div *ngIf="place.is_favorite" style="position: absolute; top: 8px; left: 8px; z-index: 5;">
+                      <ion-icon name="heart" style="color: #FF4D6D; font-size: 1.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));"></ion-icon>
+                    </div>
+                    <div style="position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5;" (click)="$event.stopPropagation(); editFoodPlace(place)">
+                      <ion-icon name="pencil-outline" style="font-size: 1.1rem; color: #FF4D6D;"></ion-icon>
+                    </div>
+                    <div class="place-image" [style.backgroundImage]="'url(' + (place.image_url_full || 'assets/default-food.png') + ')'" style="width: 100%; aspect-ratio: 1; border-radius: 10px; background-size: cover; background-position: center; margin: 0 auto 10px;"></div>
+                    <span class="p-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ place.name }}</span>
+                    <span *ngIf="place.category" style="display: block; font-size: 0.7rem; color: #a4133c; margin-bottom: 2px;">{{ place.category }}</span>
+                    <span class="p-rating" style="color: #FFB703; font-size: 0.8rem;">
+                      <ng-container *ngTemplateOutlet="staticStars; context: { rating: place.rating }"></ng-container>
+                    </span>
+                  </div>
                 </div>
-                
-                <div style="position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5;" (click)="$event.stopPropagation(); editFoodPlace(place)">
-                  <ion-icon name="pencil-outline" style="font-size: 1.1rem; color: #FF4D6D;"></ion-icon>
-                </div>
-                <div class="place-image" [style.backgroundImage]="'url(' + (place.image_url_full || 'assets/default-food.png') + ')'" style="width: 100%; aspect-ratio: 1; border-radius: 10px; background-size: cover; background-position: center; margin: 0 auto 10px;"></div>
-                <span class="p-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ place.name }}</span>
-                <span *ngIf="place.category" style="display: block; font-size: 0.7rem; color: #a4133c; margin-bottom: 2px;">{{ place.category }}</span>
-                <span class="p-rating" style="color: #FFB703; font-size: 0.8rem;">
-                  <ng-container *ngTemplateOutlet="staticStars; context: { rating: place.rating }"></ng-container>
-                </span>
               </div>
+              
+              <div class="add-glass">
+                <button id="gastro-add" class="glass-btn" style="width: 100%;" (click)="openAddFoodPlaceModal()">
+                  <ion-icon name="add-circle-outline"></ion-icon> Añadir Restaurante
+                </button>
               </div>
             </div>
-            
-            <button id="gastro-add" class="glass-btn" style="width: 100%; margin-bottom: 10px;" (click)="openAddFoodPlaceModal()">
-              <ion-icon name="add-circle-outline"></ion-icon> Añadir Restaurante
-            </button>
-            <button class="glass-btn" style="width: 100%; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="closeGastroModal()">Cerrar</button>
           </div>
         </div>
 
         <!-- Movies List Modal -->
-        <div class="custom-overlay" id="cine-modal" *ngIf="isMovieListModalOpen" (click)="closeCineModal()">
-          <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 85vh; overflow-y: hidden;" (click)="$event.stopPropagation()">
-            <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;"><ion-icon name="film-outline"></ion-icon> Cine en Pareja</h2>
-            <p style="color: #a4133c; font-size: 0.95rem; margin-bottom: 20px;">Películas y series que vemos juntos</p>
+        <div class="custom-overlay" id="cine-modal" *ngIf="isMovieListModalOpen" (click)="closeCineModal()" style="align-items: flex-end;">
+          <div class="bottom-sheet-modal glass-card" (click)="$event.stopPropagation()">
+            <div class="bottom-sheet-header">
+              <div class="sheet-close-btn" (click)="closeCineModal()">
+                <ion-icon name="close-outline"></ion-icon>
+              </div>
+              <h2>Cine en Pareja</h2>
+              <p>Películas y series que vemos juntos.</p>
+            </div>
             
-            <ion-searchbar id="cine-search" animated="true" [(ngModel)]="searchQueryMovies" placeholder="Buscar película o serie..." class="custom-searchbar" style="--border-radius: 14px; --background: rgba(255,255,255,0.8); --box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 0; margin-bottom: 15px;"></ion-searchbar>
+            <div class="bottom-sheet-body">
+              <ion-searchbar id="cine-search" animated="true" [(ngModel)]="searchQueryMovies" placeholder="Buscar película o serie..." class="custom-searchbar" style="--border-radius: 14px; --background: rgba(255,255,255,0.8); --box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 0; margin-bottom: 15px;"></ion-searchbar>
 
-            <div id="cine-filters" style="display: flex; gap: 10px; margin-bottom: 15px; width: 100%;">
-              <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedMovieGenre" class="glass-input" style="flex: 1; margin: 0; border: 2px solid #FF4D6D; background: white; font-weight: 600; color: #590D22; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todas las categorías">
-                <ion-select-option value="">Todas las categorías</ion-select-option>
-                <ion-select-option *ngFor="let cat of movieGenres" [value]="cat">{{ cat }}</ion-select-option>
-              </ion-select>
-              <button class="glass-btn" style="padding: 0 15px; font-size: 1.5rem; width: auto; flex: 0 0 auto; box-shadow: none; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 77, 109, 0.2);" [style.color]="showFavoritesOnlyMovies ? '#FF4D6D' : '#888'" [style.background]="showFavoritesOnlyMovies ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="showFavoritesOnlyMovies = !showFavoritesOnlyMovies">
-                <ion-icon [name]="showFavoritesOnlyMovies ? 'heart' : 'heart-outline'"></ion-icon>
-              </button>
-            </div>
-            
-            <div id="cine-list" style="max-height: 35vh; overflow-y: auto; overflow-x: hidden; padding-right: 5px; margin-bottom: 20px;">
-              <div class="movies-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-              <div class="movie-item" *ngFor="let movie of filteredMovies" (click)="openMovieModal(movie)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
-                <div *ngIf="movie.is_favorite" style="position: absolute; top: 8px; left: 8px; width: 26px; height: 26px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5;"><ion-icon name="heart" style="font-size: 1.1rem; color: #FF4D6D;"></ion-icon></div>
-                <div style="position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5;" (click)="$event.stopPropagation(); editMovie(movie)">
-                  <ion-icon name="pencil-outline" style="font-size: 1.1rem; color: #FF4D6D;"></ion-icon>
+              <div id="cine-filters" style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
+                <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedMovieGenre" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todos los géneros">
+                  <ion-select-option value="">Todos los géneros</ion-select-option>
+                  <ion-select-option *ngFor="let g of movieGenres" [value]="g">{{ g }}</ion-select-option>
+                </ion-select>
+                
+                <button class="glass-btn" style="padding: 8px 15px; font-size: 1.5rem; width: auto; flex: 0 0 auto; box-shadow: none;" [style.color]="showFavoritesOnlyMovies ? '#FF4D6D' : '#888'" [style.background]="showFavoritesOnlyMovies ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="showFavoritesOnlyMovies = !showFavoritesOnlyMovies">
+                  <ion-icon [name]="showFavoritesOnlyMovies ? 'heart' : 'heart-outline'"></ion-icon>
+                </button>
+              </div>
+              
+              <div id="cine-list" style="margin-bottom: 20px;">
+                <div class="movies-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                  <div class="movie-item" *ngFor="let movie of filteredMovies" (click)="openMovieModal(movie)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
+                    <div *ngIf="movie.is_favorite" style="position: absolute; top: 8px; left: 8px; z-index: 5;">
+                      <ion-icon name="heart" style="color: #FF4D6D; font-size: 1.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));"></ion-icon>
+                    </div>
+                    <div style="position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5;" (click)="$event.stopPropagation(); editMovie(movie)">
+                      <ion-icon name="pencil-outline" style="font-size: 1.1rem; color: #FF4D6D;"></ion-icon>
+                    </div>
+                    <div class="movie-image" [style.backgroundImage]="'url(' + (movie.image_url_full || 'assets/default-movie.png') + ')'" style="width: 100%; aspect-ratio: 2/3; border-radius: 10px; background-size: cover; background-position: center; margin: 0 auto 10px;"></div>
+                    <span class="m-title" style="display: block; font-weight: 800; color: #590D22; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">{{ movie.title }}</span>
+                    <span *ngIf="movie.genre" style="display: block; font-size: 0.7rem; color: #a4133c; margin-top: 3px;">{{ movie.genre }}</span>
+                    <span class="m-rating" style="color: #FFB703; font-size: 0.8rem; display: block; margin-top: 3px;">
+                      <ng-container *ngTemplateOutlet="staticStars; context: { rating: movie.rating }"></ng-container>
+                    </span>
+                  </div>
                 </div>
-                <div class="movie-image" [style.backgroundImage]="'url(' + (movie.image_url_full || movie.image_url || 'assets/default-movie.png') + ')'" style="width: 100%; aspect-ratio: 0.7; border-radius: 10px; background-size: cover; background-position: center; margin: 0 auto 10px;"></div>
-                <span class="m-title" style="display: block; font-weight: 700; color: #590D22; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ movie.title }}</span>
-                <span class="p-rating" style="color: #FFB703; font-size: 0.7rem;">
-                  <ng-container *ngTemplateOutlet="staticStars; context: { rating: movie.rating }"></ng-container>
-                </span>
               </div>
+              
+              <div class="add-glass">
+                <button id="cine-add" class="glass-btn" style="width: 100%;" (click)="openAddMovieModal()">
+                  <ion-icon name="add-circle-outline"></ion-icon> Añadir Película/Serie
+                </button>
               </div>
             </div>
-            
-            <button id="cine-add" class="glass-btn" style="width: 100%; margin-bottom: 10px;" (click)="openAddMovieModal()">
-              <ion-icon name="add-circle-outline"></ion-icon> Añadir Película/Serie
-            </button>
-            <button class="glass-btn" style="width: 100%; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="closeCineModal()">Cerrar</button>
           </div>
         </div>
 
@@ -635,6 +646,30 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
     .title { margin: 0; font-size: 1.8rem; font-weight: 900; color: #590D22; letter-spacing: -0.5px; text-shadow: 0 2px 10px rgba(255,255,255,0.8); }
     .subtitle { margin: 5px 0 0; color: #a4133c; font-weight: 500; font-size: 0.95rem; }
 
+    .custom-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center; z-index: 99999;
+    }
+    
+    .bottom-sheet-modal {
+      width: 100%; height: 90%; background: #fff0f3;
+      border-top-left-radius: 30px; border-top-right-radius: 30px;
+      display: flex; flex-direction: column; overflow: hidden; position: relative;
+    }
+    .bottom-sheet-header { padding: 25px 20px 10px; position: relative; background: #fff0f3; z-index: 2; text-align: left; }
+    .bottom-sheet-header h2 { margin: 0; font-size: 1.8rem; font-weight: 900; color: #590D22; display: flex; align-items: center; gap: 10px; }
+    .bottom-sheet-header p { margin: 5px 0 20px; color: #a4133c; font-size: 0.95rem; }
+    .bottom-sheet-body { flex: 1; overflow-y: auto; padding: 0 20px 40px; }
+    
+    .sheet-close-btn {
+      position: absolute; top: 20px; right: 20px; width: 36px; height: 36px;
+      background: rgba(255,255,255,0.8); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer;
+    }
+    .sheet-close-btn ion-icon { font-size: 1.5rem; color: #590D22; }
+
     /* Glassmorphism Cards */
     .glass-card { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 24px; padding: 22px; margin-bottom: 20px; box-shadow: 0 8px 32px rgba(255, 77, 109, 0.08); border: 1px solid rgba(255, 255, 255, 0.6); }
     
@@ -729,20 +764,7 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
     .logout-btn { width: 100%; background: rgba(208, 0, 0, 0.1); color: #d00000; border: 2px solid rgba(208, 0, 0, 0.2); padding: 16px; border-radius: 20px; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(10px); }
     .logout-btn:active { background: rgba(208, 0, 0, 0.2); transform: scale(0.98); }
     .logout-btn ion-icon { font-size: 1.4rem; }
-      .custom-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.15);
-        backdrop-filter: blur(5px);
-        -webkit-backdrop-filter: blur(5px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 99999;
-      }
+
       .star { --star-color: #FF4D6D; position: relative; width: 44px; height: 44px; transition: transform 0.3s ease; cursor: pointer; }
       .star .svg-container { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
       .star .svg-outline, .star .svg-filled { fill: var(--star-color); position: absolute; left: 0; top: 0; width: 100%; height: 100%; transition: all 0.3s ease; }
