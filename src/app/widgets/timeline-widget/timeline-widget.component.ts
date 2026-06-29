@@ -251,34 +251,34 @@ import { OfflineSyncService } from '../../services/offline-sync.service';
     .dynamic-section h4 { color: #590D22; }
 
     /* Night Owl Mode Overrides */
-    :host-context(.night-owl-mode) .timeline-modal-content { background: #121212; }
-    :host-context(.night-owl-mode) .timeline-header { background: #121212; }
-    :host-context(.night-owl-mode) .timeline-header h2 { color: #fdfdfd; }
-    :host-context(.night-owl-mode) .timeline-header p { color: #ccc; }
-    :host-context(.night-owl-mode) .close-btn { background: rgba(255,255,255,0.1); }
-    :host-context(.night-owl-mode) .close-btn ion-icon { color: #fdfdfd; }
-    :host-context(.night-owl-mode) .tabs { background: rgba(255,255,255,0.1); }
-    :host-context(.night-owl-mode) .tab { color: #ccc; }
-    :host-context(.night-owl-mode) .tab.active { background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: white; box-shadow: 0 4px 10px rgba(167,139,250,0.3); }
-    :host-context(.night-owl-mode) .empty-state { color: #a78bfa; }
-    :host-context(.night-owl-mode) .plan-card { background: rgba(30,30,30,0.85); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-    :host-context(.night-owl-mode) .plan-info h3 { color: #fdfdfd; }
-    :host-context(.night-owl-mode) .plan-date { color: #aaa; }
-    :host-context(.night-owl-mode) .plan-countdown { background: rgba(167,139,250,0.1); color: #a78bfa; }
-    :host-context(.night-owl-mode) .plan-countdown.completed { background: rgba(255,255,255,0.05); color: #888; }
-    :host-context(.night-owl-mode) .fab-btn { background: linear-gradient(135deg, #a78bfa, #8b5cf6); box-shadow: 0 6px 20px rgba(167,139,250,0.4); }
-    :host-context(.night-owl-mode) .editor-overlay { background: #121212; }
-    :host-context(.night-owl-mode) .editor-header { color: #fdfdfd; }
-    :host-context(.night-owl-mode) .editor-body label { color: #ccc; }
-    :host-context(.night-owl-mode) .glass-input, :host-context(.night-owl-mode) .glass-select { background: rgba(30,30,30,0.8); border-color: #333; color: #fdfdfd; color-scheme: dark; }
-    :host-context(.night-owl-mode) .glass-input::-webkit-datetime-edit { color: #fdfdfd; }
-    :host-context(.night-owl-mode) .editor-footer { background: rgba(18,18,18,0.9); }
-    :host-context(.night-owl-mode) .glass-btn { background: linear-gradient(135deg, #a78bfa, #8b5cf6); }
-    :host-context(.night-owl-mode) .danger-btn { background: rgba(255,0,0,0.2); color: #ff4d4d; }
-    :host-context(.night-owl-mode) .inline-input { color: #fdfdfd; }
-    :host-context(.night-owl-mode) .packing-item { border-bottom-color: rgba(255,255,255,0.1); }
-    :host-context(.night-owl-mode) .small-glass-btn { background: rgba(167,139,250,0.1); color: #a78bfa; }
-    :host-context(.night-owl-mode) .dynamic-section h4 { color: #fdfdfd; border-bottom-color: rgba(255,255,255,0.1); }
+    :host-context(.night-owl-mode) .timeline-modal-content { background: #121212 !important; }
+    :host-context(.night-owl-mode) .timeline-header { background: #121212 !important; }
+    :host-context(.night-owl-mode) .timeline-header h2 { color: #fdfdfd !important; }
+    :host-context(.night-owl-mode) .timeline-header p { color: #ccc !important; }
+    :host-context(.night-owl-mode) .close-btn { background: rgba(255,255,255,0.1) !important; }
+    :host-context(.night-owl-mode) .close-btn ion-icon { color: #fdfdfd !important; }
+    :host-context(.night-owl-mode) .tabs { background: rgba(255,255,255,0.1) !important; }
+    :host-context(.night-owl-mode) .tab { color: #ccc !important; }
+    :host-context(.night-owl-mode) .tab.active { background: linear-gradient(135deg, #a78bfa, #8b5cf6) !important; color: white !important; box-shadow: 0 4px 10px rgba(167,139,250,0.3) !important; }
+    :host-context(.night-owl-mode) .empty-state { color: #a78bfa !important; }
+    :host-context(.night-owl-mode) .plan-card { background: rgba(30,30,30,0.85) !important; box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important; border: 1px solid rgba(255,255,255,0.05) !important; }
+    :host-context(.night-owl-mode) .plan-info h3 { color: #fdfdfd !important; }
+    :host-context(.night-owl-mode) .plan-date { color: #aaa !important; }
+    :host-context(.night-owl-mode) .plan-countdown { background: rgba(167,139,250,0.1) !important; color: #a78bfa !important; }
+    :host-context(.night-owl-mode) .plan-countdown.completed { background: rgba(255,255,255,0.05) !important; color: #888 !important; }
+    :host-context(.night-owl-mode) .fab-btn { background: linear-gradient(135deg, #a78bfa, #8b5cf6) !important; box-shadow: 0 6px 20px rgba(167,139,250,0.4) !important; }
+    :host-context(.night-owl-mode) .editor-overlay { background: #121212 !important; }
+    :host-context(.night-owl-mode) .editor-header { color: #fdfdfd !important; }
+    :host-context(.night-owl-mode) .editor-body label { color: #ccc !important; }
+    :host-context(.night-owl-mode) .glass-input, :host-context(.night-owl-mode) .glass-select { background: rgba(30,30,30,0.8) !important; border-color: #333 !important; color: #fdfdfd !important; color-scheme: dark !important; }
+    :host-context(.night-owl-mode) .glass-input::-webkit-datetime-edit { color: #fdfdfd !important; }
+    :host-context(.night-owl-mode) .editor-footer { background: rgba(18,18,18,0.9) !important; }
+    :host-context(.night-owl-mode) .glass-btn { background: linear-gradient(135deg, #a78bfa, #8b5cf6) !important; }
+    :host-context(.night-owl-mode) .danger-btn { background: rgba(255,0,0,0.2) !important; color: #ff4d4d !important; }
+    :host-context(.night-owl-mode) .inline-input { color: #fdfdfd !important; }
+    :host-context(.night-owl-mode) .packing-item { border-bottom-color: rgba(255,255,255,0.1) !important; }
+    :host-context(.night-owl-mode) .small-glass-btn { background: rgba(167,139,250,0.1) !important; color: #a78bfa !important; }
+    :host-context(.night-owl-mode) .dynamic-section h4 { color: #fdfdfd !important; border-bottom-color: rgba(255,255,255,0.1) !important; }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
