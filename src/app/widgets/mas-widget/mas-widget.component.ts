@@ -142,6 +142,14 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
             </div>
             <h3 style="color: #590D22; margin: 0; font-weight: 900; font-size: 1.5rem;">Timeline y Planes</h3>
             <p style="color: #a4133c; margin: 5px 0 0; font-size: 0.95rem;">Ideas, viajes futuros y el historial de nuestra historia.</p>
+            
+            <div *ngIf="upcomingPlan" class="upcoming-preview" style="margin-top: 15px; padding: 10px 15px; background: rgba(255,255,255,0.7); border-radius: 12px; display: flex; align-items: center; gap: 12px; border: 1px solid rgba(255,77,109,0.1);">
+              <ion-icon [name]="getCategoryIcon(upcomingPlan.category)" style="font-size: 1.4rem; color: #FF4D6D; background: rgba(255,77,109,0.1); padding: 8px; border-radius: 50%;"></ion-icon>
+              <div style="flex: 1; text-align: left; overflow: hidden;">
+                <div style="font-size: 0.75rem; color: #FF4D6D; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Próximo plan</div>
+                <div style="font-size: 0.95rem; color: #590D22; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ upcomingPlan.title }}</div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -611,7 +619,7 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
         </div>
 
         <!-- TIMELINE COMPONENT -->
-        <app-timeline-widget *ngIf="isTimelineModalOpen" (close)="isTimelineModalOpen = false"></app-timeline-widget>
+        <app-timeline-widget *ngIf="isTimelineModalOpen" (close)="closeTimelineModal()"></app-timeline-widget>
       </ion-content>
     `,
     styles: [`
@@ -802,9 +810,42 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   selectedAlbumId: number | string = 'feed';
   albums: any[] = [];
   isTimelineModalOpen = false;
+  upcomingPlan: any = null;
+
+  async loadUpcomingPlan() {
+    try {
+      const plans = await this.api.getPlans();
+      // find the next planned event that is not completed
+      const upcoming = plans.filter((p: any) => p.status === 'planned' && p.target_date)
+                            .sort((a: any, b: any) => new Date(a.target_date).getTime() - new Date(b.target_date).getTime());
+      
+      const now = new Date().getTime();
+      const futurePlans = upcoming.filter((p: any) => new Date(p.target_date).getTime() >= now - 86400000); // include today
+      
+      if (futurePlans.length > 0) {
+        this.upcomingPlan = futurePlans[0];
+      } else {
+        this.upcomingPlan = null;
+      }
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  getCategoryIcon(cat: string) {
+    if (cat === 'trip') return 'airplane-outline';
+    if (cat === 'date') return 'wine-outline';
+    if (cat === 'music') return 'musical-notes-outline';
+    return 'star-outline';
+  }
 
   openTimelineModal() {
     this.isTimelineModalOpen = true;
+  }
+
+  closeTimelineModal() {
+    this.isTimelineModalOpen = false;
+    this.loadUpcomingPlan();
   }
 
   timeTogether = { years: 0, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
@@ -989,6 +1030,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     } catch (e) {}
     
     this.loadFoodAndMovies();
+    this.loadUpcomingPlan();
 
     this.startTimer();
 
