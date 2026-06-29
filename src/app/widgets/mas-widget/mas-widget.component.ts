@@ -871,7 +871,8 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
       :host-context(.night-owl-mode) .glass-input:focus { border-color: #a78bfa; background: #111; box-shadow: 0 4px 15px rgba(167,139,250,0.2); }
       :host-context(.night-owl-mode) .glass-btn { background: linear-gradient(135deg, #a78bfa, #8b5cf6); box-shadow: 0 4px 15px rgba(167,139,250,0.3); }
       :host-context(.night-owl-mode) .date-picker-glass label { color: #ccc; }
-      :host-context(.night-owl-mode) .heart-pulse ion-icon, :host-context(.night-owl-mode) .section-title ion-icon { color: #a78bfa; filter: drop-shadow(0 0 15px rgba(167,139,250,0.6)); background: rgba(167,139,250,0.1); }
+      :host-context(.night-owl-mode) .heart-pulse ion-icon { color: #a78bfa; filter: drop-shadow(0 0 15px rgba(167,139,250,0.6)); background: transparent; }
+      :host-context(.night-owl-mode) .section-title ion-icon { color: #a78bfa; filter: drop-shadow(0 0 15px rgba(167,139,250,0.6)); background: rgba(167,139,250,0.1); }
       :host-context(.night-owl-mode) .time-block { background: rgba(0,0,0,0.5); border-color: #333; }
       :host-context(.night-owl-mode) .time-block.highlight { background: linear-gradient(135deg, #8b5cf6, #6d28d9); box-shadow: 0 4px 15px rgba(167,139,250,0.3); border: none; }
       :host-context(.night-owl-mode) .time-block.highlight .value, :host-context(.night-owl-mode) .time-block.highlight .label { color: #fdfdfd; }
