@@ -159,6 +159,7 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
     @keyframes radarPulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.6); opacity: 0; } }
 
     /* Night Owl Mode Overrides */
+    :host-context(.night-owl-mode) .location-container { background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%); }
     :host-context(.night-owl-mode) .top-bar-overlay { background: linear-gradient(180deg, rgba(18,18,18,0.95) 0%, rgba(18,18,18,0) 100%); }
     :host-context(.night-owl-mode) .hud-bar { background: rgba(30,30,30,0.85); border-color: rgba(255,255,255,0.05); }
     :host-context(.night-owl-mode) .partner-name { color: #fdfdfd; }

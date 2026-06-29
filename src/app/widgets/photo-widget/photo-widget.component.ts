@@ -620,6 +620,16 @@ import { Share } from '@capacitor/share';
     .prompt-btn:disabled { opacity: 0.7; pointer-events: none; }
 
     /* Night Owl Mode Overrides */
+    :host-context(.night-owl-mode) .photo-widget-container { background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%); }
+    :host-context(.night-owl-mode) .floating-toggles { background: rgba(30,30,30,0.9); }
+    :host-context(.night-owl-mode) .floating-toggles button { color: #888; }
+    :host-context(.night-owl-mode) .floating-toggles button.active { background: #121212; color: #a78bfa; }
+    :host-context(.night-owl-mode) .streak-badge { background: rgba(30,30,30,0.95); color: #fdfdfd; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .streak-badge.pending { background: linear-gradient(135deg, #b45309, #9a3412); color: white; }
+    :host-context(.night-owl-mode) .streak-badge.zero { background: rgba(30,30,30,0.8); color: #888; }
+    :host-context(.night-owl-mode) .albums-btn-small, 
+    :host-context(.night-owl-mode) .header-icon-btn { background: rgba(30,30,30,0.95); color: #a78bfa; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .header-upload-btn { background: #8b5cf6; box-shadow: 0 4px 10px rgba(139,92,246,0.3); }
     :host-context(.night-owl-mode) .top-nav { background: rgba(30,30,30,0.85); border-color: rgba(255,255,255,0.05); }
     :host-context(.night-owl-mode) .nav-btn { color: #fdfdfd; }
     :host-context(.night-owl-mode) .nav-btn.active { color: #a78bfa; background: rgba(167,139,250,0.1); }
