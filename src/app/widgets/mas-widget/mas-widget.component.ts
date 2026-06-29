@@ -905,6 +905,24 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
       :host-context(.night-owl-mode) .settings-item h4 { color: #fdfdfd !important; }
       :host-context(.night-owl-mode) .settings-item p { color: #aaa !important; }
       :host-context(.night-owl-mode) .logout-btn { background: rgba(255,77,109,0.1); color: #FF4D6D; border-color: rgba(255,77,109,0.3); }
+
+      /* Inside Modals Night Owl Fixes */
+      :host-context(.night-owl-mode) .modal-content div[style*="background: rgba(255,255,255,0.9)"] { background: rgba(30,30,30,0.8) !important; box-shadow: 0 4px 10px rgba(0,0,0,0.5) !important; }
+      :host-context(.night-owl-mode) .modal-content ion-icon[name="close-outline"] { color: #fdfdfd !important; }
+      :host-context(.night-owl-mode) .modal-content ion-icon[name="pencil-outline"] { color: #a78bfa !important; }
+      :host-context(.night-owl-mode) .modal-content p[style*="color: #590D22"] { background: rgba(0,0,0,0.4) !important; border-color: #333 !important; color: #fdfdfd !important; }
+      :host-context(.night-owl-mode) .modal-content p[style*="color: #a4133c"] { color: #ccc !important; }
+      :host-context(.night-owl-mode) .modal-content span[style*="background: rgba(255,77,109,0.1)"] { background: rgba(167,139,250,0.1) !important; color: #c4b5fd !important; }
+      :host-context(.night-owl-mode) .modal-content button[style*="background: rgba(255,255,255,0.9)"] { background: rgba(0,0,0,0.4) !important; border-color: #333 !important; color: #fdfdfd !important; }
+      :host-context(.night-owl-mode) .modal-content button ion-icon[name="location-outline"] { color: #a78bfa !important; }
+      :host-context(.night-owl-mode) .dishes-section h4 { color: #fdfdfd !important; border-bottom-color: #333 !important; }
+      :host-context(.night-owl-mode) .dish-item { background: rgba(0,0,0,0.4) !important; border: 1px solid #333 !important; }
+      :host-context(.night-owl-mode) .dish-item span[style*="color: #590D22"] { color: #fdfdfd !important; }
+      :host-context(.night-owl-mode) .dish-item div[style*="background: rgba(255,77,109,0.1)"] { background: rgba(167,139,250,0.1) !important; }
+      :host-context(.night-owl-mode) .dish-item div[style*="background: white"] { background: rgba(30,30,30,0.8) !important; }
+      :host-context(.night-owl-mode) .dish-item ion-icon[name="restaurant-outline"] { color: rgba(167,139,250,0.5) !important; }
+      :host-context(.night-owl-mode) .dish-item ion-icon[name="close-circle"] { color: rgba(255,255,255,0.2) !important; }
+      :host-context(.night-owl-mode) .modal-content div[style*="background: rgba(255,77,109,0.05)"] { background: rgba(0,0,0,0.4) !important; border: 1px solid #333 !important; }
     `]
 })
 export class MasWidgetComponent implements OnInit, OnDestroy {
