@@ -143,7 +143,7 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
             <h3 style="color: #590D22; margin: 0; font-weight: 900; font-size: 1.5rem;">Timeline y Planes</h3>
             <p style="color: #a4133c; margin: 5px 0 0; font-size: 0.95rem;">Ideas, viajes futuros y el historial de nuestra historia.</p>
             
-            <div *ngIf="upcomingPlan" class="upcoming-preview" style="margin-top: 15px; padding: 10px 15px; background: rgba(255,255,255,0.7); border-radius: 12px; display: flex; align-items: center; gap: 12px; border: 1px solid rgba(255,77,109,0.1);">
+            <div *ngIf="upcomingPlan" class="upcoming-preview" (click)="$event.stopPropagation(); openTimelineModal(upcomingPlan.id)" style="margin-top: 15px; padding: 10px 15px; background: rgba(255,255,255,0.7); border-radius: 12px; display: flex; align-items: center; gap: 12px; border: 1px solid rgba(255,77,109,0.1); cursor: pointer;">
               <ion-icon [name]="getCategoryIcon(upcomingPlan.category)" style="font-size: 1.4rem; color: #FF4D6D; background: rgba(255,77,109,0.1); padding: 8px; border-radius: 50%;"></ion-icon>
               <div style="flex: 1; text-align: left; overflow: hidden;">
                 <div style="font-size: 0.75rem; color: #FF4D6D; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Próximo plan</div>
@@ -619,7 +619,7 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
         </div>
 
         <!-- TIMELINE COMPONENT -->
-        <app-timeline-widget *ngIf="isTimelineModalOpen" (close)="closeTimelineModal()"></app-timeline-widget>
+        <app-timeline-widget *ngIf="isTimelineModalOpen" [initialPlanId]="timelineInitialPlanId" (close)="closeTimelineModal()"></app-timeline-widget>
       </ion-content>
     `,
     styles: [`
@@ -810,6 +810,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   selectedAlbumId: number | string = 'feed';
   albums: any[] = [];
   isTimelineModalOpen = false;
+  timelineInitialPlanId: number | null = null;
   upcomingPlan: any = null;
 
   async loadUpcomingPlan() {
@@ -839,12 +840,14 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     return 'star-outline';
   }
 
-  openTimelineModal() {
+  openTimelineModal(planId?: number) {
+    this.timelineInitialPlanId = planId || null;
     this.isTimelineModalOpen = true;
   }
 
   closeTimelineModal() {
     this.isTimelineModalOpen = false;
+    this.timelineInitialPlanId = null;
     this.loadUpcomingPlan();
   }
 

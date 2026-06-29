@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, OnInit, OnDestroy, Output } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, OnDestroy, Output, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ToastController, AlertController } from '@ionic/angular';
@@ -252,6 +252,7 @@ import { Camera, CameraResultType } from '@capacitor/camera';
   imports: [CommonModule, FormsModule, IonicModule]
 })
 export class TimelineWidgetComponent implements OnInit, OnDestroy {
+  @Input() initialPlanId: number | null = null;
   @Output() close = new EventEmitter<void>();
 
   private api = inject(LoveApiService);
@@ -286,6 +287,14 @@ export class TimelineWidgetComponent implements OnInit, OnDestroy {
   async loadPlans() {
     try {
       this.plans = await this.api.getPlans();
+      if (this.initialPlanId) {
+        const p = this.plans.find((x: any) => x.id === this.initialPlanId);
+        if (p) {
+          this.activeTab = p.status;
+          this.openPlan(p);
+        }
+        this.initialPlanId = null;
+      }
     } catch (e) {
       console.error(e);
       this.showToast('Error cargando planes', 'danger');
