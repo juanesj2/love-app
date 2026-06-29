@@ -1050,45 +1050,29 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   }
 
   async confirmUnpair() {
-    const alert = await this.alertCtrl.create({
-      header: '¿Desvincular pareja?',
-      message: 'Dejarás de ver toda la información compartida hasta que vuelvas a vincularte. ¿Estás seguro?',
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { 
-          text: 'Sí, desvincular', 
-          role: 'destructive',
-          handler: async () => {
-            await this.api.unpair();
-            this.showToast('Pareja desvinculada', 'success');
-            setTimeout(() => {
-              window.location.reload();
-            }, 1000);
-          }
-        }
-      ]
-    });
-    await alert.present();
+    this.showConfirm(
+      '¿Desvincular pareja?',
+      'Dejarás de ver toda la información compartida hasta que vuelvas a vincularte. ¿Estás seguro?',
+      async () => {
+        await this.api.unpair();
+        this.showToast('Pareja desvinculada', 'success');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
+    );
   }
 
   async confirmDeleteAccount() {
-    const alert = await this.alertCtrl.create({
-      header: '¿ELIMINAR CUENTA?',
-      message: 'Esta acción es IRREVERSIBLE. Se borrarán todos tus datos. ¿Estás absolutamente seguro?',
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { 
-          text: 'ELIMINAR', 
-          role: 'destructive',
-          handler: async () => {
-            await this.api.deleteAccount();
-            await this.api.logout();
-            window.location.reload();
-          }
-        }
-      ]
-    });
-    await alert.present();
+    this.showConfirm(
+      '¿ELIMINAR CUENTA?',
+      'Esta acción es IRREVERSIBLE. Se borrarán todos tus datos. ¿Estás absolutamente seguro?',
+      async () => {
+        await this.api.deleteAccount();
+        await this.api.logout();
+        window.location.reload();
+      }
+    );
   }
 
   async ngOnInit() {
