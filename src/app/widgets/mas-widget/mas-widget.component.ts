@@ -13,7 +13,7 @@ import { LocationService } from '../../services/location.service';
 import { TutorialService } from '../../services/tutorial.service';
 import { OfflineSyncService } from '../../services/offline-sync.service';
 import { addIcons } from 'ionicons';
-import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline } from 'ionicons/icons';
+import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, bookOutline, imageOutline, checkmarkCircleOutline, informationCircleOutline, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp } from 'ionicons/icons';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.component';
@@ -22,7 +22,7 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
 @Component({
   selector: 'app-mas-widget',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent, IonRefresher, IonRefresherContent, IonIcon, IonSelect, IonSelectOption, IonSearchbar, TimelineWidgetComponent],
+  imports: [CommonModule, FormsModule, IonContent, IonRefresher, IonRefresherContent, IonIcon, IonSelect, IonSelectOption, TimelineWidgetComponent],
   template: `
     <ion-content class="scroll-content">
       <ng-template #staticStars let-rating="rating">
@@ -882,6 +882,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   private sanitizer = inject(DomSanitizer);
   private tutorialService = inject(TutorialService);
   private offlineSync = inject(OfflineSyncService);
+  private router = inject(Router);
 
   isMapModalOpen = false;
   safeMapUrl: SafeResourceUrl | null = null;
