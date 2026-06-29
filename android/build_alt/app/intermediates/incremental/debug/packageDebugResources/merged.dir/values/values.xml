@@ -5,9 +5,9 @@
     <string name="custom_url_scheme">com.juanesj2.lovewidget</string>
     <string name="default_web_client_id" translatable="false">292953977993-6528i8ggjvsporn2kq5fjvmoa6td1a9c.apps.googleusercontent.com</string>
     <string name="gcm_defaultSenderId" translatable="false">292953977993</string>
-    <string name="google_api_key" translatable="false">AIzaSyAVj3NrWKBjApNK4z25EDvO1b4jViSH5y8</string>
+    <string name="google_api_key" translatable="false">AIzaSyBsa_YMgPhhIbqyXpIgnxVgFypPc9RtVAI</string>
     <string name="google_app_id" translatable="false">1:292953977993:android:500c1e438536774cac8258</string>
-    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyAVj3NrWKBjApNK4z25EDvO1b4jViSH5y8</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyBsa_YMgPhhIbqyXpIgnxVgFypPc9RtVAI</string>
     <string name="google_storage_bucket" translatable="false">love-widget-app-ec037.firebasestorage.app</string>
     <string name="package_name">com.juanesj2.lovewidget</string>
     <string name="project_id" translatable="false">love-widget-app-ec037</string>
