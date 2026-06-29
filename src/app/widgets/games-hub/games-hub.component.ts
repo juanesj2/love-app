@@ -111,11 +111,17 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
     :host-context(.night-owl-mode) .header h2 { color: #fdfdfd; }
     :host-context(.night-owl-mode) .header p { color: #ccc; }
     :host-context(.night-owl-mode) .back-btn { background: #222; border-color: #333; color: #fdfdfd; }
-    :host-context(.night-owl-mode) .game-card { background: rgba(30, 30, 30, 0.85); border-color: rgba(255, 255, 255, 0.05); }
+    :host-context(.night-owl-mode) .game-card { background: rgba(20, 20, 20, 0.85); border-color: rgba(255, 255, 255, 0.05); box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5); }
+    :host-context(.night-owl-mode) .game-card::after { background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%); }
     :host-context(.night-owl-mode) .game-info h3 { color: #fdfdfd; }
     :host-context(.night-owl-mode) .game-info p { color: #aaa; }
-    :host-context(.night-owl-mode) .progress-container { background: rgba(0, 0, 0, 0.4); border-color: rgba(255, 255, 255, 0.05); }
+    :host-context(.night-owl-mode) .progress-container { background: rgba(0, 0, 0, 0.5); border-color: rgba(255, 255, 255, 0.05); }
+    :host-context(.night-owl-mode) .progress-bar { background: rgba(255,255,255,0.1); }
     :host-context(.night-owl-mode) .progress-text { color: #c4b5fd; }
+    :host-context(.night-owl-mode) .test-card .game-icon-bg, 
+    :host-context(.night-owl-mode) .swipe-card .game-icon-bg, 
+    :host-context(.night-owl-mode) .draw-card .game-icon-bg, 
+    :host-context(.night-owl-mode) .roulette-card .game-icon-bg { border-color: rgba(255,255,255,0.15); }
   `],
   standalone: true,
   imports: [CommonModule, IonIcon]
