@@ -523,3 +523,38 @@ body.night-owl-mode ion-header,
 body.night-owl-mode ion-toolbar {
   --background: #121212;
 }
+
+body.night-owl-mode {
+  .premium-action-sheet {
+    --background: rgba(30, 30, 30, 0.9);
+    
+    .action-sheet-wrapper {
+      background: rgba(30, 30, 30, 0.95) !important;
+      box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5) !important;
+    }
+    
+    .action-sheet-title {
+      color: #fdfdfd !important;
+    }
+    
+    .action-sheet-button {
+      background: rgba(20, 20, 20, 0.6) !important;
+      border: 1px solid rgba(255, 255, 255, 0.05) !important;
+      color: #fdfdfd !important;
+      
+      .action-sheet-icon {
+        color: #a78bfa !important;
+      }
+    }
+    
+    .action-sheet-button.action-sheet-cancel {
+      background: linear-gradient(135deg, #a78bfa, #8b5cf6) !important;
+      box-shadow: 0 4px 15px rgba(167, 139, 250, 0.3) !important;
+      color: white !important;
+      
+      .action-sheet-icon {
+        color: white !important;
+      }
+    }
+  }
+}
