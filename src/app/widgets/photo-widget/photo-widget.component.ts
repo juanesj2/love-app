@@ -638,6 +638,7 @@ import { Share } from '@capacitor/share';
     :host-context(.night-owl-mode) .filter-chip.active { background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: white; border-color: transparent; }
     :host-context(.night-owl-mode) .gallery-month-title { color: #fdfdfd; }
     :host-context(.night-owl-mode) .photo-card { background: rgba(30,30,30,0.85); border-color: rgba(255,255,255,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .global-date-overlay { background: linear-gradient(135deg, #8b5cf6, #5b21b6); }
     :host-context(.night-owl-mode) .card-username { color: #fdfdfd; }
     :host-context(.night-owl-mode) .card-time { color: #aaa; }
     :host-context(.night-owl-mode) .action-btn { color: #ccc; background: rgba(255,255,255,0.05); }
