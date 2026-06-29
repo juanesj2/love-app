@@ -642,7 +642,11 @@ import { Share } from '@capacitor/share';
     :host-context(.night-owl-mode) .card-username { color: #fdfdfd; }
     :host-context(.night-owl-mode) .card-time { color: #aaa; }
     :host-context(.night-owl-mode) .action-btn { color: #ccc; background: rgba(255,255,255,0.05); }
-    :host-context(.night-owl-mode) .action-btn.liked { color: #a78bfa; background: rgba(167,139,250,0.1); }
+    :host-context(.night-owl-mode) .action-btn.active { color: #a78bfa; }
+    :host-context(.night-owl-mode) .reaction-btn { background: rgba(30,30,30,0.95); color: #fdfdfd; box-shadow: 0 3px 8px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .reply-box { background: rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.05); }
+    :host-context(.night-owl-mode) .reply-box input { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .send-reply-btn { background: #8b5cf6; }
     :host-context(.night-owl-mode) .comment-input-wrapper { background: rgba(0,0,0,0.4); border-color: #333; }
     :host-context(.night-owl-mode) .comment-input { color: #fdfdfd; }
     :host-context(.night-owl-mode) .comment-input::placeholder { color: #666; }
