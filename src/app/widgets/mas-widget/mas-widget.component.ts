@@ -241,7 +241,7 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
 
         <!-- Food List Modal -->
         <div class="custom-overlay" *ngIf="isFoodListModalOpen" (click)="closeGastroModal()" style="align-items: flex-end;">
-          <div class="bottom-sheet-modal glass-card" (click)="$event.stopPropagation()">
+          <div class="bottom-sheet-modal" (click)="$event.stopPropagation()">
             <div class="bottom-sheet-header">
               <div class="sheet-close-btn" (click)="closeGastroModal()">
                 <ion-icon name="close-outline"></ion-icon>
@@ -294,7 +294,7 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
 
         <!-- Movies List Modal -->
         <div class="custom-overlay" id="cine-modal" *ngIf="isMovieListModalOpen" (click)="closeCineModal()" style="align-items: flex-end;">
-          <div class="bottom-sheet-modal glass-card" (click)="$event.stopPropagation()">
+          <div class="bottom-sheet-modal" (click)="$event.stopPropagation()">
             <div class="bottom-sheet-header">
               <div class="sheet-close-btn" (click)="closeCineModal()">
                 <ion-icon name="close-outline"></ion-icon>
