@@ -13,10 +13,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       // Fallback for web development or older users
       const pref = await Preferences.get({ key: 'auth_token' });
       if (pref && pref.value) {
-        // Try to migrate if possible (might fail on web, which is fine)
+        // Removed: We need to keep auth_token in Preferences so Android Widgets can read it
         try {
-          await SecureStoragePlugin.set({ key: 'auth_token', value: pref.value });
-          await Preferences.remove({ key: 'auth_token' });
+          await SecureStoragePlugin.set({ key: 'auth_token', value: pref.value }).catch(() => {});
         } catch (err) {}
         return { value: pref.value };
       }

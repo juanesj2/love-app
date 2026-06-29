@@ -15,10 +15,13 @@ import { addIcons } from 'ionicons';
 import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline, trophyOutline, sparklesOutline } from 'ionicons/icons';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.component';
 
 
 @Component({
   selector: 'app-mas-widget',
+  standalone: true,
+  imports: [CommonModule, FormsModule, IonContent, IonRefresher, IonRefresherContent, IonIcon, IonSelect, IonSelectOption, IonSearchbar, TimelineWidgetComponent],
   template: `
     <ion-content class="scroll-content">
       <ng-template #staticStars let-rating="rating">
@@ -131,51 +134,14 @@ import { debounceTime } from 'rxjs/operators';
           </div>
         </div>
 
-        <!-- Hitos -->
-        <div class="glass-card" id="mas-hitos">
-          <div class="section-title">
-            <ion-icon name="flag-outline"></ion-icon>
-            <h3>Hitos Importantes</h3>
-          </div>
-          
-          <div class="milestone-list">
-            <div class="milestone-item" *ngFor="let m of milestones" (click)="openMilestoneModal(m)" [class.is-past]="isPast(m.date)">
-              <div class="milestone-indicator"></div>
-              <div class="milestone-info">
-                <span class="m-title">{{ m.title }}</span>
-                <span class="m-date">{{ m.date | date:'longDate' }}</span>
-              </div>
-              <div class="m-days">{{ isPast(m.date) ? 'Hace ' + calculateDays(m.date) + ' d' : calculateDays(m.date) + ' d' }}</div>
-              <ion-icon name="close-circle" class="delete-icon" (click)="deleteMilestone(m.id); $event.stopPropagation()"></ion-icon>
+        <!-- Timeline y Planes -->
+        <div class="glass-card timeline-banner" id="mas-timeline" (click)="openTimelineModal()">
+          <div class="timeline-banner-content">
+            <div class="icon-circle" style="background: linear-gradient(135deg, #a2d2ff, #bde0fe); box-shadow: 0 4px 15px rgba(162, 210, 255, 0.3); color: #023e8a; width: 60px; height: 60px; font-size: 1.8rem; margin-bottom: 10px;">
+              <ion-icon name="map-outline"></ion-icon>
             </div>
-          </div>
-
-          <div class="add-glass">
-            <input type="text" placeholder="Ej: Viaje a París" [(ngModel)]="newMilestoneTitle" class="glass-input" />
-            <input type="date" [(ngModel)]="newMilestoneDate" class="glass-input" />
-            <button class="glass-btn" (click)="addMilestone()"><ion-icon name="add-circle-outline"></ion-icon> Añadir Hito</button>
-          </div>
-        </div>
-
-        <!-- Cubo de Deseos -->
-        <div class="glass-card" id="mas-deseos">
-          <div class="section-title">
-            <ion-icon name="star-outline"></ion-icon>
-            <h3>Cubo de Deseos</h3>
-          </div>
-          <p class="desc">Planes de futuro y cosas que queréis hacer juntos.</p>
-          
-          <div class="bucket-list">
-            <div class="bucket-item" *ngFor="let item of bucketList; let i = index" (click)="toggleBucketItem(i)" [class.is-done]="item.completed">
-              <ion-icon [name]="item.completed ? 'checkmark-circle' : 'ellipse-outline'" class="check-icon"></ion-icon>
-              <span class="b-text">{{ item.title }}</span>
-              <ion-icon name="close-circle" class="delete-icon" (click)="deleteBucketItem(i, $event)"></ion-icon>
-            </div>
-          </div>
-
-          <div class="add-glass">
-            <input type="text" placeholder="Ej: Viajar a Japón..." [(ngModel)]="newBucketTitle" (keyup.enter)="addBucketItem()" class="glass-input" />
-            <button class="glass-btn" (click)="addBucketItem()"><ion-icon name="add-circle-outline"></ion-icon> Añadir Deseo</button>
+            <h3>Timeline y Planes</h3>
+            <p>Ideas, viajes futuros y el historial de nuestra historia.</p>
           </div>
         </div>
 
@@ -264,63 +230,6 @@ import { debounceTime } from 'rxjs/operators';
         </div>
       </div>
 
-      <!-- Modal for Milestone Details -->
-      <div class="custom-overlay" *ngIf="isMilestoneModalOpen" (click)="isMilestoneModalOpen = false">
-        <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 450px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
-          
-          <!-- Portada del Hito -->
-          <div *ngIf="selectedMilestone?.image_url_full || selectedMilestone?.newImageBase64" class="milestone-cover" style="width: 100%; height: 180px; border-radius: 18px; margin-bottom: 20px; overflow: hidden; position: relative;">
-            <img [src]="selectedMilestone?.newImageBase64 || selectedMilestone?.image_url_full" style="width: 100%; height: 100%; object-fit: cover;" />
-            <div *ngIf="isEditingMilestone" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="uploadMilestonePhoto()">
-               <ion-icon name="camera-outline" style="color: white; font-size: 3rem;"></ion-icon>
-            </div>
-          </div>
-          
-          <ion-icon *ngIf="!selectedMilestone?.image_url_full && !selectedMilestone?.newImageBase64" name="flag" style="font-size: 4rem; color: #FF4D6D; margin-bottom: 15px; background: rgba(255,77,109,0.1); padding: 15px; border-radius: 50%;"></ion-icon>
-          
-          <h2 style="color: #590D22; margin-bottom: 5px; font-weight: 900; font-size: 1.6rem;">{{ selectedMilestone?.title }}</h2>
-          <p style="color: #a4133c; font-size: 1.1rem; font-weight: 700; margin-bottom: 20px;">
-            {{ selectedMilestone?.date | date:'longDate' }}
-          </p>
-          
-          <div style="background: rgba(255,77,109,0.05); border-radius: 18px; padding: 18px; margin-bottom: 20px; text-align: center;">
-            <p style="color: #800f2f; margin: 0; font-weight: 600; font-size: 1rem; line-height: 1.4; font-style: italic;">
-              {{ getMilestonePhrase(selectedMilestone?.date) }}
-            </p>
-          </div>
-
-          <!-- Mostrar Anécdota -->
-          <div *ngIf="!isEditingMilestone" style="margin-bottom: 25px;">
-            <p *ngIf="selectedMilestone?.story" style="color: #590D22; font-size: 1rem; line-height: 1.5; font-weight: 500; text-align: left; background: rgba(255,255,255,0.8); padding: 15px; border-radius: 14px; border: 1px solid rgba(255,77,109,0.2);">
-              "{{ selectedMilestone.story }}"
-            </p>
-            <button *ngIf="!selectedMilestone?.story && !selectedMilestone?.image_url_full" class="glass-btn" style="background: rgba(255,77,109,0.1); color: #FF4D6D; width: auto; padding: 10px 20px; font-size: 0.9rem;" (click)="isEditingMilestone = true">
-              <ion-icon name="pencil-outline"></ion-icon> Añadir un recuerdo
-            </button>
-            <button *ngIf="selectedMilestone?.story || selectedMilestone?.image_url_full" class="glass-btn" style="background: transparent; color: #a4133c; width: auto; padding: 5px 15px; font-size: 0.9rem; margin-top: 10px; border: none; box-shadow: none;" (click)="isEditingMilestone = true">
-              <ion-icon name="create-outline"></ion-icon> Editar recuerdo
-            </button>
-          </div>
-
-          <!-- Editar Anécdota y Foto -->
-          <div *ngIf="isEditingMilestone" style="margin-bottom: 25px; text-align: left;">
-            <button *ngIf="!selectedMilestone?.image_url_full && !selectedMilestone?.newImageBase64" class="glass-btn" style="width: 100%; margin-bottom: 15px; background: rgba(255,77,109,0.1); color: #FF4D6D;" (click)="uploadMilestonePhoto()">
-              <ion-icon name="camera-outline"></ion-icon> Subir portada
-            </button>
-            <label style="color: #a4133c; font-weight: 700; font-size: 0.9rem; margin-bottom: 5px; display: block;">Nuestra historia</label>
-            <textarea class="glass-input" rows="4" placeholder="Escribe aquí vuestra anécdota, cómo os sentisteis, etc." [(ngModel)]="selectedMilestone.story" style="width: 100%; border-radius: 14px; resize: none; margin-bottom: 15px;"></textarea>
-            
-            <div style="display: flex; gap: 10px;">
-              <button class="glass-btn" style="flex: 1; background: rgba(128,15,47,0.1); color: #800f2f;" (click)="isEditingMilestone = false">Cancelar</button>
-              <button class="glass-btn" style="flex: 1;" (click)="saveMilestoneChanges()">Guardar</button>
-            </div>
-          </div>
-
-          <button *ngIf="!isEditingMilestone" class="glass-btn" (click)="isMilestoneModalOpen = false" style="width: 100%; padding: 15px; font-size: 1.1rem; border-radius: 14px;">
-            Cerrar
-          </button>
-        </div>
-      </div>
 
         <!-- Food List Modal -->
         <div class="custom-overlay" *ngIf="isFoodListModalOpen" (click)="isFoodListModalOpen = false">
@@ -689,7 +598,7 @@ import { debounceTime } from 'rxjs/operators';
           </div>
         </div>
         
-          <!-- Confirm Modal -->
+        <!-- Confirm Modal -->
         <div class="custom-overlay" *ngIf="isConfirmModalOpen" style="z-index: 100000;" (click)="isConfirmModalOpen = false">
           <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: center; width: 90%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); max-height: 75vh; overflow-y: auto;" (click)="$event.stopPropagation()">
             <h2 style="color: #590D22; margin-bottom: 15px; font-weight: 900;">{{ confirmTitle }}</h2>
@@ -700,6 +609,9 @@ import { debounceTime } from 'rxjs/operators';
             </div>
           </div>
         </div>
+
+        <!-- TIMELINE COMPONENT -->
+        <app-timeline-widget *ngIf="isTimelineModalOpen" (close)="isTimelineModalOpen = false"></app-timeline-widget>
       </ion-content>
     `,
     styles: [`
@@ -866,9 +778,7 @@ import { debounceTime } from 'rxjs/operators';
       :host-context(.night-owl-mode) .add-btn { background: rgba(167,139,250,0.1); color: #a78bfa; border-color: rgba(167,139,250,0.3); }
       :host-context(.night-owl-mode) .modal-content.glass-card { background: rgba(30,30,30,0.95); }
       :host-context(.night-owl-mode) .modal-content h2 { color: #fdfdfd !important; }
-    `],
-  standalone: true,
-  imports: [CommonModule, FormsModule, IonIcon, IonContent, IonRefresher, IonRefresherContent, IonSelect, IonSelectOption, IonSearchbar]
+    `]
 })
 export class MasWidgetComponent implements OnInit, OnDestroy {
   @Output() openGameEvent = new EventEmitter<void>();
@@ -891,12 +801,11 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   startDate: string = '';
   selectedAlbumId: number | string = 'feed';
   albums: any[] = [];
-  milestones: any[] = [];
-  bucketList: any[] = [];
+  isTimelineModalOpen = false;
 
-  newMilestoneTitle = '';
-  newMilestoneDate = '';
-  newBucketTitle = '';
+  openTimelineModal() {
+    this.isTimelineModalOpen = true;
+  }
 
   timeTogether = { years: 0, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
   
@@ -906,10 +815,6 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   
   isEventModalOpen = false;
   selectedEvent: any = null;
-
-  isMilestoneModalOpen = false;
-  selectedMilestone: any = null;
-  isEditingMilestone = false;
 
   myBirthday: string = '';
   partnerBirthday: string = '';
@@ -1081,11 +986,8 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     // Load API data
     try {
       this.albums = await this.api.getAlbums().catch(() => []);
-      this.loadMilestones();
     } catch (e) {}
     
-    // Load bucket list from backend
-    this.loadBucketList();
     this.loadFoodAndMovies();
 
     this.startTimer();
@@ -1153,10 +1055,6 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     this.showToast('Cumpleaños guardados', 'success');
   }
 
-  async loadMilestones() {
-    this.milestones = await this.api.getMilestones();
-  }
-
   async openGastroModal() {
     this.isFoodListModalOpen = true;
     setTimeout(() => this.tutorialService.showGastroTour(), 600);
@@ -1168,130 +1066,10 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   }
 
   async handleRefresh(event: any) {
-    await this.loadMilestones();
     event.target.complete();
   }
 
-  async addMilestone() {
-    if (!this.newMilestoneTitle || !this.newMilestoneDate) return;
-    try {
-      await this.api.addMilestone(this.newMilestoneTitle, this.newMilestoneDate);
-      this.newMilestoneTitle = '';
-      this.newMilestoneDate = '';
-      this.loadMilestones();
-      this.showToast('Hito añadido con éxito', 'success');
-    } catch (e) {
-      console.error(e);
-      this.showToast('Error al añadir hito', 'danger');
-    }
-  }
 
-  async deleteMilestone(id: number) {
-    const alert = await this.alertCtrl.create({
-      header: '¿Eliminar Hito?',
-      message: '¿Estás seguro de que quieres borrar este hito? Esta acción no se puede deshacer.',
-      cssClass: 'custom-love-alert',
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { 
-          text: 'Eliminar', 
-          role: 'destructive',
-          handler: async () => {
-            try {
-              await this.api.deleteMilestone(id);
-              this.loadMilestones();
-              this.showToast('Hito eliminado', 'medium');
-            } catch (e) {
-              console.error(e);
-              this.showToast('Error al eliminar hito', 'danger');
-            }
-          }
-        }
-      ]
-    });
-    await alert.present();
-  }
-
-  async loadBucketList() {
-    try {
-      const wishes = await this.api.getWishes();
-      this.bucketList = wishes;
-    } catch (e) {
-      console.error('Error loading wishes', e);
-    }
-  }
-
-  async addBucketItem() {
-    if (!this.newBucketTitle.trim()) return;
-    try {
-      const wish = await this.api.addWish(this.newBucketTitle.trim());
-      this.bucketList.unshift(wish);
-      this.newBucketTitle = '';
-    } catch (e) {
-      this.showToast('Error al añadir deseo', 'danger');
-    }
-  }
-
-  async toggleBucketItem(index: number) {
-    const item = this.bucketList[index];
-    item.completed = !item.completed;
-    try {
-      await this.api.updateWish(item.id, item.completed);
-    } catch (e) {
-      item.completed = !item.completed; // Revert on failure
-      this.showToast('Error al actualizar deseo', 'danger');
-    }
-  }
-
-  async deleteBucketItem(index: number, event: Event) {
-    event.stopPropagation();
-    
-    const alert = await this.alertCtrl.create({
-      header: '¿Eliminar Deseo?',
-      message: '¿Estás seguro de que quieres borrar este deseo de la lista?',
-      cssClass: 'custom-love-alert',
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          handler: async () => {
-            const item = this.bucketList[index];
-            const originalList = [...this.bucketList];
-            this.bucketList.splice(index, 1);
-            
-            try {
-              await this.api.deleteWish(item.id);
-            } catch (e) {
-              this.bucketList = originalList; // Revert on failure
-              this.showToast('Error al eliminar deseo', 'danger');
-            }
-          }
-        }
-      ]
-    });
-    
-    await alert.present();
-  }
-
-  calculateDays(dateStr: string): number {
-    if (!dateStr) return 0;
-    const d = new Date(dateStr);
-    const now = new Date();
-    d.setHours(0,0,0,0);
-    now.setHours(0,0,0,0);
-    return Math.round(Math.abs(now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
-  }
-
-  isPast(dateStr: string): boolean {
-    if (!dateStr) return true;
-    const d = new Date(dateStr);
-    const now = new Date();
-    // Compare dates ignoring time
-    d.setHours(0,0,0,0);
-    now.setHours(0,0,0,0);
-    return d.getTime() < now.getTime();
-  }
 
   openGame() {
     this.router.navigate(['/games']);
@@ -1332,75 +1110,6 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     this.isEventModalOpen = true;
   }
 
-  openMilestoneModal(m: any) {
-    this.selectedMilestone = m;
-    this.isEditingMilestone = false;
-    this.isMilestoneModalOpen = true;
-  }
-
-  async uploadMilestonePhoto() {
-    this.presentPhotoOptions(async (source) => {
-      try {
-        const image = await Camera.getPhoto({
-          quality: 80,
-          allowEditing: true, // Matching typical app behavior to allow crop
-          resultType: CameraResultType.DataUrl,
-          source: source
-        });
-        if (image.dataUrl) {
-          this.selectedMilestone.newImageBase64 = image.dataUrl;
-        }
-      } catch (e) {
-        console.log('User cancelled camera or error', e);
-      }
-    });
-  }
-
-  async saveMilestoneChanges() {
-    if (!this.selectedMilestone) return;
-    try {
-      const res = await this.api.updateMilestone(this.selectedMilestone.id, this.selectedMilestone.newImageBase64, this.selectedMilestone.story);
-      this.selectedMilestone.image_url_full = res.image_url_full;
-      this.selectedMilestone.newImageBase64 = null;
-      this.isEditingMilestone = false;
-      this.loadMilestones();
-      this.showToast('Recuerdo guardado con éxito', 'success');
-    } catch (e) {
-      console.error(e);
-      this.showToast('Error al guardar el recuerdo', 'danger');
-    }
-  }
-
-  getMilestonePhrase(dateStr: string): string {
-    if (!dateStr) return '';
-    const d = new Date(dateStr);
-    const now = new Date();
-    d.setHours(0,0,0,0);
-    now.setHours(0,0,0,0);
-
-    const diffTime = Math.abs(now.getTime() - d.getTime());
-    const totalDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (totalDays === 0) return "¡El momento es ahora! 🎉";
-
-    let years = Math.floor(totalDays / 365);
-    let remainingDays = totalDays % 365;
-    let months = Math.floor(remainingDays / 30);
-    let days = remainingDays % 30;
-
-    let timeParts = [];
-    if (years > 0) timeParts.push(`${years} ${years === 1 ? 'año' : 'años'}`);
-    if (months > 0) timeParts.push(`${months} ${months === 1 ? 'mes' : 'meses'}`);
-    if (days > 0 || timeParts.length === 0) timeParts.push(`${days} ${days === 1 ? 'día' : 'días'}`);
-
-    const joinedTime = timeParts.join(', ').replace(/, ([^,]*)$/, ' y $1');
-
-    if (d.getTime() < now.getTime()) {
-      return `Han pasado ${joinedTime} desde aquel mágico momento.`;
-    } else {
-      return `¡La emoción crece! Faltan ${joinedTime} para este gran momento.`;
-    }
-  }
 
   calculateTime() {
     if (!this.startDate) return;

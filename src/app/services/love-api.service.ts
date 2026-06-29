@@ -91,7 +91,8 @@ export class LoveApiService {
   async login(email: string, password: string): Promise<any> {
     const res: any = await firstValueFrom(this.http.post(`${API_BASE_URL}/login`, { email, password }));
     if (res && res.access_token) {
-      await SecureStoragePlugin.set({ key: 'auth_token', value: res.access_token }).catch(async () => { await Preferences.set({ key: 'auth_token', value: res.access_token }); });
+      await Preferences.set({ key: 'auth_token', value: res.access_token });
+      await SecureStoragePlugin.set({ key: 'auth_token', value: res.access_token }).catch(() => {});
       this.token$.next(res.access_token);
     }
     return res;
@@ -109,7 +110,8 @@ export class LoveApiService {
   async register(data: {name: string, email: string, password: string, password_confirmation: string, app: string}): Promise<any> {
     const res: any = await firstValueFrom(this.http.post(`${API_BASE_URL}/register`, data));
     if (res && res.access_token) {
-      await SecureStoragePlugin.set({ key: 'auth_token', value: res.access_token }).catch(async () => { await Preferences.set({ key: 'auth_token', value: res.access_token }); });
+      await Preferences.set({ key: 'auth_token', value: res.access_token });
+      await SecureStoragePlugin.set({ key: 'auth_token', value: res.access_token }).catch(() => {});
       this.token$.next(res.access_token);
     }
     return res;
@@ -128,7 +130,8 @@ export class LoveApiService {
   }
 
   async logout(): Promise<void> {
-    await SecureStoragePlugin.remove({ key: 'auth_token' }).catch(async () => { await Preferences.remove({ key: 'auth_token' }); });
+    await Preferences.remove({ key: 'auth_token' });
+    await SecureStoragePlugin.remove({ key: 'auth_token' }).catch(() => {});
     this.token$.next(null);
   }
 
@@ -163,54 +166,21 @@ export class LoveApiService {
     return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/poke`, {}));
   }
 
-  // --- HITOS IMPORTANTES ---
-  async getMilestones(): Promise<any[]> {
-    return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/milestones`));
+  // --- TIMELINE Y PLANES ---
+  async getPlans(): Promise<any[]> {
+    return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/plans`));
   }
 
-  async addMilestone(title: string, date: string): Promise<any> {
-    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/milestones`, { title, date }));
+  async addPlan(data: any): Promise<any> {
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/plans`, data));
   }
 
-  async updateMilestone(id: number, imageBase64?: string, story?: string): Promise<any> {
-    // Convert base64 to File object if image exists
-    const formData = new FormData();
-    if (imageBase64) {
-      try {
-        const response = await fetch(imageBase64);
-        const blob = await response.blob();
-        formData.append('image', blob, `milestone_${id}.jpg`);
-      } catch (e) {
-        console.error('Error procesando imagen', e);
-      }
-    }
-    
-    if (story !== undefined && story !== null) {
-      formData.append('story', story);
-    }
-    
-    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/milestones/${id}`, formData));
+  async updatePlan(id: number, data: any): Promise<any> {
+    return firstValueFrom(this.http.put<any>(`${API_BASE_URL}/love-album/plans/${id}`, data));
   }
 
-  async deleteMilestone(id: number): Promise<any> {
-    return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/love-album/milestones/${id}`));
-  }
-
-  // --- WISHES (CUBO DE DESEOS) ---
-  async getWishes(): Promise<any[]> {
-    return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/wishes`));
-  }
-
-  async addWish(title: string): Promise<any> {
-    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/wishes`, { title }));
-  }
-
-  async updateWish(id: number, completed: boolean): Promise<any> {
-    return firstValueFrom(this.http.put<any>(`${API_BASE_URL}/love-album/wishes/${id}`, { completed }));
-  }
-
-  async deleteWish(id: number): Promise<any> {
-    return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/love-album/wishes/${id}`));
+  async deletePlan(id: number): Promise<any> {
+    return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/love-album/plans/${id}`));
   }
 
   // --- PREGUNTAS MINIJUEGO ---

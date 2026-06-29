@@ -11,6 +11,8 @@ import { Capacitor } from '@capacitor/core';
 import { addIcons } from 'ionicons';
 import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline } from 'ionicons/icons';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 
 @Component({
   selector: 'app-photo-widget',
@@ -1784,16 +1786,42 @@ export class PhotoWidgetComponent implements OnInit {
   async downloadPhoto(photo: any) {
     try {
       const blob = await this.api.downloadPhotoBlob(photo.id);
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = `love_photo_${photo.id}.jpg`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      this.showSuccess('Imagen descargada');
+      
+      if (Capacitor.isNativePlatform()) {
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = async () => {
+          const base64data = reader.result as string;
+          try {
+            const savedFile = await Filesystem.writeFile({
+              path: `love_photo_${photo.id}.jpg`,
+              data: base64data,
+              directory: Directory.Cache
+            });
+            
+            await Share.share({
+              title: 'Foto de Love Widget',
+              url: savedFile.uri,
+              dialogTitle: 'Compartir o guardar foto'
+            });
+            this.showSuccess('Listo');
+          } catch(e) {
+            console.error('Error guardando archivo nativo:', e);
+            this.showError('Error al procesar la imagen');
+          }
+        };
+      } else {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `love_photo_${photo.id}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        this.showSuccess('Imagen descargada');
+      }
     } catch (e) {
       console.error('Error al descargar:', e);
       this.showError('Error al descargar la imagen');

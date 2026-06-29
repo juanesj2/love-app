@@ -266,7 +266,8 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
 
   async loadNextMilestone() {
     try {
-      const milestones = await this.api.getMilestones();
+      const allPlans = await this.api.getPlans();
+      const milestones = allPlans.filter(p => p.status === 'planned' && p.target_date);
       const now = new Date();
       now.setHours(0,0,0,0);
       
