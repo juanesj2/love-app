@@ -234,6 +234,11 @@ import { Camera, CameraResultType } from '@capacitor/camera';
       background: rgba(255,255,255,0.6); font-family: 'Inter', sans-serif; font-size: 0.95rem;
       color: #590D22; --color: #590D22; outline: none; font-weight: 600;
     }
+    .glass-input[type="date"] { color-scheme: light; }
+    .glass-input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(12%) sepia(87%) saturate(3025%) hue-rotate(327deg) brightness(82%) contrast(106%);
+      opacity: 0.7; cursor: pointer;
+    }
     .editor-footer { padding: 20px; display: flex; gap: 10px; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); }
     .glass-btn { flex: 1; padding: 15px; border-radius: 15px; border: none; background: #FF4D6D; color: white; font-weight: 800; font-size: 1rem; }
     .danger-btn { background: rgba(255,0,0,0.1); color: red; flex: 0.5; }
