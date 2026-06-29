@@ -574,6 +574,14 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
     :host-context(.night-owl-mode) .recording-bar { background: rgba(167,139,250,0.15); }
     :host-context(.night-owl-mode) .recording-indicator { color: #a78bfa; }
     :host-context(.night-owl-mode) .pulse-dot { background: #a78bfa; }
+    :host-context(.night-owl-mode) .mine .bubble { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+    :host-context(.night-owl-mode) .send-btn { background: rgba(255,255,255,0.1); color: #ccc; }
+    :host-context(.night-owl-mode) .send-btn.active { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; }
+    :host-context(.night-owl-mode) .mine .reply-context { background: rgba(139, 92, 246, 0.15); border-right-color: #8b5cf6; color: #fdfdfd; }
+    :host-context(.night-owl-mode) .mine .reply-context-name { color: #a78bfa; }
+    :host-context(.night-owl-mode) .reply-icon-circle ion-icon { color: #8b5cf6; }
+    :host-context(.night-owl-mode) .mine .play-btn { color: #8b5cf6; }
+    :host-context(.night-owl-mode) .add-btn { background: #8b5cf6; }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
