@@ -895,6 +895,12 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
       :host-context(.night-owl-mode) .bottom-sheet-body ion-icon[name="search-outline"] { color: #aaa !important; }
       :host-context(.night-owl-mode) .sheet-close-btn { background: rgba(255,255,255,0.1) !important; }
       :host-context(.night-owl-mode) .sheet-close-btn ion-icon { color: #fdfdfd !important; }
+      :host-context(.night-owl-mode) .star { --star-color: #a78bfa !important; }
+      :host-context(.night-owl-mode) .food-place-item span:not(.p-title):not(.p-rating),
+      :host-context(.night-owl-mode) .movie-item span:not(.m-title):not(.m-rating) { color: #c4b5fd !important; }
+      :host-context(.night-owl-mode) .food-place-item div:has(ion-icon[name="pencil-outline"]),
+      :host-context(.night-owl-mode) .movie-item div:has(ion-icon[name="pencil-outline"]) { background: rgba(30,30,30,0.8) !important; }
+      :host-context(.night-owl-mode) ion-icon[name="pencil-outline"] { color: #a78bfa !important; }
       :host-context(.night-owl-mode) .settings-item { background: rgba(0,0,0,0.4) !important; border: 1px solid #333; }
       :host-context(.night-owl-mode) .settings-item h4 { color: #fdfdfd !important; }
       :host-context(.night-owl-mode) .settings-item p { color: #aaa !important; }
