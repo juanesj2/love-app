@@ -140,8 +140,8 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
             <div class="icon-circle" style="background: linear-gradient(135deg, #a2d2ff, #bde0fe); box-shadow: 0 4px 15px rgba(162, 210, 255, 0.3); color: #023e8a; width: 60px; height: 60px; font-size: 1.8rem; margin-bottom: 10px;">
               <ion-icon name="map-outline"></ion-icon>
             </div>
-            <h3>Timeline y Planes</h3>
-            <p>Ideas, viajes futuros y el historial de nuestra historia.</p>
+            <h3 style="color: #590D22; margin: 0; font-weight: 900; font-size: 1.5rem;">Timeline y Planes</h3>
+            <p style="color: #a4133c; margin: 5px 0 0; font-size: 0.95rem;">Ideas, viajes futuros y el historial de nuestra historia.</p>
           </div>
         </div>
 
