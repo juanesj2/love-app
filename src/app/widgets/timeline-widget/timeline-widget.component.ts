@@ -17,6 +17,7 @@ import {
   calendarOutline,
   flagOutline
 } from 'ionicons/icons';
+import { NotificationService } from '../../services/notification.service';
 import { LoveApiService } from '../../services/love-api.service';
 import { Camera, CameraResultType } from '@capacitor/camera';
 
@@ -258,6 +259,7 @@ export class TimelineWidgetComponent implements OnInit, OnDestroy {
   private api = inject(LoveApiService);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
+  private notificationService = inject(NotificationService);
 
   activeTab: 'idea' | 'planned' | 'completed' = 'idea';
   plans: any[] = [];
@@ -287,6 +289,7 @@ export class TimelineWidgetComponent implements OnInit, OnDestroy {
   async loadPlans() {
     try {
       this.plans = await this.api.getPlans();
+      this.notificationService.scheduleTripReminders(this.plans);
       if (this.initialPlanId) {
         const p = this.plans.find((x: any) => x.id === this.initialPlanId);
         if (p) {

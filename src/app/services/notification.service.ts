@@ -93,4 +93,64 @@ export class NotificationService {
       ]
     });
   }
+
+  async scheduleTripReminders(plans: any[]) {
+    if (!this.platform.is('capacitor')) return;
+    const perm = await LocalNotifications.requestPermissions();
+    if (perm.display !== 'granted') return;
+
+    // Cancel previously scheduled trip reminders to start fresh
+    const pending = await LocalNotifications.getPending();
+    const tripIdsToCancel = pending.notifications
+      .filter(n => n.id >= 10000)
+      .map(n => ({ id: n.id }));
+      
+    if (tripIdsToCancel.length > 0) {
+      await LocalNotifications.cancel({ notifications: tripIdsToCancel });
+    }
+
+    const notificationsToSchedule: any[] = [];
+    const now = new Date();
+
+    for (const plan of plans) {
+      if (plan.status !== 'planned' || !plan.target_date || !plan.id) continue;
+      
+      const targetDate = new Date(plan.target_date);
+      if (isNaN(targetDate.getTime())) continue;
+
+      // 3 days before at 10:00 AM
+      const threeDaysBefore = new Date(targetDate);
+      threeDaysBefore.setDate(threeDaysBefore.getDate() - 3);
+      threeDaysBefore.setHours(10, 0, 0, 0);
+
+      if (threeDaysBefore > now) {
+        notificationsToSchedule.push({
+          title: '¡Se acerca el plan! 🗺️',
+          body: `Faltan 3 días para "${plan.title}"`,
+          id: 10000 + plan.id,
+          schedule: { at: threeDaysBefore }
+        });
+      }
+
+      // 1 day before at 10:00 AM
+      const oneDayBefore = new Date(targetDate);
+      oneDayBefore.setDate(oneDayBefore.getDate() - 1);
+      oneDayBefore.setHours(10, 0, 0, 0);
+
+      if (oneDayBefore > now) {
+        notificationsToSchedule.push({
+          title: '¡Es mañana! 🎉',
+          body: `Prepárate para "${plan.title}"`,
+          id: 20000 + plan.id,
+          schedule: { at: oneDayBefore }
+        });
+      }
+    }
+
+    if (notificationsToSchedule.length > 0) {
+      await LocalNotifications.schedule({
+        notifications: notificationsToSchedule
+      });
+    }
+  }
 }
