@@ -35,7 +35,7 @@ import { Camera, CameraResultType } from '@capacitor/camera';
           <p>El pasado, presente y futuro de nosotros.</p>
           
           <div class="tabs">
-            <div class="tab" [class.active]="activeTab === 'ideas'" (click)="activeTab = 'ideas'">
+            <div class="tab" [class.active]="activeTab === 'idea'" (click)="activeTab = 'idea'">
               <ion-icon name="star-outline"></ion-icon> Ideas
             </div>
             <div class="tab" [class.active]="activeTab === 'planned'" (click)="activeTab = 'planned'">
@@ -253,7 +253,7 @@ export class TimelineWidgetComponent implements OnInit {
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
 
-  activeTab: 'ideas' | 'planned' | 'completed' = 'ideas';
+  activeTab: 'idea' | 'planned' | 'completed' = 'idea';
   plans: any[] = [];
   albums: any[] = [];
   
