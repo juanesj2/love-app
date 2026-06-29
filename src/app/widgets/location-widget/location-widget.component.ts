@@ -160,6 +160,23 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
 
     /* Night Owl Mode Overrides */
     :host-context(.night-owl-mode) .location-container { background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%); }
+    :host-context(.night-owl-mode) .location-container.is-together { background: linear-gradient(135deg, #121212 0%, #2a0a18 100%); }
+    :host-context(.night-owl-mode) .privacy-map-btn { background: rgba(30,30,30,0.95); color: #fdfdfd; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.05); }
+    :host-context(.night-owl-mode) .together-box { background: rgba(30,30,30,0.9); border-color: rgba(255,255,255,0.05); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .text-info-together h2 { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .text-info-together p { color: #a78bfa; }
+    :host-context(.night-owl-mode) .next-milestone-card { background: rgba(30,30,30,0.85); border-color: rgba(255,255,255,0.05); box-shadow: 0 6px 20px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .nm-title { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .ghost-overlay { background: rgba(0,0,0,0.7); }
+    :host-context(.night-owl-mode) .ghost-box { background: rgba(30,30,30,0.95); color: #fdfdfd; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .ghost-box h3 { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .ghost-box p { color: #ccc; }
+    :host-context(.night-owl-mode) .partner-location-card { background: rgba(30,30,30,0.85); border-color: rgba(255,255,255,0.05); box-shadow: 0 4px 30px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .center-map-btn { background: rgba(30,30,30,0.95); color: #fdfdfd; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .partner-info-mini { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .avatar-container { border-color: rgba(255,255,255,0.1); background: #1a1a1a; }
+    :host-context(.night-owl-mode) .camera-icon { background: rgba(30,30,30,0.9); border-color: rgba(255,255,255,0.1); }
+    :host-context(.night-owl-mode) .avatar-container-mini.ghost { background: rgba(30,30,30,0.9); border-color: rgba(255,255,255,0.1); }
     :host-context(.night-owl-mode) .top-bar-overlay { background: linear-gradient(180deg, rgba(18,18,18,0.95) 0%, rgba(18,18,18,0) 100%); }
     :host-context(.night-owl-mode) .hud-bar { background: rgba(30,30,30,0.85); border-color: rgba(255,255,255,0.05); }
     :host-context(.night-owl-mode) .partner-name { color: #fdfdfd; }
