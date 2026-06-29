@@ -208,7 +208,7 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
             <span class="sub" *ngIf="uploadingAvatar">Actualizando...</span>
           </div>
         <!-- Settings -->
-          <div class="grid-card full-width interactive" id="mas-ajustes" (click)="isSettingsModalOpen = true">
+          <div class="grid-card full-width interactive" id="mas-ajustes" (click)="openSettingsModal()">
             <h4><ion-icon name="settings-sharp" style="color: #6c757d;"></ion-icon> Ajustes de Cuenta</h4>
             <p style="margin: 0; font-size: 0.85rem; color: #495057; font-weight: 500;">Modo Búho, Privacidad y Cuenta.</p>
           </div>
@@ -246,10 +246,10 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
       </div>
 
       <!-- Settings Modal -->
-      <div class="custom-overlay" *ngIf="isSettingsModalOpen" (click)="isSettingsModalOpen = false" style="align-items: flex-end;">
-        <div class="bottom-sheet-modal" (click)="$event.stopPropagation()">
+      <div class="custom-overlay" *ngIf="isSettingsModalOpen" (click)="closeSettingsModal()" style="align-items: flex-end;">
+        <div class="bottom-sheet-modal auto-height-sheet" (click)="$event.stopPropagation()">
           <div class="bottom-sheet-header">
-            <div class="sheet-close-btn" (click)="isSettingsModalOpen = false">
+            <div class="sheet-close-btn" (click)="closeSettingsModal()">
               <ion-icon name="close-outline"></ion-icon>
             </div>
             <h2>Ajustes</h2>
@@ -713,6 +713,12 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
       border-top-left-radius: 30px; border-top-right-radius: 30px;
       display: flex; flex-direction: column; overflow: hidden; position: relative;
     }
+    
+    .bottom-sheet-modal.auto-height-sheet {
+      height: auto;
+      max-height: 90%;
+      padding-bottom: 20px;
+    }
     .bottom-sheet-header { padding: 25px 20px 10px; position: relative; background: #fff0f3; z-index: 2; text-align: left; }
     .bottom-sheet-header h2 { margin: 0; font-size: 1.8rem; font-weight: 900; color: #590D22; display: flex; align-items: center; gap: 10px; }
     .bottom-sheet-header p { margin: 5px 0 20px; color: #a4133c; font-size: 0.95rem; }
@@ -1087,6 +1093,16 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   }
 
   isSettingsModalOpen = false;
+
+  openSettingsModal() {
+    this.isSettingsModalOpen = true;
+    document.body.classList.add('hide-tabs');
+  }
+
+  closeSettingsModal() {
+    this.isSettingsModalOpen = false;
+    document.body.classList.remove('hide-tabs');
+  }
   isNightOwlEnabled = false;
 
   constructor() {
