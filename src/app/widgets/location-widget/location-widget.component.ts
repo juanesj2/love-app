@@ -157,9 +157,7 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
 
     ::ng-deep .pulse-marker::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%; border: 3px solid #FF4D6D; animation: radarPulse 2s infinite; z-index: -1; }
     @keyframes radarPulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.6); opacity: 0; } }
-  `],
-  standalone: true,
-  imports: [CommonModule, IonIcon]
+  `]
 })
 export class LocationWidgetComponent implements OnInit, OnDestroy {
   @Output() poke = new EventEmitter<void>();
