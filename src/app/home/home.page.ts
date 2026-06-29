@@ -230,6 +230,27 @@ import { App } from '@capacitor/app';
     .prompt-btn.cancel { background: #f1f3f5; color: #888; }
     .prompt-btn.confirm { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3); }
     .prompt-btn:disabled { opacity: 0.7; pointer-events: none; }
+
+    /* Night Owl Global Fixes for App Shell */
+    :host-context(.night-owl-mode) .custom-header { background: rgba(30, 30, 30, 0.85); border-bottom-color: rgba(255, 255, 255, 0.05); }
+    :host-context(.night-owl-mode) .custom-tab-bar { background: rgba(30, 30, 30, 0.85); border-color: rgba(255, 255, 255, 0.05); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .tab-btn { color: #888; }
+    :host-context(.night-owl-mode) .tab-btn.active { color: #a78bfa; }
+    :host-context(.night-owl-mode) .tab-btn.active::after { background: #a78bfa; box-shadow: 0 2px 5px rgba(167,139,250,0.4); }
+    :host-context(.night-owl-mode) .tab-btn.active ion-icon { filter: drop-shadow(0 4px 8px rgba(167,139,250,0.3)); }
+    :host-context(.night-owl-mode) .plus-circle { background: linear-gradient(135deg, #a78bfa, #8b5cf6); border-color: #222; box-shadow: 0 10px 25px rgba(167, 139, 250, 0.5); }
+    :host-context(.night-owl-mode) .plus-circle::before { background: linear-gradient(135deg, #c4b5fd, #a78bfa); }
+    
+    :host-context(.night-owl-mode) .prompt-sheet,
+    :host-context(.night-owl-mode) .surprise-sheet { background: rgba(30, 30, 30, 0.95); }
+    :host-context(.night-owl-mode) .modal-header h2 { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .premium-input,
+    :host-context(.night-owl-mode) .premium-textarea { background: rgba(0,0,0,0.4); border-color: #333; color: #fdfdfd; color-scheme: dark; }
+    :host-context(.night-owl-mode) .premium-input:focus,
+    :host-context(.night-owl-mode) .premium-textarea:focus { border-color: #a78bfa; }
+    :host-context(.night-owl-mode) .prompt-btn.cancel { background: rgba(255,255,255,0.1); color: #ccc; }
+    :host-context(.night-owl-mode) .prompt-btn.confirm { background: linear-gradient(135deg, #a78bfa, #8b5cf6); box-shadow: 0 4px 15px rgba(167, 139, 250, 0.3); }
+    :host-context(.night-owl-mode) .prompt-preview-container { background: rgba(0,0,0,0.3); }
   `],
   standalone: true,
   imports: [IonHeader, IonToolbar, IonContent, IonFooter, IonIcon, IonSpinner, CommonModule, FormsModule, LocationWidgetComponent, PhotoWidgetComponent, ChatWidgetComponent, MasWidgetComponent, QuestionsWidgetComponent],

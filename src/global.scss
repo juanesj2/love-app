@@ -477,3 +477,16 @@ body:not(.hide-tabs) .floating-center-wrapper {
   transform: translate(-50%, 0) !important;
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
+/* Global Night Owl Mode Variables */
+body.night-owl-mode {
+  --ion-background-color: #121212;
+  --ion-text-color: #fdfdfd;
+  background-color: #121212 !important;
+}
+
+body.night-owl-mode ion-content, 
+body.night-owl-mode ion-header, 
+body.night-owl-mode ion-toolbar {
+  --background: #121212;
+}
