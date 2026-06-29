@@ -150,6 +150,9 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
                 <div style="font-size: 0.95rem; color: #590D22; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ upcomingPlan.title }}</div>
               </div>
             </div>
+          </div>
+        </div>
+
         <!-- Quick Actions Grid -->
         <div class="quick-actions-grid">
           <!-- Logros y Secretos (Spans full width) -->
