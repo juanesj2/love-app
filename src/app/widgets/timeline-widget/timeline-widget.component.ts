@@ -334,6 +334,11 @@ export class TimelineWidgetComponent implements OnInit, OnDestroy {
 
   openPlan(plan: any) {
     this.editingPlan = JSON.parse(JSON.stringify(plan));
+    if (this.editingPlan.target_date) {
+      try {
+        this.editingPlan.target_date = new Date(this.editingPlan.target_date).toISOString().split('T')[0];
+      } catch (e) {}
+    }
     if (!this.editingPlan.dynamic_data) this.editingPlan.dynamic_data = {};
     if (!this.editingPlan.dynamic_data.packing_list) this.editingPlan.dynamic_data.packing_list = [];
     this.isEditing = true;
