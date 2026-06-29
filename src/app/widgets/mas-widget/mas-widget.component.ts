@@ -860,6 +860,12 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
       :host-context(.night-owl-mode) .grid-card .sub { color: #a78bfa; }
       :host-context(.night-owl-mode) .title, :host-context(.night-owl-mode) .section-title h3, :host-context(.night-owl-mode) .food-info h4, :host-context(.night-owl-mode) .movie-info h4 { color: #fdfdfd; text-shadow: none; }
       :host-context(.night-owl-mode) .subtitle, :host-context(.night-owl-mode) .desc { color: #ccc; }
+      :host-context(.night-owl-mode) .timeline-banner-content h3 { color: #fdfdfd !important; }
+      :host-context(.night-owl-mode) .timeline-banner-content p { color: #ccc !important; }
+      :host-context(.night-owl-mode) .grid-card p { color: #ccc !important; }
+      :host-context(.night-owl-mode) .upcoming-preview { background: rgba(0,0,0,0.5) !important; border-color: rgba(255,255,255,0.05) !important; }
+      :host-context(.night-owl-mode) .upcoming-preview > div > div:first-child { color: #a78bfa !important; }
+      :host-context(.night-owl-mode) .upcoming-preview > div > div:last-child { color: #fdfdfd !important; }
       :host-context(.night-owl-mode) .glass-input, :host-context(.night-owl-mode) .glass-select { background: rgba(0,0,0,0.4); border-color: #333; color: #fdfdfd; color-scheme: dark; }
       :host-context(.night-owl-mode) .glass-input::-webkit-datetime-edit { color: #fdfdfd; }
       :host-context(.night-owl-mode) .glass-input:focus { border-color: #a78bfa; background: #111; box-shadow: 0 4px 15px rgba(167,139,250,0.2); }
