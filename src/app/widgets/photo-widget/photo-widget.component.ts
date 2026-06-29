@@ -663,6 +663,12 @@ import { Share } from '@capacitor/share';
     :host-context(.night-owl-mode) .streak-timer-box { background: rgba(167,139,250,0.1); color: #a78bfa; }
     :host-context(.night-owl-mode) .streak-timer-box.success { background: rgba(46,204,113,0.1); color: #2ecc71; }
     :host-context(.night-owl-mode) .streak-close-btn { background: rgba(255,255,255,0.1); color: #fdfdfd; }
+    :host-context(.night-owl-mode) .albums-sheet { background: rgba(30,30,30,0.95); box-shadow: 0 -10px 20px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); }
+    :host-context(.night-owl-mode) .modal-header h2 { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .close-btn { background: rgba(255,255,255,0.1); color: #fdfdfd; }
+    :host-context(.night-owl-mode) .album-cover.empty { background: rgba(0,0,0,0.4); border-color: #a78bfa; color: #a78bfa; }
+    :host-context(.night-owl-mode) .album-name { color: #ccc; }
+    :host-context(.night-owl-mode) .change-cover-btn { background: rgba(30,30,30,0.9); color: #a78bfa; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
@@ -1451,6 +1457,7 @@ export class PhotoWidgetComponent implements OnInit {
   startPickingCover(albumId: number) {
     this.pickingCoverForAlbumId = albumId;
     this.isAlbumsModalOpen = false; // Cerramos el modal para que vea las fotos
+    document.body.classList.remove('hide-tabs');
     this.currentAlbum = null; // Mostramos todas las fotos
     this.viewMode = 'grid'; // Cambiamos a la vista de galería
     this.cdr.detectChanges(); // Forzamos actualización de la UI
@@ -1472,10 +1479,12 @@ export class PhotoWidgetComponent implements OnInit {
 
   openAlbumsModal() {
     this.isAlbumsModalOpen = true;
+    document.body.classList.add('hide-tabs');
   }
   
   closeAlbumsModal() {
     this.isAlbumsModalOpen = false;
+    document.body.classList.remove('hide-tabs');
   }
 
   async react(photoId: number, emoji: string) {
@@ -1782,6 +1791,7 @@ export class PhotoWidgetComponent implements OnInit {
           await this.api.uploadAlbumCover(albumId, base64data);
           this.pickingCoverForAlbumId = null;
           this.isAlbumsModalOpen = true; // Reabrir el modal para ver el cambio
+          document.body.classList.add('hide-tabs');
           this.cdr.detectChanges();
           this.loadData();
           this.showSuccess('Portada actualizada');
@@ -1798,6 +1808,7 @@ export class PhotoWidgetComponent implements OnInit {
   cancelPickingCover() {
     this.pickingCoverForAlbumId = null;
     this.isAlbumsModalOpen = true; // Volvemos a abrir el modal de álbumes
+    document.body.classList.add('hide-tabs');
     this.cdr.detectChanges(); // Forzamos actualización UI para que sea instantáneo
   }
 
