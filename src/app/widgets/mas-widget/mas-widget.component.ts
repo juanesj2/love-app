@@ -12,7 +12,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { LocationService } from '../../services/location.service';
 import { TutorialService } from '../../services/tutorial.service';
 import { addIcons } from 'ionicons';
-import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline } from 'ionicons/icons';
+import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline } from 'ionicons/icons';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.component';
@@ -251,7 +251,10 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
             </div>
             
             <div class="bottom-sheet-body">
-              <ion-searchbar id="gastro-search" animated="true" [(ngModel)]="searchQueryFoodPlaces" placeholder="Buscar restaurante..." class="custom-searchbar" style="--border-radius: 14px; --background: rgba(255,255,255,0.8); --box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin: 0 -16px 15px -16px; --icon-color: #a4133c;"></ion-searchbar>
+              <div style="position: relative; margin-bottom: 15px; width: 100%;">
+                <ion-icon name="search-outline" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #a4133c; font-size: 1.4rem; z-index: 1; pointer-events: none;"></ion-icon>
+                <input type="text" id="gastro-search" [(ngModel)]="searchQueryFoodPlaces" placeholder="Buscar restaurante..." class="glass-input" style="padding-left: 45px; background: rgba(255,255,255,0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.05);" />
+              </div>
 
               <div id="gastro-filters" style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
                 <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedFoodCategory" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todas las categorías">
@@ -304,7 +307,10 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
             </div>
             
             <div class="bottom-sheet-body">
-              <ion-searchbar id="cine-search" animated="true" [(ngModel)]="searchQueryMovies" placeholder="Buscar película o serie..." class="custom-searchbar" style="--border-radius: 14px; --background: rgba(255,255,255,0.8); --box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin: 0 -16px 15px -16px; --icon-color: #a4133c;"></ion-searchbar>
+              <div style="position: relative; margin-bottom: 15px; width: 100%;">
+                <ion-icon name="search-outline" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #a4133c; font-size: 1.4rem; z-index: 1; pointer-events: none;"></ion-icon>
+                <input type="text" id="cine-search" [(ngModel)]="searchQueryMovies" placeholder="Buscar película o serie..." class="glass-input" style="padding-left: 45px; background: rgba(255,255,255,0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.05);" />
+              </div>
 
               <div id="cine-filters" style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
                 <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedMovieGenre" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todos los géneros">
@@ -978,7 +984,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   }
 
   constructor() {
-    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, add, pencilOutline, locationOutline, restaurantOutline, filmOutline, star, cameraOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline });
+    addIcons({ logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, add, pencilOutline, locationOutline, restaurantOutline, filmOutline, star, cameraOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline });
   }
 
   async ngOnInit() {
