@@ -351,6 +351,39 @@ ion-popover.love-popover {
   }
 }
 
+body.night-owl-mode ion-popover.love-popover {
+  --background: rgba(30, 30, 30, 0.98) !important;
+  --color: #fdfdfd !important;
+
+  &::part(content) {
+    background: rgba(30, 30, 30, 0.98) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  ion-content, ion-list, ion-item {
+    --color: #fdfdfd !important;
+    color: #fdfdfd !important;
+  }
+  
+  ion-item {
+    --border-color: rgba(255, 255, 255, 0.1) !important;
+    --background-hover: rgba(255, 255, 255, 0.05) !important;
+    --background-focused: rgba(255, 255, 255, 0.08) !important;
+    --background-activated: rgba(255, 255, 255, 0.08) !important;
+  }
+  
+  ion-item.item-radio-checked {
+    --background: rgba(167, 139, 250, 0.15) !important;
+  }
+  
+  ion-radio {
+    --color: #ccc !important;
+    --color-checked: #a78bfa !important;
+  }
+}
+
+
 /* Remove tab bar shadow */
 ion-tab-bar {
   box-shadow: none !important;
