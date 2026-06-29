@@ -214,7 +214,7 @@ import { Camera, CameraResultType } from '@capacitor/camera';
     .plan-countdown.completed { background: rgba(0,0,0,0.05); color: #666; }
 
     .fab-btn {
-      position: absolute; bottom: 100px; right: 20px; width: 60px; height: 60px;
+      position: absolute; bottom: max(30px, calc(env(safe-area-inset-bottom) + 20px)); right: 20px; width: 60px; height: 60px;
       background: linear-gradient(135deg, #FF4D6D, #c9184a); border-radius: 50%;
       display: flex; align-items: center; justify-content: center; z-index: 100;
       box-shadow: 0 6px 20px rgba(255,77,109,0.4); color: white; font-size: 2.5rem; cursor: pointer;
