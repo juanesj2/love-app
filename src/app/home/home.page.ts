@@ -30,8 +30,7 @@ import { App } from '@capacitor/app';
       <ion-toolbar>
         <div class="custom-header" *ngIf="selectedWidget !== 'location'">
           <div class="avatar-container"
-               (mousedown)="startGoldenPress()" (mouseup)="endGoldenPress()" (mouseleave)="endGoldenPress()"
-               (touchstart)="startGoldenPress()" (touchend)="endGoldenPress()">
+               (pointerdown)="startGoldenPress()" (pointerup)="endGoldenPress()" (pointercancel)="endGoldenPress()" (pointerleave)="endGoldenPress()">
             <img *ngIf="myAvatarUrl" [src]="myAvatarUrl" class="avatar" [class.golden-frame]="hasGoldenFrame" />
             <div *ngIf="!myAvatarUrl" class="avatar my-avatar" [class.golden-frame]="hasGoldenFrame">Tú</div>
             <div class="mood-badge" *ngIf="myMood">{{ myMood }}</div>
@@ -45,15 +44,13 @@ import { App } from '@capacitor/app';
             
             <div class="poke-btn"
               (click)="onPokeClick()"
-              (mousedown)="startPokeHold()" (mouseup)="endPokeHold()" (mouseleave)="endPokeHold()"
-              (touchstart)="startPokeHold()" (touchend)="endPokeHold()" (touchcancel)="endPokeHold()">
+              (pointerdown)="startPokeHold()" (pointerup)="endPokeHold()" (pointercancel)="endPokeHold()" (pointerleave)="endPokeHold()">
               <ion-icon name="heart" [class.poking]="pokeAnimation" [class.super-poking]="superPokeAnimation"></ion-icon>
             </div>
           </div>
 
           <div class="avatar-container partner-container"
-               (mousedown)="startSurprisePress()" (mouseup)="endSurprisePress()" (mouseleave)="endSurprisePress()"
-               (touchstart)="startSurprisePress()" (touchend)="endSurprisePress()">
+               (pointerdown)="startSurprisePress()" (pointerup)="endSurprisePress()" (pointercancel)="endSurprisePress()" (pointerleave)="endSurprisePress()">
             <img *ngIf="partnerAvatarUrl" [src]="partnerAvatarUrl" class="avatar" />
             <div *ngIf="!partnerAvatarUrl" class="avatar partner-avatar">{{ partnerInitial }}</div>
             <div class="mood-badge" *ngIf="partnerMood">{{ partnerMood }}</div>
@@ -410,6 +407,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   startGoldenPress() {
     this.goldenTimeout = setTimeout(() => {
+      this.goldenTimeout = null;
       try { navigator.vibrate?.([50, 50, 50]); } catch(e){}
       this.api.unlockAchievement('secret_golden_frame');
       this.openMoodSelector(); // Abre el selector de mood de todas formas
