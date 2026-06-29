@@ -264,7 +264,7 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
                 </button>
               </div>
               
-              <div id="gastro-list" style="margin-bottom: 20px;">
+              <div id="gastro-list" style="margin-bottom: 0;">
                 <div class="food-places-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
                   <div class="food-place-item" *ngFor="let place of filteredFoodPlaces" (click)="openFoodPlaceModal(place)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
                     <div *ngIf="place.is_favorite" style="position: absolute; top: 8px; left: 8px; z-index: 5;">
@@ -282,12 +282,12 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
                   </div>
                 </div>
               </div>
-              
-              <div class="add-glass">
-                <button id="gastro-add" class="glass-btn" style="width: 100%;" (click)="openAddFoodPlaceModal()">
-                  <ion-icon name="add-circle-outline"></ion-icon> Añadir Restaurante
-                </button>
-              </div>
+            </div>
+            
+            <div class="bottom-sheet-footer">
+              <button id="gastro-add" class="glass-btn" style="width: 100%; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4);" (click)="openAddFoodPlaceModal()">
+                <ion-icon name="add-circle-outline"></ion-icon> Añadir Restaurante
+              </button>
             </div>
           </div>
         </div>
@@ -317,7 +317,7 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
                 </button>
               </div>
               
-              <div id="cine-list" style="margin-bottom: 20px;">
+              <div id="cine-list" style="margin-bottom: 0;">
                 <div class="movies-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
                   <div class="movie-item" *ngFor="let movie of filteredMovies" (click)="openMovieModal(movie)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
                     <div *ngIf="movie.is_favorite" style="position: absolute; top: 8px; left: 8px; z-index: 5;">
@@ -335,12 +335,12 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
                   </div>
                 </div>
               </div>
-              
-              <div class="add-glass">
-                <button id="cine-add" class="glass-btn" style="width: 100%;" (click)="openAddMovieModal()">
-                  <ion-icon name="add-circle-outline"></ion-icon> Añadir Película/Serie
-                </button>
-              </div>
+            </div>
+            
+            <div class="bottom-sheet-footer">
+              <button id="cine-add" class="glass-btn" style="width: 100%; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4);" (click)="openAddMovieModal()">
+                <ion-icon name="add-circle-outline"></ion-icon> Añadir Película/Serie
+              </button>
             </div>
           </div>
         </div>
@@ -663,7 +663,8 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
     .bottom-sheet-header { padding: 25px 20px 10px; position: relative; background: #fff0f3; z-index: 2; text-align: left; }
     .bottom-sheet-header h2 { margin: 0; font-size: 1.8rem; font-weight: 900; color: #590D22; display: flex; align-items: center; gap: 10px; }
     .bottom-sheet-header p { margin: 5px 0 20px; color: #a4133c; font-size: 0.95rem; }
-    .bottom-sheet-body { flex: 1; overflow-y: auto; padding: 0 20px 40px; }
+    .bottom-sheet-body { flex: 1; overflow-y: auto; padding: 0 20px; }
+    .bottom-sheet-footer { padding: 15px 20px 25px; background: linear-gradient(to top, #fff0f3 80%, rgba(255,240,243,0)); position: relative; z-index: 2; }
     
     .sheet-close-btn {
       position: absolute; top: 20px; right: 20px; width: 36px; height: 36px;
