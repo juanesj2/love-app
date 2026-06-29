@@ -251,7 +251,7 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
             </div>
             
             <div class="bottom-sheet-body">
-              <ion-searchbar id="gastro-search" animated="true" [(ngModel)]="searchQueryFoodPlaces" placeholder="Buscar restaurante..." class="custom-searchbar" style="--border-radius: 14px; --background: rgba(255,255,255,0.8); --box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 0; margin-bottom: 15px;"></ion-searchbar>
+              <ion-searchbar id="gastro-search" animated="true" [(ngModel)]="searchQueryFoodPlaces" placeholder="Buscar restaurante..." class="custom-searchbar" style="--border-radius: 14px; --background: rgba(255,255,255,0.8); --box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin: 0 -16px 15px -16px; --icon-color: #a4133c;"></ion-searchbar>
 
               <div id="gastro-filters" style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
                 <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedFoodCategory" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todas las categorías">
@@ -304,7 +304,7 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
             </div>
             
             <div class="bottom-sheet-body">
-              <ion-searchbar id="cine-search" animated="true" [(ngModel)]="searchQueryMovies" placeholder="Buscar película o serie..." class="custom-searchbar" style="--border-radius: 14px; --background: rgba(255,255,255,0.8); --box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 0; margin-bottom: 15px;"></ion-searchbar>
+              <ion-searchbar id="cine-search" animated="true" [(ngModel)]="searchQueryMovies" placeholder="Buscar película o serie..." class="custom-searchbar" style="--border-radius: 14px; --background: rgba(255,255,255,0.8); --box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin: 0 -16px 15px -16px; --icon-color: #a4133c;"></ion-searchbar>
 
               <div id="cine-filters" style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
                 <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedMovieGenre" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todos los géneros">
