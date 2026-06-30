@@ -9,7 +9,7 @@ import { LoveApiService } from '../../services/love-api.service';
 import { TutorialService } from '../../services/tutorial.service';
 import { environment } from '../../../environments/environment';
 import { addIcons } from 'ionicons';
-import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline } from 'ionicons/icons';
+import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline } from 'ionicons/icons';
 @Component({
   selector: 'app-chat-widget',
   template: `
@@ -49,13 +49,13 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
 
           <!-- Contenido del mensaje deslizable -->
           <div class="message-content-wrapper" [id]="'slide-el-' + msg.id"
-            (contextmenu)="onContextMenu($event, msg)"
-            (touchstart)="ts($event, msg)"
-            (touchmove)="tm($event, msg)"
-            (touchend)="te($event, msg)"
-            (mousedown)="startPress($event, msg)"
-            (mouseup)="endPress()"
-            (mouseleave)="endPress()">
+            (contextmenu)="msg.isDeletedLocally ? null : onContextMenu($event, msg)"
+            (touchstart)="msg.isDeletedLocally ? null : ts($event, msg)"
+            (touchmove)="msg.isDeletedLocally ? null : tm($event, msg)"
+            (touchend)="msg.isDeletedLocally ? null : te($event, msg)"
+            (mousedown)="msg.isDeletedLocally ? null : startPress($event, msg)"
+            (mouseup)="msg.isDeletedLocally ? null : endPress()"
+            (mouseleave)="msg.isDeletedLocally ? null : endPress()">
             <div class="message-wrapper" [class.mine]="isMine(msg)">
               <div class="msg-avatar-container" *ngIf="!isMine(msg)">
                 <img *ngIf="avatars[msg.user?.name]" [src]="avatars[msg.user.name]" class="msg-avatar" />
@@ -71,43 +71,49 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
                 <div class="bubble" [class.only-photo]="msg.photo && (!msg.mensaje || msg.mensaje === 'null')"
                                     [class.transparent-bubble]="msg.mensaje && msg.mensaje.startsWith('[DOODLE]')">
                   
-                  <div class="restore-graffitis-btn" *ngIf="hasHiddenGraffitis(msg.id)" (click)="showGraffitis(msg.id)">
-                    <ion-icon name="eye"></ion-icon> Mostrar grafitis
-                  </div>
-                  
-                  <div class="photo-reply" *ngIf="msg.photo && !msg.mensaje?.startsWith('[DOODLE]') && !msg.mensaje?.startsWith('[AUDIO]')">
-                    <img [src]="environment.storageUrl + msg.photo.image_path" loading="lazy" />
+                  <div class="deleted-tombstone" *ngIf="msg.isDeletedLocally" style="color: #888; font-style: italic; display: flex; align-items: center; gap: 5px;">
+                    <ion-icon name="ban-outline"></ion-icon> Se eliminó este mensaje
                   </div>
 
-                  <p class="text" *ngIf="msg.mensaje && msg.mensaje !== 'null' && !msg.mensaje.startsWith('[GIF]') && !msg.mensaje.startsWith('[DOODLE]') && !msg.mensaje.startsWith('[AUDIO]')">
-                    {{msg.mensaje}}
-                    <span class="edited-label" *ngIf="msg.is_edited">(editado)</span>
-                  </p>
-                  <div class="gif-reply" *ngIf="msg.mensaje && msg.mensaje.startsWith('[GIF]')">
-                    <img [src]="msg.mensaje.replace('[GIF]', '')" loading="lazy" class="chat-gif" />
-                  </div>
-                  <div class="doodle-reply" *ngIf="msg.mensaje && msg.mensaje.startsWith('[DOODLE]')">
-                    <img [src]="environment.storageUrl + msg.photo?.image_path" loading="lazy" class="chat-doodle" />
-                  </div>
-                  <div class="audio-reply" *ngIf="msg.mensaje && msg.mensaje.startsWith('[AUDIO]')">
-                    <div class="custom-audio-player">
-                      <button class="play-btn" (click)="toggleAudio(msg, audioEl)">
-                        <ion-icon [name]="msg.playing ? 'pause' : 'play'"></ion-icon>
-                      </button>
-                      <div class="waveform" [class.animating]="msg.playing">
-                        <div class="bar" *ngFor="let h of getWaveform(msg)" [style.height]="h + '%'"></div>
-                      </div>
-                      <span class="duration" *ngIf="audioEl.duration && audioEl.duration !== Infinity">{{ formatDuration(audioEl.duration) }}</span>
+                  <ng-container *ngIf="!msg.isDeletedLocally">
+                    <div class="restore-graffitis-btn" *ngIf="hasHiddenGraffitis(msg.id)" (click)="showGraffitis(msg.id)">
+                      <ion-icon name="eye"></ion-icon> Mostrar grafitis
                     </div>
-                    <audio [src]="getAudioSrc(msg)" 
-                           (ended)="msg.playing = false" 
-                           (pause)="msg.playing = false" 
-                           (play)="msg.playing = true" 
-                           (loadedmetadata)="onAudioLoaded(audioEl)"
-                           #audioEl></audio>
-                  </div>
+                    
+                    <div class="photo-reply" *ngIf="msg.photo && !msg.mensaje?.startsWith('[DOODLE]') && !msg.mensaje?.startsWith('[AUDIO]')">
+                      <img [src]="environment.storageUrl + msg.photo.image_path" loading="lazy" />
+                    </div>
+
+                    <p class="text" *ngIf="msg.mensaje && msg.mensaje !== 'null' && !msg.mensaje.startsWith('[GIF]') && !msg.mensaje.startsWith('[DOODLE]') && !msg.mensaje.startsWith('[AUDIO]')">
+                      {{msg.mensaje}}
+                      <span class="edited-label" *ngIf="msg.is_edited">(editado)</span>
+                    </p>
+                    <div class="gif-reply" *ngIf="msg.mensaje && msg.mensaje.startsWith('[GIF]')">
+                      <img [src]="msg.mensaje.replace('[GIF]', '')" loading="lazy" class="chat-gif" />
+                    </div>
+                    <div class="doodle-reply" *ngIf="msg.mensaje && msg.mensaje.startsWith('[DOODLE]')">
+                      <img [src]="environment.storageUrl + msg.photo?.image_path" loading="lazy" class="chat-doodle" />
+                    </div>
+                    <div class="audio-reply" *ngIf="msg.mensaje && msg.mensaje.startsWith('[AUDIO]')">
+                      <div class="custom-audio-player">
+                        <button class="play-btn" (click)="toggleAudio(msg, audioEl)">
+                          <ion-icon [name]="msg.playing ? 'pause' : 'play'"></ion-icon>
+                        </button>
+                        <div class="waveform" [class.animating]="msg.playing">
+                          <div class="bar" *ngFor="let h of getWaveform(msg)" [style.height]="h + '%'"></div>
+                        </div>
+                        <span class="duration" *ngIf="audioEl.duration && audioEl.duration !== Infinity">{{ formatDuration(audioEl.duration) }}</span>
+                      </div>
+                      <audio [src]="getAudioSrc(msg)" 
+                             (ended)="msg.playing = false" 
+                             (pause)="msg.playing = false" 
+                             (play)="msg.playing = true" 
+                             (loadedmetadata)="onAudioLoaded(audioEl)"
+                             #audioEl></audio>
+                    </div>
+                  </ng-container>
                   
-                  <div class="reactions-container" *ngIf="hasReactions(msg)">
+                  <div class="reactions-container" *ngIf="hasReactions(msg) && !msg.isDeletedLocally">
                     <span class="reaction" *ngFor="let r of getReactions(msg)">{{r}}</span>
                   </div>
                 </div>
@@ -615,7 +621,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   @ViewChild('doodleCanvas', { static: false }) doodleCanvas: any;
   
   constructor() {
-    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline });
+    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline });
   }
 
   private viewInitialized = false;
@@ -712,7 +718,9 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     this.graffitisByAnchorId = {};
 
     this.messages.forEach(msg => {
-      if (this.deletedLocalMessages.includes(msg.id)) return;
+      if (this.deletedLocalMessages.includes(msg.id)) {
+        msg.isDeletedLocally = true;
+      }
 
       if (msg.mensaje && msg.mensaje.startsWith('[GRAFFITI:')) {
         const parts = msg.mensaje.split(':');
@@ -1422,8 +1430,13 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   async deleteMessageForEveryone(msgId: number) {
     try {
-      await this.api.deleteMessage(msgId);
-      this.messages = this.messages.filter(m => m.id !== msgId);
+      await this.api.editMessage(msgId, '[DELETED]');
+      
+      const msg = this.messages.find(m => m.id === msgId);
+      if (msg) {
+        msg.mensaje = '[DELETED]';
+        msg.isDeletedLocally = true; // Act as local delete so it shows tombstone
+      }
       this.processMessages();
     } catch (e) {
       console.error(e);
@@ -1432,8 +1445,12 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
   
   async deleteMessageForMe(msgId: number) {
-    this.deletedLocalMessages.push(msgId);
-    await Preferences.set({ key: 'deleted_chat_messages', value: JSON.stringify(this.deletedLocalMessages) });
+    if (!this.deletedLocalMessages.includes(msgId)) {
+      this.deletedLocalMessages.push(msgId);
+      await Preferences.set({ key: 'deleted_chat_messages', value: JSON.stringify(this.deletedLocalMessages) });
+    }
+    const msg = this.messages.find(m => m.id === msgId);
+    if (msg) msg.isDeletedLocally = true;
     this.processMessages();
   }
 
