@@ -349,10 +349,14 @@ export class HomePage implements OnInit, OnDestroy {
 
     // Suscribirse a los logros para el búho nocturno y marco dorado
     // Usar una suscripción separada que NO se cancela en loadHeaderData
-    this.api.unlockedAchievements$.subscribe(achievements => {
+    this.subscriptions.push(this.api.unlockedAchievements$.subscribe(achievements => {
       this.hasNightOwlSecret = achievements.includes('secret_owl');
       this.hasGoldenFrame = achievements.includes('secret_golden_frame');
-    });
+    }));
+
+    this.subscriptions.push(this.api.avatarUpdated$.subscribe(() => {
+      this.loadHeaderData();
+    }));
 
     // Widget Intent listener & Background Polling replacement
     this.appStateListener = await App.addListener('appStateChange', async ({ isActive }) => {

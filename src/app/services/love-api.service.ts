@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ToastController } from '@ionic/angular/standalone';
 import { Preferences } from '@capacitor/preferences';
 import { SecureStoragePlugin } from 'capacitor-secure-storage-plugin';
-import { firstValueFrom, BehaviorSubject } from 'rxjs';
+import { firstValueFrom, BehaviorSubject, Subject } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export const API_BASE_URL = environment.apiUrl;
@@ -16,6 +16,7 @@ export class LoveApiService {
   private toastCtrl = inject(ToastController);
   public token$ = new BehaviorSubject<string | null>(null);
   public unlockedAchievements$ = new BehaviorSubject<string[]>([]);
+  public avatarUpdated$ = new Subject<void>();
   
   constructor() {
     this.loadToken();
@@ -155,7 +156,9 @@ export class LoveApiService {
   }
 
   async uploadAvatar(base64Image: string): Promise<any> {
-    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/avatar`, { avatar: base64Image }));
+    const res = await firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/avatar`, { avatar: base64Image }));
+    this.avatarUpdated$.next();
+    return res;
   }
 
   async getRouletteOptions(): Promise<any> {

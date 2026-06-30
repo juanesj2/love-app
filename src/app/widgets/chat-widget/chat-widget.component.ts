@@ -1,4 +1,5 @@
 import { Component, inject, OnInit, ViewChild, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { Preferences } from '@capacitor/preferences';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { CommonModule } from '@angular/common';
@@ -625,6 +626,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   private viewInitialized = false;
+  private subscriptions: Subscription[] = [];
 
   async ngOnInit() {
     this.currentUser = localStorage.getItem('love_widget_user') === 'juan' ? 'Juan' : 'Roberta';
@@ -637,10 +639,15 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     await this.loadAvatars();
     await this.loadMessages();
     this.tutorialService.showChatTour();
+
+    this.subscriptions.push(this.api.avatarUpdated$.subscribe(() => {
+      this.loadAvatars();
+    }));
   }
 
   ngOnDestroy() {
     this.timeouts.forEach(t => clearTimeout(t));
+    this.subscriptions.forEach(s => s.unsubscribe());
   }
 
   safeTimeout(fn: Function, ms: number) {
