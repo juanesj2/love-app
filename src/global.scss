@@ -591,4 +591,40 @@ body.night-owl-mode {
       color: #a78bfa !important;
     }
   }
+
+  /* Tutorial (driver.js) Overrides for Night Owl */
+  .driver-popover {
+    background: rgba(30, 30, 30, 0.95) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5) !important;
+    color: #fdfdfd !important;
+  }
+  
+  .driver-popover-title {
+    color: #fdfdfd !important;
+  }
+  
+  .driver-popover-description {
+    color: #ccc !important;
+  }
+  
+  .driver-popover-progress-text {
+    color: #a78bfa !important;
+  }
+  
+  .driver-popover-next-btn {
+    background: linear-gradient(135deg, #a78bfa, #8b5cf6) !important;
+    box-shadow: 0 4px 15px rgba(167, 139, 250, 0.3) !important;
+    color: white !important;
+  }
+  
+  .driver-popover-prev-btn, .driver-popover-close-btn {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #fdfdfd !important;
+  }
+  
+  .driver-popover-close-btn.driver-popover-close-btn-top {
+    background: transparent !important;
+    color: #888 !important;
+  }
 }

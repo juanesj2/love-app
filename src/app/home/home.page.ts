@@ -330,19 +330,19 @@ export class HomePage implements OnInit, OnDestroy {
     const nightPref = await Preferences.get({ key: 'night_owl_enabled' });
     if (nightPref.value === 'true') {
       this.isDarkMode = true;
+    } else if (nightPref.value === 'false') {
+      this.isDarkMode = false;
+    } else {
+      // Default to system preference if not set
+      this.isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+
+    if (this.isDarkMode) {
       document.body.classList.add('night-owl-mode');
       document.documentElement.classList.add('night-owl-mode');
     } else {
-      this.isDarkMode = false;
       document.body.classList.remove('night-owl-mode');
       document.documentElement.classList.remove('night-owl-mode');
-    }
-
-    // Still sync with ThemeService for the standard generic dark theme base if needed
-    if (!nightPref.value && this.themeService.currentTheme === 'dark') {
-      this.isDarkMode = true;
-      document.body.classList.add('night-owl-mode');
-      document.documentElement.classList.add('night-owl-mode');
     }
 
     await this.loadHeaderData();
