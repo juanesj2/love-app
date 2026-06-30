@@ -139,6 +139,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
             <span (click)="addReaction(activeMsg, '👍')">👍</span>
             <span class="custom-emoji-btn" (click)="openCustomEmoji()">➕</span>
             <span class="custom-emoji-btn edit-btn" *ngIf="canEditMessage(activeMsg)" (click)="startEditingMessage(activeMsg)"><ion-icon name="pencil"></ion-icon></span>
+            <span class="custom-emoji-btn delete-btn" (click)="confirmDeleteMessage(activeMsg)"><ion-icon name="trash-outline" style="color: #FF4D6D;"></ion-icon></span>
           </div>
           <div class="reactions-popover-content custom-input-mode" *ngIf="showCustomEmojiInput">
             <input type="text" id="customEmojiInput" placeholder="Añade emoji" (keyup.enter)="addCustomReaction(customEmojiInput.value)" #customEmojiInput class="custom-emoji-field">
@@ -600,6 +601,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   messages: any[] = [];
   regularMessages: any[] = [];
   graffitisByAnchorId: {[key: number]: any[]} = {};
+  deletedLocalMessages: number[] = [];
   newMessage = '';
   sending = false;
   avatars: { [key: string]: string } = {};
@@ -620,6 +622,12 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   async ngOnInit() {
     this.currentUser = localStorage.getItem('love_widget_user') === 'juan' ? 'Juan' : 'Roberta';
+    
+    const deletedPref = await Preferences.get({ key: 'deleted_chat_messages' });
+    if (deletedPref.value) {
+      try { this.deletedLocalMessages = JSON.parse(deletedPref.value); } catch(e){}
+    }
+
     await this.loadAvatars();
     await this.loadMessages();
     this.tutorialService.showChatTour();
@@ -704,6 +712,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     this.graffitisByAnchorId = {};
 
     this.messages.forEach(msg => {
+      if (this.deletedLocalMessages.includes(msg.id)) return;
+
       if (msg.mensaje && msg.mensaje.startsWith('[GRAFFITI:')) {
         const parts = msg.mensaje.split(':');
         if (parts.length >= 6) {
@@ -1368,6 +1378,63 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     const now = new Date();
     const diffMs = now.getTime() - msgDate.getTime();
     return diffMs <= 120000; // 120000 ms = 2 minutes
+  }
+
+  async confirmDeleteMessage(msg: any) {
+    this.closePopover();
+    
+    const isMine = msg.user?.name === this.currentUser;
+    const buttons = [];
+    
+    if (isMine) {
+      buttons.push({
+        text: 'Eliminar para todos',
+        role: 'destructive',
+        icon: 'trash',
+        handler: () => {
+          this.deleteMessageForEveryone(msg.id);
+        }
+      });
+    }
+    
+    buttons.push({
+      text: 'Eliminar para mí',
+      icon: 'eye-off',
+      handler: () => {
+        this.deleteMessageForMe(msg.id);
+      }
+    });
+    
+    buttons.push({
+      text: 'Cancelar',
+      icon: 'close',
+      role: 'cancel'
+    });
+
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Eliminar mensaje',
+      cssClass: 'premium-action-sheet',
+      buttons
+    });
+    
+    await actionSheet.present();
+  }
+
+  async deleteMessageForEveryone(msgId: number) {
+    try {
+      await this.api.deleteMessage(msgId);
+      this.messages = this.messages.filter(m => m.id !== msgId);
+      this.processMessages();
+    } catch (e) {
+      console.error(e);
+      this.showError('Error al eliminar mensaje');
+    }
+  }
+  
+  async deleteMessageForMe(msgId: number) {
+    this.deletedLocalMessages.push(msgId);
+    await Preferences.set({ key: 'deleted_chat_messages', value: JSON.stringify(this.deletedLocalMessages) });
+    this.processMessages();
   }
 
   startEditingMessage(msg: any) {
