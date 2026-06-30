@@ -274,27 +274,27 @@ export class TutorialService {
           }
         },
         {
-          element: '#mas-hitos',
+          element: '#mas-timeline',
           popover: {
-            title: 'Hitos Importantes 🚩',
-            description: '¿Vuestro primer viaje? ¿El día que adoptasteis al gato? Añadid aquí vuestras fechas especiales.',
+            title: 'Nuestra Historia 📜',
+            description: 'Una línea de tiempo mágica con todas vuestras fotos y recuerdos ordenados cronológicamente.',
             side: 'top',
             align: 'center'
           },
           onHighlightStarted: () => {
-            document.querySelector('#mas-hitos')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.querySelector('#mas-timeline')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         },
         {
-          element: '#mas-deseos',
+          element: '#mas-logros',
           popover: {
-            title: 'Cubo de Deseos ✨',
-            description: 'Una lista compartida con todo lo que soñáis hacer juntos. ¡Marcadlos cuando los cumpláis!',
+            title: 'Logros y Trofeos 🏆',
+            description: 'Desbloquead premios secretos usando la app. ¡Hay sorpresas ocultas!',
             side: 'top',
             align: 'center'
           },
           onHighlightStarted: () => {
-            document.querySelector('#mas-deseos')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.querySelector('#mas-logros')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         },
         {
@@ -336,8 +336,8 @@ export class TutorialService {
         {
           element: '#mas-test',
           popover: {
-            title: 'Test Pareja 🎮',
-            description: 'Un minijuego divertido para ver cuánto os conocéis.',
+            title: 'Juegos de Pareja 🎮',
+            description: '¡Tinder de pareja, preguntas y una ruleta de citas para divertiros juntos!',
             side: 'top',
             align: 'center'
           },
