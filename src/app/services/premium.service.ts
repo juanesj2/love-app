@@ -13,10 +13,10 @@ export class PremiumService {
   private platform = inject(Platform);
 
   // Observable for the entire app to know if they are premium
-  public isPremium$ = new BehaviorSubject<boolean>(true); // Por defecto true para no bloquear mientras carga
+  public isPremium$ = new BehaviorSubject<boolean>(false);
   
   // To track if it's explicitly a free user
-  public isFree$ = new BehaviorSubject<boolean>(false);
+  public isFree$ = new BehaviorSubject<boolean>(true);
   
   public packages$ = new BehaviorSubject<any[]>([]);
 
@@ -66,9 +66,12 @@ export class PremiumService {
       const info: any = await this.api.getMe(); // getMe() returns a Promise
       if (info && info.is_premium !== undefined) {
         this.setPremiumState(info.is_premium);
+      } else {
+        this.setPremiumState(false);
       }
     } catch (e) {
       console.error('Error fallback backend premium', e);
+      this.setPremiumState(false);
     }
   }
 
