@@ -316,7 +316,7 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
               
               <div id="gastro-list" style="margin-bottom: 0;">
                 <div class="food-places-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-                  <div class="food-place-item" *ngFor="let place of filteredFoodPlaces" (click)="openFoodPlaceModal(place)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
+                  <div class="food-place-item" *ngFor="let place of filteredFoodPlaces" (click)="openFoodPlaceModal(place)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; box-sizing: border-box; min-width: 0; overflow: hidden;">
                     <div *ngIf="place.is_favorite" style="position: absolute; top: 8px; left: 8px; z-index: 5;">
                       <ion-icon name="heart" style="color: #FF4D6D; font-size: 1.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));"></ion-icon>
                     </div>
@@ -372,7 +372,7 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
               
               <div id="cine-list" style="margin-bottom: 0;">
                 <div class="movies-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-                  <div class="movie-item" *ngFor="let movie of filteredMovies" (click)="openMovieModal(movie)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer;">
+                  <div class="movie-item" *ngFor="let movie of filteredMovies" (click)="openMovieModal(movie)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; box-sizing: border-box; min-width: 0; overflow: hidden;">
                     <div *ngIf="movie.is_favorite" style="position: absolute; top: 8px; left: 8px; z-index: 5;">
                       <ion-icon name="heart" style="color: #FF4D6D; font-size: 1.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));"></ion-icon>
                     </div>
