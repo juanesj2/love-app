@@ -49,13 +49,13 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
 
           <!-- Contenido del mensaje deslizable -->
           <div class="message-content-wrapper" [id]="'slide-el-' + msg.id"
-            (contextmenu)="msg.isDeletedLocally ? null : onContextMenu($event, msg)"
-            (touchstart)="msg.isDeletedLocally ? null : ts($event, msg)"
-            (touchmove)="msg.isDeletedLocally ? null : tm($event, msg)"
-            (touchend)="msg.isDeletedLocally ? null : te($event, msg)"
-            (mousedown)="msg.isDeletedLocally ? null : startPress($event, msg)"
-            (mouseup)="msg.isDeletedLocally ? null : endPress()"
-            (mouseleave)="msg.isDeletedLocally ? null : endPress()">
+            (contextmenu)="msg.isDeletedLocally || msg.mensaje === '[DELETED]' ? null : onContextMenu($event, msg)"
+            (touchstart)="msg.isDeletedLocally || msg.mensaje === '[DELETED]' ? null : ts($event, msg)"
+            (touchmove)="msg.isDeletedLocally || msg.mensaje === '[DELETED]' ? null : tm($event, msg)"
+            (touchend)="msg.isDeletedLocally || msg.mensaje === '[DELETED]' ? null : te($event, msg)"
+            (mousedown)="msg.isDeletedLocally || msg.mensaje === '[DELETED]' ? null : startPress($event, msg)"
+            (mouseup)="msg.isDeletedLocally || msg.mensaje === '[DELETED]' ? null : endPress()"
+            (mouseleave)="msg.isDeletedLocally || msg.mensaje === '[DELETED]' ? null : endPress()">
             <div class="message-wrapper" [class.mine]="isMine(msg)">
               <div class="msg-avatar-container" *ngIf="!isMine(msg)">
                 <img *ngIf="avatars[msg.user?.name]" [src]="avatars[msg.user.name]" class="msg-avatar" />
@@ -71,11 +71,11 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
                 <div class="bubble" [class.only-photo]="msg.photo && (!msg.mensaje || msg.mensaje === 'null')"
                                     [class.transparent-bubble]="msg.mensaje && msg.mensaje.startsWith('[DOODLE]')">
                   
-                  <div class="deleted-tombstone" *ngIf="msg.isDeletedLocally" style="color: #888; font-style: italic; display: flex; align-items: center; gap: 5px;">
+                  <div class="deleted-tombstone" *ngIf="msg.isDeletedLocally || msg.mensaje === '[DELETED]'" style="color: #888; font-style: italic; display: flex; align-items: center; gap: 5px;">
                     <ion-icon name="ban-outline"></ion-icon> Se eliminó este mensaje
                   </div>
 
-                  <ng-container *ngIf="!msg.isDeletedLocally">
+                  <ng-container *ngIf="!msg.isDeletedLocally && msg.mensaje !== '[DELETED]'">
                     <div class="restore-graffitis-btn" *ngIf="hasHiddenGraffitis(msg.id)" (click)="showGraffitis(msg.id)">
                       <ion-icon name="eye"></ion-icon> Mostrar grafitis
                     </div>
@@ -113,7 +113,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
                     </div>
                   </ng-container>
                   
-                  <div class="reactions-container" *ngIf="hasReactions(msg) && !msg.isDeletedLocally">
+                  <div class="reactions-container" *ngIf="hasReactions(msg) && !msg.isDeletedLocally && msg.mensaje !== '[DELETED]'">
                     <span class="reaction" *ngFor="let r of getReactions(msg)">{{r}}</span>
                   </div>
                 </div>
