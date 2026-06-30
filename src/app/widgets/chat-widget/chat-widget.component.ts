@@ -4,13 +4,15 @@ import { Preferences } from '@capacitor/preferences';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, ToastController, ActionSheetController, AlertController, IonContent } from '@ionic/angular';
+import { IonicModule, ToastController, ActionSheetController, AlertController, IonContent, ModalController } from '@ionic/angular';
 import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { LoveApiService } from '../../services/love-api.service';
 import { TutorialService } from '../../services/tutorial.service';
+import { PremiumService } from '../../services/premium.service';
+import { PaywallComponent } from '../../components/paywall/paywall.component';
 import { environment } from '../../../environments/environment';
 import { addIcons } from 'ionicons';
-import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline } from 'ionicons/icons';
+import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed } from 'ionicons/icons';
 @Component({
   selector: 'app-chat-widget',
   template: `
@@ -175,7 +177,10 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
 
           <div class="attach-menu" *ngIf="showAttachMenu">
             <button class="attach-menu-item" (click)="toggleGifModal(); showAttachMenu = false"><ion-icon name="image"></ion-icon></button>
-            <button class="attach-menu-item" (click)="startDoodle(); showAttachMenu = false"><ion-icon name="color-palette"></ion-icon></button>
+            <button class="attach-menu-item" (click)="startDoodle(); showAttachMenu = false">
+              <ion-icon name="color-palette"></ion-icon>
+              <ion-icon name="lock-closed" class="premium-lock" *ngIf="premiumService.isFree$ | async"></ion-icon>
+            </button>
           </div>
 
           <div class="recording-bar" *ngIf="isRecording">
@@ -195,7 +200,10 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
                   [class.active]="newMessage.trim() || isRecording"
                   (click)="onSendBtnClick($event)">
             <ion-icon name="paper-plane" *ngIf="!sending && (newMessage.trim() || isRecording)"></ion-icon>
-            <ion-icon name="mic" *ngIf="!sending && !newMessage.trim() && !isRecording"></ion-icon>
+            <div class="mic-container" *ngIf="!sending && !newMessage.trim() && !isRecording">
+              <ion-icon name="mic"></ion-icon>
+              <ion-icon name="lock-closed" class="premium-lock mic-lock" *ngIf="premiumService.isFree$ | async"></ion-icon>
+            </div>
             <ion-icon name="hourglass-outline" *ngIf="sending"></ion-icon>
           </button>
         </div>
@@ -590,6 +598,30 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
     :host-context(.night-owl-mode) .reply-icon-circle ion-icon { color: #8b5cf6; }
     :host-context(.night-owl-mode) .mine .play-btn { color: #8b5cf6; }
     :host-context(.night-owl-mode) .add-btn { background: #8b5cf6; }
+
+    /* Premium Locks */
+    .premium-lock {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      font-size: 12px;
+      color: #FFD700;
+      background: #000;
+      border-radius: 50%;
+      padding: 2px;
+    }
+    
+    .mic-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mic-lock {
+      top: -2px;
+      right: -8px;
+    }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
@@ -603,6 +635,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   private cdr = inject(ChangeDetectorRef);
   private actionSheetCtrl = inject(ActionSheetController);
   private alertCtrl = inject(AlertController);
+  public premiumService = inject(PremiumService);
+  private modalCtrl = inject(ModalController);
   public environment = environment;
   
   messages: any[] = [];
@@ -622,7 +656,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   @ViewChild('doodleCanvas', { static: false }) doodleCanvas: any;
   
   constructor() {
-    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline });
+    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed });
   }
 
   private viewInitialized = false;
@@ -657,6 +691,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   async loadAvatars() {
+
     try {
       const info = await this.api.getCoupleInfo();
       if (info) {
@@ -851,6 +886,11 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   currentStrokePoints: {x: number, y: number}[] = [];
 
   startDoodle() {
+    if (this.premiumService.isFree$.value) {
+      this.openPaywall();
+      return;
+    }
+
     this.isDoodling = true;
     this.strokes = [];
     this.safeTimeout(() => {
@@ -1202,7 +1242,20 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     }
   }
 
+  async openPaywall() {
+    const modal = await this.modalCtrl.create({
+      component: PaywallComponent
+    });
+    await modal.present();
+  }
+
   async startAudioRecording() {
+    if (this.premiumService.isFree$.value) {
+      this.openPaywall();
+      return;
+    }
+    
+    if (this.isDoodling) return;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       this.mediaRecorder = new MediaRecorder(stream);

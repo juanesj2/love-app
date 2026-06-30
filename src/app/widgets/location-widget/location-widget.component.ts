@@ -12,6 +12,9 @@ import { addIcons } from 'ionicons';
 import { locateOutline, flagOutline, camera, image, close, locationOutline, heart, eyeOutline, eyeOffOutline } from 'ionicons/icons';
 import { LoveApiService } from '../../services/love-api.service';
 import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.component';
+import { PremiumService } from '../../services/premium.service';
+import { PaywallComponent } from '../../components/paywall/paywall.component';
+import { ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-location-widget',
@@ -34,6 +37,12 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
 
       <div class="map-wrapper">
         <div id="map"></div>
+        <div class="map-premium-overlay" *ngIf="premiumService.isFree$ | async" (click)="openPaywall()">
+          <div class="overlay-content">
+            <ion-icon name="lock-closed"></ion-icon>
+            <p>Mapa Interactivo</p>
+          </div>
+        </div>
         <button class="center-map-btn" *ngIf="myLastPos" (click)="centerMap()">
           <ion-icon name="locate-outline"></ion-icon>
         </button>
@@ -158,6 +167,31 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
     ::ng-deep .pulse-marker::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%; border: 3px solid #FF4D6D; animation: radarPulse 2s infinite; z-index: -1; }
     @keyframes radarPulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.6); opacity: 0; } }
 
+    /* Premium Overlay */
+    .map-premium-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .map-premium-overlay .overlay-content {
+      background: rgba(0,0,0,0.7);
+      color: #FFD700;
+      padding: 10px 20px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
     /* Night Owl Mode Overrides */
     :host-context(.night-owl-mode) .location-container { background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%); }
     :host-context(.night-owl-mode) .location-container.is-together { background: linear-gradient(135deg, #121212 0%, #2a0a18 100%); }
@@ -196,6 +230,8 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
   private locationService = inject(LocationService);
   private api = inject(LoveApiService);
   private actionSheetCtrl = inject(ActionSheetController);
+  public premiumService = inject(PremiumService);
+  private modalCtrl = inject(ModalController);
 
   public nextMilestone: any = null;
   public daysRemaining: number = 0;
@@ -235,11 +271,16 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
   private hasCentered = false;
 
   constructor() {
-    addIcons({ locateOutline, flagOutline, camera, image, close, locationOutline, heart, eyeOutline, eyeOffOutline });
+    addIcons({ locateOutline, flagOutline, camera, image, close, locationOutline, heart, eyeOutline, eyeOffOutline, lockClosed: 'lock-closed' });
   }
 
   private appStateListener?: PluginListenerHandle;
   isTimelineModalOpen = false;
+
+  async openPaywall() {
+    const modal = await this.modalCtrl.create({ component: PaywallComponent });
+    await modal.present();
+  }
 
   openTimeline() {
     this.isTimelineModalOpen = true;
@@ -362,11 +403,26 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
   }
 
   private initMap() {
-    this.map = L.map('map', { zoomControl: false }).setView([40.4168, -3.7038], 15);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      maxZoom: 19,
-      attribution: '&copy; CartoDB'
-    }).addTo(this.map);
+    if (!this.map) {
+      this.map = L.map('map', { 
+        zoomControl: false, 
+        attributionControl: false,
+        dragging: this.premiumService.isPremium,
+        touchZoom: this.premiumService.isPremium,
+        scrollWheelZoom: this.premiumService.isPremium,
+        doubleClickZoom: this.premiumService.isPremium
+      }).setView([40.4168, -3.7038], 15);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+      }).addTo(this.map);
+    } else {
+      if (!this.premiumService.isPremium) {
+        this.map.dragging.disable();
+        this.map.touchZoom.disable();
+        this.map.scrollWheelZoom.disable();
+        this.map.doubleClickZoom.disable();
+      }
+    }
   }
 
   private async getCityName(lat: number, lng: number) {

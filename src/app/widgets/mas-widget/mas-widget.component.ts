@@ -13,10 +13,13 @@ import { LocationService } from '../../services/location.service';
 import { TutorialService } from '../../services/tutorial.service';
 import { OfflineSyncService } from '../../services/offline-sync.service';
 import { addIcons } from 'ionicons';
-import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, bookOutline, imageOutline, checkmarkCircleOutline, informationCircleOutline, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp } from 'ionicons/icons';
+import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, bookOutline, imageOutline, checkmarkCircleOutline, informationCircleOutline, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, lockClosed } from 'ionicons/icons';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.component';
+import { PremiumService } from '../../services/premium.service';
+import { PaywallComponent } from '../../components/paywall/paywall.component';
+import { ModalController } from '@ionic/angular';
 
 
 @Component({
@@ -138,8 +141,9 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
         <!-- Timeline y Planes -->
         <div class="glass-card timeline-banner" id="mas-timeline" (click)="openTimelineModal()">
           <div class="timeline-banner-content">
-            <div class="icon-circle" style="background: linear-gradient(135deg, #a2d2ff, #bde0fe); box-shadow: 0 4px 15px rgba(162, 210, 255, 0.3); color: #023e8a; width: 60px; height: 60px; font-size: 1.8rem; margin-bottom: 10px;">
+            <div class="icon-circle" style="background: linear-gradient(135deg, #a2d2ff, #bde0fe); box-shadow: 0 4px 15px rgba(162, 210, 255, 0.3); color: #023e8a; width: 60px; height: 60px; font-size: 1.8rem; margin-bottom: 10px; position: relative;">
               <ion-icon name="map-outline"></ion-icon>
+              <ion-icon name="lock-closed" class="premium-lock" *ngIf="premiumService.isFree$ | async"></ion-icon>
             </div>
             <h3 style="color: #590D22; margin: 0; font-weight: 900; font-size: 1.5rem;">Timeline y Planes</h3>
             <p style="color: #a4133c; margin: 5px 0 0; font-size: 0.95rem;">Ideas, viajes futuros y el historial de nuestra historia.</p>
@@ -173,8 +177,9 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
 
           <!-- Tour Gastronómico -->
           <div class="grid-card interactive" id="mas-gastro" (click)="openGastroModal()">
-            <div class="icon-circle" style="background: linear-gradient(135deg, #FF9A9E, #FECFEF); box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3); color: #c9184a;">
+            <div class="icon-circle" style="background: linear-gradient(135deg, #FF9A9E, #FECFEF); box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3); color: #c9184a; position: relative;">
               <ion-icon name="restaurant-outline"></ion-icon>
+              <ion-icon name="lock-closed" class="premium-lock" *ngIf="premiumService.isFree$ | async"></ion-icon>
             </div>
             <h4>Tour Gastro</h4>
             <span class="sub">Platos y sitios</span>
@@ -182,8 +187,9 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
 
           <!-- Cine Pareja -->
           <div class="grid-card interactive" id="mas-cine" (click)="openCineModal()">
-            <div class="icon-circle" style="background: linear-gradient(135deg, #a2d2ff, #bde0fe); box-shadow: 0 4px 15px rgba(162, 210, 255, 0.3); color: #023e8a;">
+            <div class="icon-circle" style="background: linear-gradient(135deg, #a2d2ff, #bde0fe); box-shadow: 0 4px 15px rgba(162, 210, 255, 0.3); color: #023e8a; position: relative;">
               <ion-icon name="film-outline"></ion-icon>
+              <ion-icon name="lock-closed" class="premium-lock" *ngIf="premiumService.isFree$ | async"></ion-icon>
             </div>
             <h4>Cine Pareja</h4>
             <span class="sub">Pelis y series</span>
@@ -858,6 +864,8 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
       @keyframes particle-7 { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 35% { transform: translate(35px, -15px) scale(0.6); opacity: 0.6; } 100% { transform: translate(60px, 50px) scale(0); opacity: 0; } }
       @keyframes particle-8 { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 45% { transform: translate(0, -35px) scale(0.6); opacity: 0.6; } 100% { transform: translate(0, 45px) scale(0); opacity: 0; } }
       
+      .premium-lock { position: absolute; top: -4px; right: -4px; font-size: 14px; color: #FFD700; background: #000; border-radius: 50%; padding: 2px; z-index: 10; }
+
       :host-context(.night-owl-mode) .mas-container { background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%); }
       :host-context(.night-owl-mode) .glass-card { background: rgba(30, 30, 30, 0.85); border-color: rgba(255, 255, 255, 0.05); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
       :host-context(.night-owl-mode) .grid-card { background: rgba(30, 30, 30, 0.85); border-color: rgba(255, 255, 255, 0.05); }
@@ -939,11 +947,15 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
   private actionSheetCtrl = inject(ActionSheetController);
-  private locationService = inject(LocationService);
   private sanitizer = inject(DomSanitizer);
+  public premiumService = inject(PremiumService);
+  private modalCtrl = inject(ModalController);
+  private locationService = inject(LocationService);
   private tutorialService = inject(TutorialService);
   private offlineSync = inject(OfflineSyncService);
   private router = inject(Router);
+
+  @Output() viewChange = new EventEmitter<string>();
 
   isMapModalOpen = false;
   safeMapUrl: SafeResourceUrl | null = null;
@@ -985,7 +997,12 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     return 'star-outline';
   }
 
-  openTimelineModal(planId?: number) {
+  async openTimelineModal(planId?: number) {
+    if (this.premiumService.isFree$.value) {
+      const modal = await this.modalCtrl.create({ component: PaywallComponent });
+      await modal.present();
+      return;
+    }
     this.timelineInitialPlanId = planId || null;
     this.isTimelineModalOpen = true;
   }
@@ -1106,7 +1123,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   isNightOwlEnabled = false;
 
   constructor() {
-    addIcons({ bookOutline, imageOutline, logOutOutline, addCircleOutline, starOutline, star, closeOutline, checkmarkCircleOutline, restaurantOutline, locationOutline, pencilOutline, filmOutline, gameControllerOutline, personCircleOutline, informationCircleOutline, heartOutline, heart, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, timeOutline, settingsOutline, flagOutline, checkmarkCircle, ellipseOutline, moonOutline, closeCircle, calendar, add, cameraOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline });
+    addIcons({ bookOutline, imageOutline, logOutOutline, addCircleOutline, starOutline, star, closeOutline, checkmarkCircleOutline, restaurantOutline, locationOutline, pencilOutline, filmOutline, gameControllerOutline, personCircleOutline, informationCircleOutline, heartOutline, heart, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, timeOutline, settingsOutline, flagOutline, checkmarkCircle, ellipseOutline, moonOutline, closeCircle, calendar, add, cameraOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, lockClosed });
   }
 
   async checkNightOwl() {
@@ -1297,6 +1314,11 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   }
 
   async openGastroModal() {
+    if (this.premiumService.isFree$.value) {
+      const modal = await this.modalCtrl.create({ component: PaywallComponent });
+      await modal.present();
+      return;
+    }
     this.isFoodListModalOpen = true;
     document.body.classList.add('hide-tabs');
     setTimeout(() => this.tutorialService.showGastroTour(), 600);
@@ -1307,7 +1329,12 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     document.body.classList.remove('hide-tabs');
   }
 
-  openCineModal() {
+  async openCineModal() {
+    if (this.premiumService.isFree$.value) {
+      const modal = await this.modalCtrl.create({ component: PaywallComponent });
+      await modal.present();
+      return;
+    }
     this.isMovieListModalOpen = true;
     document.body.classList.add('hide-tabs');
     setTimeout(() => this.tutorialService.showCineTour(), 600);

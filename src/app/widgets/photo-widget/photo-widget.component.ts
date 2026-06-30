@@ -9,8 +9,10 @@ import { environment } from '../../../environments/environment';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Capacitor } from '@capacitor/core';
 import { addIcons } from 'ionicons';
-import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline } from 'ionicons/icons';
+import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline, lockClosed } from 'ionicons/icons';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { PremiumService } from '../../services/premium.service';
+import { PaywallComponent } from '../../components/paywall/paywall.component';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 
@@ -62,6 +64,7 @@ import { Share } from '@capacitor/share';
 
             <button class="header-upload-btn" (click)="uploadNewPhoto()">
               <ion-icon name="add"></ion-icon>
+              <ion-icon name="lock-closed" class="premium-lock" *ngIf="(premiumService.isFree$ | async) && photos.length >= 5"></ion-icon>
             </button>
           </ng-container>
         </div>
@@ -280,7 +283,11 @@ import { Share } from '@capacitor/share';
           <ion-icon name="images-outline" class="empty-icon"></ion-icon>
           <p>No hay fotos aún.</p>
           <p *ngIf="!currentAlbum">¡Sube una para empezar la racha!</p>
-          <button *ngIf="currentAlbum" class="empty-upload-btn" (click)="uploadNewPhoto()"><ion-icon name="camera"></ion-icon> Añadir foto al álbum</button>
+          <button *ngIf="currentAlbum" class="empty-upload-btn" (click)="uploadNewPhoto()">
+            <ion-icon name="camera"></ion-icon> 
+            Añadir foto al álbum
+            <ion-icon name="lock-closed" class="premium-lock" style="position: relative; margin-left: 5px; top: 0; right: 0;" *ngIf="(premiumService.isFree$ | async) && photos.length >= 5"></ion-icon>
+          </button>
         </div>
       </ng-template>
 
@@ -619,6 +626,22 @@ import { Share } from '@capacitor/share';
     .prompt-btn.confirm { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3); }
     .prompt-btn:disabled { opacity: 0.7; pointer-events: none; }
 
+    /* Premium Locks */
+    .premium-lock {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      font-size: 12px;
+      color: #FFD700;
+      background: #000;
+      border-radius: 50%;
+      padding: 2px;
+    }
+    
+    .header-upload-btn {
+      position: relative;
+    }
+
     /* Night Owl Mode Overrides */
     :host-context(.night-owl-mode) .photo-widget-container { background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%); }
     :host-context(.night-owl-mode) .floating-toggles { background: rgba(30,30,30,0.9); }
@@ -680,6 +703,8 @@ export class PhotoWidgetComponent implements OnInit {
   private actionSheetCtrl = inject(ActionSheetController);
   private cdr = inject(ChangeDetectorRef);
   private tutorialService = inject(TutorialService);
+  public premiumService = inject(PremiumService);
+  private modalCtrl = inject(ModalController);
   public environment = environment;
   
   pendingPhotoFile: File | null = null;
@@ -768,7 +793,7 @@ export class PhotoWidgetComponent implements OnInit {
   timelineHideTimeout: any;
 
   constructor() {
-    addIcons({ arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline, calendarOutline: 'calendar-outline', chevronExpand: 'chevron-expand' });
+    addIcons({ arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline, calendarOutline: 'calendar-outline', chevronExpand: 'chevron-expand', lockClosed });
   }
 
   async ngOnInit() {
@@ -1583,7 +1608,20 @@ export class PhotoWidgetComponent implements OnInit {
     }
   }
 
+  async openPaywall() {
+    const modal = await this.modalCtrl.create({
+      component: PaywallComponent
+    });
+    await modal.present();
+  }
+
   async uploadNewPhoto() {
+    // Si es usuario Free y ya hay 5 fotos o más en total, bloqueamos
+    if (this.premiumService.isFree$.value && this.photos.length >= 5) {
+      this.openPaywall();
+      return;
+    }
+
     if (this.currentAlbum) {
       const actionSheet = await this.actionSheetCtrl.create({
         header: 'Añadir al álbum',
