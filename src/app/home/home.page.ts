@@ -370,6 +370,8 @@ export class HomePage implements OnInit, OnDestroy {
       await Preferences.set({ key: 'action_intent', value: actionRes.value });
       await Preferences.remove({ key: 'widget_action' });
     }
+  }
+
   showPremiumCountdownModal = false;
   premiumCountdownText = '';
   premiumCountdownInterval: any;
