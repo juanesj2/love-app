@@ -179,7 +179,13 @@ import { ModalController } from '@ionic/angular';
         </div>
         
         <div class="prompt-body" style="text-align: center;">
-          <div [innerHTML]="premiumCountdownText"></div>
+          <div *ngIf="premiumCountdown.expired" style="font-size: 1.1rem; color: #590D22; padding: 20px;">Tu suscripción ha caducado.</div>
+          <div class="countdown-boxes" *ngIf="!premiumCountdown.expired">
+            <div class="c-box"><span>{{ premiumCountdown.d }}</span><small>Días</small></div>
+            <div class="c-box"><span>{{ premiumCountdown.h }}</span><small>Hrs</small></div>
+            <div class="c-box"><span>{{ premiumCountdown.m }}</span><small>Min</small></div>
+            <div class="c-box"><span>{{ premiumCountdown.s }}</span><small>Seg</small></div>
+          </div>
         </div>
         
         <div class="prompt-actions">
@@ -373,7 +379,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   showPremiumCountdownModal = false;
-  premiumCountdownText = '';
+  premiumCountdown = { d: 0, h: 0, m: 0, s: 0, expired: false };
   premiumCountdownInterval: any;
 
   async showPremiumDetails() {
@@ -388,23 +394,15 @@ export class HomePage implements OnInit, OnDestroy {
     const updateCountdown = () => {
       const diff = expiresAt.getTime() - new Date().getTime();
       if (diff <= 0) {
-         this.premiumCountdownText = 'Tu suscripción ha caducado.';
+         this.premiumCountdown.expired = true;
          return;
       }
       
-      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const m = Math.floor((diff / 1000 / 60) % 60);
-      const s = Math.floor((diff / 1000) % 60);
-      
-      this.premiumCountdownText = `
-        <div class="countdown-boxes">
-          <div class="c-box"><span>${d}</span><small>Días</small></div>
-          <div class="c-box"><span>${h}</span><small>Hrs</small></div>
-          <div class="c-box"><span>${m}</span><small>Min</small></div>
-          <div class="c-box"><span>${s}</span><small>Seg</small></div>
-        </div>
-      `;
+      this.premiumCountdown.expired = false;
+      this.premiumCountdown.d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      this.premiumCountdown.h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      this.premiumCountdown.m = Math.floor((diff / 1000 / 60) % 60);
+      this.premiumCountdown.s = Math.floor((diff / 1000) % 60);
     };
 
     updateCountdown();
@@ -420,7 +418,10 @@ export class HomePage implements OnInit, OnDestroy {
 
   managePremium() {
     this.closePremiumCountdown();
-    this.openPaywall();
+    // Use setTimeout to allow the current modal to close smoothly before opening the paywall
+    setTimeout(() => {
+      this.openPaywall();
+    }, 100);
   }
 
   async ngOnInit() {
