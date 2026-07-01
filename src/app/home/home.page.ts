@@ -21,7 +21,9 @@ import { LocationService } from '../services/location.service';
 import { TutorialService } from '../services/tutorial.service';
 import { Camera, CameraResultType, CameraSource, CameraDirection } from '@capacitor/camera';
 import { Preferences } from '@capacitor/preferences';
-import { App } from '@capacitor/app';
+import { PremiumService } from '../services/premium.service';
+import { PaywallComponent } from '../components/paywall/paywall.component';
+import { ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-home',
@@ -37,6 +39,13 @@ import { App } from '@capacitor/app';
           </div>
           
           <div class="header-center-actions">
+            <div class="premium-btn" *ngIf="(premiumService.isPremium$ | async) && (premiumService.premiumDaysLeft$ | async) !== null" (click)="openPaywall()">
+              <ion-icon name="hourglass-outline"></ion-icon>
+              <span *ngIf="(premiumService.premiumDaysLeft$ | async) as days">
+                {{ days === 365 ? '1 año' : days + ' días' }}
+              </span>
+            </div>
+
             <!-- Moon icon for Night Mode if unlocked -->
             <div class="moon-btn" [class.dark-active]="isDarkMode" *ngIf="hasNightOwlSecret" (click)="toggleDarkMode()">
               <span style="font-size: 1.3rem; line-height: 1;">{{ isDarkMode ? '🌕' : '🌙' }}</span>
@@ -180,6 +189,10 @@ import { App } from '@capacitor/app';
       .moon-btn.dark-active { background: linear-gradient(135deg, rgba(108,99,255,0.4), rgba(76,70,201,0.5)); border-color: rgba(108,99,255,0.6); box-shadow: 0 4px 20px rgba(108,99,255,0.4); }
       .moon-btn.dark-active ion-icon { color: #fff !important; }
       
+      .premium-btn { padding: 8px 12px; border-radius: 20px; background: linear-gradient(135deg, #FFCA3A, #FF9F1C); display: flex; align-items: center; gap: 5px; color: white; font-weight: 800; font-size: 0.85rem; box-shadow: 0 4px 15px rgba(255,159,28,0.4); cursor: pointer; border: 2px solid white; transition: transform 0.3s; }
+      .premium-btn:active { transform: scale(0.95); }
+      .premium-btn ion-icon { font-size: 1.1rem; }
+
       .poke-btn { width: 55px; height: 55px; border-radius: 50%; background: linear-gradient(135deg, #fff0f3, #ffe5ec); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #FF4D6D; cursor: pointer; box-shadow: 0 8px 20px rgba(255,77,109,0.2), inset 0 2px 5px rgba(255,255,255,0.8); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid white; }
       .poke-btn:active { transform: scale(0.85); box-shadow: 0 4px 10px rgba(255,77,109,0.2); }
       .poke-btn ion-icon { filter: drop-shadow(0 2px 4px rgba(255,77,109,0.3)); transition: transform 0.3s; }
@@ -284,6 +297,7 @@ export class HomePage implements OnInit, OnDestroy {
   surpriseBody = '';
   sendingSurprise = false;
 
+  public premiumService = inject(PremiumService);
   private api = inject(LoveApiService);
   private locationService = inject(LocationService);
   private toastController = inject(ToastController);
@@ -292,6 +306,7 @@ export class HomePage implements OnInit, OnDestroy {
   private router = inject(Router);
   private tutorialService = inject(TutorialService);
   private themeService = inject(ThemeService);
+  private modalCtrl = inject(ModalController);
 
   @ViewChild('photoWidget') photoWidgetComp?: PhotoWidgetComponent;
   @ViewChild('chatWidget') chatWidgetComp?: ChatWidgetComponent;
@@ -382,6 +397,14 @@ export class HomePage implements OnInit, OnDestroy {
         case 'mas': this.tutorialService.showMasTour(); break;
       }
     }, 300);
+  }
+
+  async openPaywall() {
+    const modal = await this.modalCtrl.create({
+      component: PaywallComponent,
+      cssClass: 'paywall-modal'
+    });
+    await modal.present();
   }
 
   ngOnDestroy() {

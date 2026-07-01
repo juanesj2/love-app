@@ -20,6 +20,8 @@ export class PremiumService {
   
   public packages$ = new BehaviorSubject<any[]>([]);
 
+  public premiumDaysLeft$ = new BehaviorSubject<number | null>(null);
+
   get isPremium() {
     return this.isPremium$.value;
   }
@@ -66,6 +68,12 @@ export class PremiumService {
       const info: any = await this.api.getMe(); // getMe() returns a Promise
       if (info && info.is_premium !== undefined) {
         this.setPremiumState(info.is_premium);
+        if (info.premium_until) {
+          const diff = new Date(info.premium_until).getTime() - new Date().getTime();
+          this.premiumDaysLeft$.next(Math.max(0, Math.ceil(diff / (1000 * 3600 * 24))));
+        } else if (info.is_premium) {
+          this.premiumDaysLeft$.next(365); // Default si no hay fecha pero es premium
+        }
       } else {
         this.setPremiumState(false);
       }
@@ -81,10 +89,24 @@ export class PremiumService {
     try {
       const customerInfo = await Purchases.getCustomerInfo();
       // "Premium" es el nombre del entitlement que debes crear en RevenueCat
-      const isPremium = typeof customerInfo.customerInfo.entitlements.active['Premium'] !== 'undefined';
+      const premiumEntitlement = customerInfo.customerInfo.entitlements.active['Premium'];
+      const isPremium = typeof premiumEntitlement !== 'undefined';
+      
+      if (isPremium) {
+        this.updateDaysLeftFromEntitlement(premiumEntitlement);
+      }
       this.setPremiumState(isPremium);
     } catch (e) {
       console.error('Error checking status', e);
+    }
+  }
+
+  private updateDaysLeftFromEntitlement(entitlement: any) {
+    if (entitlement && entitlement.expirationDate) {
+      const diff = new Date(entitlement.expirationDate).getTime() - new Date().getTime();
+      this.premiumDaysLeft$.next(Math.max(0, Math.ceil(diff / (1000 * 3600 * 24))));
+    } else {
+      this.premiumDaysLeft$.next(365);
     }
   }
 
@@ -110,8 +132,12 @@ export class PremiumService {
 
   async purchasePremium(pkg?: any): Promise<boolean> {
     if (!this.platform.is('hybrid')) {
+      const confirmPurchase = confirm('Estás en la web (modo simulado). ¿Seguro que quieres "comprar" el plan Premium? No se te cobrará nada real.');
+      if (!confirmPurchase) return false;
+
       // Simulamos éxito en Web
       this.setPremiumState(true);
+      this.premiumDaysLeft$.next(pkg?.packageType === 'ANNUAL' ? 365 : 30);
       return true;
     }
 
@@ -127,7 +153,11 @@ export class PremiumService {
       
       const purchaseResult = await Purchases.purchasePackage({ aPackage: pkg });
       
-      const isPremium = typeof purchaseResult.customerInfo.entitlements.active['Premium'] !== 'undefined';
+      const premiumEntitlement = purchaseResult.customerInfo.entitlements.active['Premium'];
+      const isPremium = typeof premiumEntitlement !== 'undefined';
+      if (isPremium) {
+        this.updateDaysLeftFromEntitlement(premiumEntitlement);
+      }
       this.setPremiumState(isPremium);
       return isPremium;
     } catch (e: any) {
@@ -143,7 +173,11 @@ export class PremiumService {
 
     try {
       const customerInfo = await Purchases.restorePurchases();
-      const isPremium = typeof customerInfo.customerInfo.entitlements.active['Premium'] !== 'undefined';
+      const premiumEntitlement = customerInfo.customerInfo.entitlements.active['Premium'];
+      const isPremium = typeof premiumEntitlement !== 'undefined';
+      if (isPremium) {
+        this.updateDaysLeftFromEntitlement(premiumEntitlement);
+      }
       this.setPremiumState(isPremium);
       return isPremium;
     } catch (e) {
