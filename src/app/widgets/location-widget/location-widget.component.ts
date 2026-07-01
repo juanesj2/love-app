@@ -519,7 +519,7 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
         this.getCityName(partnerPos.lat, partnerPos.lng);
       }
       distanceMeters = myPos.distanceTo(partnerPos);
-      this.areTogether = distanceMeters < 50; 
+      this.areTogether = distanceMeters < 50 && this.premiumService.isPremium;
     }
 
     if (this.areTogether) {
