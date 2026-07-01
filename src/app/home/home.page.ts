@@ -21,6 +21,7 @@ import { LocationService } from '../services/location.service';
 import { TutorialService } from '../services/tutorial.service';
 import { Camera, CameraResultType, CameraSource, CameraDirection } from '@capacitor/camera';
 import { Preferences } from '@capacitor/preferences';
+import { App } from '@capacitor/app';
 import { PremiumService } from '../services/premium.service';
 import { PaywallComponent } from '../components/paywall/paywall.component';
 import { ModalController } from '@ionic/angular';
@@ -374,7 +375,7 @@ export class HomePage implements OnInit, OnDestroy {
     }));
 
     // Widget Intent listener & Background Polling replacement
-    this.appStateListener = await App.addListener('appStateChange', async ({ isActive }) => {
+    this.appStateListener = await App.addListener('appStateChange', async ({ isActive }: { isActive: boolean }) => {
       if (isActive) {
         this.checkWidgetIntent();
         this.loadHeaderData(); // Refrescar info al volver a la app
