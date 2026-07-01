@@ -69,10 +69,10 @@ import { closeOutline, heart, mic, map, images, star } from 'ionicons/icons';
             <div class="package-price">{{ pkg.product?.priceString || pkg.product?.price }}</div>
           </div>
         </div>
-        <p class="trial-text">¡Pruébalo gratis durante 7 días!</p>
+        <p class="trial-text" *ngIf="!(premiumService.isPremium$ | async)">¡Pruébalo gratis durante 7 días!</p>
 
         <ion-button expand="block" class="subscribe-btn" (click)="subscribe()">
-          Comenzar Prueba Gratis
+          {{ (premiumService.isPremium$ | async) ? 'Comprar Suscripción' : 'Comenzar Prueba Gratis' }}
         </ion-button>
 
         <div class="footer-links">
