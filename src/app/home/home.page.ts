@@ -169,8 +169,37 @@ import { ModalController } from '@ionic/angular';
         </div>
       </div>
     </div>
+
+    <!-- Premium Countdown Modal -->
+    <div class="home-overlay" *ngIf="showPremiumCountdownModal" (click)="closePremiumCountdown()">
+      <div class="prompt-sheet surprise-sheet" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Amor Ilimitado ❤️</h2>
+          <p style="color: #a08c92; font-size: 0.9rem; margin-top: 5px;">Tiempo restante de tu suscripción</p>
+        </div>
+        
+        <div class="prompt-body" style="text-align: center;">
+          <div [innerHTML]="premiumCountdownText"></div>
+        </div>
+        
+        <div class="prompt-actions">
+          <button class="prompt-btn cancel" (click)="closePremiumCountdown()">Cerrar</button>
+          <button class="prompt-btn confirm premium-gold-btn" (click)="managePremium()">
+            <ion-icon name="star"></ion-icon> Gestionar
+          </button>
+        </div>
+      </div>
+    </div>
   `,
   styles: [`
+      .countdown-boxes { display: flex; gap: 10px; justify-content: center; margin: 15px 0; }
+      .c-box { background: linear-gradient(135deg, #FFCA3A, #FF9F1C); color: white; padding: 10px; border-radius: 12px; min-width: 65px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 15px rgba(255, 159, 28, 0.3); }
+      .c-box span { font-size: 1.5rem; font-weight: 800; line-height: 1.2; }
+      .c-box small { font-size: 0.75rem; font-weight: bold; opacity: 0.9; text-transform: uppercase; }
+      .premium-gold-btn { background: linear-gradient(135deg, #FFCA3A, #FF9F1C) !important; box-shadow: 0 4px 15px rgba(255, 159, 28, 0.4) !important; color: white !important; }
+      
+      :host-context(.night-owl-mode) .c-box { background: linear-gradient(135deg, #FF9F1C, #E85D04); }
+
       ion-toolbar { --background: transparent; position: absolute; top: 0; width: 100%; }
       .custom-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); border-radius: 0 0 25px 25px; margin-bottom: 10px; position: relative; z-index: 20; }
       .avatar-container { position: relative; cursor: pointer; z-index: 2; }
@@ -341,7 +370,9 @@ export class HomePage implements OnInit, OnDestroy {
       await Preferences.set({ key: 'action_intent', value: actionRes.value });
       await Preferences.remove({ key: 'widget_action' });
     }
-  }
+  showPremiumCountdownModal = false;
+  premiumCountdownText = '';
+  premiumCountdownInterval: any;
 
   async showPremiumDetails() {
     const expiresAt = this.premiumService.premiumExpiresAt$.value;
@@ -350,46 +381,44 @@ export class HomePage implements OnInit, OnDestroy {
       return;
     }
     
-    const calculateTimeLeft = () => {
+    this.showPremiumCountdownModal = true;
+    
+    const updateCountdown = () => {
       const diff = expiresAt.getTime() - new Date().getTime();
-      if (diff <= 0) return 'Tu suscripción ha caducado.';
+      if (diff <= 0) {
+         this.premiumCountdownText = 'Tu suscripción ha caducado.';
+         return;
+      }
       
       const d = Math.floor(diff / (1000 * 60 * 60 * 24));
       const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
       const m = Math.floor((diff / 1000 / 60) % 60);
       const s = Math.floor((diff / 1000) % 60);
-      return `⏳ Te quedan:<br><br><b>${d} días, ${h} horas, ${m} minutos y ${s} segundos</b><br><br>de Premium ilimitado.`;
+      
+      this.premiumCountdownText = `
+        <div class="countdown-boxes">
+          <div class="c-box"><span>${d}</span><small>Días</small></div>
+          <div class="c-box"><span>${h}</span><small>Hrs</small></div>
+          <div class="c-box"><span>${m}</span><small>Min</small></div>
+          <div class="c-box"><span>${s}</span><small>Seg</small></div>
+        </div>
+      `;
     };
 
-    const alert = await this.alertController.create({
-      header: 'Amor Ilimitado ❤️',
-      message: calculateTimeLeft(),
-      cssClass: 'premium-countdown-alert',
-      buttons: [
-        {
-          text: 'Gestionar',
-          handler: () => {
-            this.openPaywall();
-          }
-        },
-        {
-          text: 'Cerrar',
-          role: 'cancel'
-        }
-      ]
-    });
-    await alert.present();
+    updateCountdown();
+    this.premiumCountdownInterval = setInterval(updateCountdown, 1000);
+  }
 
-    const interval = setInterval(() => {
-      const msg = calculateTimeLeft();
-      const alertMessageEl = document.querySelector('.premium-countdown-alert .alert-message');
-      if (alertMessageEl) {
-        alertMessageEl.innerHTML = msg;
-      }
-    }, 1000);
+  closePremiumCountdown() {
+    this.showPremiumCountdownModal = false;
+    if (this.premiumCountdownInterval) {
+      clearInterval(this.premiumCountdownInterval);
+    }
+  }
 
-    await alert.onDidDismiss();
-    clearInterval(interval);
+  managePremium() {
+    this.closePremiumCountdown();
+    this.openPaywall();
   }
 
   async ngOnInit() {
