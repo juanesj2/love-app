@@ -2,23 +2,19 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { PremiumService } from '../../services/premium.service';
+import { addIcons } from 'ionicons';
+import { closeOutline, heart, mic, map, images, star } from 'ionicons/icons';
 
 @Component({
   selector: 'app-paywall',
   standalone: true,
   imports: [CommonModule, IonicModule],
   template: `
-    <ion-header class="ion-no-border">
-      <ion-toolbar color="transparent">
-        <ion-buttons slot="end">
-          <ion-button (click)="close()" class="close-btn">
-            <ion-icon name="close-outline"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
+    <ion-content class="paywall-content" [fullscreen]="true">
+      <ion-button (click)="close()" class="absolute-close" fill="clear">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
 
-    <ion-content class="paywall-content">
       <div class="paywall-container">
         <div class="hero-icon">
           <ion-icon name="heart"></ion-icon>
@@ -94,16 +90,21 @@ import { PremiumService } from '../../services/premium.service';
       --background: linear-gradient(180deg, #2d1b2e 0%, #121212 100%);
     }
 
-    .close-btn {
+    .absolute-close {
+      position: absolute;
+      top: env(safe-area-inset-top, 15px);
+      right: 15px;
+      z-index: 100;
       color: #333;
-      --padding-end: 15px;
+      --color: #333;
     }
-    :host-context(.night-owl-mode) .close-btn {
+    :host-context(.night-owl-mode) .absolute-close {
       color: #fff;
+      --color: #fff;
     }
 
     .paywall-container {
-      padding: 20px 30px;
+      padding: 40px 30px 20px 30px;
       text-align: center;
       display: flex;
       flex-direction: column;
