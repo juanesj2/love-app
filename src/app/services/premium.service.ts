@@ -21,6 +21,7 @@ export class PremiumService {
   public packages$ = new BehaviorSubject<any[]>([]);
 
   public premiumDaysLeft$ = new BehaviorSubject<number | null>(null);
+  public premiumExpiresAt$ = new BehaviorSubject<Date | null>(null);
 
   get isPremium() {
     return this.isPremium$.value;
@@ -69,7 +70,9 @@ export class PremiumService {
       if (info && info.is_premium !== undefined) {
         this.setPremiumState(info.is_premium);
         if (info.premium_until) {
-          const diff = new Date(info.premium_until).getTime() - new Date().getTime();
+          const expirationDate = new Date(info.premium_until);
+          this.premiumExpiresAt$.next(expirationDate);
+          const diff = expirationDate.getTime() - new Date().getTime();
           this.premiumDaysLeft$.next(Math.max(0, Math.ceil(diff / (1000 * 3600 * 24))));
         } else if (info.is_premium) {
           this.premiumDaysLeft$.next(365); // Default si no hay fecha pero es premium
@@ -103,7 +106,9 @@ export class PremiumService {
 
   private updateDaysLeftFromEntitlement(entitlement: any) {
     if (entitlement && entitlement.expirationDate) {
-      const diff = new Date(entitlement.expirationDate).getTime() - new Date().getTime();
+      const expirationDate = new Date(entitlement.expirationDate);
+      this.premiumExpiresAt$.next(expirationDate);
+      const diff = expirationDate.getTime() - new Date().getTime();
       this.premiumDaysLeft$.next(Math.max(0, Math.ceil(diff / (1000 * 3600 * 24))));
     } else {
       this.premiumDaysLeft$.next(365);
@@ -135,9 +140,12 @@ export class PremiumService {
       const confirmPurchase = confirm('Estás en la web (modo simulado). ¿Seguro que quieres "comprar" el plan Premium? No se te cobrará nada real.');
       if (!confirmPurchase) return false;
 
-      // Simulamos éxito en Web
+      // Simulamos éxito en Web con 7 días de prueba
       this.setPremiumState(true);
-      this.premiumDaysLeft$.next(pkg?.packageType === 'ANNUAL' ? 365 : 30);
+      const expirationDate = new Date();
+      expirationDate.setDate(expirationDate.getDate() + 7);
+      this.premiumExpiresAt$.next(expirationDate);
+      this.premiumDaysLeft$.next(7);
       return true;
     }
 

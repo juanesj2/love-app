@@ -40,11 +40,11 @@ import { ModalController } from '@ionic/angular';
           </div>
           
           <div class="header-center-actions">
-            <div class="premium-btn" *ngIf="(premiumService.isPremium$ | async) && (premiumService.premiumDaysLeft$ | async) !== null" (click)="openPaywall()">
+            <div class="premium-btn" *ngIf="(premiumService.isPremium$ | async) && (premiumService.premiumDaysLeft$ | async) !== null" (click)="showPremiumDetails()">
               <ion-icon name="hourglass-outline"></ion-icon>
-              <span *ngIf="(premiumService.premiumDaysLeft$ | async) as days">
-                {{ days === 365 ? '1 año' : days + ' días' }}
-              </span>
+              <ng-container *ngIf="(premiumService.premiumDaysLeft$ | async) !== null">
+                <span>{{ (premiumService.premiumDaysLeft$ | async) === 365 ? '1 año' : (premiumService.premiumDaysLeft$ | async) + ' días' }}</span>
+              </ng-container>
             </div>
 
             <!-- Moon icon for Night Mode if unlocked -->
@@ -193,6 +193,7 @@ import { ModalController } from '@ionic/angular';
       .premium-btn { padding: 8px 12px; border-radius: 20px; background: linear-gradient(135deg, #FFCA3A, #FF9F1C); display: flex; align-items: center; gap: 5px; color: white; font-weight: 800; font-size: 0.85rem; box-shadow: 0 4px 15px rgba(255,159,28,0.4); cursor: pointer; border: 2px solid white; transition: transform 0.3s; }
       .premium-btn:active { transform: scale(0.95); }
       .premium-btn ion-icon { font-size: 1.1rem; }
+      .premium-btn span { white-space: nowrap; }
 
       .poke-btn { width: 55px; height: 55px; border-radius: 50%; background: linear-gradient(135deg, #fff0f3, #ffe5ec); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #FF4D6D; cursor: pointer; box-shadow: 0 8px 20px rgba(255,77,109,0.2), inset 0 2px 5px rgba(255,255,255,0.8); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid white; }
       .poke-btn:active { transform: scale(0.85); box-shadow: 0 4px 10px rgba(255,77,109,0.2); }
@@ -340,6 +341,55 @@ export class HomePage implements OnInit, OnDestroy {
       await Preferences.set({ key: 'action_intent', value: actionRes.value });
       await Preferences.remove({ key: 'widget_action' });
     }
+  }
+
+  async showPremiumDetails() {
+    const expiresAt = this.premiumService.premiumExpiresAt$.value;
+    if (!expiresAt) {
+      this.openPaywall();
+      return;
+    }
+    
+    const calculateTimeLeft = () => {
+      const diff = expiresAt.getTime() - new Date().getTime();
+      if (diff <= 0) return 'Tu suscripción ha caducado.';
+      
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const m = Math.floor((diff / 1000 / 60) % 60);
+      const s = Math.floor((diff / 1000) % 60);
+      return `⏳ Te quedan:<br><br><b>${d} días, ${h} horas, ${m} minutos y ${s} segundos</b><br><br>de Premium ilimitado.`;
+    };
+
+    const alert = await this.alertController.create({
+      header: 'Amor Ilimitado ❤️',
+      message: calculateTimeLeft(),
+      cssClass: 'premium-countdown-alert',
+      buttons: [
+        {
+          text: 'Gestionar',
+          handler: () => {
+            this.openPaywall();
+          }
+        },
+        {
+          text: 'Cerrar',
+          role: 'cancel'
+        }
+      ]
+    });
+    await alert.present();
+
+    const interval = setInterval(() => {
+      const msg = calculateTimeLeft();
+      const alertMessageEl = document.querySelector('.premium-countdown-alert .alert-message');
+      if (alertMessageEl) {
+        alertMessageEl.innerHTML = msg;
+      }
+    }, 1000);
+
+    await alert.onDidDismiss();
+    clearInterval(interval);
   }
 
   async ngOnInit() {
