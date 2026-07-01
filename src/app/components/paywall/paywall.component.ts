@@ -295,6 +295,10 @@ export class PaywallComponent {
   
   public selectedPackageIndex = 0;
 
+  constructor() {
+    addIcons({ closeOutline, heart, mic, map, images, star });
+  }
+
   close() {
     this.modalCtrl.dismiss();
   }
