@@ -92,7 +92,7 @@ export class PremiumService {
     try {
       const customerInfo = await Purchases.getCustomerInfo();
       // "Premium" es el nombre del entitlement que debes crear en RevenueCat
-      const premiumEntitlement = customerInfo.customerInfo.entitlements.active['Premium'];
+      const premiumEntitlement = customerInfo.customerInfo.entitlements.active['Love Widget Pro'];
       const isPremium = typeof premiumEntitlement !== 'undefined';
       
       if (isPremium) {
@@ -161,7 +161,7 @@ export class PremiumService {
       
       const purchaseResult = await Purchases.purchasePackage({ aPackage: pkg });
       
-      const premiumEntitlement = purchaseResult.customerInfo.entitlements.active['Premium'];
+      const premiumEntitlement = purchaseResult.customerInfo.entitlements.active['Love Widget Pro'];
       const isPremium = typeof premiumEntitlement !== 'undefined';
       if (isPremium) {
         this.updateDaysLeftFromEntitlement(premiumEntitlement);
@@ -181,7 +181,7 @@ export class PremiumService {
 
     try {
       const customerInfo = await Purchases.restorePurchases();
-      const premiumEntitlement = customerInfo.customerInfo.entitlements.active['Premium'];
+      const premiumEntitlement = customerInfo.customerInfo.entitlements.active['Love Widget Pro'];
       const isPremium = typeof premiumEntitlement !== 'undefined';
       if (isPremium) {
         this.updateDaysLeftFromEntitlement(premiumEntitlement);
