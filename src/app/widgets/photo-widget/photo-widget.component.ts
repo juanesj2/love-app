@@ -1,20 +1,23 @@
-import { Component, inject, OnInit, ChangeDetectorRef, OnDestroy, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { Preferences } from '@capacitor/preferences';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, ToastController, AlertController, ActionSheetController, ModalController, IonContent } from '@ionic/angular';
+import { IonicModule, ToastController, AlertController, ActionSheetController, ModalController, IonContent, LoadingController } from '@ionic/angular';
 import { LoveApiService } from '../../services/love-api.service';
 import { TutorialService } from '../../services/tutorial.service';
 import { environment } from '../../../environments/environment';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Capacitor } from '@capacitor/core';
 import { addIcons } from 'ionicons';
-import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline, lockClosed } from 'ionicons/icons';
+import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline, lockClosed, shareSocialOutline } from 'ionicons/icons';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { PremiumService } from '../../services/premium.service';
 import { PaywallComponent } from '../../components/paywall/paywall.component';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
+import { Media } from '@capacitor-community/media';
+import { DotLottie } from '@lottiefiles/dotlottie-web';
 
 @Component({
   selector: 'app-photo-widget',
@@ -280,7 +283,7 @@ import { Share } from '@capacitor/share';
 
       <ng-template #noFeedPhotos>
         <div class="empty-state" *ngIf="viewMode === 'feed'">
-          <ion-icon name="images-outline" class="empty-icon"></ion-icon>
+          <canvas #sadLottie width="200" height="200" style="margin: 0 auto 15px auto;"></canvas>
           <p>No hay fotos aún.</p>
           <p *ngIf="!currentAlbum">¡Sube una para empezar la racha!</p>
           <button *ngIf="currentAlbum" class="empty-upload-btn" (click)="uploadNewPhoto()">
@@ -408,6 +411,15 @@ import { Share } from '@capacitor/share';
               ¡Sube tu foto primero antes de avisar a tu pareja!
             </p>
           </div>
+        </div>
+      </div>
+
+      <!-- Save Overlay -->
+      <div class="albums-overlay" *ngIf="showSaveOverlay" style="z-index: 3000; justify-content: center; align-items: center;">
+        <div class="albums-sheet prompt-sheet" style="width: 250px; max-width: 90%; border-radius: 25px; text-align: center; padding: 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; max-height: auto;">
+          <ion-spinner name="crescent" *ngIf="saveState === 'loading'" style="width: 60px; height: 60px; color: #FF4D6D; margin: 20px auto;"></ion-spinner>
+          <canvas #saveLottie width="120" height="120" style="margin: 0 auto; max-width: 100%; object-fit: contain;" [style.display]="saveState === 'success' ? 'block' : 'none'"></canvas>
+          <h3 style="color: #590D22; margin-top: 15px; font-weight: bold;">{{ saveText }}</h3>
         </div>
       </div>
 
@@ -700,7 +712,16 @@ export class PhotoWidgetComponent implements OnInit {
   private api = inject(LoveApiService);
   private toastController = inject(ToastController);
   private alertController = inject(AlertController);
+  public saveState: 'loading' | 'success' = 'loading';
+  public saveText = 'Descargando imagen...';
+  public showSaveOverlay = false;
+  
+  @ViewChild('saveLottie') saveLottie?: ElementRef<HTMLCanvasElement>;
+  private dotLottieInstance?: DotLottie;
+
+  private locationsSub?: Subscription;
   private actionSheetCtrl = inject(ActionSheetController);
+  private loadingController = inject(LoadingController);
   private cdr = inject(ChangeDetectorRef);
   private tutorialService = inject(TutorialService);
   public premiumService = inject(PremiumService);
@@ -793,7 +814,7 @@ export class PhotoWidgetComponent implements OnInit {
   timelineHideTimeout: any;
 
   constructor() {
-    addIcons({ arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline, calendarOutline: 'calendar-outline', chevronExpand: 'chevron-expand', lockClosed });
+    addIcons({ arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline, calendarOutline: 'calendar-outline', chevronExpand: 'chevron-expand', lockClosed, shareSocialOutline });
   }
 
   async ngOnInit() {
@@ -1872,14 +1893,53 @@ export class PhotoWidgetComponent implements OnInit {
     for (const photoId of selectedIds) {
       const photo = this.photos.find(p => p.id === photoId);
       if (photo) {
-        await this.downloadPhoto(photo);
+        await this.downloadPhoto(photo, 'save');
       }
     }
     
     this.cancelSelection();
   }
 
-  async downloadPhoto(photo: any) {
+  async downloadPhoto(photo: any, skipActionSheet?: 'share' | 'save') {
+    if (Capacitor.isNativePlatform()) {
+      if (skipActionSheet) {
+        return this.processPhotoDownload(photo, skipActionSheet);
+      }
+      const actionSheet = await this.actionSheetCtrl.create({
+        header: '¿Qué deseas hacer con la foto?',
+        buttons: [
+          {
+            text: 'Compartir',
+            icon: 'share-social-outline',
+            handler: () => {
+              this.processPhotoDownload(photo, 'share');
+            }
+          },
+          {
+            text: 'Guardar en dispositivo',
+            icon: 'download-outline',
+            handler: () => {
+              this.processPhotoDownload(photo, 'save');
+            }
+          },
+          {
+            text: 'Cancelar',
+            icon: 'close',
+            role: 'cancel'
+          }
+        ]
+      });
+      await actionSheet.present();
+    } else {
+      this.processPhotoDownload(photo, 'save');
+    }
+  }
+
+  async processPhotoDownload(photo: any, action: 'share' | 'save') {
+    this.showSaveOverlay = true;
+    this.saveState = 'loading';
+    this.saveText = action === 'share' ? 'Preparando imagen...' : 'Descargando imagen...';
+
     try {
       const blob = await this.api.downloadPhotoBlob(photo.id);
       
@@ -1887,23 +1947,39 @@ export class PhotoWidgetComponent implements OnInit {
         const reader = new FileReader();
         reader.readAsDataURL(blob);
         reader.onloadend = async () => {
-          const base64data = reader.result as string;
+          const dataUrl = reader.result as string;
+          const base64data = dataUrl.split(',')[1];
           try {
-            const savedFile = await Filesystem.writeFile({
-              path: `love_photo_${photo.id}.jpg`,
-              data: base64data,
-              directory: Directory.Cache
-            });
-            
-            await Share.share({
-              title: 'Foto de Love Widget',
-              url: savedFile.uri,
-              dialogTitle: 'Compartir o guardar foto'
-            });
-            this.showSuccess('Listo');
+            if (action === 'share') {
+              const savedFile = await Filesystem.writeFile({
+                path: `love_photo_${photo.id}.jpg`,
+                data: base64data,
+                directory: Directory.Cache
+              });
+              this.showSaveOverlay = false;
+              await Share.share({
+                title: 'Foto de Love Widget',
+                url: savedFile.uri,
+                dialogTitle: 'Compartir foto'
+              });
+            } else {
+              // Guardar en la galería usando el plugin Media
+              const savedFile = await Filesystem.writeFile({
+                path: `love_photo_${photo.id}.jpg`,
+                data: base64data,
+                directory: Directory.Cache
+              });
+              
+              await Media.savePhoto({
+                path: savedFile.uri
+              });
+              
+              this.playSaveSuccessLottie('Guardada en tu galería');
+            }
           } catch(e) {
             console.error('Error guardando archivo nativo:', e);
-            this.showError('Error al procesar la imagen');
+            this.showSaveOverlay = false;
+            this.showError('Error al guardar la imagen');
           }
         };
       } else {
@@ -1916,12 +1992,64 @@ export class PhotoWidgetComponent implements OnInit {
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-        this.showSuccess('Imagen descargada');
+        
+        this.playSaveSuccessLottie('Imagen descargada');
       }
     } catch (e) {
-      console.error('Error al descargar:', e);
-      this.showError('Error al descargar la imagen');
+      console.error('Download error:', e);
+      this.showSaveOverlay = false;
+      this.showError('Error descargando imagen');
     }
+  }
+
+  private dotLottieEmptyState: DotLottie | null = null;
+  
+  @ViewChild('sadLottie') set sadLottie(el: ElementRef<HTMLCanvasElement>) {
+    if (el) {
+      if (!this.dotLottieEmptyState) {
+        this.dotLottieEmptyState = new DotLottie({
+          canvas: el.nativeElement,
+          src: 'assets/lottie/Sad Heart.lottie',
+          loop: true,
+          autoplay: true
+        });
+      }
+    } else {
+      if (this.dotLottieEmptyState) {
+        this.dotLottieEmptyState.destroy();
+        this.dotLottieEmptyState = null;
+      }
+    }
+  }
+
+  private playSaveSuccessLottie(text: string) {
+    this.saveState = 'success';
+    this.saveText = text;
+    this.cdr.detectChanges();
+    
+    setTimeout(() => {
+      if (this.dotLottieInstance) {
+        this.dotLottieInstance.destroy();
+      }
+      
+      if (this.saveLottie?.nativeElement) {
+        this.dotLottieInstance = new DotLottie({
+          canvas: this.saveLottie.nativeElement,
+          src: 'assets/lottie/Success.lottie',
+          loop: false,
+          autoplay: true
+        });
+      }
+    }, 50);
+
+    // Ocultar después de la animación
+    setTimeout(() => {
+      this.showSaveOverlay = false;
+      if (this.dotLottieInstance) {
+        this.dotLottieInstance.destroy();
+        this.dotLottieInstance = undefined;
+      }
+    }, 2500);
   }
 
   private async showError(message: string) {

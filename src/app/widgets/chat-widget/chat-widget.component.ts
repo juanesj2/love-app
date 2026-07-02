@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ViewChild, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Preferences } from '@capacitor/preferences';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
@@ -13,6 +13,7 @@ import { PaywallComponent } from '../../components/paywall/paywall.component';
 import { environment } from '../../../environments/environment';
 import { addIcons } from 'ionicons';
 import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed } from 'ionicons/icons';
+import { DotLottie } from '@lottiefiles/dotlottie-web';
 @Component({
   selector: 'app-chat-widget',
   template: `
@@ -130,7 +131,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
           </div>
         </div>
           <div class="empty-state" *ngIf="regularMessages.length === 0">
-            <ion-icon name="chatbubbles-outline" class="empty-icon"></ion-icon>
+            <canvas #sadLottie width="200" height="200" style="margin: 0 auto 15px auto;"></canvas>
             <p>No hay mensajes aún.</p>
             <p>¡Dile algo bonito para empezar!</p>
           </div>
@@ -1668,6 +1669,26 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   hasReactions(msg: any): boolean {
     return msg.reactions && msg.reactions.length > 0;
+  }
+
+  private dotLottieEmptyState: DotLottie | null = null;
+  
+  @ViewChild('sadLottie') set sadLottie(el: ElementRef<HTMLCanvasElement>) {
+    if (el) {
+      if (!this.dotLottieEmptyState) {
+        this.dotLottieEmptyState = new DotLottie({
+          canvas: el.nativeElement,
+          src: 'assets/lottie/Sad Heart.lottie',
+          loop: true,
+          autoplay: true
+        });
+      }
+    } else {
+      if (this.dotLottieEmptyState) {
+        this.dotLottieEmptyState.destroy();
+        this.dotLottieEmptyState = null;
+      }
+    }
   }
 
   getReactions(msg: any): string[] {

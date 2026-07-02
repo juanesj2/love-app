@@ -1,10 +1,11 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonIcon, ToastController, IonSegment, IonSegmentButton, IonLabel } from '@ionic/angular/standalone';
 import { Location } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { arrowBack, trophyOutline, lockClosedOutline, sparklesOutline, helpCircleOutline, alertCircleOutline, searchOutline, heartCircleOutline, colorPaletteOutline, flameOutline, cameraOutline, moonOutline, restaurantOutline, filmOutline, chatbubblesOutline, apertureOutline, happyOutline, earthOutline } from 'ionicons/icons';
+import { DotLottie } from '@lottiefiles/dotlottie-web';
 import { LoveApiService } from '../../services/love-api.service';
 
 @Component({
@@ -75,6 +76,14 @@ import { LoveApiService } from '../../services/love-api.service';
           <div class="spinner"></div>
           <p>Cargando secretos...</p>
         </div>
+
+        <!-- Winner Lottie Overlay -->
+        <div class="winner-overlay" *ngIf="showWinnerLottie">
+          <div class="winner-content">
+            <canvas #winnerLottie width="300" height="300"></canvas>
+            <h2 class="winner-message">{{ winnerMessage }}</h2>
+          </div>
+        </div>
       </div>
     </ion-content>
   `,
@@ -82,6 +91,13 @@ import { LoveApiService } from '../../services/love-api.service';
     .scroll-content { --background: #fff0f3; }
     .achievements-container { padding: 20px; padding-bottom: 80px; min-height: 100vh; position: relative; }
     
+    .winner-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.3s; }
+    .winner-content { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .winner-content canvas { width: 300px; height: 300px; max-width: 90vw; margin-bottom: 20px; }
+    .winner-message { color: white; font-size: 1.5rem; font-weight: 800; text-shadow: 0 4px 10px rgba(0,0,0,0.5); max-width: 80%; line-height: 1.3; animation: slideUpPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUpPop { 0% { transform: translateY(30px) scale(0.9); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+
     .header { text-align: center; margin-bottom: 20px; margin-top: 10px; position: relative; padding-top: 45px; }
     .header h2 { font-size: 2rem; font-weight: 800; color: #800f2f; margin: 0; }
     .header p { color: #a4133c; margin-top: 5px; font-weight: 500; }
@@ -167,6 +183,8 @@ export class AchievementsWidgetComponent implements OnInit {
   private location = inject(Location);
   private toastCtrl = inject(ToastController);
 
+  private cdr = inject(ChangeDetectorRef);
+
   achievementsList: any[] = [];
   displayedAchievements: any[] = [];
   unlockedHintsList: any[] = [];
@@ -176,6 +194,12 @@ export class AchievementsWidgetComponent implements OnInit {
   // Variables para secretos
   titleClickCount: number = 0;
   titleClickTimer: any;
+
+  // Variables para Lottie
+  showWinnerLottie: boolean = false;
+  winnerMessage: string = '';
+  @ViewChild('winnerLottie') winnerLottie?: ElementRef<HTMLCanvasElement>;
+  private dotLottieInstance: DotLottie | null = null;
 
   constructor() {
     addIcons({ 
@@ -196,7 +220,7 @@ export class AchievementsWidgetComponent implements OnInit {
     const hour = new Date().getHours();
     // Entre las 2:00 AM y las 4:59 AM
     if (hour >= 2 && hour < 5) {
-      this.unlockSecretSilent('secret_owl', '🦉 ¡Logro Secreto Descubierto! Eres todo un búho nocturno.');
+      this.unlockSecretSilent('secret_owl', '🦉 ¡Eres todo un búho nocturno!');
     }
   }
 
@@ -289,7 +313,7 @@ export class AchievementsWidgetComponent implements OnInit {
   }
 
   async unlockTrophySecret() {
-    this.unlockSecretSilent('trophy_secret', '🏆 ¡Logro Secreto Descubierto! Ahora puedes pedir 2 pistas al día.');
+    this.unlockSecretSilent('trophy_secret', '🏆 ¡Logro Desbloqueado: Trofeo Secreto!');
   }
 
   onTitleClick() {
@@ -298,12 +322,42 @@ export class AchievementsWidgetComponent implements OnInit {
     
     if (this.titleClickCount >= 10) {
       this.titleClickCount = 0;
-      this.unlockSecretSilent('secret_spammer', '👆 ¡Dedo Inquieto! Has descubierto un logro secreto por tocar tanto la pantalla.');
+      this.unlockSecretSilent('secret_spammer', '👆 ¡Logro Desbloqueado: Dedo Inquieto!');
     } else {
       this.titleClickTimer = setTimeout(() => {
         this.titleClickCount = 0;
       }, 1500); // 1.5s para seguir tocando
     }
+  }
+
+  private playWinnerAnimation(message: string) {
+    this.winnerMessage = message;
+    this.showWinnerLottie = true;
+    this.cdr.detectChanges(); // Forzar dibujado del div y canvas
+
+    setTimeout(() => {
+      if (this.dotLottieInstance) {
+        this.dotLottieInstance.destroy();
+      }
+      
+      if (this.winnerLottie?.nativeElement) {
+        this.dotLottieInstance = new DotLottie({
+          canvas: this.winnerLottie.nativeElement,
+          src: 'assets/lottie/Winner.lottie',
+          loop: false,
+          autoplay: true
+        });
+
+        // Ocultar la animación después de 3.5 segundos
+        setTimeout(() => {
+          this.showWinnerLottie = false;
+          if (this.dotLottieInstance) {
+            this.dotLottieInstance.destroy();
+            this.dotLottieInstance = null;
+          }
+        }, 3500);
+      }
+    }, 50);
   }
 
   async unlockSecretSilent(achievementId: string, successMessage: string) {
@@ -313,13 +367,7 @@ export class AchievementsWidgetComponent implements OnInit {
     try {
       const res = await this.api.unlockAchievement(achievementId);
       if (res && res.newly_unlocked) {
-        const toast = await this.toastCtrl.create({
-          message: successMessage,
-          duration: 5000,
-          color: 'tertiary',
-          position: 'top'
-        });
-        toast.present();
+        this.playWinnerAnimation(successMessage);
         this.loadAchievements();
       }
     } catch (e) {
