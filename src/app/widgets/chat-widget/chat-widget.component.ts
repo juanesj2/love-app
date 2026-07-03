@@ -1726,15 +1726,16 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     if ('vibrate' in navigator) {
       navigator.vibrate(50);
     }
-    const count = 30 + Math.random() * 20;
+    const count = 15 + Math.random() * 10;
     for (let i = 0; i < count; i++) {
       const duration = 2.5 + Math.random() * 2.5;
+      const delay = Math.random() * 1.5;
       const newEmoji = {
         id: Date.now() + Math.random(),
         emoji: emoji,
         left: Math.random() * 100,
         duration: duration,
-        delay: Math.random() * 0.5,
+        delay: delay,
         size: 1.5 + Math.random() * 2
       };
       this.floatingEmojis.push(newEmoji);
