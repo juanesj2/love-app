@@ -376,7 +376,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     audio { display: none; }
     
     .messages-content { flex: 1; --background: transparent; }
-    .messages-inner { padding: calc(env(safe-area-inset-top) + 85px) 15px 20px; display: flex; flex-direction: column; background: transparent !important; }
+    .messages-inner { padding: calc(env(safe-area-inset-top) + 85px) 15px 20px; display: flex; flex-direction: column; min-height: 100%; background: transparent !important; }
     
     .message-row { position: relative; width: 100%; display: flex; align-items: center; margin-bottom: 12px; }
     .message-content-wrapper { width: 100%; position: relative; z-index: 2; transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
@@ -388,7 +388,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .message-wrapper.mine .reactions-container { left: auto; right: 10px; }
     .reaction { display: inline-block; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     
-    .empty-state { text-align: center; color: #a08c92; padding: 100px 20px 40px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .empty-state { text-align: center; color: #a08c92; padding: 20px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     .empty-icon { font-size: 4rem; margin-bottom: 15px; color: #ffb3c1; opacity: 0.8; }
 
     /* Custom Input Mode Styling */

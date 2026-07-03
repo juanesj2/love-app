@@ -195,6 +195,17 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
           </div>
           </div>
           </ng-container>
+          
+          <div class="empty-state" *ngIf="photos.length === 0">
+            <canvas #sadLottieGrid width="200" height="200" style="margin: 0 auto 15px auto;"></canvas>
+            <p>No hay fotos aún.</p>
+            <p *ngIf="!currentAlbum">¡Sube una para empezar la racha!</p>
+            <button *ngIf="currentAlbum" class="empty-upload-btn" (click)="uploadNewPhoto()">
+              <ion-icon name="camera"></ion-icon> 
+              Añadir foto al álbum
+              <ion-icon name="lock-closed" class="premium-lock" style="position: relative; margin-left: 5px; top: 0; right: 0;" *ngIf="(premiumService.isFree$ | async) && photos.length >= 5"></ion-icon>
+            </button>
+          </div>
 
         <ion-infinite-scroll (ionInfinite)="loadMore($event)">
           <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Cargando más fotos..."></ion-infinite-scroll-content>
@@ -528,7 +539,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .send-reply-btn:hover:not(:disabled) { transform: scale(1.1); background: #c9184a; }
     .send-reply-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     
-    .empty-state { text-align: center; color: #a08c92; padding: 20px; height: 65vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .empty-state { text-align: center; color: #a08c92; padding: 20px; height: calc(100vh - 320px); min-height: 350px; margin-top: -20px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     .empty-icon { font-size: 4rem; margin-bottom: 15px; color: #ffb3c1; opacity: 0.8; }
     .empty-upload-btn { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none; padding: 12px 24px; border-radius: 20px; font-weight: bold; margin-top: 15px; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3); }
 
@@ -2003,6 +2014,7 @@ export class PhotoWidgetComponent implements OnInit {
   }
 
   private dotLottieEmptyState: DotLottie | null = null;
+  private dotLottieEmptyStateGrid: DotLottie | null = null;
   
   @ViewChild('sadLottie') set sadLottie(el: ElementRef<HTMLCanvasElement>) {
     if (el) {
@@ -2018,6 +2030,24 @@ export class PhotoWidgetComponent implements OnInit {
       if (this.dotLottieEmptyState) {
         this.dotLottieEmptyState.destroy();
         this.dotLottieEmptyState = null;
+      }
+    }
+  }
+
+  @ViewChild('sadLottieGrid') set sadLottieGrid(el: ElementRef<HTMLCanvasElement>) {
+    if (el) {
+      if (!this.dotLottieEmptyStateGrid) {
+        this.dotLottieEmptyStateGrid = new DotLottie({
+          canvas: el.nativeElement,
+          src: 'assets/lottie/Sad Heart.lottie',
+          loop: true,
+          autoplay: true
+        });
+      }
+    } else {
+      if (this.dotLottieEmptyStateGrid) {
+        this.dotLottieEmptyStateGrid.destroy();
+        this.dotLottieEmptyStateGrid = null;
       }
     }
   }
