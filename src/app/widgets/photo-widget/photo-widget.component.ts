@@ -433,6 +433,16 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
           <h3 style="color: #590D22; margin-top: 15px; font-weight: bold;">{{ saveText }}</h3>
         </div>
       </div>
+      <!-- Floating Emojis Overlay -->
+      <div class="floating-emoji-container" *ngIf="floatingEmojis.length > 0">
+        <div *ngFor="let fe of floatingEmojis" class="floating-emoji" 
+             [style.left.%]="fe.left" 
+             [style.animation-duration.s]="fe.duration"
+             [style.font-size.rem]="fe.size"
+             [style.animation-delay.s]="fe.delay">
+          {{ fe.emoji }}
+        </div>
+      </div>
 
     </div>
   `,
@@ -543,6 +553,15 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .empty-state canvas { width: 160px !important; height: 160px !important; margin: 0 auto 15px auto; display: block; flex-shrink: 0; }
     .empty-icon { font-size: 4rem; margin-bottom: 15px; color: #ffb3c1; opacity: 0.8; }
     .empty-upload-btn { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none; padding: 12px 24px; border-radius: 20px; font-weight: bold; margin-top: 15px; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3); }
+
+    .floating-emoji-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; overflow: hidden; }
+    .floating-emoji { position: absolute; bottom: -10%; animation-name: floatUp; animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94); animation-fill-mode: forwards; will-change: transform, opacity; opacity: 0; text-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(1) rotate(-10deg); opacity: 0; }
+      10% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { transform: translateY(-110vh) scale(1.5) rotate(20deg); opacity: 0; }
+    }
 
     .selection-actions { position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); display: flex; align-items: center; gap: 15px; padding: 10px 20px; border-radius: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000; border: 1px solid rgba(255,77,109,0.2); }
     .selection-count { font-weight: 700; color: #590D22; font-size: 1rem; }
@@ -1545,8 +1564,47 @@ export class PhotoWidgetComponent implements OnInit {
     document.body.classList.remove('hide-tabs');
   }
 
+  floatingEmojis: any[] = [];
+  
+  private isEmojiOnly(text: string): boolean {
+    if (!text) return false;
+    const t = text.trim();
+    if (t.length === 0 || t.length > 10) return false;
+    const stripped = t.replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, '');
+    return stripped.length === 0;
+  }
+  
+  private triggerEmojiReaction(emoji: string) {
+    if ('vibrate' in navigator) {
+      navigator.vibrate(50);
+    }
+    const count = 30 + Math.random() * 20;
+    for (let i = 0; i < count; i++) {
+      const duration = 2.5 + Math.random() * 2.5;
+      const newEmoji = {
+        id: Date.now() + Math.random(),
+        emoji: emoji,
+        left: Math.random() * 100,
+        duration: duration,
+        delay: Math.random() * 0.5,
+        size: 1.5 + Math.random() * 2
+      };
+      this.floatingEmojis.push(newEmoji);
+      
+      setTimeout(() => {
+        this.floatingEmojis = this.floatingEmojis.filter(e => e.id !== newEmoji.id);
+        this.cdr.detectChanges();
+      }, (duration + 1) * 1000);
+    }
+    this.cdr.detectChanges();
+  }
+
   async react(photoId: number, emoji: string) {
     try {
+      if (this.isEmojiOnly(emoji)) {
+        this.triggerEmojiReaction(emoji.trim());
+      }
+      
       await this.api.reactToPhoto(photoId, emoji);
       await this.api.sendMessage(emoji, photoId); // Mandar la reacción al chat también
       // Actualización local para no perder la paginación
