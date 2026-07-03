@@ -1608,8 +1608,10 @@ export class PhotoWidgetComponent implements OnInit {
     const photo = this.lightboxPhotos[this.currentLightboxIndex];
     if (photo && photo.reactions && photo.reactions.length > 0) {
       const uniqueEmojis = Array.from(new Set(photo.reactions.map((r: any) => r.content).filter((e: string) => this.isEmojiOnly(e))));
-      uniqueEmojis.forEach(emoji => {
-        this.triggerEmojiReaction(emoji.trim());
+      uniqueEmojis.forEach((emoji: any) => {
+        if (typeof emoji === 'string') {
+          this.triggerEmojiReaction(emoji.trim());
+        }
       });
     }
   }
