@@ -138,6 +138,17 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
         </div>
       </ion-content>
 
+      <!-- Emoji Overlay para animaciones a pantalla completa -->
+      <div class="floating-emoji-container" *ngIf="floatingEmojis.length > 0">
+        <div *ngFor="let fe of floatingEmojis" class="floating-emoji" 
+             [style.left.%]="fe.left" 
+             [style.animation-duration.s]="fe.duration"
+             [style.font-size.rem]="fe.size"
+             [style.animation-delay.s]="fe.delay">
+          {{ fe.emoji }}
+        </div>
+      </div>
+
       <!-- Custom emoji overlay (replaces ion-popover for Capacitor compatibility) -->
       <div class="reactions-overlay" *ngIf="showReactionsMsgId !== null" (click)="closePopover()">
         <div class="reactions-bar" (click)="$event.stopPropagation()">
@@ -391,6 +402,15 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .empty-state { text-align: center; color: #a08c92; padding: 20px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     .empty-state canvas { width: 160px !important; height: 160px !important; margin: 0 auto 15px auto; display: block; flex-shrink: 0; }
     .empty-icon { font-size: 4rem; margin-bottom: 15px; color: #ffb3c1; opacity: 0.8; }
+    
+    .floating-emoji-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; overflow: hidden; }
+    .floating-emoji { position: absolute; bottom: -10%; animation-name: floatUp; animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94); animation-fill-mode: forwards; will-change: transform, opacity; opacity: 0; text-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(1) rotate(-10deg); opacity: 0; }
+      10% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { transform: translateY(-110vh) scale(1.5) rotate(20deg); opacity: 0; }
+    }
 
     /* Custom Input Mode Styling */
     .custom-input-mode { display: flex; width: 100%; gap: 10px; }
@@ -729,12 +749,17 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     event.target.complete();
   }
 
+  lastKnownMessageId: number = 0;
+
   async loadMessages() {
     try {
       // 1. Mostrar caché primero para experiencia instantánea
       const cache = await Preferences.get({ key: 'chat_cache' });
       if (cache.value) {
         this.messages = JSON.parse(cache.value);
+        if (this.messages.length > 0) {
+          this.lastKnownMessageId = this.messages[this.messages.length - 1].id;
+        }
         this.processMessages();
         this.safeTimeout(() => this.scrollToBottom(false), 50);
         this.safeTimeout(() => this.scrollToBottom(false), 300);
@@ -746,6 +771,15 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       // 3. Actualizar la vista solo si hay cambios (evita parpadeos)
       if (JSON.stringify(this.messages) !== JSON.stringify(newMessages)) {
         this.messages = newMessages;
+        
+        if (this.messages.length > 0) {
+          const latestMsg = this.messages[this.messages.length - 1];
+          if (this.lastKnownMessageId > 0 && latestMsg.id > this.lastKnownMessageId && !this.isMine(latestMsg) && this.isEmojiOnly(latestMsg.mensaje)) {
+            this.triggerEmojiReaction(latestMsg.mensaje.trim());
+          }
+          this.lastKnownMessageId = latestMsg.id;
+        }
+        
         this.processMessages();
         this.safeTimeout(() => this.scrollToBottom(false), 100);
         this.safeTimeout(() => this.scrollToBottom(true), 500);
@@ -797,6 +831,12 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     
     this.sending = true;
     const isReplyingTo = this.replyingTo;
+    const payloadMessage = this.newMessage;
+    
+    // Trigger locally immediately if it's an emoji
+    if (this.isEmojiOnly(payloadMessage)) {
+      this.triggerEmojiReaction(payloadMessage.trim());
+    }
     
     try {
       if (this.isEditing && this.editingMsgId) {
@@ -1670,6 +1710,41 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   hasReactions(msg: any): boolean {
     return msg.reactions && msg.reactions.length > 0;
+  }
+
+  floatingEmojis: any[] = [];
+  
+  private isEmojiOnly(text: string): boolean {
+    if (!text) return false;
+    const t = text.trim();
+    if (t.length === 0 || t.length > 10) return false;
+    const stripped = t.replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, '');
+    return stripped.length === 0;
+  }
+  
+  private triggerEmojiReaction(emoji: string) {
+    if ('vibrate' in navigator) {
+      navigator.vibrate(50);
+    }
+    const count = 30 + Math.random() * 20;
+    for (let i = 0; i < count; i++) {
+      const duration = 2.5 + Math.random() * 2.5;
+      const newEmoji = {
+        id: Date.now() + Math.random(),
+        emoji: emoji,
+        left: Math.random() * 100,
+        duration: duration,
+        delay: Math.random() * 0.5,
+        size: 1.5 + Math.random() * 2
+      };
+      this.floatingEmojis.push(newEmoji);
+      
+      setTimeout(() => {
+        this.floatingEmojis = this.floatingEmojis.filter(e => e.id !== newEmoji.id);
+        this.cdr.detectChanges();
+      }, (duration + 1) * 1000);
+    }
+    this.cdr.detectChanges();
   }
 
   private dotLottieEmptyState: DotLottie | null = null;
