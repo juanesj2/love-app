@@ -1206,6 +1206,9 @@ export class PhotoWidgetComponent implements OnInit {
     }
     
     this.lightboxActive = true;
+    setTimeout(() => {
+      this.playReactionsForCurrentPhoto();
+    }, 150);
   }
 
   closeLightbox() {
@@ -1233,6 +1236,7 @@ export class PhotoWidgetComponent implements OnInit {
     if (this.currentLightboxIndex < this.lightboxPhotos.length - 1) {
       this.animateLightboxTo('up', () => {
         this.currentLightboxIndex++;
+        this.playReactionsForCurrentPhoto();
       });
     }
   }
@@ -1241,6 +1245,7 @@ export class PhotoWidgetComponent implements OnInit {
     if (this.currentLightboxIndex > 0) {
       this.animateLightboxTo('down', () => {
         this.currentLightboxIndex--;
+        this.playReactionsForCurrentPhoto();
       });
     }
   }
@@ -1597,6 +1602,16 @@ export class PhotoWidgetComponent implements OnInit {
       }, (duration + 1) * 1000);
     }
     this.cdr.detectChanges();
+  }
+
+  playReactionsForCurrentPhoto() {
+    const photo = this.lightboxPhotos[this.currentLightboxIndex];
+    if (photo && photo.reactions && photo.reactions.length > 0) {
+      const uniqueEmojis = Array.from(new Set(photo.reactions.map((r: any) => r.content).filter((e: string) => this.isEmojiOnly(e))));
+      uniqueEmojis.forEach(emoji => {
+        this.triggerEmojiReaction(emoji.trim());
+      });
+    }
   }
 
   async react(photoId: number, emoji: string) {
