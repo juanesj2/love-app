@@ -389,6 +389,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .reaction { display: inline-block; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     
     .empty-state { text-align: center; color: #a08c92; padding: 20px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .empty-state canvas { width: 160px !important; height: 160px !important; margin: 0 auto 15px auto; display: block; flex-shrink: 0; }
     .empty-icon { font-size: 4rem; margin-bottom: 15px; color: #ffb3c1; opacity: 0.8; }
 
     /* Custom Input Mode Styling */

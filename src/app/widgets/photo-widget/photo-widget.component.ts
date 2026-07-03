@@ -540,6 +540,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .send-reply-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     
     .empty-state { text-align: center; color: #a08c92; padding: 20px; height: calc(100vh - 320px); min-height: 350px; margin-top: -20px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .empty-state canvas { width: 160px !important; height: 160px !important; margin: 0 auto 15px auto; display: block; flex-shrink: 0; }
     .empty-icon { font-size: 4rem; margin-bottom: 15px; color: #ffb3c1; opacity: 0.8; }
     .empty-upload-btn { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none; padding: 12px 24px; border-radius: 20px; font-weight: bold; margin-top: 15px; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3); }
 
