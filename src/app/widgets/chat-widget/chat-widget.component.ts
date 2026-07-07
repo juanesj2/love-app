@@ -593,6 +593,9 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     :host-context(.night-owl-mode) .input-area { background: rgba(30,30,30,0.85); border-top-color: rgba(255,255,255,0.05); }
     :host-context(.night-owl-mode) .premium-input { background: rgba(0,0,0,0.4); border-color: #333; color: #fdfdfd; }
     :host-context(.night-owl-mode) .premium-input:focus { background: rgba(0,0,0,0.6); border-color: #a78bfa; }
+    :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble-dog::before, :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble-dog::after {
+        background: rgba(40,40,40,0.9); border-color: #333;
+    }
     :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble { background: rgba(40,40,40,0.9); color: #fdfdfd; border-color: #333; }
     :host-context(.night-owl-mode) .sender { color: #a78bfa; }
     :host-context(.night-owl-mode) .attach-btn { color: #a78bfa; }
