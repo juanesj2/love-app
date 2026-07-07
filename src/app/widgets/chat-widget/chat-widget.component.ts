@@ -704,49 +704,49 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       cssClass: 'premium-action-sheet',
       buttons: [
         {
-          text: '🎨 Fondo por Defecto',
+          text: 'Fondo por Defecto',
           icon: 'trash-outline',
           handler: () => this.setChatBackground('')
         },
         {
-          text: '💖 Patrón Kawaii',
+          text: 'Patrón Kawaii',
           icon: 'heart-outline',
           handler: () => this.setChatBackground("url('assets/backgrounds/cute_pattern.png')")
         },
         {
-          text: '🌇 Atardecer Cálido',
+          text: 'Atardecer Cálido',
           icon: 'partly-sunny-outline',
-          handler: () => this.setChatBackground('linear-gradient(120deg, #f6d365 0%, #fda085 100%)')
+          handler: () => this.setChatBackground("url('assets/backgrounds/bg_sunset.png')")
         },
         {
-          text: '🌊 Océano Profundo',
+          text: 'Océano Profundo',
           icon: 'water-outline',
-          handler: () => this.setChatBackground('linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%)')
+          handler: () => this.setChatBackground("url('assets/backgrounds/bg_ocean.png')")
         },
         {
-          text: '✨ Noche Estrellada',
+          text: 'Noche Estrellada',
           icon: 'moon-outline',
-          handler: () => this.setChatBackground('linear-gradient(to top, #30cfd0 0%, #330867 100%)')
+          handler: () => this.setChatBackground("url('assets/backgrounds/bg_night.png')")
         },
         {
-          text: '🌌 Aurora Boreal',
+          text: 'Aurora Boreal',
           icon: 'planet-outline',
-          handler: () => this.setChatBackground('linear-gradient(to right, #43e97b 0%, #38f9d7 100%)')
+          handler: () => this.setChatBackground("url('assets/backgrounds/bg_aurora.png')")
         },
         {
-          text: '🌸 Rosa Pastel',
+          text: 'Rosa Pastel',
           icon: 'color-palette-outline',
-          handler: () => this.setChatBackground('linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)')
+          handler: () => this.setChatBackground("url('assets/backgrounds/bg_pastel.png')")
         },
         {
-          text: '🖼️ Subir Foto Personal',
+          text: 'Subir Foto Personal',
           icon: 'image-outline',
           handler: () => {
             this.pickCustomBackground();
           }
         },
         {
-          text: '❌ Cancelar',
+          text: 'Cancelar',
           icon: 'close',
           role: 'cancel'
         }
