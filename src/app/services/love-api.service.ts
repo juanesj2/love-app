@@ -170,7 +170,9 @@ export class LoveApiService {
   }
 
   async updateCoupleInfo(data: any): Promise<any> {
-    return firstValueFrom(this.http.put<any>(`${API_BASE_URL}/love-album/info`, data));
+    const res = await firstValueFrom(this.http.put<any>(`${API_BASE_URL}/love-album/info`, data));
+    this.avatarUpdated$.next();
+    return res;
   }
 
   async sendPoke(): Promise<any> {
