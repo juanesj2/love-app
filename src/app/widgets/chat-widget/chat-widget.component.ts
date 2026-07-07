@@ -657,9 +657,59 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
       right: -8px;
     }
 
-    /* Burbuja Nube */
-    .bubble-cloud { border-radius: 20px 20px 20px 5px !important; }
-    .mine .bubble-cloud { border-radius: 20px 20px 5px 20px !important; }
+    
+    /* Burbuja Gatito */
+    .bubble-cat { border-top-left-radius: 16px; border-top-right-radius: 16px; isolation: isolate; }
+    .mine .bubble-cat::before, .mine .bubble-cat::after {
+      content: ''; position: absolute; top: -6px; width: 14px; height: 14px; background: #FF4D6D; border-radius: 3px; transform: rotate(45deg); z-index: -1;
+    }
+    .message-wrapper:not(.mine) .bubble-cat::before, .message-wrapper:not(.mine) .bubble-cat::after {
+      content: ''; position: absolute; top: -6px; width: 14px; height: 14px; background: white; border-radius: 3px; transform: rotate(45deg); z-index: -1; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .bubble-cat::before { left: 12px; }
+    .bubble-cat::after { right: 12px; }
+
+    /* Burbuja Perrito */
+    .bubble-dog { border-top-left-radius: 16px; border-top-right-radius: 16px; isolation: isolate; }
+    .mine .bubble-dog::before, .mine .bubble-dog::after {
+      content: ''; position: absolute; top: 4px; width: 16px; height: 26px; background: #FF4D6D; border-radius: 8px; z-index: -1;
+    }
+    .message-wrapper:not(.mine) .bubble-dog::before, .message-wrapper:not(.mine) .bubble-dog::after {
+      content: ''; position: absolute; top: 4px; width: 16px; height: 26px; background: white; border-radius: 8px; z-index: -1; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .bubble-dog::before { left: -8px; transform: rotate(15deg); }
+    .bubble-dog::after { right: -8px; transform: rotate(-15deg); }
+    
+    /* Burbuja Nube - ¡Mucho más nubosa! */
+    .bubble-cloud { border-radius: 20px !important; margin-top: 10px; margin-bottom: 5px; isolation: isolate; }
+    .bubble-cloud::before {
+      content: ''; position: absolute; top: -10px; left: 15%; width: 28px; height: 28px; border-radius: 50%; z-index: -1;
+    }
+    .bubble-cloud::after {
+      content: ''; position: absolute; top: -14px; right: 20%; width: 36px; height: 36px; border-radius: 50%; z-index: -1;
+    }
+    
+    .mine .bubble-cloud::before, .mine .bubble-cloud::after { background: #FF4D6D; }
+    .message-wrapper:not(.mine) .bubble-cloud::before, .message-wrapper:not(.mine) .bubble-cloud::after { background: white; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+    /* Fix borders for pseudo-elements */
+    .message-wrapper:not(.mine) .bubble-cat::before, .message-wrapper:not(.mine) .bubble-cat::after,
+    .message-wrapper:not(.mine) .bubble-dog::before, .message-wrapper:not(.mine) .bubble-dog::after,
+    .message-wrapper:not(.mine) .bubble-cloud::before, .message-wrapper:not(.mine) .bubble-cloud::after {
+        border-bottom: none; border-right: none;
+    }
+
+    /* Modo Oscuro Night Owl */
+    :host-context(.night-owl-mode) .mine .bubble-cat::before, :host-context(.night-owl-mode) .mine .bubble-cat::after,
+    :host-context(.night-owl-mode) .mine .bubble-dog::before, :host-context(.night-owl-mode) .mine .bubble-dog::after,
+    :host-context(.night-owl-mode) .mine .bubble-cloud::before, :host-context(.night-owl-mode) .mine .bubble-cloud::after {
+        background: linear-gradient(135deg, #8b5cf6, #6d28d9); box-shadow: none; border: none;
+    }
+    :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble-cat::before, :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble-cat::after,
+    :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble-dog::before, :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble-dog::after,
+    :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble-cloud::before, :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble-cloud::after {
+        background: rgba(40,40,40,0.9); box-shadow: none; border: none;
+    }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
