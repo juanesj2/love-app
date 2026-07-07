@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, ViewChild, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { PluginListenerHandle } from '@capacitor/core';
 import { IonContent, IonFooter, IonHeader, IonToolbar, AlertController, ActionSheetController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
