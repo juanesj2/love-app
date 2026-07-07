@@ -368,9 +368,10 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     /* --- TYPOGRAPHY SETTINGS --- */
     @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Nunito:wght@400..800&family=Special+Elite&display=swap');
 
-    .font-typewriter { font-family: 'Special Elite', 'Courier New', Courier, monospace !important; }
-    .font-handwriting { font-family: 'Caveat', cursive !important; font-size: 1.2em; }
-    .font-kawaii { font-family: 'Nunito', sans-serif !important; font-weight: 700; }
+    .font-typewriter, .font-typewriter .message-text, .font-typewriter .timestamp, .font-typewriter .chat-date-header, .font-typewriter .deleted-text { font-family: 'Special Elite', 'Courier New', Courier, monospace !important; }
+    .font-handwriting, .font-handwriting .message-text, .font-handwriting .timestamp, .font-handwriting .chat-date-header, .font-handwriting .deleted-text { font-family: 'Caveat', cursive !important; }
+    .font-handwriting .message-text { font-size: 1.2em; }
+    .font-kawaii, .font-kawaii .message-text, .font-kawaii .timestamp, .font-kawaii .chat-date-header, .font-kawaii .deleted-text { font-family: 'Nunito', sans-serif !important; font-weight: 700; }
 
     .chat-bg-settings-btn { position: absolute; top: 100px; right: 16px; z-index: 100; background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(0,0,0,0.05); border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.2s ease; }
     .chat-bg-settings-btn:active { transform: scale(0.95); }
