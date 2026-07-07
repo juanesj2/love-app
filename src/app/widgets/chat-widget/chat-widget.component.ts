@@ -701,6 +701,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   async openBgSettings() {
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Fondo del Chat',
+      cssClass: 'premium-action-sheet',
       buttons: [
         {
           text: 'Fondo por Defecto',
