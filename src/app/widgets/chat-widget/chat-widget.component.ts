@@ -18,7 +18,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 @Component({
   selector: 'app-chat-widget',
   template: `
-    <div class="chat-wrapper" [style.background]="chatBackground || null" [class]="'font-' + chatFont">
+    <div class="chat-wrapper" [style.background]="chatBackground || null" [ngClass]="'font-' + chatFont">
       <button class="chat-bg-settings-btn" (click)="openChatSettings()" *ngIf="regularMessages.length > 0">
         <ion-icon name="color-palette"></ion-icon>
       </button>
@@ -873,6 +873,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   async setLocalPref(key: string, value: string, varName: string) {
     (this as any)[varName] = value;
     await Preferences.set({ key, value });
+    this.cdr.detectChanges();
   }
 
   async saveCoupleInfoSetting(field: string, value: string) {
