@@ -656,6 +656,10 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
       top: -2px;
       right: -8px;
     }
+
+    /* Burbuja Nube */
+    .bubble-cloud { border-radius: 20px 20px 20px 5px !important; }
+    .mine .bubble-cloud { border-radius: 20px 20px 5px 20px !important; }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
