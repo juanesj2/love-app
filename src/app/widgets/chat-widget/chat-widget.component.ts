@@ -487,9 +487,9 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     .gif-results img { height: 100px; border-radius: 8px; cursor: pointer; object-fit: cover; }
     .gif-loading { text-align: center; color: #666; padding: 20px; }
 
-    .msg-avatar-container { width: 35px; height: 35px; border-radius: 50%; overflow: hidden; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); background: white; }
-    .msg-avatar { width: 100%; height: 100%; object-fit: cover; }
-    .msg-avatar-fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; font-weight: bold; font-size: 0.8rem; }
+    .msg-avatar-container { position: relative; width: 35px; height: 35px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); background: transparent; }
+    .msg-avatar { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; box-sizing: border-box; }
+    .msg-avatar-fallback { border-radius: 50%; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; font-weight: bold; font-size: 0.8rem; }
     
     
     .photo-reply img { width: 100%; max-width: 200px; border-radius: 12px; margin-bottom: 8px; border: 2px solid rgba(255,255,255,0.2); display: block; overflow: hidden; }
