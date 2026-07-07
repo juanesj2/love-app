@@ -80,7 +80,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
                 <div class="bubble" [ngClass]="isMine(msg) ? 'bubble-' + myBubbleStyle : 'bubble-' + partnerBubbleStyle" [class.only-photo]="msg.photo && (!msg.mensaje || msg.mensaje === 'null')"
                                     [class.transparent-bubble]="msg.mensaje && msg.mensaje.startsWith('[DOODLE]')">
                   
-                  <div class="deleted-tombstone" *ngIf="msg.isDeletedLocally || msg.mensaje === '[DELETED]'" style="color: #888; font-style: italic; display: flex; align-items: center; gap: 5px;">
+                  <div class="deleted-tombstone" *ngIf="msg.isDeletedLocally || msg.mensaje === '[DELETED]'">
                     <ion-icon name="ban-outline"></ion-icon> Se eliminó este mensaje
                   </div>
 
@@ -429,10 +429,10 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     .message-wrapper.mine { justify-content: flex-end; }
     .message-wrapper:not(.mine) { justify-content: flex-start; }
     
-    .bubble { width: fit-content; max-width: 100%; padding: 8px 12px; border-radius: 12px; font-size: 1rem; line-height: 1.4; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+    .bubble { padding: 10px 16px; border-radius: 18px; max-width: 100%; word-break: break-word; font-size: 0.95rem; line-height: 1.4; position: relative; border-bottom-left-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.04), inset 0 2px 0 rgba(255,255,255,0.5); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); color: #2c3e50; border: 1px solid rgba(255,255,255,0.4); }
     .transparent-bubble { background: transparent !important; box-shadow: none !important; border: none !important; padding: 0 !important; }
     
-    .mine .bubble { background: #FF4D6D; color: white; border-bottom-right-radius: 4px; }
+    .mine .bubble { background: linear-gradient(135deg, #FF758C 0%, #FF7EB3 100%); color: white; border-bottom-right-radius: 6px; border-bottom-left-radius: 18px; box-shadow: 0 4px 15px rgba(255, 117, 140, 0.35), inset 0 2px 0 rgba(255,255,255,0.25); border: none; }
     .message-wrapper:not(.mine) .bubble { background: white; color: #333; border-bottom-left-radius: 4px; border: 1px solid rgba(0,0,0,0.05); }
     
     .sender { font-size: 0.75rem; font-weight: 700; color: #FF4D6D; margin-bottom: 4px; display: block; }
@@ -658,45 +658,47 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     }
 
     
-    /* Burbuja Gatito */
-    .bubble-cat { border-top-left-radius: 16px; border-top-right-radius: 16px; isolation: isolate; }
+        /* Burbuja Gatito - Premium */
+    .bubble-cat { border-top-left-radius: 20px; border-top-right-radius: 20px; isolation: isolate; }
     .mine .bubble-cat::before, .mine .bubble-cat::after {
-      content: ''; position: absolute; top: -6px; width: 14px; height: 14px; background: #FF4D6D; border-radius: 3px; transform: rotate(45deg); z-index: -1;
+      content: ''; position: absolute; top: -6px; width: 16px; height: 16px; background: linear-gradient(135deg, #FF758C, #ff799b); border-radius: 4px; transform: rotate(45deg); z-index: -1; box-shadow: inset 2px 2px 0 rgba(255,255,255,0.2);
     }
     .message-wrapper:not(.mine) .bubble-cat::before, .message-wrapper:not(.mine) .bubble-cat::after {
-      content: ''; position: absolute; top: -6px; width: 14px; height: 14px; background: white; border-radius: 3px; transform: rotate(45deg); z-index: -1; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      content: ''; position: absolute; top: -6px; width: 16px; height: 16px; background: rgba(255,255,255,0.95); border-radius: 4px; transform: rotate(45deg); z-index: -1; box-shadow: inset 1px 1px 0 rgba(255,255,255,0.8), 0 -2px 5px rgba(0,0,0,0.02);
     }
-    .bubble-cat::before { left: 12px; }
-    .bubble-cat::after { right: 12px; }
+    .bubble-cat::before { left: 14px; }
+    .bubble-cat::after { right: 14px; }
 
-    /* Burbuja Perrito */
-    .bubble-dog { border-top-left-radius: 16px; border-top-right-radius: 16px; isolation: isolate; }
+    /* Burbuja Perrito - Premium */
+    .bubble-dog { border-top-left-radius: 20px; border-top-right-radius: 20px; isolation: isolate; }
     .mine .bubble-dog::before, .mine .bubble-dog::after {
-      content: ''; position: absolute; top: 4px; width: 16px; height: 26px; background: #FF4D6D; border-radius: 8px; z-index: -1;
+      content: ''; position: absolute; top: 2px; width: 18px; height: 28px; background: linear-gradient(135deg, #FF758C, #ff799b); border-radius: 10px; z-index: -1; box-shadow: inset 1px 2px 0 rgba(255,255,255,0.15), -2px 4px 8px rgba(255, 117, 140, 0.4);
     }
     .message-wrapper:not(.mine) .bubble-dog::before, .message-wrapper:not(.mine) .bubble-dog::after {
-      content: ''; position: absolute; top: 4px; width: 16px; height: 26px; background: white; border-radius: 8px; z-index: -1; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      content: ''; position: absolute; top: 2px; width: 18px; height: 28px; background: rgba(255,255,255,0.95); border-radius: 10px; z-index: -1; box-shadow: inset 1px 1px 0 rgba(255,255,255,0.8), -2px 4px 8px rgba(0,0,0,0.04);
     }
-    .bubble-dog::before { left: -8px; transform: rotate(15deg); }
-    .bubble-dog::after { right: -8px; transform: rotate(-15deg); }
+    .bubble-dog::before { left: -6px; transform: rotate(20deg); }
+    .bubble-dog::after { right: -6px; transform: rotate(-20deg); }
     
-    /* Burbuja Nube - ¡Mucho más nubosa! */
-    .bubble-cloud { border-radius: 20px !important; margin-top: 10px; margin-bottom: 5px; isolation: isolate; }
+    /* Burbuja Nube - Esponjosa Premium */
+    .bubble-cloud { border-radius: 24px !important; margin-top: 12px; margin-bottom: 5px; isolation: isolate; }
     .bubble-cloud::before {
-      content: ''; position: absolute; top: -10px; left: 15%; width: 28px; height: 28px; border-radius: 50%; z-index: -1;
+      content: ''; position: absolute; top: -14px; left: 15%; width: 34px; height: 34px; border-radius: 50%; z-index: -1;
     }
     .bubble-cloud::after {
-      content: ''; position: absolute; top: -14px; right: 20%; width: 36px; height: 36px; border-radius: 50%; z-index: -1;
+      content: ''; position: absolute; top: -18px; right: 20%; width: 44px; height: 44px; border-radius: 50%; z-index: -1;
     }
     
-    .mine .bubble-cloud::before, .mine .bubble-cloud::after { background: #FF4D6D; }
-    .message-wrapper:not(.mine) .bubble-cloud::before, .message-wrapper:not(.mine) .bubble-cloud::after { background: white; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    .mine .bubble-cloud::before { background: #FF758C; box-shadow: inset 0 3px 0 rgba(255,255,255,0.15); }
+    .mine .bubble-cloud::after { background: #FF7794; box-shadow: inset 0 3px 0 rgba(255,255,255,0.15); }
+    
+    .message-wrapper:not(.mine) .bubble-cloud::before, .message-wrapper:not(.mine) .bubble-cloud::after { background: rgba(255,255,255,0.95); box-shadow: inset 0 2px 0 rgba(255,255,255,0.8), 0 -2px 6px rgba(0,0,0,0.02); }
 
     /* Fix borders for pseudo-elements */
     .message-wrapper:not(.mine) .bubble-cat::before, .message-wrapper:not(.mine) .bubble-cat::after,
     .message-wrapper:not(.mine) .bubble-dog::before, .message-wrapper:not(.mine) .bubble-dog::after,
     .message-wrapper:not(.mine) .bubble-cloud::before, .message-wrapper:not(.mine) .bubble-cloud::after {
-        border-bottom: none; border-right: none;
+        border: none;
     }
 
     /* Modo Oscuro Night Owl */
@@ -709,6 +711,28 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble-dog::before, :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble-dog::after,
     :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble-cloud::before, :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble-cloud::after {
         background: rgba(40,40,40,0.9); box-shadow: none; border: none;
+    }
+
+    .deleted-tombstone {
+      font-style: italic; display: flex; align-items: center; gap: 6px; padding: 2px 4px;
+      font-weight: 500; font-size: 0.9rem;
+    }
+    .mine .deleted-tombstone { color: rgba(255,255,255,0.8); }
+    .message-wrapper:not(.mine) .deleted-tombstone { color: #888; }
+    
+    .mine .bubble:has(.deleted-tombstone) {
+      background: rgba(255, 117, 140, 0.4) !important;
+      box-shadow: none !important;
+      border: 1px dashed rgba(255, 117, 140, 0.6) !important;
+    }
+    .message-wrapper:not(.mine) .bubble:has(.deleted-tombstone) {
+      background: rgba(255, 255, 255, 0.4) !important;
+      box-shadow: none !important;
+      border: 1px dashed rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .bubble:has(.deleted-tombstone)::before, .bubble:has(.deleted-tombstone)::after {
+      display: none !important; /* Hide ears/clouds for deleted messages */
     }
   `],
   standalone: true,
