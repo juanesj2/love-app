@@ -616,9 +616,12 @@ export class HomePage implements OnInit, OnDestroy {
       cssClass: 'premium-action-sheet',
       buttons: [
         { text: 'Feliz 😊', handler: () => this.setAvatarSetting('current_mood', '😊') },
-        { text: 'Durmiendo 💤', handler: () => this.setAvatarSetting('current_mood', '💤') },
+        { text: 'Mimoso/a 🥰', handler: () => this.setAvatarSetting('current_mood', '🥰') },
         { text: 'Jugando 🎮', handler: () => this.setAvatarSetting('current_mood', '🎮') },
-        { text: 'Cansado 😴', handler: () => this.setAvatarSetting('current_mood', '😴') },
+        { text: 'Cansado/a 😴', handler: () => this.setAvatarSetting('current_mood', '😴') },
+        { text: 'Durmiendo 💤', handler: () => this.setAvatarSetting('current_mood', '💤') },
+        { text: 'Estresado/a 🤯', handler: () => this.setAvatarSetting('current_mood', '🤯') },
+        { text: 'Triste 🥺', handler: () => this.setAvatarSetting('current_mood', '🥺') },
         { text: 'Quitar Estado', icon: 'trash-outline', handler: () => this.setAvatarSetting('current_mood', '') },
         { text: 'Cancelar', icon: 'close', role: 'cancel' }
       ]
