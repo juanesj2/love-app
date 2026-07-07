@@ -32,20 +32,16 @@ import { ModalController } from '@ionic/angular';
     <ion-header class="ion-no-border">
       <ion-toolbar>
         <div class="custom-header" *ngIf="selectedWidget !== 'location'">
+          
           <div class="avatar-container"
+               (click)="openAvatarSettings()"
                (pointerdown)="startGoldenPress()" (pointerup)="endGoldenPress()" (pointercancel)="endGoldenPress()" (pointerleave)="endGoldenPress()">
-            <img *ngIf="myAvatarUrl" [src]="myAvatarUrl" class="avatar" [class.golden-frame]="hasGoldenFrame" />
-            <div *ngIf="!myAvatarUrl" class="avatar my-avatar" [class.golden-frame]="hasGoldenFrame">Tú</div>
+            <img *ngIf="myAvatarUrl" [src]="myAvatarUrl" class="avatar" [ngClass]="'frame-' + myAvatarFrame" [class.golden-frame]="hasGoldenFrame && myAvatarFrame === 'default'" />
+            <div *ngIf="!myAvatarUrl" class="avatar my-avatar" [ngClass]="'frame-' + myAvatarFrame" [class.golden-frame]="hasGoldenFrame && myAvatarFrame === 'default'">Tú</div>
             <div class="mood-badge" *ngIf="myMood">{{ myMood }}</div>
           </div>
-          
+
           <div class="header-center-actions">
-            <div class="premium-btn" *ngIf="(premiumService.isPremium$ | async) && (premiumService.premiumDaysLeft$ | async) !== null" (click)="showPremiumDetails()">
-              <ion-icon name="hourglass-outline"></ion-icon>
-              <ng-container *ngIf="(premiumService.premiumDaysLeft$ | async) !== null">
-                <span>{{ (premiumService.premiumDaysLeft$ | async) === 365 ? '1 año' : (premiumService.premiumDaysLeft$ | async) + ' días' }}</span>
-              </ng-container>
-            </div>
 
             <!-- Moon icon for Night Mode if unlocked -->
             <div class="moon-btn" [class.dark-active]="isDarkMode" *ngIf="hasNightOwlSecret" (click)="toggleDarkMode()">
@@ -59,12 +55,14 @@ import { ModalController } from '@ionic/angular';
             </div>
           </div>
 
+          
           <div class="avatar-container partner-container"
                (pointerdown)="startSurprisePress()" (pointerup)="endSurprisePress()" (pointercancel)="endSurprisePress()" (pointerleave)="endSurprisePress()">
-            <img *ngIf="partnerAvatarUrl" [src]="partnerAvatarUrl" class="avatar" />
-            <div *ngIf="!partnerAvatarUrl" class="avatar partner-avatar">{{ partnerInitial }}</div>
+            <img *ngIf="partnerAvatarUrl" [src]="partnerAvatarUrl" class="avatar" [ngClass]="'frame-' + partnerAvatarFrame" />
+            <div *ngIf="!partnerAvatarUrl" class="avatar partner-avatar" [ngClass]="'frame-' + partnerAvatarFrame">{{ partnerInitial }}</div>
             <div class="mood-badge" *ngIf="partnerMood">{{ partnerMood }}</div>
           </div>
+
         </div>
       </ion-toolbar>
     </ion-header>
@@ -318,6 +316,8 @@ export class HomePage implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
 
   myMood = '';
+  myAvatarFrame = 'default';
+  partnerAvatarFrame = 'default';
   partnerMood = '';
   partnerInitial = 'P';
   
@@ -520,7 +520,7 @@ export class HomePage implements OnInit, OnDestroy {
       this.goldenTimeout = null;
       try { navigator.vibrate?.([50, 50, 50]); } catch(e){}
       this.api.unlockAchievement('secret_golden_frame');
-      this.openMoodSelector(); // Abre el selector de mood de todas formas
+      this.openAvatarSettings(); // Abre el selector de mood de todas formas
     }, 1000); // 1s
   }
 
@@ -529,7 +529,7 @@ export class HomePage implements OnInit, OnDestroy {
       clearTimeout(this.goldenTimeout);
       this.goldenTimeout = null;
       // Si se suelta antes, es un click normal
-      this.openMoodSelector();
+      this.openAvatarSettings();
     }
   }
 
@@ -562,8 +562,12 @@ export class HomePage implements OnInit, OnDestroy {
   async loadHeaderData() {
     try {
       const data = await this.api.getCoupleInfo();
+      
       if (data.my_mood) this.myMood = data.my_mood;
       if (data.partner_mood) this.partnerMood = data.partner_mood;
+      if (data.my_avatar_frame || data.avatar_frame) this.myAvatarFrame = data.my_avatar_frame || data.avatar_frame || 'default';
+      if (data.partner_avatar_frame) this.partnerAvatarFrame = data.partner_avatar_frame || 'default';
+
       if (data.partner_name) this.partnerInitial = data.partner_name.charAt(0).toUpperCase();
       if (data.my_avatar) this.myAvatarUrl = data.my_avatar;
       if (data.partner_avatar) this.partnerAvatarUrl = data.partner_avatar;
@@ -591,26 +595,45 @@ export class HomePage implements OnInit, OnDestroy {
     }
   }
 
-  async openMoodSelector() {
-    const alert = await this.alertController.create({
-      header: '¿Cómo te sientes?',
-      cssClass: 'premium-mood-alert',
+  
+  async openAvatarSettings() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Tu Avatar y Estado',
+      cssClass: 'premium-action-sheet',
       buttons: [
-        { text: 'Feliz 😊', handler: () => this.setMood('😊') },
-        { text: 'Cansado/a 😴', handler: () => this.setMood('😴') },
-        { text: 'Estresado/a 🤯', handler: () => this.setMood('🤯') },
-        { text: 'Mimoso/a 🥰', handler: () => this.setMood('🥰') },
-        { text: 'Triste 🥺', handler: () => this.setMood('🥺') },
-        { text: 'Cancelar', role: 'cancel', cssClass: 'mood-cancel-btn' }
+        { text: 'Estado: Feliz 😊', handler: () => this.setAvatarSetting('current_mood', '😊') },
+        { text: 'Estado: Durmiendo 💤', handler: () => this.setAvatarSetting('current_mood', '💤') },
+        { text: 'Estado: Jugando 🎮', handler: () => this.setAvatarSetting('current_mood', '🎮') },
+        { text: 'Quitar Estado', handler: () => this.setAvatarSetting('current_mood', '') },
+        { text: 'Marco: Normal', handler: () => this.setAvatarSetting('avatar_frame', 'default') },
+        { text: 'Marco: Dorado 🏆', handler: () => this.setAvatarSetting('avatar_frame', 'golden') },
+        { text: 'Marco: Neón 🔵', handler: () => this.setAvatarSetting('avatar_frame', 'neon') },
+        { text: 'Marco: Pastel 🌸', handler: () => this.setAvatarSetting('avatar_frame', 'pastel') },
+        { text: 'Marco: Fuego 🔥', handler: () => this.setAvatarSetting('avatar_frame', 'fire') },
+        { text: 'Cancelar', icon: 'close', role: 'cancel' }
       ]
     });
-    await alert.present();
+    await actionSheet.present();
   }
 
-  async setMood(mood: string) {
-    this.myMood = mood;
+  async setAvatarSetting(field: string, value: string) {
+    if (field === 'current_mood') this.myMood = value;
+    if (field === 'avatar_frame') this.myAvatarFrame = value;
+    
     try {
-      await this.api.updateCoupleInfo({ current_mood: mood });
+      await this.api.updateCoupleInfo({ [field]: value });
+      const toast = await this.toastController.create({
+        message: '¡Ajuste actualizado!',
+        duration: 2000,
+        color: 'success',
+        position: 'top'
+      });
+      toast.present();
+    } catch(e) {
+      console.error(e);
+    }
+  }
+);
       const toast = await this.toastController.create({
         message: 'Estado de ánimo actualizado',
         duration: 2000,

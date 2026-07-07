@@ -817,7 +817,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         { text: 'Estilo de Burbujas', icon: 'chatbubble-ellipses-outline', handler: () => { setTimeout(() => this.openBubbleSettings(), 300); } },
         { text: 'Tipografía', icon: 'text-outline', handler: () => { setTimeout(() => this.openFontSettings(), 300); } },
         { text: 'Sonidos', icon: 'musical-notes-outline', handler: () => { setTimeout(() => this.openSoundSettings(), 300); } },
-        { text: 'Avatar y Estado', icon: 'person-circle-outline', handler: () => { setTimeout(() => this.openAvatarSettings(), 300); } },
+         },
         { text: 'Cancelar', icon: 'close', role: 'cancel' }
       ]
     });
@@ -869,25 +869,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     await actionSheet.present();
   }
 
-  async openAvatarSettings() {
-    const actionSheet = await this.actionSheetCtrl.create({
-      header: 'Tu Avatar y Estado',
-      cssClass: 'premium-action-sheet',
-      buttons: [
-        { text: 'Estado: Feliz 😊', handler: () => this.saveCoupleInfoSetting('current_mood', '😊') },
-        { text: 'Estado: Durmiendo 💤', handler: () => this.saveCoupleInfoSetting('current_mood', '💤') },
-        { text: 'Estado: Jugando 🎮', handler: () => this.saveCoupleInfoSetting('current_mood', '🎮') },
-        { text: 'Quitar Estado', handler: () => this.saveCoupleInfoSetting('current_mood', '') },
-        { text: 'Marco: Normal', handler: () => this.saveCoupleInfoSetting('avatar_frame', 'default') },
-        { text: 'Marco: Dorado 🏆', handler: () => this.saveCoupleInfoSetting('avatar_frame', 'golden') },
-        { text: 'Marco: Neón 🔵', handler: () => this.saveCoupleInfoSetting('avatar_frame', 'neon') },
-        { text: 'Marco: Pastel 🌸', handler: () => this.saveCoupleInfoSetting('avatar_frame', 'pastel') },
-        { text: 'Marco: Fuego 🔥', handler: () => this.saveCoupleInfoSetting('avatar_frame', 'fire') },
-        { text: 'Cancelar', icon: 'close', role: 'cancel' }
-      ]
-    });
-    await actionSheet.present();
-  }
+  
 
   async setLocalPref(key: string, value: string, varName: string) {
     (this as any)[varName] = value;

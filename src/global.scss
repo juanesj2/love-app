@@ -628,3 +628,40 @@ body.night-owl-mode {
     color: #888 !important;
   }
 }
+
+
+/* AVATAR FRAMES */
+.frame-golden {
+  border: 3px solid transparent;
+  background: linear-gradient(135deg, #FFD700, #FFA500) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+img.frame-golden, .avatar.frame-golden {
+  border: 3px solid #FFD700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5), inset 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+img.frame-neon, .avatar.frame-neon {
+  border: 3px solid #00f3ff;
+  box-shadow: 0 0 15px #00f3ff, inset 0 0 10px #00f3ff;
+}
+
+img.frame-pastel, .avatar.frame-pastel {
+  border: 3px solid #ffb7b2;
+  box-shadow: 0 0 15px rgba(255, 183, 178, 0.6), inset 0 0 5px rgba(255, 183, 178, 0.4);
+}
+
+img.frame-fire, .avatar.frame-fire {
+  border: 3px solid #ff4500;
+  box-shadow: 0 0 15px #ff4500, inset 0 0 10px #ff4500, 0 0 30px #ffa500;
+  animation: firePulse 1.5s infinite alternate;
+}
+
+@keyframes firePulse {
+  0% { box-shadow: 0 0 10px #ff4500, inset 0 0 5px #ff4500, 0 0 15px #ffa500; }
+  100% { box-shadow: 0 0 20px #ff4500, inset 0 0 15px #ff4500, 0 0 35px #ffa500; }
+}
