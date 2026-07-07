@@ -680,21 +680,29 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     .bubble-dog::before { left: -6px; transform: rotate(20deg); }
     .bubble-dog::after { right: -6px; transform: rotate(-20deg); }
     
-    /* Burbuja Nube - Esponjosa Premium */
-    .bubble-cloud { border-radius: 24px !important; margin-top: 12px; margin-bottom: 5px; isolation: isolate; }
+        /* Burbuja Nube - Estilo Pensamiento (Elegante y escalable) */
+    .bubble-cloud { border-radius: 32px !important; margin-bottom: 24px; isolation: isolate; }
     .bubble-cloud::before {
-      content: ''; position: absolute; top: -14px; left: 15%; width: 34px; height: 34px; border-radius: 50%; z-index: -1;
+      content: ''; position: absolute; bottom: -12px; width: 16px; height: 16px; border-radius: 50%; z-index: -1;
     }
     .bubble-cloud::after {
-      content: ''; position: absolute; top: -18px; right: 20%; width: 44px; height: 44px; border-radius: 50%; z-index: -1;
+      content: ''; position: absolute; bottom: -24px; width: 8px; height: 8px; border-radius: 50%; z-index: -1;
     }
     
-    .mine .bubble-cloud::before { background: #FF758C; box-shadow: inset 0 3px 0 rgba(255,255,255,0.15); }
-    .mine .bubble-cloud::after { background: #FF7794; box-shadow: inset 0 3px 0 rgba(255,255,255,0.15); }
+    .mine .bubble-cloud::before { background: #FF758C; right: 24px; box-shadow: inset 1px 2px 0 rgba(255,255,255,0.15); }
+    .mine .bubble-cloud::after { background: #FF7794; right: 12px; box-shadow: inset 1px 1px 0 rgba(255,255,255,0.15); }
     
-    .message-wrapper:not(.mine) .bubble-cloud::before, .message-wrapper:not(.mine) .bubble-cloud::after { background: rgba(255,255,255,0.95); box-shadow: inset 0 2px 0 rgba(255,255,255,0.8), 0 -2px 6px rgba(0,0,0,0.02); }
+    .message-wrapper:not(.mine) .bubble-cloud::before { background: rgba(255,255,255,0.95); left: 24px; box-shadow: inset 1px 1px 0 rgba(255,255,255,0.8), -1px 2px 4px rgba(0,0,0,0.02); }
+    .message-wrapper:not(.mine) .bubble-cloud::after { background: rgba(255,255,255,0.95); left: 12px; box-shadow: inset 1px 1px 0 rgba(255,255,255,0.8), -1px 1px 3px rgba(0,0,0,0.02); }
+    
+    /* Disable shapes for pure photo bubbles to avoid stretching weirdly */
+    .only-photo::before, .only-photo::after { display: none !important; }
+    
+    /* Ensure only-photo is perfectly transparent and no borders */
+    .mine .bubble.only-photo { background: transparent !important; box-shadow: none !important; border: none !important; padding: 4px; }
+    .message-wrapper:not(.mine) .bubble.only-photo { background: transparent !important; box-shadow: none !important; border: none !important; padding: 4px; }
 
-    /* Fix borders for pseudo-elements */
+/* Fix borders for pseudo-elements */
     .message-wrapper:not(.mine) .bubble-cat::before, .message-wrapper:not(.mine) .bubble-cat::after,
     .message-wrapper:not(.mine) .bubble-dog::before, .message-wrapper:not(.mine) .bubble-dog::after,
     .message-wrapper:not(.mine) .bubble-cloud::before, .message-wrapper:not(.mine) .bubble-cloud::after {
