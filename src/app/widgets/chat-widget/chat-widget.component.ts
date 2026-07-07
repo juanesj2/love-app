@@ -18,8 +18,8 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 @Component({
   selector: 'app-chat-widget',
   template: `
-    <div class="chat-wrapper" [style.background]="chatBackground || null">
-      <button class="chat-bg-settings-btn" (click)="openBgSettings()" *ngIf="regularMessages.length > 0">
+    <div class="chat-wrapper" [style.background]="chatBackground || null" [class]="'font-' + chatFont">
+      <button class="chat-bg-settings-btn" (click)="openChatSettings()" *ngIf="regularMessages.length > 0">
         <ion-icon name="color-palette"></ion-icon>
       </button>
       <ion-content class="messages-content" [style.--background]="chatBackground ? 'transparent' : null" #msgContainer>
@@ -66,7 +66,8 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
             (mouseleave)="msg.isDeletedLocally || msg.mensaje === '[DELETED]' ? null : endPress()">
             <div class="message-wrapper" [class.mine]="isMine(msg)">
               <div class="msg-avatar-container" *ngIf="!isMine(msg)">
-                <img *ngIf="avatars[msg.user?.name]" [src]="avatars[msg.user.name]" class="msg-avatar" />
+                <img *ngIf="avatars[msg.user?.name]" [src]="avatars[msg.user.name]" class="msg-avatar" [ngClass]="'frame-' + partnerAvatarFrame" />
+                <div class="msg-avatar-mood" *ngIf="partnerAvatarMood">{{ partnerAvatarMood }}</div>
                 <div *ngIf="!avatars[msg.user?.name]" class="msg-avatar-fallback">{{ msg.user?.name?.charAt(0) || 'U' }}</div>
               </div>
               
@@ -76,7 +77,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
                   <span class="reply-context-text">{{msg.reply_to.text}}</span>
                 </div>
 
-                <div class="bubble" [class.only-photo]="msg.photo && (!msg.mensaje || msg.mensaje === 'null')"
+                <div class="bubble" [ngClass]="isMine(msg) ? 'bubble-' + myBubbleStyle : 'bubble-' + partnerBubbleStyle" [class.only-photo]="msg.photo && (!msg.mensaje || msg.mensaje === 'null')"
                                     [class.transparent-bubble]="msg.mensaje && msg.mensaje.startsWith('[DOODLE]')">
                   
                   <div class="deleted-tombstone" *ngIf="msg.isDeletedLocally || msg.mensaje === '[DELETED]'" style="color: #888; font-style: italic; display: flex; align-items: center; gap: 5px;">
@@ -128,7 +129,8 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
               </div>
 
               <div class="msg-avatar-container" *ngIf="isMine(msg)">
-                <img *ngIf="avatars[msg.user?.name]" [src]="avatars[msg.user.name]" class="msg-avatar" />
+                <img *ngIf="avatars[msg.user?.name]" [src]="avatars[msg.user.name]" class="msg-avatar" [ngClass]="'frame-' + myAvatarFrame" />
+                <div class="msg-avatar-mood" *ngIf="myAvatarMood">{{ myAvatarMood }}</div>
                 <div *ngIf="!avatars[msg.user?.name]" class="msg-avatar-fallback">{{ msg.user?.name?.charAt(0) || 'U' }}</div>
               </div>
             </div>
@@ -690,13 +692,144 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   // --- Background Feature ---
   chatBackground: string = '';
+  chatFont: string = 'default';
+  chatSound: string = 'default';
+  myBubbleStyle: string = 'default';
+  partnerBubbleStyle: string = 'default';
+  myAvatarFrame: string = 'default';
+  partnerAvatarFrame: string = 'default';
+  myAvatarMood: string = '';
+  partnerAvatarMood: string = '';
+
 
   async loadChatBackground() {
     const { value } = await Preferences.get({ key: 'chat_bg' });
     if (value) {
       this.chatBackground = value;
     }
+    const { value: fontValue } = await Preferences.get({ key: 'chat_font' });
+    if (fontValue) this.chatFont = fontValue;
+
+    const { value: soundValue } = await Preferences.get({ key: 'chat_sound' });
+    if (soundValue) this.chatSound = soundValue;
+    
+    this.loadCoupleInfoSettings();
+    if (false) {
+    }
   }
+
+  
+  async openChatSettings() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Ajustes del Chat 🎨',
+      cssClass: 'premium-action-sheet',
+      buttons: [
+        { text: 'Fondos de Chat', icon: 'image-outline', handler: () => { setTimeout(() => this.openBgSettings(), 300); } },
+        { text: 'Estilo de Burbujas', icon: 'chatbubble-ellipses-outline', handler: () => { setTimeout(() => this.openBubbleSettings(), 300); } },
+        { text: 'Tipografía', icon: 'text-outline', handler: () => { setTimeout(() => this.openFontSettings(), 300); } },
+        { text: 'Sonidos', icon: 'musical-notes-outline', handler: () => { setTimeout(() => this.openSoundSettings(), 300); } },
+        { text: 'Avatar y Estado', icon: 'person-circle-outline', handler: () => { setTimeout(() => this.openAvatarSettings(), 300); } },
+        { text: 'Cancelar', icon: 'close', role: 'cancel' }
+      ]
+    });
+    await actionSheet.present();
+  }
+
+  async openBubbleSettings() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Forma de Burbuja',
+      cssClass: 'premium-action-sheet',
+      buttons: [
+        { text: 'Clásica 💬', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'default') },
+        { text: 'Gatito 🐱', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'cat') },
+        { text: 'Perrito 🐶', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'dog') },
+        { text: 'Nube ☁️', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'cloud') },
+        { text: 'Cancelar', icon: 'close', role: 'cancel' }
+      ]
+    });
+    await actionSheet.present();
+  }
+
+  async openFontSettings() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Tipografía (Local)',
+      cssClass: 'premium-action-sheet',
+      buttons: [
+        { text: 'Por Defecto', handler: () => this.setLocalPref('chat_font', 'default', 'chatFont') },
+        { text: 'Máquina de Escribir', handler: () => this.setLocalPref('chat_font', 'typewriter', 'chatFont') },
+        { text: 'Escritura a Mano', handler: () => this.setLocalPref('chat_font', 'handwriting', 'chatFont') },
+        { text: 'Kawaii', handler: () => this.setLocalPref('chat_font', 'kawaii', 'chatFont') },
+        { text: 'Cancelar', icon: 'close', role: 'cancel' }
+      ]
+    });
+    await actionSheet.present();
+  }
+
+  async openSoundSettings() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Sonido de Mensaje (Local)',
+      cssClass: 'premium-action-sheet',
+      buttons: [
+        { text: 'Por Defecto', handler: () => this.setLocalPref('chat_sound', 'default', 'chatSound') },
+        { text: 'Burbuja de Agua 💧', handler: () => this.setLocalPref('chat_sound', 'water', 'chatSound') },
+        { text: 'Campanilla 🔔', handler: () => this.setLocalPref('chat_sound', 'bell', 'chatSound') },
+        { text: 'Silencio 🔇', handler: () => this.setLocalPref('chat_sound', 'none', 'chatSound') },
+        { text: 'Cancelar', icon: 'close', role: 'cancel' }
+      ]
+    });
+    await actionSheet.present();
+  }
+
+  async openAvatarSettings() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Tu Avatar y Estado',
+      cssClass: 'premium-action-sheet',
+      buttons: [
+        { text: 'Estado: Feliz 😊', handler: () => this.saveCoupleInfoSetting('current_mood', '😊') },
+        { text: 'Estado: Durmiendo 💤', handler: () => this.saveCoupleInfoSetting('current_mood', '💤') },
+        { text: 'Estado: Jugando 🎮', handler: () => this.saveCoupleInfoSetting('current_mood', '🎮') },
+        { text: 'Quitar Estado', handler: () => this.saveCoupleInfoSetting('current_mood', '') },
+        { text: 'Marco: Normal', handler: () => this.saveCoupleInfoSetting('avatar_frame', 'default') },
+        { text: 'Marco: Dorado 🏆', handler: () => this.saveCoupleInfoSetting('avatar_frame', 'golden') },
+        { text: 'Marco: Neón 🔵', handler: () => this.saveCoupleInfoSetting('avatar_frame', 'neon') },
+        { text: 'Marco: Pastel 🌸', handler: () => this.saveCoupleInfoSetting('avatar_frame', 'pastel') },
+        { text: 'Marco: Fuego 🔥', handler: () => this.saveCoupleInfoSetting('avatar_frame', 'fire') },
+        { text: 'Cancelar', icon: 'close', role: 'cancel' }
+      ]
+    });
+    await actionSheet.present();
+  }
+
+  async setLocalPref(key: string, value: string, varName: string) {
+    (this as any)[varName] = value;
+    await Preferences.set({ key, value });
+  }
+
+  async saveCoupleInfoSetting(field: string, value: string) {
+    if (field === 'bubble_shape') this.myBubbleStyle = value;
+    if (field === 'current_mood') this.myAvatarMood = value;
+    if (field === 'avatar_frame') this.myAvatarFrame = value;
+    try {
+      await this.api.updateCoupleInfo({ [field]: value });
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  async loadCoupleInfoSettings() {
+    try {
+      const info = await this.api.getCoupleInfo();
+      if (info) {
+        this.myBubbleStyle = info.my_bubble_shape || info.bubble_shape || 'default';
+        this.partnerBubbleStyle = info.partner_bubble_shape || 'default';
+        this.myAvatarMood = info.my_mood || info.current_mood || '';
+        this.partnerAvatarMood = info.partner_mood || '';
+        this.myAvatarFrame = info.my_avatar_frame || info.avatar_frame || 'default';
+        this.partnerAvatarFrame = info.partner_avatar_frame || 'default';
+      }
+    } catch(e){}
+  }
+
 
   async openBgSettings() {
     const actionSheet = await this.actionSheetCtrl.create({
@@ -878,8 +1011,14 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         
         if (this.messages.length > 0) {
           const latestMsg = this.messages[this.messages.length - 1];
-          if (this.lastKnownMessageId > 0 && latestMsg.id > this.lastKnownMessageId && !this.isMine(latestMsg) && this.isEmojiOnly(latestMsg.mensaje)) {
-            this.triggerEmojiReaction(latestMsg.mensaje.trim());
+          if (this.lastKnownMessageId > 0 && latestMsg.id > this.lastKnownMessageId && !this.isMine(latestMsg)) {
+            if (this.isEmojiOnly(latestMsg.mensaje)) {
+              this.triggerEmojiReaction(latestMsg.mensaje.trim());
+            }
+            if (this.chatSound && this.chatSound !== 'default' && this.chatSound !== 'none') {
+              const audio = new Audio(`assets/sounds/${this.chatSound}.mp3`);
+              audio.play().catch(e => console.log('Audio play error:', e));
+            }
           }
           this.lastKnownMessageId = latestMsg.id;
         }
@@ -1713,11 +1852,11 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       }
     }
 
-    if (this.swipeDirection === 'vertical') return;
-    
     if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) {
       this.endPress();
     }
+
+    if (this.swipeDirection === 'vertical') return;
 
     const isMine = this.isMine(msg);
     if (isMine && deltaX > 0) return;
