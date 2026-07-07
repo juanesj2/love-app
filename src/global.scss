@@ -641,23 +641,23 @@ body.night-owl-mode {
 }
 
 img.frame-golden, .avatar.frame-golden {
-  border: 3px solid #FFD700;
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5), inset 0 0 5px rgba(255, 215, 0, 0.5);
+  border: 3px solid #FFD700 !important;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5), inset 0 0 5px rgba(255, 215, 0, 0.5) !important;
 }
 
 img.frame-neon, .avatar.frame-neon {
-  border: 3px solid #00f3ff;
-  box-shadow: 0 0 15px #00f3ff, inset 0 0 10px #00f3ff;
+  border: 3px solid #00f3ff !important;
+  box-shadow: 0 0 15px #00f3ff, inset 0 0 10px #00f3ff !important;
 }
 
 img.frame-pastel, .avatar.frame-pastel {
-  border: 3px solid #ffb7b2;
-  box-shadow: 0 0 15px rgba(255, 183, 178, 0.6), inset 0 0 5px rgba(255, 183, 178, 0.4);
+  border: 3px solid #ffb7b2 !important;
+  box-shadow: 0 0 15px rgba(255, 183, 178, 0.6), inset 0 0 5px rgba(255, 183, 178, 0.4) !important;
 }
 
 img.frame-fire, .avatar.frame-fire {
-  border: 3px solid #ff4500;
-  box-shadow: 0 0 15px #ff4500, inset 0 0 10px #ff4500, 0 0 30px #ffa500;
+  border: 3px solid #ff4500 !important;
+  box-shadow: 0 0 15px #ff4500, inset 0 0 10px #ff4500, 0 0 30px #ffa500 !important;
   animation: firePulse 1.5s infinite alternate;
 }
 
