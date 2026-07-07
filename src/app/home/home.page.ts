@@ -344,6 +344,7 @@ export class HomePage implements OnInit, OnDestroy {
   private tutorialService = inject(TutorialService);
   private themeService = inject(ThemeService);
   private modalCtrl = inject(ModalController);
+  private cdr = inject(ChangeDetectorRef);
 
   @ViewChild('photoWidget') photoWidgetComp?: PhotoWidgetComponent;
   @ViewChild('chatWidget') chatWidgetComp?: ChatWidgetComponent;
@@ -450,6 +451,7 @@ export class HomePage implements OnInit, OnDestroy {
     this.subscriptions.push(this.api.unlockedAchievements$.subscribe(achievements => {
       this.hasNightOwlSecret = achievements.includes('secret_owl');
       this.hasGoldenFrame = achievements.includes('secret_golden_frame');
+      this.cdr.detectChanges();
     }));
 
     this.subscriptions.push(this.api.avatarUpdated$.subscribe(() => {
@@ -587,6 +589,7 @@ export class HomePage implements OnInit, OnDestroy {
       const achievements = this.api.unlockedAchievements$.getValue();
       this.hasNightOwlSecret = achievements.includes('secret_owl');
       this.hasGoldenFrame = achievements.includes('secret_golden_frame');
+      this.cdr.detectChanges();
     } catch (e: any) {
       console.log('No se pudo cargar la info de la cabecera', e);
       if (e.status === 403 || e.error?.message?.includes('No estás vinculado')) {

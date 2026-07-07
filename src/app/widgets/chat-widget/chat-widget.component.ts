@@ -896,6 +896,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         this.partnerAvatarMood = info.partner_mood || '';
         this.myAvatarFrame = info.my_avatar_frame || info.avatar_frame || 'default';
         this.partnerAvatarFrame = info.partner_avatar_frame || 'default';
+        this.cdr.detectChanges();
       }
     } catch(e){}
   }
