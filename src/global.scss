@@ -631,14 +631,7 @@ body.night-owl-mode {
 
 
 /* AVATAR FRAMES */
-.frame-golden {
-  border: 3px solid transparent;
-  background: linear-gradient(135deg, #FFD700, #FFA500) border-box;
-  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: destination-out;
-  mask-composite: exclude;
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-}
+
 
 img.frame-golden, .avatar.frame-golden {
   border: 3px solid #FFD700 !important;
