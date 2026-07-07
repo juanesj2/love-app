@@ -633,25 +633,6 @@ export class HomePage implements OnInit, OnDestroy {
       console.error(e);
     }
   }
-);
-      const toast = await this.toastController.create({
-        message: 'Estado de ánimo actualizado',
-        duration: 2000,
-        color: 'success',
-        position: 'top'
-      });
-      toast.present();
-    } catch (e) {
-      console.error(e);
-      const toast = await this.toastController.create({
-        message: 'Error al actualizar el estado',
-        duration: 3000,
-        color: 'danger',
-        position: 'top'
-      });
-      toast.present();
-    }
-  }
 
   onPokeClick() {
     // Si el long press ya disparó el super poke, ignorar el click

@@ -816,7 +816,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         { text: 'Fondos de Chat', icon: 'image-outline', handler: () => { setTimeout(() => this.openBgSettings(), 300); } },
         { text: 'Estilo de Burbujas', icon: 'chatbubble-ellipses-outline', handler: () => { setTimeout(() => this.openBubbleSettings(), 300); } },
         { text: 'Tipografía', icon: 'text-outline', handler: () => { setTimeout(() => this.openFontSettings(), 300); } },
-        { text: 'Sonidos', icon: 'musical-notes-outline', handler: () => { setTimeout(() => this.openSoundSettings(), 300); } }
+        { text: 'Sonidos', icon: 'musical-notes-outline', handler: () => { setTimeout(() => this.openSoundSettings(), 300); } },
         { text: 'Cancelar', icon: 'close', role: 'cancel' }
       ]
     });
