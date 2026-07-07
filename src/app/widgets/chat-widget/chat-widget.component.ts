@@ -366,7 +366,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     .chat-wrapper { display: flex; flex-direction: column; height: 100%; background: #fdf5f7; font-family: 'Inter', sans-serif; position: relative; background-size: cover !important; background-position: center !important; }
 
     /* --- TYPOGRAPHY SETTINGS --- */
-    @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Nunito:wght@400..800&family=Special+Elite&display=swap');
+    
 
     .font-typewriter, .font-typewriter .message-text, .font-typewriter .timestamp, .font-typewriter .chat-date-header, .font-typewriter .deleted-text { font-family: 'Special Elite', 'Courier New', Courier, monospace !important; }
     .font-handwriting, .font-handwriting .message-text, .font-handwriting .timestamp, .font-handwriting .chat-date-header, .font-handwriting .deleted-text { font-family: 'Caveat', cursive !important; }
