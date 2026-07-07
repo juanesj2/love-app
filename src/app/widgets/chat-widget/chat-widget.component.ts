@@ -12,7 +12,7 @@ import { PremiumService } from '../../services/premium.service';
 import { PaywallComponent } from '../../components/paywall/paywall.component';
 import { environment } from '../../../environments/environment';
 import { addIcons } from 'ionicons';
-import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed, settingsOutline, imageOutline } from 'ionicons/icons';
+import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed, settingsOutline, imageOutline, partlySunnyOutline, waterOutline, moonOutline, planetOutline, heartOutline } from 'ionicons/icons';
 import { DotLottie } from '@lottiefiles/dotlottie-web';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 @Component({
@@ -685,7 +685,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   @ViewChild('doodleCanvas', { static: false }) doodleCanvas: any;
   
   constructor() {
-    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed });
+    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed, 'image-outline': imageOutline, 'partly-sunny-outline': partlySunnyOutline, 'water-outline': waterOutline, 'moon-outline': moonOutline, 'planet-outline': planetOutline, 'heart-outline': heartOutline });
   }
 
   // --- Background Feature ---
@@ -709,19 +709,29 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
           handler: () => this.setChatBackground('')
         },
         {
-          text: 'Atardecer',
-          icon: 'color-palette-outline',
-          handler: () => this.setChatBackground('linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)')
+          text: 'Atardecer Cálido',
+          icon: 'partly-sunny-outline',
+          handler: () => this.setChatBackground('linear-gradient(120deg, #f6d365 0%, #fda085 100%)')
         },
         {
-          text: 'Océano',
-          icon: 'color-palette-outline',
-          handler: () => this.setChatBackground('linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%)')
+          text: 'Océano Profundo',
+          icon: 'water-outline',
+          handler: () => this.setChatBackground('linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%)')
         },
         {
           text: 'Noche Estrellada',
-          icon: 'color-palette-outline',
+          icon: 'moon-outline',
           handler: () => this.setChatBackground('linear-gradient(to top, #30cfd0 0%, #330867 100%)')
+        },
+        {
+          text: 'Aurora Boreal',
+          icon: 'planet-outline',
+          handler: () => this.setChatBackground('linear-gradient(to right, #43e97b 0%, #38f9d7 100%)')
+        },
+        {
+          text: 'Rosa Pastel',
+          icon: 'heart-outline',
+          handler: () => this.setChatBackground('linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)')
         },
         {
           text: 'Subir Foto Personal',
