@@ -776,7 +776,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   @ViewChild('doodleCanvas', { static: false }) doodleCanvas: any;
   
   constructor() {
-    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed, 'image-outline': imageOutline, 'partly-sunny-outline': partlySunnyOutline, 'water-outline': waterOutline, 'moon-outline': moonOutline, 'planet-outline': planetOutline, 'heart-outline': heartOutline, 'color-palette-outline': colorPaletteOutline });
+    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed, 'image-outline': imageOutline, 'partly-sunny-outline': partlySunnyOutline, 'water-outline': waterOutline, 'moon-outline': moonOutline, 'planet-outline': planetOutline, 'heart-outline': heartOutline, 'color-palette-outline': colorPaletteOutline, 'chatbubble-ellipses-outline': chatbubbleEllipsesOutline, 'text-outline': textOutline, 'musical-notes-outline': musicalNotesOutline, 'person-circle-outline': personCircleOutline });
   }
 
   // --- Background Feature ---
