@@ -743,13 +743,14 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   async pickCustomBackground() {
     try {
       const image = await Camera.getPhoto({
-        quality: 80,
+        quality: 60,
+        width: 1080,
         allowEditing: false,
-        resultType: CameraResultType.Base64,
+        resultType: CameraResultType.DataUrl,
         source: CameraSource.Photos
       });
-      if (image.base64String) {
-        const bgString = `url(data:image/${image.format};base64,${image.base64String})`;
+      if (image.dataUrl) {
+        const bgString = `url(${image.dataUrl})`;
         this.setChatBackground(bgString);
       }
     } catch (e) {
@@ -772,6 +773,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   async ngOnInit() {
     this.currentUser = localStorage.getItem('love_widget_user') === 'juan' ? 'Juan' : 'Roberta';
+    this.loadChatBackground();
     
     const deletedPref = await Preferences.get({ key: 'deleted_chat_messages' });
     if (deletedPref.value) {
