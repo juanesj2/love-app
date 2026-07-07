@@ -1625,7 +1625,7 @@ export class PhotoWidgetComponent implements OnInit {
       }
       
       await this.api.reactToPhoto(photoId, emoji);
-      await this.api.sendMessage(emoji, photoId); // Mandar la reacción al chat también
+      // await this.api.sendMessage(emoji, photoId); // Se ha eliminado para no spamear el chat con la foto
       // Actualización local para no perder la paginación
       const photo = this.photos.find(p => p.id === photoId);
       if (photo) {
