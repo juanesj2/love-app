@@ -760,6 +760,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   async setChatBackground(bg: string) {
     this.chatBackground = bg;
+    this.cdr.detectChanges();
     if (bg) {
       await Preferences.set({ key: 'chat_bg', value: bg });
     } else {
