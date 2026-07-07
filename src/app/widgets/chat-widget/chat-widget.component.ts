@@ -12,13 +12,17 @@ import { PremiumService } from '../../services/premium.service';
 import { PaywallComponent } from '../../components/paywall/paywall.component';
 import { environment } from '../../../environments/environment';
 import { addIcons } from 'ionicons';
-import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed } from 'ionicons/icons';
+import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed, settingsOutline, imageOutline } from 'ionicons/icons';
 import { DotLottie } from '@lottiefiles/dotlottie-web';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 @Component({
   selector: 'app-chat-widget',
   template: `
-    <div class="chat-wrapper">
-      <ion-content class="messages-content" #msgContainer>
+    <div class="chat-wrapper" [style.background]="chatBackground || null">
+      <button class="chat-bg-settings-btn" (click)="openBgSettings()" *ngIf="regularMessages.length > 0">
+        <ion-icon name="color-palette"></ion-icon>
+      </button>
+      <ion-content class="messages-content" [style.--background]="chatBackground ? 'transparent' : null" #msgContainer>
         <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)" [disabled]="isDoodling">
           <ion-refresher-content></ion-refresher-content>
         </ion-refresher>
@@ -357,7 +361,10 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
       display: block;
       height: 100%;
     }
-    .chat-wrapper { display: flex; flex-direction: column; height: 100%; background: #fdf5f7; font-family: 'Inter', sans-serif; position: relative; }
+    .chat-wrapper { display: flex; flex-direction: column; height: 100%; background: #fdf5f7; font-family: 'Inter', sans-serif; position: relative; background-size: cover !important; background-position: center !important; }
+    .chat-bg-settings-btn { position: absolute; top: 100px; right: 16px; z-index: 100; background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(0,0,0,0.05); border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.2s ease; }
+    .chat-bg-settings-btn:active { transform: scale(0.95); }
+    .chat-bg-settings-btn ion-icon { font-size: 24px; color: #FF4D6D; }
     
     .chat-gif { max-width: 200px; border-radius: 12px; margin-bottom: 0; display: block; }
     .gif-reply { padding: 4px; }
@@ -680,6 +687,84 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   constructor() {
     addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed });
   }
+
+  // --- Background Feature ---
+  chatBackground: string = '';
+
+  async loadChatBackground() {
+    const { value } = await Preferences.get({ key: 'chat_bg' });
+    if (value) {
+      this.chatBackground = value;
+    }
+  }
+
+  async openBgSettings() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Fondo del Chat',
+      buttons: [
+        {
+          text: 'Fondo por Defecto',
+          icon: 'trash-outline',
+          handler: () => this.setChatBackground('')
+        },
+        {
+          text: 'Atardecer',
+          icon: 'color-palette-outline',
+          handler: () => this.setChatBackground('linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)')
+        },
+        {
+          text: 'Océano',
+          icon: 'color-palette-outline',
+          handler: () => this.setChatBackground('linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%)')
+        },
+        {
+          text: 'Noche Estrellada',
+          icon: 'color-palette-outline',
+          handler: () => this.setChatBackground('linear-gradient(to top, #30cfd0 0%, #330867 100%)')
+        },
+        {
+          text: 'Subir Foto Personal',
+          icon: 'image-outline',
+          handler: () => {
+            this.pickCustomBackground();
+          }
+        },
+        {
+          text: 'Cancelar',
+          icon: 'close',
+          role: 'cancel'
+        }
+      ]
+    });
+    await actionSheet.present();
+  }
+
+  async pickCustomBackground() {
+    try {
+      const image = await Camera.getPhoto({
+        quality: 80,
+        allowEditing: false,
+        resultType: CameraResultType.Base64,
+        source: CameraSource.Photos
+      });
+      if (image.base64String) {
+        const bgString = `url(data:image/${image.format};base64,${image.base64String})`;
+        this.setChatBackground(bgString);
+      }
+    } catch (e) {
+      console.log('User cancelled or error picking image', e);
+    }
+  }
+
+  async setChatBackground(bg: string) {
+    this.chatBackground = bg;
+    if (bg) {
+      await Preferences.set({ key: 'chat_bg', value: bg });
+    } else {
+      await Preferences.remove({ key: 'chat_bg' });
+    }
+  }
+  // --------------------------
 
   private viewInitialized = false;
   private subscriptions: Subscription[] = [];
