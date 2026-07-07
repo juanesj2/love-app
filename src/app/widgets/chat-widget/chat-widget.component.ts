@@ -12,7 +12,7 @@ import { PremiumService } from '../../services/premium.service';
 import { PaywallComponent } from '../../components/paywall/paywall.component';
 import { environment } from '../../../environments/environment';
 import { addIcons } from 'ionicons';
-import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed, settingsOutline, imageOutline, partlySunnyOutline, waterOutline, moonOutline, planetOutline, heartOutline, colorPaletteOutline } from 'ionicons/icons';
+import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed, settingsOutline, imageOutline, partlySunnyOutline, waterOutline, moonOutline, planetOutline, heartOutline, colorPaletteOutline, chatbubbleEllipsesOutline, textOutline, musicalNotesOutline, personCircleOutline } from 'ionicons/icons';
 import { DotLottie } from '@lottiefiles/dotlottie-web';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 @Component({
@@ -816,8 +816,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         { text: 'Fondos de Chat', icon: 'image-outline', handler: () => { setTimeout(() => this.openBgSettings(), 300); } },
         { text: 'Estilo de Burbujas', icon: 'chatbubble-ellipses-outline', handler: () => { setTimeout(() => this.openBubbleSettings(), 300); } },
         { text: 'Tipografía', icon: 'text-outline', handler: () => { setTimeout(() => this.openFontSettings(), 300); } },
-        { text: 'Sonidos', icon: 'musical-notes-outline', handler: () => { setTimeout(() => this.openSoundSettings(), 300); } },
-         },
+        { text: 'Sonidos', icon: 'musical-notes-outline', handler: () => { setTimeout(() => this.openSoundSettings(), 300); } }
         { text: 'Cancelar', icon: 'close', role: 'cancel' }
       ]
     });
