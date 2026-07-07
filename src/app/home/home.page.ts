@@ -596,20 +596,46 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   
+  
   async openAvatarSettings() {
     const actionSheet = await this.actionSheetCtrl.create({
-      header: 'Tu Avatar y Estado',
+      header: '¿Qué quieres personalizar?',
       cssClass: 'premium-action-sheet',
       buttons: [
-        { text: 'Estado: Feliz 😊', handler: () => this.setAvatarSetting('current_mood', '😊') },
-        { text: 'Estado: Durmiendo 💤', handler: () => this.setAvatarSetting('current_mood', '💤') },
-        { text: 'Estado: Jugando 🎮', handler: () => this.setAvatarSetting('current_mood', '🎮') },
-        { text: 'Quitar Estado', handler: () => this.setAvatarSetting('current_mood', '') },
-        { text: 'Marco: Normal', handler: () => this.setAvatarSetting('avatar_frame', 'default') },
-        { text: 'Marco: Dorado 🏆', handler: () => this.setAvatarSetting('avatar_frame', 'golden') },
-        { text: 'Marco: Neón 🔵', handler: () => this.setAvatarSetting('avatar_frame', 'neon') },
-        { text: 'Marco: Pastel 🌸', handler: () => this.setAvatarSetting('avatar_frame', 'pastel') },
-        { text: 'Marco: Fuego 🔥', handler: () => this.setAvatarSetting('avatar_frame', 'fire') },
+        { text: 'Estado de Ánimo 💭', icon: 'happy-outline', handler: () => { setTimeout(() => this.openMoodSettings(), 300); } },
+        { text: 'Marco del Avatar 🖼️', icon: 'image-outline', handler: () => { setTimeout(() => this.openFrameSettings(), 300); } },
+        { text: 'Cancelar', icon: 'close', role: 'cancel' }
+      ]
+    });
+    await actionSheet.present();
+  }
+
+  async openMoodSettings() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Tu Estado de Ánimo',
+      cssClass: 'premium-action-sheet',
+      buttons: [
+        { text: 'Feliz 😊', handler: () => this.setAvatarSetting('current_mood', '😊') },
+        { text: 'Durmiendo 💤', handler: () => this.setAvatarSetting('current_mood', '💤') },
+        { text: 'Jugando 🎮', handler: () => this.setAvatarSetting('current_mood', '🎮') },
+        { text: 'Cansado 😴', handler: () => this.setAvatarSetting('current_mood', '😴') },
+        { text: 'Quitar Estado', icon: 'trash-outline', handler: () => this.setAvatarSetting('current_mood', '') },
+        { text: 'Cancelar', icon: 'close', role: 'cancel' }
+      ]
+    });
+    await actionSheet.present();
+  }
+
+  async openFrameSettings() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Marco de tu Avatar',
+      cssClass: 'premium-action-sheet',
+      buttons: [
+        { text: 'Normal', handler: () => this.setAvatarSetting('avatar_frame', 'default') },
+        { text: 'Dorado 🏆', handler: () => this.setAvatarSetting('avatar_frame', 'golden') },
+        { text: 'Neón 🔵', handler: () => this.setAvatarSetting('avatar_frame', 'neon') },
+        { text: 'Pastel 🌸', handler: () => this.setAvatarSetting('avatar_frame', 'pastel') },
+        { text: 'Fuego 🔥', handler: () => this.setAvatarSetting('avatar_frame', 'fire') },
         { text: 'Cancelar', icon: 'close', role: 'cancel' }
       ]
     });
@@ -617,6 +643,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   async setAvatarSetting(field: string, value: string) {
+
     if (field === 'current_mood') this.myMood = value;
     if (field === 'avatar_frame') this.myAvatarFrame = value;
     
