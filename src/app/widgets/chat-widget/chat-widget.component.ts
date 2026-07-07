@@ -441,7 +441,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     .attach-btn:active { transform: scale(0.9); }
 
     .attach-menu { position: absolute; bottom: 65px; left: 10px; background: white; border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; padding: 5px; animation: scaleIn 0.2s; z-index: 2000; }
-    .attach-menu-item { background: transparent; border: none; font-size: 1.5rem; color: #a4133c; padding: 10px; cursor: pointer; transition: background 0.2s; border-radius: 50%; }
+    .attach-menu-item { position: relative; background: transparent; border: none; font-size: 1.5rem; color: #a4133c; padding: 10px; cursor: pointer; transition: background 0.2s; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
     .attach-menu-item:hover { background: #fff0f3; }
     @keyframes scaleIn { from { transform: scale(0.8) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
 
