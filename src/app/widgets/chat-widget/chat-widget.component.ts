@@ -694,15 +694,159 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     .bubble-cloud::before {
       content: ''; position: absolute; bottom: -12px; width: 16px; height: 16px; border-radius: 50%; z-index: -1;
     }
+    
+    /* TEST BUBBLES WITH 9-SLICE BORDER-IMAGE */
+    .bubble-capybara {
+      border-image-source: url('assets/bubbles/capybara.png');
+      border-image-slice: 25% fill;
+      border-image-width: 30px;
+      border-image-outset: 5px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: #333 !important;
+      padding: 15px 25px !important;
+    }
+    
+    .bubble-cat-img {
+      border-image-source: url('assets/bubbles/cat.png');
+      border-image-slice: 25% fill;
+      border-image-width: 30px;
+      border-image-outset: 5px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: #333 !important;
+      padding: 15px 25px !important;
+    }
+
+    .bubble-neon {
+      border-image-source: url('assets/bubbles/neon.png');
+      border-image-slice: 25% fill;
+      border-image-width: 30px;
+      border-image-outset: 5px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: white !important;
+      padding: 15px 25px !important;
+    }
+    
+    .mine .bubble-capybara, .mine .bubble-cat-img, .mine .bubble-neon {
+      transform: scaleX(-1);
+    }
+    .mine .bubble-capybara > *, .mine .bubble-cat-img > *, .mine .bubble-neon > * {
+      transform: scaleX(-1); /* Un-flip the text */
+    }
+
     .bubble-cloud::after {
       content: ''; position: absolute; bottom: -24px; width: 8px; height: 8px; border-radius: 50%; z-index: -1;
     }
     
     .mine .bubble-cloud::before { background: #FF758C; right: 24px; box-shadow: inset 1px 2px 0 rgba(255,255,255,0.15); }
-    .mine .bubble-cloud::after { background: #FF7794; right: 12px; box-shadow: inset 1px 1px 0 rgba(255,255,255,0.15); }
+    .mine 
+    /* TEST BUBBLES WITH 9-SLICE BORDER-IMAGE */
+    .bubble-capybara {
+      border-image-source: url('assets/bubbles/capybara.png');
+      border-image-slice: 25% fill;
+      border-image-width: 30px;
+      border-image-outset: 5px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: #333 !important;
+      padding: 15px 25px !important;
+    }
+    
+    .bubble-cat-img {
+      border-image-source: url('assets/bubbles/cat.png');
+      border-image-slice: 25% fill;
+      border-image-width: 30px;
+      border-image-outset: 5px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: #333 !important;
+      padding: 15px 25px !important;
+    }
+
+    .bubble-neon {
+      border-image-source: url('assets/bubbles/neon.png');
+      border-image-slice: 25% fill;
+      border-image-width: 30px;
+      border-image-outset: 5px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: white !important;
+      padding: 15px 25px !important;
+    }
+    
+    .mine .bubble-capybara, .mine .bubble-cat-img, .mine .bubble-neon {
+      transform: scaleX(-1);
+    }
+    .mine .bubble-capybara > *, .mine .bubble-cat-img > *, .mine .bubble-neon > * {
+      transform: scaleX(-1); /* Un-flip the text */
+    }
+
+    .bubble-cloud::after { background: #FF7794; right: 12px; box-shadow: inset 1px 1px 0 rgba(255,255,255,0.15); }
     
     .message-wrapper:not(.mine) .bubble-cloud::before { background: rgba(255,255,255,0.95); left: 24px; box-shadow: inset 1px 1px 0 rgba(255,255,255,0.8), -1px 2px 4px rgba(0,0,0,0.02); }
-    .message-wrapper:not(.mine) .bubble-cloud::after { background: rgba(255,255,255,0.95); left: 12px; box-shadow: inset 1px 1px 0 rgba(255,255,255,0.8), -1px 1px 3px rgba(0,0,0,0.02); }
+    .message-wrapper:not(.mine) 
+    /* TEST BUBBLES WITH 9-SLICE BORDER-IMAGE */
+    .bubble-capybara {
+      border-image-source: url('assets/bubbles/capybara.png');
+      border-image-slice: 25% fill;
+      border-image-width: 30px;
+      border-image-outset: 5px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: #333 !important;
+      padding: 15px 25px !important;
+    }
+    
+    .bubble-cat-img {
+      border-image-source: url('assets/bubbles/cat.png');
+      border-image-slice: 25% fill;
+      border-image-width: 30px;
+      border-image-outset: 5px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: #333 !important;
+      padding: 15px 25px !important;
+    }
+
+    .bubble-neon {
+      border-image-source: url('assets/bubbles/neon.png');
+      border-image-slice: 25% fill;
+      border-image-width: 30px;
+      border-image-outset: 5px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: white !important;
+      padding: 15px 25px !important;
+    }
+    
+    .mine .bubble-capybara, .mine .bubble-cat-img, .mine .bubble-neon {
+      transform: scaleX(-1);
+    }
+    .mine .bubble-capybara > *, .mine .bubble-cat-img > *, .mine .bubble-neon > * {
+      transform: scaleX(-1); /* Un-flip the text */
+    }
+
+    .bubble-cloud::after { background: rgba(255,255,255,0.95); left: 12px; box-shadow: inset 1px 1px 0 rgba(255,255,255,0.8), -1px 1px 3px rgba(0,0,0,0.02); }
     
     /* Disable shapes for pure photo bubbles to avoid stretching weirdly */
     .only-photo::before, .only-photo::after { display: none !important; }
@@ -714,19 +858,163 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 /* Fix borders for pseudo-elements */
     .message-wrapper:not(.mine) .bubble-cat::before, .message-wrapper:not(.mine) .bubble-cat::after,
     .message-wrapper:not(.mine) .bubble-dog::before, .message-wrapper:not(.mine) .bubble-dog::after,
-    .message-wrapper:not(.mine) .bubble-cloud::before, .message-wrapper:not(.mine) .bubble-cloud::after {
+    .message-wrapper:not(.mine) .bubble-cloud::before, .message-wrapper:not(.mine) 
+    /* TEST BUBBLES WITH 9-SLICE BORDER-IMAGE */
+    .bubble-capybara {
+      border-image-source: url('assets/bubbles/capybara.png');
+      border-image-slice: 25% fill;
+      border-image-width: 30px;
+      border-image-outset: 5px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: #333 !important;
+      padding: 15px 25px !important;
+    }
+    
+    .bubble-cat-img {
+      border-image-source: url('assets/bubbles/cat.png');
+      border-image-slice: 25% fill;
+      border-image-width: 30px;
+      border-image-outset: 5px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: #333 !important;
+      padding: 15px 25px !important;
+    }
+
+    .bubble-neon {
+      border-image-source: url('assets/bubbles/neon.png');
+      border-image-slice: 25% fill;
+      border-image-width: 30px;
+      border-image-outset: 5px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: white !important;
+      padding: 15px 25px !important;
+    }
+    
+    .mine .bubble-capybara, .mine .bubble-cat-img, .mine .bubble-neon {
+      transform: scaleX(-1);
+    }
+    .mine .bubble-capybara > *, .mine .bubble-cat-img > *, .mine .bubble-neon > * {
+      transform: scaleX(-1); /* Un-flip the text */
+    }
+
+    .bubble-cloud::after {
         border: none;
     }
 
     /* Modo Oscuro Night Owl */
     :host-context(.night-owl-mode) .mine .bubble-cat::before, :host-context(.night-owl-mode) .mine .bubble-cat::after,
     :host-context(.night-owl-mode) .mine .bubble-dog::before, :host-context(.night-owl-mode) .mine .bubble-dog::after,
-    :host-context(.night-owl-mode) .mine .bubble-cloud::before, :host-context(.night-owl-mode) .mine .bubble-cloud::after {
+    :host-context(.night-owl-mode) .mine .bubble-cloud::before, :host-context(.night-owl-mode) .mine 
+    /* TEST BUBBLES WITH 9-SLICE BORDER-IMAGE */
+    .bubble-capybara {
+      border-image-source: url('assets/bubbles/capybara.png');
+      border-image-slice: 25% fill;
+      border-image-width: 30px;
+      border-image-outset: 5px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: #333 !important;
+      padding: 15px 25px !important;
+    }
+    
+    .bubble-cat-img {
+      border-image-source: url('assets/bubbles/cat.png');
+      border-image-slice: 25% fill;
+      border-image-width: 30px;
+      border-image-outset: 5px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: #333 !important;
+      padding: 15px 25px !important;
+    }
+
+    .bubble-neon {
+      border-image-source: url('assets/bubbles/neon.png');
+      border-image-slice: 25% fill;
+      border-image-width: 30px;
+      border-image-outset: 5px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: white !important;
+      padding: 15px 25px !important;
+    }
+    
+    .mine .bubble-capybara, .mine .bubble-cat-img, .mine .bubble-neon {
+      transform: scaleX(-1);
+    }
+    .mine .bubble-capybara > *, .mine .bubble-cat-img > *, .mine .bubble-neon > * {
+      transform: scaleX(-1); /* Un-flip the text */
+    }
+
+    .bubble-cloud::after {
         background: linear-gradient(135deg, #8b5cf6, #6d28d9); box-shadow: none; border: none;
     }
     :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble-cat::before, :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble-cat::after,
     :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble-dog::before, :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble-dog::after,
-    :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble-cloud::before, :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble-cloud::after {
+    :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble-cloud::before, :host-context(.night-owl-mode) .message-wrapper:not(.mine) 
+    /* TEST BUBBLES WITH 9-SLICE BORDER-IMAGE */
+    .bubble-capybara {
+      border-image-source: url('assets/bubbles/capybara.png');
+      border-image-slice: 25% fill;
+      border-image-width: 30px;
+      border-image-outset: 5px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: #333 !important;
+      padding: 15px 25px !important;
+    }
+    
+    .bubble-cat-img {
+      border-image-source: url('assets/bubbles/cat.png');
+      border-image-slice: 25% fill;
+      border-image-width: 30px;
+      border-image-outset: 5px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: #333 !important;
+      padding: 15px 25px !important;
+    }
+
+    .bubble-neon {
+      border-image-source: url('assets/bubbles/neon.png');
+      border-image-slice: 25% fill;
+      border-image-width: 30px;
+      border-image-outset: 5px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: white !important;
+      padding: 15px 25px !important;
+    }
+    
+    .mine .bubble-capybara, .mine .bubble-cat-img, .mine .bubble-neon {
+      transform: scaleX(-1);
+    }
+    .mine .bubble-capybara > *, .mine .bubble-cat-img > *, .mine .bubble-neon > * {
+      transform: scaleX(-1); /* Un-flip the text */
+    }
+
+    .bubble-cloud::after {
         background: rgba(40,40,40,0.9); box-shadow: none; border: none;
     }
 
@@ -841,6 +1129,9 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         { text: 'Gatito 🐱', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'cat') },
         { text: 'Perrito 🐶', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'dog') },
         { text: 'Nube ☁️', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'cloud') },
+        { text: 'TEST Capibara 🐹', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'capybara') },
+        { text: 'TEST Gato Rosa 🐈', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'cat-img') },
+        { text: 'TEST Neón ⚡', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'neon') },
         { text: 'Cancelar', icon: 'close', role: 'cancel' }
       ]
     });
