@@ -1570,10 +1570,10 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       header: 'Ajustes del Chat 🎨',
       cssClass: 'premium-action-sheet',
       buttons: [
-        { text: 'Fondos de Chat', icon: 'image-outline', handler: () => { setTimeout(() => this.openBgSettings(), 300); } },
-        { text: 'Estilo de Burbujas', icon: 'chatbubble-ellipses-outline', handler: () => { setTimeout(() => this.openBubbleSettings(), 300); } },
-        { text: 'Tipografía', icon: 'text-outline', handler: () => { setTimeout(() => this.openFontSettings(), 300); } },
-        { text: 'Sonidos', icon: 'musical-notes-outline', handler: () => { setTimeout(() => this.openSoundSettings(), 300); } },
+        { text: 'Fondos de Chat 🔒', icon: 'image-outline', handler: () => { setTimeout(() => this.openBgSettings(), 300); } },
+        { text: 'Estilo de Burbujas 🔒', icon: 'chatbubble-ellipses-outline', handler: () => { setTimeout(() => this.openBubbleSettings(), 300); } },
+        { text: 'Tipografía 🔒', icon: 'text-outline', handler: () => { setTimeout(() => this.openFontSettings(), 300); } },
+        { text: 'Sonidos 🔒', icon: 'musical-notes-outline', handler: () => { setTimeout(() => this.openSoundSettings(), 300); } },
         { text: 'Cancelar', icon: 'close', role: 'cancel' }
       ]
     });
@@ -1636,6 +1636,10 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   async openFontSettings() {
+    if (this.premiumService.isFree$.value) {
+      this.openPaywall();
+      return;
+    }
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Tipografía (Local)',
       cssClass: 'premium-action-sheet',
@@ -1651,6 +1655,10 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   async openSoundSettings() {
+    if (this.premiumService.isFree$.value) {
+      this.openPaywall();
+      return;
+    }
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Sonido de Mensaje (Local)',
       cssClass: 'premium-action-sheet',
@@ -1701,6 +1709,10 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
 
   async openBgSettings() {
+    if (this.premiumService.isFree$.value) {
+      this.openPaywall();
+      return;
+    }
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Fondo del Chat',
       cssClass: 'premium-action-sheet',
