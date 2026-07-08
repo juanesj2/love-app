@@ -1600,7 +1600,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   async openBubbleSubmenu(category: string) {
-    let buttons = [];
+    let buttons: any[] = [];
     if (category === 'basics') {
       buttons = [
         { text: 'Clásica 💬', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'default') },
