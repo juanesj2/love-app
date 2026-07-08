@@ -1378,6 +1378,79 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
       z-index: 10;
     }
 
+
+    /* ESTILO TIKTOK GATO */
+    .bubble-tiktok-cat {
+      background: #FFF0D4 !important; /* Pastel orange/yellow */
+      border-radius: 20px !important;
+      position: relative;
+      color: #555 !important;
+      overflow: visible !important;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+      padding: 10px 15px;
+    }
+    .message-wrapper:not(.mine) .bubble-tiktok-cat::before {
+      content: '🐾'; position: absolute; top: -10px; left: -10px; font-size: 20px; z-index: 10;
+    }
+    .message-wrapper:not(.mine) .bubble-tiktok-cat::after {
+      content: '🐱'; position: absolute; bottom: -10px; right: -10px; font-size: 24px; z-index: 10;
+    }
+    .mine .bubble-tiktok-cat { background: #FFE4B5 !important; }
+    .mine .bubble-tiktok-cat::before {
+      content: '🧶'; position: absolute; top: -10px; right: -10px; font-size: 20px; z-index: 10;
+    }
+    .mine .bubble-tiktok-cat::after {
+      content: '😸'; position: absolute; bottom: -10px; left: -10px; font-size: 24px; z-index: 10;
+    }
+
+    /* ESTILO TIKTOK PERRO */
+    .bubble-tiktok-dog {
+      background: #F5E6D3 !important; /* Pastel brown/beige */
+      border-radius: 20px !important;
+      position: relative;
+      color: #4A3B32 !important;
+      overflow: visible !important;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+      padding: 10px 15px;
+    }
+    .message-wrapper:not(.mine) .bubble-tiktok-dog::before {
+      content: '🦴'; position: absolute; top: -10px; left: -10px; font-size: 20px; z-index: 10;
+    }
+    .message-wrapper:not(.mine) .bubble-tiktok-dog::after {
+      content: '🐶'; position: absolute; bottom: -10px; right: -10px; font-size: 24px; z-index: 10;
+    }
+    .mine .bubble-tiktok-dog { background: #E8D3C0 !important; }
+    .mine .bubble-tiktok-dog::before {
+      content: '🎾'; position: absolute; top: -10px; right: -10px; font-size: 20px; z-index: 10;
+    }
+    .mine .bubble-tiktok-dog::after {
+      content: '🐕'; position: absolute; bottom: -10px; left: -10px; font-size: 24px; z-index: 10;
+    }
+
+    /* ESTILO TIKTOK NUBE */
+    .bubble-tiktok-cloud {
+      background: #E0F7FA !important; /* Pastel sky blue */
+      border-radius: 20px !important;
+      position: relative;
+      color: #006064 !important;
+      overflow: visible !important;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+      padding: 10px 15px;
+    }
+    .message-wrapper:not(.mine) .bubble-tiktok-cloud::before {
+      content: '☁️'; position: absolute; top: -10px; left: -10px; font-size: 20px; z-index: 10;
+    }
+    .message-wrapper:not(.mine) .bubble-tiktok-cloud::after {
+      content: '⛅'; position: absolute; bottom: -10px; right: -10px; font-size: 24px; z-index: 10;
+    }
+    .mine .bubble-tiktok-cloud { background: #B2EBF2 !important; }
+    .mine .bubble-tiktok-cloud::before {
+      content: '🌤️'; position: absolute; top: -10px; right: -10px; font-size: 20px; z-index: 10;
+    }
+    .mine .bubble-tiktok-cloud::after {
+      content: '☁️'; position: absolute; bottom: -10px; left: -10px; font-size: 24px; z-index: 10;
+    }
+
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
@@ -1465,11 +1538,11 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       cssClass: 'premium-action-sheet',
       buttons: [
         { text: 'Clásica 💬', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'default') },
-        { text: 'Gatito 🐱', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'cat') },
-        { text: 'Perrito 🐶', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'dog') },
-        { text: 'Nube ☁️', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'cloud') },
-        { text: 'TikTok Rosa 🎀', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-pink') },
-        { text: 'TikTok Mágica ✨', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-magic') },
+        { text: 'Decorada Rosa 🎀', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-pink') },
+        { text: 'Decorada Mágica ✨', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-magic') },
+        { text: 'Decorada Gato 🐱', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-cat') },
+        { text: 'Decorada Perrito 🐶', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-dog') },
+        { text: 'Decorada Nube ☁️', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-cloud') },
         { text: 'Cancelar', icon: 'close', role: 'cancel' }
       ]
     });
