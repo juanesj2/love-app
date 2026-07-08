@@ -1899,7 +1899,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
               this.triggerEmojiReaction(latestMsg.mensaje.trim());
             }
             if (this.chatSound && this.chatSound !== 'default' && this.chatSound !== 'none') {
-              const audio = new Audio(`assets/sounds/${this.chatSound}.mp3`);
+              const audio = new Audio(`assets/sounds/${this.chatSound}.wav`);
               audio.play().catch(e => console.log('Audio play error:', e));
             }
           }
