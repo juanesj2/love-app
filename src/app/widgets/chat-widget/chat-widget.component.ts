@@ -1273,6 +1273,111 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     .bubble:has(.deleted-tombstone)::before, .bubble:has(.deleted-tombstone)::after {
       display: none !important; /* Hide ears/clouds for deleted messages */
     }
+
+    /* ====== ESTILOS DE BURBUJAS TIKTOK ====== */
+    
+    /* ESTILO TIKTOK ROSA */
+    .bubble-tiktok-pink {
+      background: #FFE4E1 !important; /* Misty rose */
+      border-radius: 20px !important;
+      position: relative;
+      color: #555 !important;
+      overflow: visible !important;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+      padding: 10px 15px;
+    }
+    
+    /* Pegatina superior izquierda */
+    .message-wrapper:not(.mine) .bubble-tiktok-pink::before {
+      content: '💕';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      font-size: 20px;
+      z-index: 10;
+      filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));
+    }
+    
+    /* Pegatina inferior derecha */
+    .message-wrapper:not(.mine) .bubble-tiktok-pink::after {
+      content: '🐸';
+      position: absolute;
+      bottom: -10px;
+      right: -10px;
+      font-size: 22px;
+      z-index: 10;
+      filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));
+    }
+    
+    /* Ajustes cuando es mío */
+    .mine .bubble-tiktok-pink {
+      background: #FFD1DC !important;
+    }
+    .mine .bubble-tiktok-pink::before {
+      content: '💖';
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      font-size: 20px;
+      z-index: 10;
+      filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));
+    }
+    .mine .bubble-tiktok-pink::after {
+      content: '🌸';
+      position: absolute;
+      bottom: -10px;
+      left: -10px;
+      font-size: 22px;
+      z-index: 10;
+      filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));
+    }
+
+    /* ESTILO TIKTOK MÁGICO */
+    .bubble-tiktok-magic {
+      background: linear-gradient(135deg, #E0C3FC 0%, #8EC5FC 100%) !important;
+      border-radius: 20px !important;
+      position: relative;
+      color: #111 !important;
+      overflow: visible !important;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+      padding: 10px 15px;
+    }
+    
+    .message-wrapper:not(.mine) .bubble-tiktok-magic::before {
+      content: '✨';
+      position: absolute;
+      top: -12px;
+      left: -8px;
+      font-size: 22px;
+      z-index: 10;
+    }
+    
+    .message-wrapper:not(.mine) .bubble-tiktok-magic::after {
+      content: '🌙';
+      position: absolute;
+      bottom: -12px;
+      right: -8px;
+      font-size: 20px;
+      z-index: 10;
+    }
+    
+    .mine .bubble-tiktok-magic::before {
+      content: '🌟';
+      position: absolute;
+      top: -12px;
+      right: -8px;
+      font-size: 22px;
+      z-index: 10;
+    }
+    .mine .bubble-tiktok-magic::after {
+      content: '💫';
+      position: absolute;
+      bottom: -12px;
+      left: -8px;
+      font-size: 22px;
+      z-index: 10;
+    }
+
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
