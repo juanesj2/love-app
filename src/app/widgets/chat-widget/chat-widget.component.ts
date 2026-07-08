@@ -1451,6 +1451,54 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
       content: '☁️'; position: absolute; bottom: -10px; left: -10px; font-size: 24px; z-index: 10;
     }
 
+    /* ESTILO TIKTOK OSITO */
+    .bubble-tiktok-bear { background: #EFEBE9 !important; border-radius: 20px !important; position: relative; color: #4E342E !important; overflow: visible !important; box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important; padding: 10px 15px; }
+    .message-wrapper:not(.mine) .bubble-tiktok-bear::before { content: '🍯'; position: absolute; top: -10px; left: -10px; font-size: 20px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2)); }
+    .message-wrapper:not(.mine) .bubble-tiktok-bear::after { content: '🐻'; position: absolute; bottom: -10px; right: -10px; font-size: 24px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2)); }
+    .mine .bubble-tiktok-bear { background: #D7CCC8 !important; }
+    .mine .bubble-tiktok-bear::before { content: '🌲'; position: absolute; top: -10px; right: -10px; font-size: 20px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2)); }
+    .mine .bubble-tiktok-bear::after { content: '🧸'; position: absolute; bottom: -10px; left: -10px; font-size: 24px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2)); }
+
+    /* ESTILO TIKTOK RANITA */
+    .bubble-tiktok-frog { background: #E8F5E9 !important; border-radius: 20px !important; position: relative; color: #1B5E20 !important; overflow: visible !important; box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important; padding: 10px 15px; }
+    .message-wrapper:not(.mine) .bubble-tiktok-frog::before { content: '🌿'; position: absolute; top: -10px; left: -10px; font-size: 20px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2)); }
+    .message-wrapper:not(.mine) .bubble-tiktok-frog::after { content: '🐸'; position: absolute; bottom: -10px; right: -10px; font-size: 24px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2)); }
+    .mine .bubble-tiktok-frog { background: #C8E6C9 !important; }
+    .mine .bubble-tiktok-frog::before { content: '🍄'; position: absolute; top: -10px; right: -10px; font-size: 20px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2)); }
+    .mine .bubble-tiktok-frog::after { content: '🐸'; position: absolute; bottom: -10px; left: -10px; font-size: 24px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2)); }
+
+    /* ESTILO TIKTOK ESPAÑA */
+    .bubble-tiktok-es { background: #FFF9C4 !important; border-radius: 20px !important; position: relative; color: #B71C1C !important; overflow: visible !important; box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important; padding: 10px 15px; border: 1px solid #FFCDD2 !important; }
+    .message-wrapper:not(.mine) .bubble-tiktok-es::before { content: '💃'; position: absolute; top: -10px; left: -10px; font-size: 20px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));}
+    .message-wrapper:not(.mine) .bubble-tiktok-es::after { content: '🇪🇸'; position: absolute; bottom: -10px; right: -10px; font-size: 24px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));}
+    .mine .bubble-tiktok-es { background: #FFECB3 !important; }
+    .mine .bubble-tiktok-es::before { content: '🥘'; position: absolute; top: -10px; right: -10px; font-size: 20px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));}
+    .mine .bubble-tiktok-es::after { content: '🇪🇸'; position: absolute; bottom: -10px; left: -10px; font-size: 24px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));}
+
+    /* ESTILO TIKTOK MÉXICO */
+    .bubble-tiktok-mx { background: #F1F8E9 !important; border-radius: 20px !important; position: relative; color: #1B5E20 !important; overflow: visible !important; box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important; padding: 10px 15px; border: 1px solid #DCEDC8 !important; }
+    .message-wrapper:not(.mine) .bubble-tiktok-mx::before { content: '🌮'; position: absolute; top: -10px; left: -10px; font-size: 20px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));}
+    .message-wrapper:not(.mine) .bubble-tiktok-mx::after { content: '🇲🇽'; position: absolute; bottom: -10px; right: -10px; font-size: 24px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));}
+    .mine .bubble-tiktok-mx { background: #DCEDC8 !important; }
+    .mine .bubble-tiktok-mx::before { content: '🌵'; position: absolute; top: -10px; right: -10px; font-size: 20px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));}
+    .mine .bubble-tiktok-mx::after { content: '🇲🇽'; position: absolute; bottom: -10px; left: -10px; font-size: 24px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));}
+
+    /* ESTILO TIKTOK ARGENTINA */
+    .bubble-tiktok-ar { background: #E3F2FD !important; border-radius: 20px !important; position: relative; color: #0D47A1 !important; overflow: visible !important; box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important; padding: 10px 15px; }
+    .message-wrapper:not(.mine) .bubble-tiktok-ar::before { content: '🧉'; position: absolute; top: -10px; left: -10px; font-size: 20px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));}
+    .message-wrapper:not(.mine) .bubble-tiktok-ar::after { content: '🇦🇷'; position: absolute; bottom: -10px; right: -10px; font-size: 24px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));}
+    .mine .bubble-tiktok-ar { background: #BBDEFB !important; }
+    .mine .bubble-tiktok-ar::before { content: '☀️'; position: absolute; top: -10px; right: -10px; font-size: 20px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));}
+    .mine .bubble-tiktok-ar::after { content: '🇦🇷'; position: absolute; bottom: -10px; left: -10px; font-size: 24px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));}
+
+    /* ESTILO TIKTOK COLOMBIA */
+    .bubble-tiktok-co { background: #FFFDE7 !important; border-radius: 20px !important; position: relative; color: #F57F17 !important; overflow: visible !important; box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important; padding: 10px 15px; }
+    .message-wrapper:not(.mine) .bubble-tiktok-co::before { content: '☕'; position: absolute; top: -10px; left: -10px; font-size: 20px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));}
+    .message-wrapper:not(.mine) .bubble-tiktok-co::after { content: '🇨🇴'; position: absolute; bottom: -10px; right: -10px; font-size: 24px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));}
+    .mine .bubble-tiktok-co { background: #FFF9C4 !important; }
+    .mine .bubble-tiktok-co::before { content: '🦋'; position: absolute; top: -10px; right: -10px; font-size: 20px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));}
+    .mine .bubble-tiktok-co::after { content: '🇨🇴'; position: absolute; bottom: -10px; left: -10px; font-size: 24px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));}
+
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
@@ -1533,20 +1581,58 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   async openBubbleSettings() {
-    const actionSheet = await this.actionSheetCtrl.create({
-      header: 'Forma de Burbuja',
+    if (this.premiumService.isFree$.value) {
+      this.openPaywall();
+      return;
+    }
+    
+    const categoryAlert = await this.actionSheetCtrl.create({
+      header: 'Categorías de Burbujas',
       cssClass: 'premium-action-sheet',
       buttons: [
-        { text: 'Clásica 💬', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'default') },
-        { text: 'Decorada Rosa 🎀', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-pink') },
-        { text: 'Decorada Mágica ✨', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-magic') },
-        { text: 'Decorada Gato 🐱', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-cat') },
-        { text: 'Decorada Perrito 🐶', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-dog') },
-        { text: 'Decorada Nube ☁️', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-cloud') },
+        { text: '🎨 Básicos y Mágicos', handler: () => this.openBubbleSubmenu('basics') },
+        { text: '🐾 Animales', handler: () => this.openBubbleSubmenu('animals') },
+        { text: '🌍 Países', handler: () => this.openBubbleSubmenu('countries') },
         { text: 'Cancelar', icon: 'close', role: 'cancel' }
       ]
     });
-    await actionSheet.present();
+    await categoryAlert.present();
+  }
+
+  async openBubbleSubmenu(category: string) {
+    let buttons = [];
+    if (category === 'basics') {
+      buttons = [
+        { text: 'Clásica 💬', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'default') },
+        { text: 'Decorada Rosa 🎀', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-pink') },
+        { text: 'Decorada Mágica ✨', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-magic') },
+        { text: 'Decorada Nube ☁️', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-cloud') },
+        { text: 'Volver ↩️', handler: () => setTimeout(() => this.openBubbleSettings(), 300) }
+      ];
+    } else if (category === 'animals') {
+      buttons = [
+        { text: 'Decorada Gato 🐱', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-cat') },
+        { text: 'Decorada Perrito 🐶', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-dog') },
+        { text: 'Decorada Osito 🐻', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-bear') },
+        { text: 'Decorada Ranita 🐸', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-frog') },
+        { text: 'Volver ↩️', handler: () => setTimeout(() => this.openBubbleSettings(), 300) }
+      ];
+    } else if (category === 'countries') {
+      buttons = [
+        { text: 'España 🇪🇸', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-es') },
+        { text: 'México 🇲🇽', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-mx') },
+        { text: 'Argentina 🇦🇷', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-ar') },
+        { text: 'Colombia 🇨🇴', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-co') },
+        { text: 'Volver ↩️', handler: () => setTimeout(() => this.openBubbleSettings(), 300) }
+      ];
+    }
+    
+    const alert = await this.actionSheetCtrl.create({
+      header: 'Elige un estilo',
+      cssClass: 'premium-action-sheet',
+      buttons: buttons
+    });
+    await alert.present();
   }
 
   async openFontSettings() {
