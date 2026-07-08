@@ -1363,9 +1363,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         { text: 'Gatito 🐱', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'cat') },
         { text: 'Perrito 🐶', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'dog') },
         { text: 'Nube ☁️', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'cloud') },
-        { text: 'TEST Capibara 🐹', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'capybara') },
-        { text: 'TEST Gato Rosa 🐈', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'cat-img') },
-        { text: 'TEST Neón ⚡', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'neon') },
+        { text: 'TikTok Rosa 🎀', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-pink') },
+        { text: 'TikTok Mágica ✨', handler: () => this.saveCoupleInfoSetting('bubble_shape', 'tiktok-magic') },
         { text: 'Cancelar', icon: 'close', role: 'cancel' }
       ]
     });
