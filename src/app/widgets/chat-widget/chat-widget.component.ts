@@ -697,46 +697,55 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     
     /* TEST BUBBLES WITH 9-SLICE BORDER-IMAGE */
     .bubble-capybara {
-      border-image-source: url('/assets/bubbles/capybara.png');
-      border-image-slice: 25% fill;
-      border-image-width: 30px;
-      border-image-outset: 5px;
+      border-image-source: url('/assets/bubbles/capybara.svg');
+      border-image-slice: 20 30 20 40 fill;
+      border-image-width: 20px 30px 20px 40px;
+      border-image-outset: 0px;
       border-image-repeat: stretch;
       background: transparent !important;
       border-radius: 0 !important;
       box-shadow: none !important;
-      color: #333 !important;
-      padding: 15px 25px !important;
+      color: #4A3B32 !important;
+      padding: 5px 20px 5px 30px !important;
     }
     
     .bubble-cat-img {
-      border-image-source: url('/assets/bubbles/cat.png');
-      border-image-slice: 25% fill;
-      border-image-width: 30px;
-      border-image-outset: 5px;
+      border-image-source: url('/assets/bubbles/cat.svg');
+      border-image-slice: 25 25 20 50 fill;
+      border-image-width: 25px 25px 20px 50px;
+      border-image-outset: 0px;
       border-image-repeat: stretch;
       background: transparent !important;
       border-radius: 0 !important;
       box-shadow: none !important;
       color: #333 !important;
-      padding: 15px 25px !important;
+      padding: 0px 10px 5px 40px !important;
     }
 
     .bubble-neon {
-      border-image-source: url('/assets/bubbles/neon.png');
-      border-image-slice: 25% fill;
-      border-image-width: 30px;
-      border-image-outset: 5px;
+      border-image-source: url('/assets/bubbles/neon.svg');
+      border-image-slice: 20 fill;
+      border-image-width: 20px;
+      border-image-outset: 0px;
       border-image-repeat: stretch;
       background: transparent !important;
       border-radius: 0 !important;
       box-shadow: none !important;
-      color: white !important;
-      padding: 15px 25px !important;
+      color: #00FFFF !important;
+      padding: 10px 15px !important;
     }
     
     .mine .bubble-capybara, .mine .bubble-cat-img, .mine .bubble-neon {
-      transform: scaleX(-1);
+      border-image-source: url('/assets/bubbles/neon.svg');
+      border-image-slice: 20 fill;
+      border-image-width: 20px;
+      border-image-outset: 0px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: #00FFFF !important;
+      padding: 10px 15px !important;
     }
     .mine .bubble-capybara > *, .mine .bubble-cat-img > *, .mine .bubble-neon > * {
       transform: scaleX(-1); /* Un-flip the text */
@@ -750,46 +759,55 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     .mine 
     /* TEST BUBBLES WITH 9-SLICE BORDER-IMAGE */
     .bubble-capybara {
-      border-image-source: url('/assets/bubbles/capybara.png');
-      border-image-slice: 25% fill;
-      border-image-width: 30px;
-      border-image-outset: 5px;
+      border-image-source: url('/assets/bubbles/capybara.svg');
+      border-image-slice: 20 30 20 40 fill;
+      border-image-width: 20px 30px 20px 40px;
+      border-image-outset: 0px;
       border-image-repeat: stretch;
       background: transparent !important;
       border-radius: 0 !important;
       box-shadow: none !important;
-      color: #333 !important;
-      padding: 15px 25px !important;
+      color: #4A3B32 !important;
+      padding: 5px 20px 5px 30px !important;
     }
     
     .bubble-cat-img {
-      border-image-source: url('/assets/bubbles/cat.png');
-      border-image-slice: 25% fill;
-      border-image-width: 30px;
-      border-image-outset: 5px;
+      border-image-source: url('/assets/bubbles/cat.svg');
+      border-image-slice: 25 25 20 50 fill;
+      border-image-width: 25px 25px 20px 50px;
+      border-image-outset: 0px;
       border-image-repeat: stretch;
       background: transparent !important;
       border-radius: 0 !important;
       box-shadow: none !important;
       color: #333 !important;
-      padding: 15px 25px !important;
+      padding: 0px 10px 5px 40px !important;
     }
 
     .bubble-neon {
-      border-image-source: url('/assets/bubbles/neon.png');
-      border-image-slice: 25% fill;
-      border-image-width: 30px;
-      border-image-outset: 5px;
+      border-image-source: url('/assets/bubbles/neon.svg');
+      border-image-slice: 20 fill;
+      border-image-width: 20px;
+      border-image-outset: 0px;
       border-image-repeat: stretch;
       background: transparent !important;
       border-radius: 0 !important;
       box-shadow: none !important;
-      color: white !important;
-      padding: 15px 25px !important;
+      color: #00FFFF !important;
+      padding: 10px 15px !important;
     }
     
     .mine .bubble-capybara, .mine .bubble-cat-img, .mine .bubble-neon {
-      transform: scaleX(-1);
+      border-image-source: url('/assets/bubbles/neon.svg');
+      border-image-slice: 20 fill;
+      border-image-width: 20px;
+      border-image-outset: 0px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: #00FFFF !important;
+      padding: 10px 15px !important;
     }
     .mine .bubble-capybara > *, .mine .bubble-cat-img > *, .mine .bubble-neon > * {
       transform: scaleX(-1); /* Un-flip the text */
@@ -801,46 +819,55 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     .message-wrapper:not(.mine) 
     /* TEST BUBBLES WITH 9-SLICE BORDER-IMAGE */
     .bubble-capybara {
-      border-image-source: url('/assets/bubbles/capybara.png');
-      border-image-slice: 25% fill;
-      border-image-width: 30px;
-      border-image-outset: 5px;
+      border-image-source: url('/assets/bubbles/capybara.svg');
+      border-image-slice: 20 30 20 40 fill;
+      border-image-width: 20px 30px 20px 40px;
+      border-image-outset: 0px;
       border-image-repeat: stretch;
       background: transparent !important;
       border-radius: 0 !important;
       box-shadow: none !important;
-      color: #333 !important;
-      padding: 15px 25px !important;
+      color: #4A3B32 !important;
+      padding: 5px 20px 5px 30px !important;
     }
     
     .bubble-cat-img {
-      border-image-source: url('/assets/bubbles/cat.png');
-      border-image-slice: 25% fill;
-      border-image-width: 30px;
-      border-image-outset: 5px;
+      border-image-source: url('/assets/bubbles/cat.svg');
+      border-image-slice: 25 25 20 50 fill;
+      border-image-width: 25px 25px 20px 50px;
+      border-image-outset: 0px;
       border-image-repeat: stretch;
       background: transparent !important;
       border-radius: 0 !important;
       box-shadow: none !important;
       color: #333 !important;
-      padding: 15px 25px !important;
+      padding: 0px 10px 5px 40px !important;
     }
 
     .bubble-neon {
-      border-image-source: url('/assets/bubbles/neon.png');
-      border-image-slice: 25% fill;
-      border-image-width: 30px;
-      border-image-outset: 5px;
+      border-image-source: url('/assets/bubbles/neon.svg');
+      border-image-slice: 20 fill;
+      border-image-width: 20px;
+      border-image-outset: 0px;
       border-image-repeat: stretch;
       background: transparent !important;
       border-radius: 0 !important;
       box-shadow: none !important;
-      color: white !important;
-      padding: 15px 25px !important;
+      color: #00FFFF !important;
+      padding: 10px 15px !important;
     }
     
     .mine .bubble-capybara, .mine .bubble-cat-img, .mine .bubble-neon {
-      transform: scaleX(-1);
+      border-image-source: url('/assets/bubbles/neon.svg');
+      border-image-slice: 20 fill;
+      border-image-width: 20px;
+      border-image-outset: 0px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: #00FFFF !important;
+      padding: 10px 15px !important;
     }
     .mine .bubble-capybara > *, .mine .bubble-cat-img > *, .mine .bubble-neon > * {
       transform: scaleX(-1); /* Un-flip the text */
@@ -861,46 +888,55 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     .message-wrapper:not(.mine) .bubble-cloud::before, .message-wrapper:not(.mine) 
     /* TEST BUBBLES WITH 9-SLICE BORDER-IMAGE */
     .bubble-capybara {
-      border-image-source: url('/assets/bubbles/capybara.png');
-      border-image-slice: 25% fill;
-      border-image-width: 30px;
-      border-image-outset: 5px;
+      border-image-source: url('/assets/bubbles/capybara.svg');
+      border-image-slice: 20 30 20 40 fill;
+      border-image-width: 20px 30px 20px 40px;
+      border-image-outset: 0px;
       border-image-repeat: stretch;
       background: transparent !important;
       border-radius: 0 !important;
       box-shadow: none !important;
-      color: #333 !important;
-      padding: 15px 25px !important;
+      color: #4A3B32 !important;
+      padding: 5px 20px 5px 30px !important;
     }
     
     .bubble-cat-img {
-      border-image-source: url('/assets/bubbles/cat.png');
-      border-image-slice: 25% fill;
-      border-image-width: 30px;
-      border-image-outset: 5px;
+      border-image-source: url('/assets/bubbles/cat.svg');
+      border-image-slice: 25 25 20 50 fill;
+      border-image-width: 25px 25px 20px 50px;
+      border-image-outset: 0px;
       border-image-repeat: stretch;
       background: transparent !important;
       border-radius: 0 !important;
       box-shadow: none !important;
       color: #333 !important;
-      padding: 15px 25px !important;
+      padding: 0px 10px 5px 40px !important;
     }
 
     .bubble-neon {
-      border-image-source: url('/assets/bubbles/neon.png');
-      border-image-slice: 25% fill;
-      border-image-width: 30px;
-      border-image-outset: 5px;
+      border-image-source: url('/assets/bubbles/neon.svg');
+      border-image-slice: 20 fill;
+      border-image-width: 20px;
+      border-image-outset: 0px;
       border-image-repeat: stretch;
       background: transparent !important;
       border-radius: 0 !important;
       box-shadow: none !important;
-      color: white !important;
-      padding: 15px 25px !important;
+      color: #00FFFF !important;
+      padding: 10px 15px !important;
     }
     
     .mine .bubble-capybara, .mine .bubble-cat-img, .mine .bubble-neon {
-      transform: scaleX(-1);
+      border-image-source: url('/assets/bubbles/neon.svg');
+      border-image-slice: 20 fill;
+      border-image-width: 20px;
+      border-image-outset: 0px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: #00FFFF !important;
+      padding: 10px 15px !important;
     }
     .mine .bubble-capybara > *, .mine .bubble-cat-img > *, .mine .bubble-neon > * {
       transform: scaleX(-1); /* Un-flip the text */
@@ -916,46 +952,55 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     :host-context(.night-owl-mode) .mine .bubble-cloud::before, :host-context(.night-owl-mode) .mine 
     /* TEST BUBBLES WITH 9-SLICE BORDER-IMAGE */
     .bubble-capybara {
-      border-image-source: url('/assets/bubbles/capybara.png');
-      border-image-slice: 25% fill;
-      border-image-width: 30px;
-      border-image-outset: 5px;
+      border-image-source: url('/assets/bubbles/capybara.svg');
+      border-image-slice: 20 30 20 40 fill;
+      border-image-width: 20px 30px 20px 40px;
+      border-image-outset: 0px;
       border-image-repeat: stretch;
       background: transparent !important;
       border-radius: 0 !important;
       box-shadow: none !important;
-      color: #333 !important;
-      padding: 15px 25px !important;
+      color: #4A3B32 !important;
+      padding: 5px 20px 5px 30px !important;
     }
     
     .bubble-cat-img {
-      border-image-source: url('/assets/bubbles/cat.png');
-      border-image-slice: 25% fill;
-      border-image-width: 30px;
-      border-image-outset: 5px;
+      border-image-source: url('/assets/bubbles/cat.svg');
+      border-image-slice: 25 25 20 50 fill;
+      border-image-width: 25px 25px 20px 50px;
+      border-image-outset: 0px;
       border-image-repeat: stretch;
       background: transparent !important;
       border-radius: 0 !important;
       box-shadow: none !important;
       color: #333 !important;
-      padding: 15px 25px !important;
+      padding: 0px 10px 5px 40px !important;
     }
 
     .bubble-neon {
-      border-image-source: url('/assets/bubbles/neon.png');
-      border-image-slice: 25% fill;
-      border-image-width: 30px;
-      border-image-outset: 5px;
+      border-image-source: url('/assets/bubbles/neon.svg');
+      border-image-slice: 20 fill;
+      border-image-width: 20px;
+      border-image-outset: 0px;
       border-image-repeat: stretch;
       background: transparent !important;
       border-radius: 0 !important;
       box-shadow: none !important;
-      color: white !important;
-      padding: 15px 25px !important;
+      color: #00FFFF !important;
+      padding: 10px 15px !important;
     }
     
     .mine .bubble-capybara, .mine .bubble-cat-img, .mine .bubble-neon {
-      transform: scaleX(-1);
+      border-image-source: url('/assets/bubbles/neon.svg');
+      border-image-slice: 20 fill;
+      border-image-width: 20px;
+      border-image-outset: 0px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: #00FFFF !important;
+      padding: 10px 15px !important;
     }
     .mine .bubble-capybara > *, .mine .bubble-cat-img > *, .mine .bubble-neon > * {
       transform: scaleX(-1); /* Un-flip the text */
@@ -969,46 +1014,55 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble-cloud::before, :host-context(.night-owl-mode) .message-wrapper:not(.mine) 
     /* TEST BUBBLES WITH 9-SLICE BORDER-IMAGE */
     .bubble-capybara {
-      border-image-source: url('/assets/bubbles/capybara.png');
-      border-image-slice: 25% fill;
-      border-image-width: 30px;
-      border-image-outset: 5px;
+      border-image-source: url('/assets/bubbles/capybara.svg');
+      border-image-slice: 20 30 20 40 fill;
+      border-image-width: 20px 30px 20px 40px;
+      border-image-outset: 0px;
       border-image-repeat: stretch;
       background: transparent !important;
       border-radius: 0 !important;
       box-shadow: none !important;
-      color: #333 !important;
-      padding: 15px 25px !important;
+      color: #4A3B32 !important;
+      padding: 5px 20px 5px 30px !important;
     }
     
     .bubble-cat-img {
-      border-image-source: url('/assets/bubbles/cat.png');
-      border-image-slice: 25% fill;
-      border-image-width: 30px;
-      border-image-outset: 5px;
+      border-image-source: url('/assets/bubbles/cat.svg');
+      border-image-slice: 25 25 20 50 fill;
+      border-image-width: 25px 25px 20px 50px;
+      border-image-outset: 0px;
       border-image-repeat: stretch;
       background: transparent !important;
       border-radius: 0 !important;
       box-shadow: none !important;
       color: #333 !important;
-      padding: 15px 25px !important;
+      padding: 0px 10px 5px 40px !important;
     }
 
     .bubble-neon {
-      border-image-source: url('/assets/bubbles/neon.png');
-      border-image-slice: 25% fill;
-      border-image-width: 30px;
-      border-image-outset: 5px;
+      border-image-source: url('/assets/bubbles/neon.svg');
+      border-image-slice: 20 fill;
+      border-image-width: 20px;
+      border-image-outset: 0px;
       border-image-repeat: stretch;
       background: transparent !important;
       border-radius: 0 !important;
       box-shadow: none !important;
-      color: white !important;
-      padding: 15px 25px !important;
+      color: #00FFFF !important;
+      padding: 10px 15px !important;
     }
     
     .mine .bubble-capybara, .mine .bubble-cat-img, .mine .bubble-neon {
-      transform: scaleX(-1);
+      border-image-source: url('/assets/bubbles/neon.svg');
+      border-image-slice: 20 fill;
+      border-image-width: 20px;
+      border-image-outset: 0px;
+      border-image-repeat: stretch;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      color: #00FFFF !important;
+      padding: 10px 15px !important;
     }
     .mine .bubble-capybara > *, .mine .bubble-cat-img > *, .mine .bubble-neon > * {
       transform: scaleX(-1); /* Un-flip the text */
