@@ -1566,14 +1566,16 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   
   async openChatSettings() {
+    const isFree = this.premiumService.isFree$.value;
+    const lockStr = isFree ? ' 🔒' : '';
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Ajustes del Chat 🎨',
       cssClass: 'premium-action-sheet',
       buttons: [
-        { text: 'Fondos de Chat 🔒', icon: 'image-outline', handler: () => { setTimeout(() => this.openBgSettings(), 300); } },
-        { text: 'Estilo de Burbujas 🔒', icon: 'chatbubble-ellipses-outline', handler: () => { setTimeout(() => this.openBubbleSettings(), 300); } },
-        { text: 'Tipografía 🔒', icon: 'text-outline', handler: () => { setTimeout(() => this.openFontSettings(), 300); } },
-        { text: 'Sonidos 🔒', icon: 'musical-notes-outline', handler: () => { setTimeout(() => this.openSoundSettings(), 300); } },
+        { text: 'Fondos de Chat' + lockStr, icon: 'image-outline', handler: () => { setTimeout(() => this.openBgSettings(), 300); } },
+        { text: 'Estilo de Burbujas' + lockStr, icon: 'chatbubble-ellipses-outline', handler: () => { setTimeout(() => this.openBubbleSettings(), 300); } },
+        { text: 'Tipografía' + lockStr, icon: 'text-outline', handler: () => { setTimeout(() => this.openFontSettings(), 300); } },
+        { text: 'Sonidos' + lockStr, icon: 'musical-notes-outline', handler: () => { setTimeout(() => this.openSoundSettings(), 300); } },
         { text: 'Cancelar', icon: 'close', role: 'cancel' }
       ]
     });
