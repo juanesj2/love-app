@@ -17,7 +17,7 @@ import { closeOutline, heart, mic, map, images, star } from 'ionicons/icons';
 
       <div class="paywall-container">
         <div class="hero-icon">
-          <ion-icon name="heart"></ion-icon>
+          <img src="assets/icons/icon-512.webp" alt="Love App" />
         </div>
         
         <h1 class="title">Love App Premium</h1>
@@ -123,9 +123,11 @@ import { closeOutline, heart, mic, map, images, star } from 'ionicons/icons';
       box-shadow: 0 10px 20px rgba(255, 77, 109, 0.4);
     }
 
-    .hero-icon ion-icon {
-      font-size: 40px;
-      color: white;
+    .hero-icon img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%; /* Opcional: ajustar si el icono se ve mejor cuadrado */
+      object-fit: cover;
     }
 
     .title {
