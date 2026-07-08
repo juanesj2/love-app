@@ -697,7 +697,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     
     /* TEST BUBBLES WITH 9-SLICE BORDER-IMAGE */
     .bubble-capybara {
-      border-image-source: url('assets/bubbles/capybara.png');
+      border-image-source: url('/assets/bubbles/capybara.png');
       border-image-slice: 25% fill;
       border-image-width: 30px;
       border-image-outset: 5px;
@@ -710,7 +710,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     }
     
     .bubble-cat-img {
-      border-image-source: url('assets/bubbles/cat.png');
+      border-image-source: url('/assets/bubbles/cat.png');
       border-image-slice: 25% fill;
       border-image-width: 30px;
       border-image-outset: 5px;
@@ -723,7 +723,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     }
 
     .bubble-neon {
-      border-image-source: url('assets/bubbles/neon.png');
+      border-image-source: url('/assets/bubbles/neon.png');
       border-image-slice: 25% fill;
       border-image-width: 30px;
       border-image-outset: 5px;
@@ -750,7 +750,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     .mine 
     /* TEST BUBBLES WITH 9-SLICE BORDER-IMAGE */
     .bubble-capybara {
-      border-image-source: url('assets/bubbles/capybara.png');
+      border-image-source: url('/assets/bubbles/capybara.png');
       border-image-slice: 25% fill;
       border-image-width: 30px;
       border-image-outset: 5px;
@@ -763,7 +763,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     }
     
     .bubble-cat-img {
-      border-image-source: url('assets/bubbles/cat.png');
+      border-image-source: url('/assets/bubbles/cat.png');
       border-image-slice: 25% fill;
       border-image-width: 30px;
       border-image-outset: 5px;
@@ -776,7 +776,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     }
 
     .bubble-neon {
-      border-image-source: url('assets/bubbles/neon.png');
+      border-image-source: url('/assets/bubbles/neon.png');
       border-image-slice: 25% fill;
       border-image-width: 30px;
       border-image-outset: 5px;
@@ -801,7 +801,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     .message-wrapper:not(.mine) 
     /* TEST BUBBLES WITH 9-SLICE BORDER-IMAGE */
     .bubble-capybara {
-      border-image-source: url('assets/bubbles/capybara.png');
+      border-image-source: url('/assets/bubbles/capybara.png');
       border-image-slice: 25% fill;
       border-image-width: 30px;
       border-image-outset: 5px;
@@ -814,7 +814,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     }
     
     .bubble-cat-img {
-      border-image-source: url('assets/bubbles/cat.png');
+      border-image-source: url('/assets/bubbles/cat.png');
       border-image-slice: 25% fill;
       border-image-width: 30px;
       border-image-outset: 5px;
@@ -827,7 +827,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     }
 
     .bubble-neon {
-      border-image-source: url('assets/bubbles/neon.png');
+      border-image-source: url('/assets/bubbles/neon.png');
       border-image-slice: 25% fill;
       border-image-width: 30px;
       border-image-outset: 5px;
@@ -861,7 +861,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     .message-wrapper:not(.mine) .bubble-cloud::before, .message-wrapper:not(.mine) 
     /* TEST BUBBLES WITH 9-SLICE BORDER-IMAGE */
     .bubble-capybara {
-      border-image-source: url('assets/bubbles/capybara.png');
+      border-image-source: url('/assets/bubbles/capybara.png');
       border-image-slice: 25% fill;
       border-image-width: 30px;
       border-image-outset: 5px;
@@ -874,7 +874,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     }
     
     .bubble-cat-img {
-      border-image-source: url('assets/bubbles/cat.png');
+      border-image-source: url('/assets/bubbles/cat.png');
       border-image-slice: 25% fill;
       border-image-width: 30px;
       border-image-outset: 5px;
@@ -887,7 +887,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     }
 
     .bubble-neon {
-      border-image-source: url('assets/bubbles/neon.png');
+      border-image-source: url('/assets/bubbles/neon.png');
       border-image-slice: 25% fill;
       border-image-width: 30px;
       border-image-outset: 5px;
@@ -916,7 +916,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     :host-context(.night-owl-mode) .mine .bubble-cloud::before, :host-context(.night-owl-mode) .mine 
     /* TEST BUBBLES WITH 9-SLICE BORDER-IMAGE */
     .bubble-capybara {
-      border-image-source: url('assets/bubbles/capybara.png');
+      border-image-source: url('/assets/bubbles/capybara.png');
       border-image-slice: 25% fill;
       border-image-width: 30px;
       border-image-outset: 5px;
@@ -929,7 +929,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     }
     
     .bubble-cat-img {
-      border-image-source: url('assets/bubbles/cat.png');
+      border-image-source: url('/assets/bubbles/cat.png');
       border-image-slice: 25% fill;
       border-image-width: 30px;
       border-image-outset: 5px;
@@ -942,7 +942,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     }
 
     .bubble-neon {
-      border-image-source: url('assets/bubbles/neon.png');
+      border-image-source: url('/assets/bubbles/neon.png');
       border-image-slice: 25% fill;
       border-image-width: 30px;
       border-image-outset: 5px;
@@ -969,7 +969,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble-cloud::before, :host-context(.night-owl-mode) .message-wrapper:not(.mine) 
     /* TEST BUBBLES WITH 9-SLICE BORDER-IMAGE */
     .bubble-capybara {
-      border-image-source: url('assets/bubbles/capybara.png');
+      border-image-source: url('/assets/bubbles/capybara.png');
       border-image-slice: 25% fill;
       border-image-width: 30px;
       border-image-outset: 5px;
@@ -982,7 +982,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     }
     
     .bubble-cat-img {
-      border-image-source: url('assets/bubbles/cat.png');
+      border-image-source: url('/assets/bubbles/cat.png');
       border-image-slice: 25% fill;
       border-image-width: 30px;
       border-image-outset: 5px;
@@ -995,7 +995,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     }
 
     .bubble-neon {
-      border-image-source: url('assets/bubbles/neon.png');
+      border-image-source: url('/assets/bubbles/neon.png');
       border-image-slice: 25% fill;
       border-image-width: 30px;
       border-image-outset: 5px;
