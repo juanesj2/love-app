@@ -114,20 +114,16 @@ import { closeOutline, heart, mic, map, images, star } from 'ionicons/icons';
     .hero-icon {
       width: 80px;
       height: 80px;
-      background: linear-gradient(135deg, #FF4D6D, #c9184a);
-      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 20px;
-      box-shadow: 0 10px 20px rgba(255, 77, 109, 0.4);
     }
 
     .hero-icon img {
       width: 100%;
       height: 100%;
-      border-radius: 50%; /* Opcional: ajustar si el icono se ve mejor cuadrado */
-      object-fit: cover;
+      object-fit: contain;
     }
 
     .title {
