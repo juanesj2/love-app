@@ -135,10 +135,10 @@ export class PremiumService {
     }
   }
 
-  async purchasePremium(pkg?: any): Promise<boolean> {
+  async purchasePremium(pkg?: any): Promise<{success: boolean, error?: any}> {
     if (!this.platform.is('hybrid')) {
       const confirmPurchase = confirm('Estás en la web (modo simulado). ¿Seguro que quieres "comprar" el plan Premium? No se te cobrará nada real.');
-      if (!confirmPurchase) return false;
+      if (!confirmPurchase) return { success: false, error: { userCancelled: true } };
 
       // Simulamos éxito en Web con 7 días de prueba
       this.setPremiumState(true);
@@ -146,7 +146,7 @@ export class PremiumService {
       expirationDate.setDate(expirationDate.getDate() + 7);
       this.premiumExpiresAt$.next(expirationDate);
       this.premiumDaysLeft$.next(7);
-      return true;
+      return { success: true };
     }
 
     try {
@@ -155,7 +155,7 @@ export class PremiumService {
         if (offerings.current && offerings.current.availablePackages.length !== 0) {
           pkg = offerings.current.availablePackages[0];
         } else {
-          return false;
+          return { success: false, error: { message: 'No hay paquetes de suscripción configurados.' } };
         }
       }
       
@@ -163,17 +163,17 @@ export class PremiumService {
       
       const premiumEntitlement = purchaseResult.customerInfo.entitlements.active['Love Widget Pro'];
       const isPremium = typeof premiumEntitlement !== 'undefined';
-      if (isPremium) {
-        this.updateDaysLeftFromEntitlement(premiumEntitlement);
+      if (!isPremium) {
+         return { success: false, error: { message: 'Compra procesada, pero los permisos no están activos. Entitlements activos: ' + JSON.stringify(Object.keys(purchaseResult.customerInfo.entitlements.active)) } };
+      } else {
+         this.updateDaysLeftFromEntitlement(premiumEntitlement);
       }
       this.setPremiumState(isPremium);
-      return isPremium;
+      return { success: isPremium };
     } catch (e: any) {
-      if (!e.userCancelled) {
-        console.error('Error en compra', e);
-      }
+      console.error('Error en compra', e);
+      return { success: false, error: e };
     }
-    return false;
   }
 
   async restorePurchases(): Promise<boolean> {

@@ -29,23 +29,7 @@ export class LoveApiService {
     }
   }
 
-  private async getHeaders(): Promise<HttpHeaders> {
-    let t = this.token$.value;
-    if (!t) {
-      const { value } = await SecureStoragePlugin.get({ key: 'auth_token' }).catch(() => ({ value: null }));
-      t = value;
-      if (value) {
-        this.token$.next(value);
-      }
-    }
-    let headers = new HttpHeaders({
-      'Accept': 'application/json'
-    });
-    if (t) {
-      headers = headers.set('Authorization', `Bearer ${t}`);
-    }
-    return headers;
-  }
+
 
   async sendStreakReminder(): Promise<any> {
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/remind-streak`, {}));
@@ -58,19 +42,16 @@ export class LoveApiService {
   // --- Achievements ---
 
   async getAchievements(): Promise<any> {
-    const headers = await this.getHeaders();
-    return firstValueFrom(this.http.get<any>(`${API_BASE_URL}/love-album/achievements`, { headers }));
+    return firstValueFrom(this.http.get<any>(`${API_BASE_URL}/love-album/achievements`));
   }
 
   async unlockHint(achievementId: string): Promise<any> {
-    const headers = await this.getHeaders();
-    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/achievements/hints/unlock`, { achievement_id: achievementId }, { headers }));
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/achievements/hints/unlock`, { achievement_id: achievementId }));
   }
 
   async unlockAchievement(achievementId: string): Promise<any> {
-    const headers = await this.getHeaders();
     try {
-      const res: any = await firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/achievements/unlock`, { achievement_id: achievementId }, { headers }));
+      const res: any = await firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/achievements/unlock`, { achievement_id: achievementId }));
       if (res && res.newly_unlocked) {
         const toast = await this.toastCtrl.create({
           message: `🏆 ¡Logro Desbloqueado! Ve a 'Más' para verlo.`,
@@ -103,6 +84,7 @@ export class LoveApiService {
     const res: any = await firstValueFrom(this.http.post(`${API_BASE_URL}/google-login`, { email, name, uid }));
     if (res && res.access_token) {
       await Preferences.set({ key: 'auth_token', value: res.access_token });
+      await SecureStoragePlugin.set({ key: 'auth_token', value: res.access_token }).catch(() => {});
       this.token$.next(res.access_token);
     }
     return res;

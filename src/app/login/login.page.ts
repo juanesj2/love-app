@@ -80,8 +80,7 @@ export class LoginPage implements OnInit {
       }
     }
 
-    // Auto-login si ya hay token y usuario
-    const storedUser = localStorage.getItem('love_widget_user');
+    // Auto-login si ya hay token
     let token = null;
     try {
       const res = await SecureStoragePlugin.get({ key: 'auth_token' }).catch(async () => await Preferences.get({ key: 'auth_token' }));
@@ -89,11 +88,15 @@ export class LoginPage implements OnInit {
     } catch (e) {
       token = null;
     }
-    if (storedUser && token) {
+    
+    if (token) {
       try {
-        await this.loveApi.getCoupleInfo();
+        const info = await this.loveApi.getCoupleInfo();
+        const userId = info.my_id.toString();
+        localStorage.setItem('love_widget_user', userId);
+        
         this.notificationService.init();
-        this.locationService.updateMyLocation(storedUser, storedUser);
+        this.locationService.updateMyLocation(userId, info.my_name || userId);
         this.router.navigate(['/home'], { replaceUrl: true });
       } catch (e: any) {
         if (e.status === 403 || e.error?.message?.includes('No estás vinculado')) {

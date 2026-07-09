@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { App } from '@capacitor/app';
 import { NotificationService } from './services/notification.service';
 import { environment } from '../environments/environment';
+import { PremiumService } from './services/premium.service';
 
 @Component({
   selector: 'app-root',
@@ -12,6 +13,7 @@ import { environment } from '../environments/environment';
 })
 export class AppComponent {
   private notificationService = inject(NotificationService);
+  private premiumService = inject(PremiumService);
   private toastCtrl = inject(ToastController);
   private router = inject(Router);
   private platform = inject(Platform);
@@ -20,6 +22,7 @@ export class AppComponent {
 
   constructor() {
     this.notificationService.init();
+    this.premiumService.initialize();
     this.setupBackButton();
   }
 

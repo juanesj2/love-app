@@ -126,6 +126,75 @@ body {
   }
 }
 
+/* Premium Success and Error Alerts */
+.premium-success-alert, .premium-error-alert {
+  --backdrop-opacity: 0.6;
+  --background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+
+  .alert-wrapper {
+    border-radius: 24px !important;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .alert-title {
+    font-weight: 800 !important;
+    font-size: 1.5rem !important;
+    text-align: center !important;
+    padding-top: 15px !important;
+  }
+
+  .alert-message {
+    color: #6b7280 !important;
+    text-align: center !important;
+    font-size: 1rem !important;
+    line-height: 1.4 !important;
+    padding: 10px 20px !important;
+  }
+
+  .alert-button-group {
+    padding: 15px !important;
+    justify-content: center !important;
+  }
+
+  .alert-button {
+    font-weight: 700 !important;
+    color: white !important;
+    border-radius: 14px !important;
+    padding: 15px 30px !important;
+    width: 100% !important;
+    font-size: 1.1rem !important;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+  }
+}
+
+.premium-success-alert {
+  .alert-wrapper { border: 2px solid rgba(46, 204, 113, 0.3) !important; }
+  .alert-title { color: #2ecc71 !important; }
+  .alert-button {
+    background: linear-gradient(135deg, #2ecc71, #27ae60) !important;
+    box-shadow: 0 8px 20px rgba(46, 204, 113, 0.3) !important;
+  }
+}
+
+.premium-error-alert {
+  .alert-wrapper { border: 2px solid rgba(255, 77, 109, 0.3) !important; }
+  .alert-title { color: #FF4D6D !important; }
+  .alert-button {
+    background: linear-gradient(135deg, #FF4D6D, #c9184a) !important;
+    box-shadow: 0 8px 20px rgba(255, 77, 109, 0.3) !important;
+  }
+}
+
+body.night-owl-mode {
+  .premium-success-alert, .premium-error-alert {
+    --background: rgba(30, 30, 30, 0.95);
+    .alert-wrapper { box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5) !important; }
+    .alert-message { color: #ccc !important; }
+  }
+}
+
 /* Premium Action Sheet Styling */
 .premium-action-sheet {
   --background: rgba(255, 255, 255, 0.85);

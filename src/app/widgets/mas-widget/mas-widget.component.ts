@@ -14,8 +14,8 @@ import { TutorialService } from '../../services/tutorial.service';
 import { OfflineSyncService } from '../../services/offline-sync.service';
 import { addIcons } from 'ionicons';
 import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, bookOutline, imageOutline, checkmarkCircleOutline, informationCircleOutline, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, lockClosed } from 'ionicons/icons';
-import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.component';
 import { PremiumService } from '../../services/premium.service';
 import { PaywallComponent } from '../../components/paywall/paywall.component';
@@ -264,6 +264,22 @@ import { ModalController } from '@ionic/angular';
           
           <div class="bottom-sheet-body">
             <div class="settings-list">
+              <div class="settings-item" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.8); border-radius: 14px; margin-bottom: 10px;">
+                <div style="flex: 1;">
+                  <h4 style="margin: 0; color: #590D22; font-weight: 700;">
+                    <ion-icon name="star" style="color: #FFB703;"></ion-icon> Suscripción Premium
+                  </h4>
+                  <p style="margin: 5px 0 0; font-size: 0.8rem; color: #6c757d;" *ngIf="(premiumService.isPremium$ | async) === false">
+                    Plan Gratuito
+                  </p>
+                  <p style="margin: 5px 0 0; font-size: 0.8rem; color: #FF4D6D; font-weight: 600;" *ngIf="(premiumService.isPremium$ | async)">
+                    Activa <span *ngIf="(premiumService.premiumDaysLeft$ | async) !== null">(Quedan {{ premiumService.premiumDaysLeft$ | async }} días)</span>
+                  </p>
+                </div>
+                <button class="glass-btn subscription-btn" style="padding: 6px 14px; font-size: 0.85rem; margin: 0; width: auto !important; min-width: auto; height: auto; border-radius: 20px; flex: 0 0 auto;" (click)="openPaywall()">
+                  {{ (premiumService.isPremium$ | async) ? 'Gestionar' : 'Mejorar' }}
+                </button>
+              </div>
               <div class="settings-item" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.8); border-radius: 14px; margin-bottom: 10px;">
                 <div>
                   <h4 style="margin: 0; color: #590D22; font-weight: 700;">🦉 Modo Búho</h4>
@@ -955,6 +971,8 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   private offlineSync = inject(OfflineSyncService);
   private router = inject(Router);
 
+  private locationSub?: Subscription;
+
   @Output() viewChange = new EventEmitter<string>();
 
   isMapModalOpen = false;
@@ -1116,6 +1134,15 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     document.body.classList.add('hide-tabs');
   }
 
+  async openPaywall() {
+    this.closeSettingsModal();
+    const modal = await this.modalCtrl.create({
+      component: PaywallComponent,
+      cssClass: 'paywall-modal'
+    });
+    await modal.present();
+  }
+
   closeSettingsModal() {
     this.isSettingsModalOpen = false;
     document.body.classList.remove('hide-tabs');
@@ -1165,7 +1192,10 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.checkNightOwl();
-    this.locationSubject.pipe(debounceTime(2000)).subscribe(location => {
+    this.locationSub = this.locationSubject.pipe(
+      debounceTime(1000),
+      distinctUntilChanged()
+    ).subscribe(location => {
       if (location && location.trim().length > 0) {
         const url = `https://maps.google.com/maps?q=${encodeURIComponent(location)}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
         this.previewMapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
@@ -1273,6 +1303,9 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     this.stopTimer();
     if (this.appStateListener) {
       this.appStateListener.remove();
+    }
+    if (this.locationSub) {
+      this.locationSub.unsubscribe();
     }
   }
 

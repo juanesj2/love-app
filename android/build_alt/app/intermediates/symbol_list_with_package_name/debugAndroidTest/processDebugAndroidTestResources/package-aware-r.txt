@@ -1,3 +1,0 @@
-com.juanesj2.lovewidget.test
-style WhiteBackgroundDialogTheme
-style WhiteBackgroundTheme

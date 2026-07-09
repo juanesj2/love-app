@@ -1,9 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { IonicModule, ModalController, AlertController } from '@ionic/angular';
 import { PremiumService } from '../../services/premium.service';
 import { addIcons } from 'ionicons';
 import { closeOutline, heart, mic, map, images, star } from 'ionicons/icons';
+import { DotLottie } from '@lottiefiles/dotlottie-web';
+import confetti from 'canvas-confetti';
 
 @Component({
   selector: 'app-paywall',
@@ -71,12 +73,26 @@ import { closeOutline, heart, mic, map, images, star } from 'ionicons/icons';
         </div>
         <p class="trial-text" *ngIf="!(premiumService.isPremium$ | async)">¡Pruébalo gratis durante 7 días!</p>
 
-        <ion-button expand="block" class="subscribe-btn" (click)="subscribe()">
-          {{ (premiumService.isPremium$ | async) ? 'Comprar Suscripción' : 'Comenzar Prueba Gratis' }}
+        <ion-button expand="block" class="subscribe-btn" (click)="subscribe()" [disabled]="isLoading">
+          <ng-container *ngIf="!isLoading">
+            {{ (premiumService.isPremium$ | async) ? 'Suscripción Activa' : 'Comenzar Prueba Gratis' }}
+          </ng-container>
+          <ng-container *ngIf="isLoading">
+            Procesando...
+          </ng-container>
         </ion-button>
 
         <div class="footer-links">
           <a (click)="restorePurchases()">Restaurar Compras</a>
+        </div>
+      </div>
+
+      <!-- Lottie Overlay -->
+      <div class="lottie-overlay" *ngIf="showLottie">
+        <div class="lottie-content">
+          <canvas #lottieCanvas width="300" height="300"></canvas>
+          <h2 class="lottie-message">{{ lottieMessage }}</h2>
+          <ion-button *ngIf="showLottieButton" expand="block" class="lottie-btn" (click)="closeLottieOverlay()">{{ lottieButtonText }}</ion-button>
         </div>
       </div>
     </ion-content>
@@ -285,13 +301,33 @@ import { closeOutline, heart, mic, map, images, star } from 'ionicons/icons';
       text-decoration: underline;
       font-size: 14px;
     }
+
+    .lottie-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.3s; }
+    .lottie-content { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .lottie-content canvas { width: 300px; height: 300px; max-width: 90vw; margin-bottom: 20px; }
+    .lottie-message { color: white; font-size: 1.5rem; font-weight: 800; text-shadow: 0 4px 10px rgba(0,0,0,0.5); max-width: 80%; line-height: 1.3; animation: slideUpPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); margin-bottom: 20px; }
+    .lottie-btn { --background: linear-gradient(135deg, #FF4D6D, #c9184a); --border-radius: 14px; font-weight: 700; width: 200px; animation: slideUpPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUpPop { 0% { transform: translateY(30px) scale(0.9); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
   `]
 })
 export class PaywallComponent {
   public premiumService = inject(PremiumService);
   private modalCtrl = inject(ModalController);
+  private alertCtrl = inject(AlertController);
+  private cdr = inject(ChangeDetectorRef);
   
   public selectedPackageIndex = 0;
+  public isLoading = false;
+
+  public showLottie = false;
+  public lottieMessage = '';
+  public showLottieButton = false;
+  public lottieButtonText = 'Aceptar';
+  private lottieResolve: ((value: void | PromiseLike<void>) => void) | null = null;
+  
+  @ViewChild('lottieCanvas') lottieCanvas?: ElementRef<HTMLCanvasElement>;
+  private dotLottieInstance: DotLottie | null = null;
 
   constructor() {
     addIcons({ closeOutline, heart, mic, map, images, star });
@@ -302,21 +338,103 @@ export class PaywallComponent {
   }
 
   async subscribe() {
+    if (this.isLoading) return;
+    const isAlreadyPremium = this.premiumService.isPremium$.value;
+    if (isAlreadyPremium) {
+      this.close();
+      return;
+    }
+
     const packages = this.premiumService.packages$.value;
-    const pkg = packages[this.selectedPackageIndex];
-    const success = await this.premiumService.purchasePremium(pkg);
-    if (success) {
-      this.modalCtrl.dismiss({ success: true });
+    const pkg = packages && packages.length > 0 ? packages[this.selectedPackageIndex] : null;
+    
+    this.isLoading = true;
+    try {
+      const result = await this.premiumService.purchasePremium(pkg);
+      if (result.success) {
+        this.fireConfetti();
+        await this.playLottieAnimation('assets/lottie/Payment Success.lottie', '¡Bienvenido a Premium!', '¡A disfrutar!');
+        this.modalCtrl.dismiss({ success: true });
+      } else {
+        // Ignoramos si el usuario simplemente canceló la ventana de Google Play (código 1)
+        if (result.error && result.error.code !== 1 && !result.error.userCancelled) {
+           await this.playLottieAnimation('assets/lottie/Payment Failed.lottie', 'Error en la compra. Revisa tu conexión.', 'Volver');
+        }
+      }
+    } finally {
+      this.isLoading = false;
     }
   }
 
   async restorePurchases() {
-    const success = await this.premiumService.restorePurchases();
-    if (success) {
-      this.modalCtrl.dismiss({ success: true });
-    } else {
-      // Mostrar toast de que no se encontraron compras
-      alert('No se encontraron compras anteriores para restaurar.');
+    this.isLoading = true;
+    try {
+      const success = await this.premiumService.restorePurchases();
+      if (success) {
+        this.fireConfetti();
+        await this.playLottieAnimation('assets/lottie/Payment Success.lottie', '¡Compras Restauradas!', '¡Genial!');
+        this.modalCtrl.dismiss({ success: true });
+      } else {
+        await this.playLottieAnimation('assets/lottie/Payment Failed.lottie', 'No hemos encontrado compras previas.', 'Volver');
+      }
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  private fireConfetti() {
+    confetti({
+      particleCount: 150,
+      spread: 80,
+      origin: { y: 0.6 },
+      colors: ['#FF4D6D', '#ffb703', '#2ecc71', '#ffffff'],
+      zIndex: 5001 // Ensure it's above the lottie overlay (5000)
+    });
+  }
+
+  private async playLottieAnimation(src: string, message: string, buttonText: string): Promise<void> {
+    this.lottieMessage = message;
+    this.lottieButtonText = buttonText;
+    this.showLottie = true;
+    this.showLottieButton = false;
+    this.cdr.detectChanges(); // Force redraw
+
+    return new Promise((resolve) => {
+      this.lottieResolve = resolve;
+      
+      setTimeout(() => {
+        if (this.dotLottieInstance) {
+          this.dotLottieInstance.destroy();
+        }
+        
+        if (this.lottieCanvas?.nativeElement) {
+          this.dotLottieInstance = new DotLottie({
+            canvas: this.lottieCanvas.nativeElement,
+            src: src,
+            loop: false,
+            autoplay: true
+          });
+
+          // Show button after 2 seconds
+          setTimeout(() => {
+            this.showLottieButton = true;
+            this.cdr.detectChanges();
+          }, 2000);
+        }
+      }, 50);
+    });
+  }
+
+  closeLottieOverlay() {
+    this.showLottie = false;
+    if (this.dotLottieInstance) {
+      this.dotLottieInstance.destroy();
+      this.dotLottieInstance = null;
+    }
+    if (this.lottieResolve) {
+      this.lottieResolve();
+      this.lottieResolve = null;
     }
   }
 }
+
