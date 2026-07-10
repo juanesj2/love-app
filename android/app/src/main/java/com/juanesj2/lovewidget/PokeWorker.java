@@ -23,6 +23,10 @@ public class PokeWorker extends Worker {
         if (token == null || token.isEmpty()) {
             token = prefs.getString("auth_token", "");
         }
+        if (token == null || token.isEmpty()) {
+            SharedPreferences capPrefs = context.getSharedPreferences("CAPStorage", Context.MODE_PRIVATE);
+            token = capPrefs.getString("_cap_auth_token", "");
+        }
 
         if (token.isEmpty()) {
             return Result.failure();

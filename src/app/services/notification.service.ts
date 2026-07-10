@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { PushNotifications, Token, ActionPerformed } from '@capacitor/push-notifications';
 import { LocalNotifications } from '@capacitor/local-notifications';
+import { Preferences } from '@capacitor/preferences';
 import { Platform } from '@ionic/angular';
 import { LoveApiService } from './love-api.service';
 
@@ -20,8 +21,21 @@ export class NotificationService {
     try {
       await this.initPush();
       await this.initLocal();
+      await this.syncToken();
     } catch (e) {
       console.error('Error initializing notifications:', e);
+    }
+  }
+
+  private async syncToken() {
+    const { value: token } = await Preferences.get({ key: 'fcm_token' });
+    if (token) {
+      try {
+        await this.api.saveFcmToken(token);
+        console.log('FCM Token synced to backend successfully');
+      } catch(e) {
+        console.error('Error syncing FCM Token to backend:', e);
+      }
     }
   }
 
@@ -41,6 +55,7 @@ export class NotificationService {
     PushNotifications.addListener('registration',
       async (token: Token) => {
         console.log('Push registration success, token: ' + token.value);
+        await Preferences.set({ key: 'fcm_token', value: token.value });
         // Envía el token FCM a nuestro backend
         try {
           await this.api.saveFcmToken(token.value);
