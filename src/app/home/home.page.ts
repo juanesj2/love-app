@@ -206,8 +206,8 @@ import { ModalController } from '@ionic/angular';
 
       ion-toolbar { --background: transparent; position: absolute; top: 0; width: 100%; }
       .custom-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); border-radius: 0 0 25px 25px; margin-bottom: 10px; position: relative; z-index: 20; }
-      .avatar-container { position: relative; cursor: pointer; z-index: 2; }
-      .avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.15); object-fit: cover; border: 2px solid white; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+      .avatar-container { position: relative; cursor: pointer; z-index: 2; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+      .avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.15); object-fit: cover; border: 2px solid white; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; }
       .avatar-container:active .avatar { transform: scale(0.9); }
       .my-avatar { background: linear-gradient(135deg, #FF4D6D, #c9184a); }
       .partner-avatar { background: linear-gradient(135deg, #ff8fa3, #ffb3c1); }
@@ -215,7 +215,7 @@ import { ModalController } from '@ionic/angular';
       
       @keyframes avatarHeartbeat { 0% { transform: scale(1); box-shadow: 0 4px 15px rgba(255,77,109,0.15); } 15% { transform: scale(1.05); box-shadow: 0 4px 20px rgba(255,77,109,0.4); } 30% { transform: scale(1); box-shadow: 0 4px 15px rgba(255,77,109,0.15); } 100% { transform: scale(1); } }
       
-      .mood-badge { position: absolute; bottom: -5px; right: -5px; background: white; border-radius: 50%; padding: 2px; font-size: 1.2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.3s; }
+      .mood-badge { position: absolute; bottom: -5px; right: -5px; background: white; border-radius: 50%; padding: 2px; font-size: 1.2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.3s; pointer-events: none; }
       
       .header-center-actions { display: flex; align-items: center; gap: 15px; position: absolute; left: 50%; transform: translateX(-50%); }
       .moon-btn { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, rgba(108,99,255,0.15), rgba(162,155,254,0.2)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 2px solid rgba(108,99,255,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(108,99,255,0.2); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -228,7 +228,7 @@ import { ModalController } from '@ionic/angular';
       .premium-btn ion-icon { font-size: 1.1rem; }
       .premium-btn span { white-space: nowrap; }
 
-      .poke-btn { width: 55px; height: 55px; border-radius: 50%; background: linear-gradient(135deg, #fff0f3, #ffe5ec); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #FF4D6D; cursor: pointer; box-shadow: 0 8px 20px rgba(255,77,109,0.2), inset 0 2px 5px rgba(255,255,255,0.8); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid white; }
+      .poke-btn { width: 55px; height: 55px; border-radius: 50%; background: linear-gradient(135deg, #fff0f3, #ffe5ec); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #FF4D6D; cursor: pointer; box-shadow: 0 8px 20px rgba(255,77,109,0.2), inset 0 2px 5px rgba(255,255,255,0.8); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid white; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
       .poke-btn:active { transform: scale(0.85); box-shadow: 0 4px 10px rgba(255,77,109,0.2); }
       .poke-btn ion-icon { filter: drop-shadow(0 2px 4px rgba(255,77,109,0.3)); transition: transform 0.3s; }
       .poke-btn ion-icon.poking { animation: heartbeat 0.8s ease-in-out 2; color: #c9184a; filter: drop-shadow(0 4px 8px rgba(201,24,74,0.5)); }
