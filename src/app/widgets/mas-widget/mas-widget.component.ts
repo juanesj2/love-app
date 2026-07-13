@@ -340,7 +340,7 @@ import confetti from 'canvas-confetti';
               
               <div id="gastro-list" style="margin-bottom: 0;">
                 <div class="food-places-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-                  <div class="food-place-item" *ngFor="let place of filteredFoodPlaces" (click)="openFoodPlaceModal(place)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; box-sizing: border-box; min-width: 0; overflow: hidden;">
+                  <div class="food-place-item" *ngFor="let place of filteredFoodPlaces; trackBy: trackById" (click)="openFoodPlaceModal(place)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; box-sizing: border-box; min-width: 0; overflow: hidden; transform: translateZ(0);">
                     <div *ngIf="place.is_favorite" style="position: absolute; top: 8px; left: 8px; z-index: 5;">
                       <ion-icon name="heart" style="color: #FF4D6D; font-size: 1.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));"></ion-icon>
                     </div>
@@ -396,7 +396,7 @@ import confetti from 'canvas-confetti';
               
               <div id="cine-list" style="margin-bottom: 0;">
                 <div class="movies-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-                  <div class="movie-item" *ngFor="let movie of filteredMovies" (click)="openMovieModal(movie)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; box-sizing: border-box; min-width: 0; overflow: hidden;">
+                  <div class="movie-item" *ngFor="let movie of filteredMovies; trackBy: trackById" (click)="openMovieModal(movie)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; box-sizing: border-box; min-width: 0; overflow: hidden; transform: translateZ(0);">
                     <div *ngIf="movie.is_favorite" style="position: absolute; top: 8px; left: 8px; z-index: 5;">
                       <ion-icon name="heart" style="color: #FF4D6D; font-size: 1.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));"></ion-icon>
                     </div>
@@ -730,6 +730,13 @@ import confetti from 'canvas-confetti';
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
       display: flex; align-items: center; justify-content: center; z-index: 99999;
+      will-change: transform, opacity;
+    }
+    
+    .custom-overlay ~ .custom-overlay {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      background: rgba(0, 0, 0, 0.6);
     }
     
     .bottom-sheet-modal {
@@ -743,11 +750,11 @@ import confetti from 'canvas-confetti';
       max-height: 90%;
       padding-bottom: 20px;
     }
-    .bottom-sheet-header { padding: 25px 20px 10px; position: relative; background: #fff0f3; z-index: 2; text-align: left; }
+    .bottom-sheet-header { padding: 25px 20px 10px; position: relative; background: #fff0f3; z-index: 2; text-align: left; transform: translateZ(0); }
     .bottom-sheet-header h2 { margin: 0; font-size: 1.8rem; font-weight: 900; color: #590D22; display: flex; align-items: center; gap: 10px; }
     .bottom-sheet-header p { margin: 5px 0 20px; color: #a4133c; font-size: 0.95rem; }
-    .bottom-sheet-body { flex: 1; overflow-y: auto; padding: 0 20px; }
-    .bottom-sheet-footer { padding: 15px 20px 25px; background: linear-gradient(to top, #fff0f3 80%, rgba(255,240,243,0)); position: relative; z-index: 2; }
+    .bottom-sheet-body { flex: 1; overflow-y: auto; padding: 0 20px; transform: translateZ(0); }
+    .bottom-sheet-footer { padding: 15px 20px 25px; background: linear-gradient(to top, #fff0f3 80%, rgba(255,240,243,0)); position: relative; z-index: 2; transform: translateZ(0); }
     
     .sheet-close-btn {
       position: absolute; top: 20px; right: 20px; width: 36px; height: 36px;
@@ -1494,6 +1501,10 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   
   openGame() {
     this.router.navigate(['/games']);
+  }
+
+  trackById(index: number, item: any): string | number {
+    return item.id || index;
   }
 
   async saveSelectedAlbum() {
