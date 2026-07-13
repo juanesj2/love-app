@@ -1507,6 +1507,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
   imports: [CommonModule, FormsModule, IonicModule]
 })
 export class ChatWidgetComponent implements OnInit, AfterViewInit {
+  pollingInterval: any;
   @ViewChild('msgContainer') msgContainer!: IonContent;
   private api = inject(LoveApiService);
   private toastController = inject(ToastController);
@@ -1810,6 +1811,10 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     this.currentUser = localStorage.getItem('love_widget_user') === 'juan' ? 'Juan' : 'Roberta';
     this.loadChatBackground();
     
+    this.pollingInterval = setInterval(() => {
+      this.loadMessages(true);
+    }, 5000);
+    
     const deletedPref = await Preferences.get({ key: 'deleted_chat_messages' });
     if (deletedPref.value) {
       try { this.deletedLocalMessages = JSON.parse(deletedPref.value); } catch(e){}
@@ -1825,6 +1830,9 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   ngOnDestroy() {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+    }
     this.timeouts.forEach(t => clearTimeout(t));
     this.subscriptions.forEach(s => s.unsubscribe());
   }
@@ -1874,18 +1882,20 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   lastKnownMessageId: number = 0;
 
-  async loadMessages() {
+  async loadMessages(isBackground = false) {
     try {
       // 1. Mostrar caché primero para experiencia instantánea
-      const cache = await Preferences.get({ key: 'chat_cache' });
-      if (cache.value) {
-        this.messages = JSON.parse(cache.value);
-        if (this.messages.length > 0) {
-          this.lastKnownMessageId = this.messages[this.messages.length - 1].id;
+      if (!isBackground) {
+        const cache = await Preferences.get({ key: 'chat_cache' });
+        if (cache.value) {
+          this.messages = JSON.parse(cache.value);
+          if (this.messages.length > 0) {
+            this.lastKnownMessageId = this.messages[this.messages.length - 1].id;
+          }
+          this.processMessages();
+          this.safeTimeout(() => this.scrollToBottom(false), 50);
+          this.safeTimeout(() => this.scrollToBottom(false), 300);
         }
-        this.processMessages();
-        this.safeTimeout(() => this.scrollToBottom(false), 50);
-        this.safeTimeout(() => this.scrollToBottom(false), 300);
       }
 
       // 2. Fetch de la red en segundo plano
@@ -1895,9 +1905,12 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       if (JSON.stringify(this.messages) !== JSON.stringify(newMessages)) {
         this.messages = newMessages;
         
+        let shouldScrollToBottom = !isBackground;
+
         if (this.messages.length > 0) {
           const latestMsg = this.messages[this.messages.length - 1];
           if (this.lastKnownMessageId > 0 && latestMsg.id > this.lastKnownMessageId && !this.isMine(latestMsg)) {
+            shouldScrollToBottom = true;
             if (this.isEmojiOnly(latestMsg.mensaje)) {
               this.triggerEmojiReaction(latestMsg.mensaje.trim());
             }
@@ -1913,13 +1926,17 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         }
         
         this.processMessages();
-        this.safeTimeout(() => this.scrollToBottom(false), 100);
-        this.safeTimeout(() => this.scrollToBottom(true), 500);
+        if (shouldScrollToBottom) {
+          this.safeTimeout(() => this.scrollToBottom(false), 100);
+          this.safeTimeout(() => this.scrollToBottom(true), 500);
+        }
         await Preferences.set({ key: 'chat_cache', value: JSON.stringify(this.messages) });
       }
     } catch (e) {
-      console.error(e);
-      this.showError('No pudimos cargar los mensajes. ¿Hay conexión?');
+      if (!isBackground) {
+        console.error(e);
+        this.showError('No pudimos cargar los mensajes. ¿Hay conexión?');
+      }
     }
   }
 
