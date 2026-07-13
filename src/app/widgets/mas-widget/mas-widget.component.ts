@@ -994,7 +994,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   locationSubject = new Subject<string>();
 
   startDate: string = '';
-  selectedAlbumId: string = 'feed';
+  selectedAlbumId: any = 'feed';
   totalPendingGames: number = 0;
   albums: any[] = [];
   isTimelineModalOpen = false;
@@ -1371,7 +1371,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
     const albumRes = await Preferences.get({ key: 'widgetAlbumId' });
     if (albumRes.value) {
-      this.selectedAlbumId = albumRes.value;
+      this.selectedAlbumId = albumRes.value === 'feed' ? 'feed' : Number(albumRes.value);
     }
 
     // Load API data
