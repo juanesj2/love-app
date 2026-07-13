@@ -1781,7 +1781,7 @@ export class PhotoWidgetComponent implements OnInit {
   async takeAndUploadPhoto(source: CameraSource) {
     try {
       const image = await Camera.getPhoto({
-        quality: 70, width: 800, height: 800, allowEditing: false, resultType: CameraResultType.Uri, source: source
+        quality: 80, allowEditing: false, resultType: CameraResultType.Uri, source: source
       });
       
       if (image.webPath) {
