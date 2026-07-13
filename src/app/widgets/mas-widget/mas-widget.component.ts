@@ -198,8 +198,9 @@ import confetti from 'canvas-confetti';
 
           <!-- Minijuego -->
           <div class="grid-card interactive" id="mas-test" (click)="openGame()">
-            <div class="icon-circle bg-purple">
+            <div class="icon-circle bg-purple" style="position: relative;">
               <ion-icon name="game-controller-outline"></ion-icon>
+              <div class="notification-badge" *ngIf="totalPendingGames > 0">{{ totalPendingGames }}</div>
             </div>
             <h4>Test Pareja</h4>
             <span class="sub">Jugar a ciegas</span>
@@ -839,6 +840,8 @@ import confetti from 'canvas-confetti';
     .grid-card.interactive:active { transform: scale(0.95); background: rgba(255,255,255,0.8); }
     
     .icon-circle { width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 1.8rem; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .notification-badge { position: absolute; top: -5px; right: -5px; background: #FF4D6D; color: white; font-size: 0.85rem; font-weight: 900; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(255, 77, 109, 0.4); border: 2px solid white; z-index: 10; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
     .bg-purple { background: linear-gradient(135deg, #7209b7, #b5179e); box-shadow: 0 4px 15px rgba(114, 9, 183, 0.3); }
     .bg-neon { background: linear-gradient(135deg, #0a0a1a, #1a1a2e); box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3); color: #00ff88; }
     .bg-blue { background: linear-gradient(135deg, #4361ee, #4cc9f0); box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3); }
@@ -984,7 +987,8 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   locationSubject = new Subject<string>();
 
   startDate: string = '';
-  selectedAlbumId: number | string = 'feed';
+  selectedAlbumId: string = 'feed';
+  totalPendingGames: number = 0;
   albums: any[] = [];
   isTimelineModalOpen = false;
   timelineInitialPlanId: number | null = null;
@@ -1366,6 +1370,10 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     // Load API data
     try {
       this.albums = await this.api.getAlbums().catch(() => []);
+      const progress = await this.api.getGamesProgress().catch(() => null);
+      if (progress && progress.total_pending !== undefined) {
+        this.totalPendingGames = progress.total_pending;
+      }
     } catch (e) {}
     
     this.loadFoodAndMovies();
@@ -1472,11 +1480,18 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   }
 
   async handleRefresh(event: any) {
-    event.target.complete();
+    try {
+      const progress = await this.api.getGamesProgress().catch(() => null);
+      if (progress && progress.total_pending !== undefined) {
+        this.totalPendingGames = progress.total_pending;
+      }
+    } catch (e) {}
+    
+    setTimeout(() => {
+      event.target.complete();
+    }, 500);
   }
-
-
-
+  
   openGame() {
     this.router.navigate(['/games']);
   }

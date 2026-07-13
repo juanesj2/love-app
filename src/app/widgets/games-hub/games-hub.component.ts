@@ -20,7 +20,10 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
 
       <div class="games-list">
         <div class="game-card test-card" id="tour-game-test" (click)="goTo('questions')">
-          <div class="game-icon-bg"><ion-icon name="game-controller-outline"></ion-icon></div>
+          <div class="game-icon-bg">
+            <ion-icon name="game-controller-outline"></ion-icon>
+            <div class="notification-badge" *ngIf="progress?.questions?.pending_actions > 0">{{ progress.questions.pending_actions }}</div>
+          </div>
           <div class="game-info">
             <h3>Test de Pareja</h3>
             <p>Descubre cuánto os conocéis respondiendo a preguntas de todo tipo, desde divertidas hasta muy íntimas.</p>
@@ -32,7 +35,10 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
         </div>
 
         <div class="game-card swipe-card" id="tour-game-swipe" (click)="goTo('games/swipe')">
-          <div class="game-icon-bg"><ion-icon name="swap-horizontal-outline"></ion-icon></div>
+          <div class="game-icon-bg">
+            <ion-icon name="swap-horizontal-outline"></ion-icon>
+            <div class="notification-badge" *ngIf="progress?.swipe?.pending_actions > 0">{{ progress.swipe.pending_actions }}</div>
+          </div>
           <div class="game-info">
             <h3>Tinder de Pareja</h3>
             <p>Desliza rápido y descubre vuestra afinidad en diferentes temas, incluyendo los más candentes.</p>
@@ -44,7 +50,10 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
         </div>
 
         <div class="game-card draw-card" id="tour-game-draw" (click)="goTo('games/draw')">
-          <div class="game-icon-bg"><ion-icon name="color-palette-outline"></ion-icon></div>
+          <div class="game-icon-bg">
+            <ion-icon name="color-palette-outline"></ion-icon>
+            <div class="notification-badge" *ngIf="progress?.drawing?.pending_actions > 0">{{ progress.drawing.pending_actions }}</div>
+          </div>
           <div class="game-info">
             <h3>Reto de Dibujo</h3>
             <p>Sacad vuestro lado creativo (y atrevido) dibujando los retos propuestos al mismo tiempo.</p>
@@ -94,6 +103,8 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
 
     .game-icon-bg { width: 68px; height: 68px; border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 2.4rem; flex-shrink: 0; box-shadow: 0 8px 20px rgba(0,0,0,0.1); position: relative; z-index: 2; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .game-card:hover .game-icon-bg { transform: rotate(-5deg) scale(1.05); }
+    .notification-badge { position: absolute; top: -5px; right: -5px; background: #FF4D6D; color: white; font-size: 0.85rem; font-weight: 900; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(255, 77, 109, 0.4); border: 2px solid white; z-index: 10; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
     
     .game-info { flex: 1; position: relative; z-index: 2; }
     .game-info h3 { margin: 0 0 6px; color: #590D22; font-size: 1.25rem; font-weight: 800; letter-spacing: -0.3px; }

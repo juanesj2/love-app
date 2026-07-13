@@ -52,11 +52,17 @@ import iro from '@jaames/iro';
         </div>
 
         <div class="completed-list-area" *ngIf="gameState === 'completed_list'">
+          <div class="custom-toggle-container sub-filter">
+            <div class="toggle-pill" [class.active]="galleryFilter === 'all'" (click)="galleryFilter = 'all'">Todos</div>
+            <div class="toggle-pill" [class.active]="galleryFilter === 'new'" (click)="galleryFilter = 'new'">Nuevos</div>
+            <div class="toggle-pill" [class.active]="galleryFilter === 'seen'" (click)="galleryFilter = 'seen'">Ya Vistos</div>
+          </div>
+
           <div *ngIf="completedPrompts.length === 0 && waitingPrompts.length === 0 && waitingMePrompts.length === 0" class="empty-state">
             <p>Aún no hay dibujos en la galería 🎨</p>
           </div>
 
-          <div *ngIf="waitingMePrompts.length > 0" class="mb-20">
+          <div *ngIf="(galleryFilter === 'all' || galleryFilter === 'new') && waitingMePrompts.length > 0" class="mb-20">
             <h3 class="section-title">¡Es tu turno! Nuevos dibujos ({{waitingMePrompts.length}})</h3>
             <div class="drawing-item unread-item" *ngFor="let p of waitingMePrompts" (click)="startSpecificPrompt(p)">
               <h4 class="d-title">{{ p.prompt_text }} <span class="new-badge">NUEVO</span></h4>
@@ -64,7 +70,7 @@ import iro from '@jaames/iro';
             </div>
           </div>
 
-          <div *ngIf="waitingPrompts.length > 0" class="mb-20">
+          <div *ngIf="(galleryFilter === 'all' || galleryFilter === 'seen') && waitingPrompts.length > 0" class="mb-20">
             <h3 class="section-title">Esperando a tu pareja ({{waitingPrompts.length}})</h3>
             <div class="drawing-item" *ngFor="let p of waitingPrompts">
               <h4 class="d-title">{{ p.prompt_text }}</h4>
@@ -81,7 +87,7 @@ import iro from '@jaames/iro';
             </div>
           </div>
 
-          <div *ngIf="completedPrompts.length > 0">
+          <div *ngIf="(galleryFilter === 'all' || galleryFilter === 'seen') && completedPrompts.length > 0">
             <h3 class="section-title">Completadas ({{completedPrompts.length}})</h3>
             <div class="drawing-item" *ngFor="let p of completedPrompts">
               <h4 class="d-title">{{ p.prompt_text }}</h4>
@@ -195,6 +201,9 @@ import iro from '@jaames/iro';
     .custom-toggle-container { display: flex; background: rgba(255,255,255,0.6); padding: 5px; border-radius: 30px; margin: 0 0 15px 0; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
     .toggle-pill { flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px; padding: 10px 0; border-radius: 25px; font-weight: 700; color: #888; transition: all 0.3s; cursor: pointer; font-size: 0.9rem; position: relative; }
     .toggle-pill.active { background: white; color: #FF4D6D; box-shadow: 0 4px 10px rgba(255,77,109,0.15); transform: scale(1.02); }
+    
+    .sub-filter { transform: scale(0.9); margin-top: -10px; margin-bottom: 20px; box-shadow: none; background: rgba(0,0,0,0.03); }
+    .sub-filter .toggle-pill.active { box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
     /* LISTA COMPLETA */
     .section-title { color: #590D22; font-size: 1.1rem; border-bottom: 2px solid #ffb3c1; padding-bottom: 5px; margin-bottom: 15px; text-align: left; }
@@ -293,6 +302,7 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
   selectedCategory: string = '';
   prompt: any = null;
   gameState: 'categories' | 'completed_list' | 'init' | 'drawing' | 'waiting' | 'completed' = 'categories';
+  galleryFilter: 'all' | 'new' | 'seen' = 'all';
   result: any = null;
   progress: any = null;
 
