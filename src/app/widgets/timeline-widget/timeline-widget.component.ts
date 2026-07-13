@@ -121,7 +121,7 @@ import { OfflineSyncService } from '../../services/offline-sync.service';
                     (click)="item.checked = !item.checked"
                     style="font-size: 1.3rem; color: #FF4D6D; cursor: pointer;">
                   </ion-icon>
-                  <input type="text" [(ngModel)]="item.name" placeholder="Ej: Pasaporte" class="inline-input" (ngModelChange)="saveLocalDynamicData()">
+                  <input type="text" [(ngModel)]="item.name" placeholder="Ej: Pasaporte" class="inline-input" (ngModelChange)="saveLocalDynamicData()" (keyup.enter)="addPackingItem(true)">
                   <ion-icon name="trash-outline" (click)="removePackingItem(i)" style="color: #ccc;"></ion-icon>
                 </div>
                 <button class="small-glass-btn" (click)="addPackingItem()">+ Añadir a la maleta</button>
@@ -442,10 +442,19 @@ export class TimelineWidgetComponent implements OnInit, OnDestroy {
     await alert.present();
   }
 
-  addPackingItem() {
+  addPackingItem(focusLast = false) {
     if (!this.editingPlan.dynamic_data) this.editingPlan.dynamic_data = {};
     if (!this.editingPlan.dynamic_data.packing_list) this.editingPlan.dynamic_data.packing_list = [];
     this.editingPlan.dynamic_data.packing_list.push({ name: '', checked: false });
+
+    if (focusLast) {
+      setTimeout(() => {
+        const inputs = document.querySelectorAll('.packing-item input') as NodeListOf<HTMLInputElement>;
+        if (inputs.length > 0) {
+          inputs[inputs.length - 1].focus();
+        }
+      }, 50);
+    }
   }
 
   removePackingItem(index: number) {
