@@ -2613,7 +2613,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   canEditMessage(msg: any): boolean {
     if (!msg || !msg.created_at) return false;
-    if (msg.user?.name !== this.currentUser) return false;
+    if (!this.isMine(msg)) return false;
     
     // Check if within 2 minutes
     const msgDate = new Date(msg.created_at);
@@ -2625,7 +2625,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   async confirmDeleteMessage(msg: any) {
     this.closePopover();
     
-    const isMine = msg.user?.name === this.currentUser;
+    const isMine = this.isMine(msg);
     const buttons = [];
     
     if (isMine) {
