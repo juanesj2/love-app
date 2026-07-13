@@ -93,20 +93,15 @@ export class NotificationService {
     const perm = await LocalNotifications.requestPermissions();
     if (perm.display !== 'granted') return;
 
-    // Crear un recordatorio diario a las 20:00 para la racha
-    await LocalNotifications.schedule({
-      notifications: [
-        {
-          title: '🔥 ¡No rompas la racha!',
-          body: 'Sube un recuerdo de hoy y descubre si tu pareja también lo hizo.',
-          id: 1,
-          schedule: {
-            on: { hour: 20, minute: 0 },
-            allowWhileIdle: true,
-          }
-        }
-      ]
-    });
+    // La racha se maneja ahora inteligentemente desde el servidor (J2-API/routes/console.php)
+    // por lo que eliminamos la notificación local estática para que no avise si ya han subido foto.
+    
+    // Cancelar la notificación estática anterior si existía (ID: 1)
+    try {
+      await LocalNotifications.cancel({ notifications: [{ id: 1 }] });
+    } catch (e) {
+      console.log('No prev notification to cancel', e);
+    }
   }
 
   async scheduleTripReminders(plans: any[]) {
