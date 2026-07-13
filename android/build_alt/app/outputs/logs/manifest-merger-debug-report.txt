@@ -11,10 +11,10 @@ INJECTED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORM
 	android:name
 		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:24:13-62
 manifest
-ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:2:1-83:12
-INJECTED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:2:1-83:12
-INJECTED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:2:1-83:12
-INJECTED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:2:1-83:12
+ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:2:1-89:12
+INJECTED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:2:1-89:12
+INJECTED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:2:1-89:12
+INJECTED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:2:1-89:12
 MERGED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-31:12
 MERGED from [:capacitor-community-media] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-media\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
 MERGED from [:capacitor-app] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-app\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
@@ -32,6 +32,7 @@ MERGED from [:capacitor-status-bar] C:\Users\JuanStivenAlcañizAuñ\OneDrive - T
 MERGED from [:capawesome-capacitor-google-sign-in] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capawesome-capacitor-google-sign-in\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
 MERGED from [:revenuecat-purchases-capacitor] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\revenuecat-purchases-capacitor\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
 MERGED from [:capacitor-secure-storage-plugin] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-secure-storage-plugin\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:capacitor-voice-recorder] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-voice-recorder\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
 MERGED from [:capacitor-android] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
 MERGED from [:capacitor-cordova-android-plugins] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-cordova-android-plugins\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-11:12
 MERGED from [org.apache.cordova:framework:14.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\e47013dec160bb8e8e78795049f410c2\transformed\framework-14.0.1\AndroidManifest.xml:20:1-27:12
@@ -142,8 +143,8 @@ MERGED from [androidx.core:core-viewtree:1.0.0] C:\Users\JuanStivenAlcañizAuñ\
 	xmlns:android
 		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:2:11-69
 application
-ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:3:5-66:19
-INJECTED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:3:5-66:19
+ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:3:5-72:19
+INJECTED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:3:5-72:19
 MERGED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:23:5-29:19
 MERGED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:23:5-29:19
 MERGED from [:capacitor-browser] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-browser\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:5-19:19
@@ -320,8 +321,20 @@ action#com.juanesj2.lovewidget.ACTION_POKE
 ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:62:17-78
 	android:name
 		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:62:25-75
+service#com.equimaps.capacitor_background_geolocation.BackgroundGeolocationService
+ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:68:9-71:56
+MERGED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:24:9-28:56
+MERGED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:24:9-28:56
+	android:enabled
+		ADDED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:26:13-35
+	android:exported
+		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:70:13-36
+	android:foregroundServiceType
+		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:71:13-53
+	android:name
+		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:69:13-102
 uses-permission#android.permission.INTERNET
-ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:69:5-67
+ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:75:5-67
 MERGED from [com.revenuecat.purchases:purchases:10.9.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\af0183122a016c4e2799cff59b2884bc\transformed\purchases-10.9.1\AndroidManifest.xml:7:5-67
 MERGED from [com.revenuecat.purchases:purchases:10.9.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\af0183122a016c4e2799cff59b2884bc\transformed\purchases-10.9.1\AndroidManifest.xml:7:5-67
 MERGED from [com.google.firebase:firebase-installations:18.0.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\df907beae055c1d2434697ac5cd0594d\transformed\firebase-installations-18.0.0\AndroidManifest.xml:8:5-67
@@ -331,39 +344,39 @@ MERGED from [com.google.android.gms:play-services-cloud-messaging:17.2.0] C:\Use
 MERGED from [com.google.android.datatransport:transport-backend-cct:3.1.9] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\ea620a6b5afc7c5e432bbec109041d91\transformed\transport-backend-cct-3.1.9\AndroidManifest.xml:25:5-67
 MERGED from [com.google.android.datatransport:transport-backend-cct:3.1.9] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\ea620a6b5afc7c5e432bbec109041d91\transformed\transport-backend-cct-3.1.9\AndroidManifest.xml:25:5-67
 	android:name
-		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:69:22-64
+		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:75:22-64
 uses-permission#android.permission.ACCESS_COARSE_LOCATION
-ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:70:5-81
+ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:76:5-81
 MERGED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-81
 MERGED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-81
 	android:name
-		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:70:22-78
+		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:76:22-78
 uses-permission#android.permission.ACCESS_FINE_LOCATION
-ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:71:5-79
+ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:77:5-79
 MERGED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-79
 MERGED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-79
 	android:name
-		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:71:22-76
+		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:77:22-76
 uses-permission#android.permission.ACCESS_BACKGROUND_LOCATION
-ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:72:5-85
+ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:78:5-85
 	android:name
-		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:72:22-82
+		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:78:22-82
 uses-permission#android.permission.FOREGROUND_SERVICE
-ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:73:5-77
+ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:79:5-77
 MERGED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:5-77
 MERGED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:5-77
 MERGED from [androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:26:5-77
 MERGED from [androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:26:5-77
 	android:name
-		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:73:22-74
+		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:79:22-74
 uses-permission#android.permission.FOREGROUND_SERVICE_LOCATION
-ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:74:5-86
+ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:80:5-86
 MERGED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:5-86
 MERGED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:5-86
 	android:name
-		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:74:22-83
+		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:80:22-83
 uses-permission#android.permission.POST_NOTIFICATIONS
-ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:75:5-77
+ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:81:5-77
 MERGED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:19:5-77
 MERGED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:19:5-77
 MERGED from [:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:5-77
@@ -371,29 +384,29 @@ MERGED from [:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\One
 MERGED from [com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:23:5-77
 MERGED from [com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:23:5-77
 	android:name
-		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:75:22-74
+		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:81:22-74
 uses-permission#android.permission.CAMERA
-ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:78:5-65
+ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:84:5-65
 	android:name
-		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:78:22-62
+		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:84:22-62
 uses-permission#android.permission.READ_EXTERNAL_STORAGE
-ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:79:5-80
+ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:85:5-80
 	android:name
-		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:79:22-77
+		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:85:22-77
 uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
-ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:80:5-81
+ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:86:5-81
 	android:name
-		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:80:22-78
+		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:86:22-78
 uses-permission#android.permission.READ_MEDIA_IMAGES
-ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:81:5-76
+ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:87:5-76
 	android:name
-		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:81:22-73
+		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:87:22-73
 uses-feature#android.hardware.camera
-ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:82:5-85
+ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:88:5-85
 	android:required
-		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:82:58-82
+		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:88:58-82
 	android:name
-		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:82:19-57
+		ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:88:19-57
 meta-data#android.support.FILE_PROVIDER_PATHS
 ADDED from C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:28:13-112
 	android:resource
@@ -438,6 +451,8 @@ MERGED from [:revenuecat-purchases-capacitor] C:\Users\JuanStivenAlcañizAuñ\On
 MERGED from [:revenuecat-purchases-capacitor] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\revenuecat-purchases-capacitor\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
 MERGED from [:capacitor-secure-storage-plugin] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-secure-storage-plugin\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
 MERGED from [:capacitor-secure-storage-plugin] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-secure-storage-plugin\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:capacitor-voice-recorder] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-voice-recorder\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:capacitor-voice-recorder] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-voice-recorder\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
 MERGED from [:capacitor-android] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
 MERGED from [:capacitor-android] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-android\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
 MERGED from [:capacitor-cordova-android-plugins] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-cordova-android-plugins\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:6:5-44
@@ -648,16 +663,6 @@ uses-feature#android.hardware.location.gps
 ADDED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:21:5-66
 	android:name
 		ADDED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:21:19-63
-service#com.equimaps.capacitor_background_geolocation.BackgroundGeolocationService
-ADDED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:24:9-28:56
-	android:enabled
-		ADDED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:26:13-35
-	android:exported
-		ADDED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:27:13-36
-	android:foregroundServiceType
-		ADDED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:28:13-53
-	android:name
-		ADDED from [:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:25:13-102
 queries
 ADDED from [:capacitor-browser] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-browser\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-11:15
 MERGED from [:capacitor-camera] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt\capacitor-camera\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-17:15

@@ -2,10 +2,11 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { LoveApiService } from '../../services/love-api.service';
+import { FingerprintGameModalComponent } from '../fingerprint-game-modal/fingerprint-game-modal.component';
+import { ModalController, IonicModule } from '@ionic/angular';
 import { TutorialService } from '../../services/tutorial.service';
-import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arrowBack, apertureOutline } from 'ionicons/icons';
+import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arrowBack, apertureOutline, fingerPrintOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-games-hub',
@@ -61,6 +62,14 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
             <p>Gira la ruleta para decidir el plan del fin de semana. ¡Añade vuestros planes favoritos al tarro!</p>
           </div>
         </div>
+
+        <div class="game-card fingerprint-card" id="tour-game-fingerprint" (click)="openFingerprintGame()" *ngIf="hasFingerprintGame">
+          <div class="game-icon-bg"><ion-icon name="finger-print-outline"></ion-icon></div>
+          <div class="game-info">
+            <h3>Analizador</h3>
+            <p>Huella digital para comprobar el nivel de compatibilidad en este momento exacto.</p>
+          </div>
+        </div>
       </div>
     </div>
   `,
@@ -95,6 +104,7 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
     .swipe-card .game-icon-bg { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: 2px solid rgba(255,77,109,0.3); }
     .draw-card .game-icon-bg { background: linear-gradient(135deg, #a2d2ff, #bde0fe); color: #023e8a; border: 2px solid rgba(255,255,255,0.8); }
     .roulette-card .game-icon-bg { background: linear-gradient(135deg, #ffd166, #ff9f1c); color: white; border: 2px solid rgba(255,255,255,0.8); }
+    .fingerprint-card .game-icon-bg { background: linear-gradient(135deg, #0a0a1a, #1a1a2e); color: #00ff88; border: 2px solid rgba(0,255,136,0.3); }
 
     .progress-container { display: flex; align-items: center; gap: 12px; margin-top: 14px; background: rgba(255,255,255,0.6); padding: 6px 12px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.03); }
     .progress-bar { flex: 1; height: 8px; background: rgba(255, 77, 109, 0.1); border-radius: 4px; overflow: hidden; position: relative; }
@@ -121,21 +131,27 @@ import { gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arro
     :host-context(.night-owl-mode) .test-card .game-icon-bg, 
     :host-context(.night-owl-mode) .swipe-card .game-icon-bg, 
     :host-context(.night-owl-mode) .draw-card .game-icon-bg, 
-    :host-context(.night-owl-mode) .roulette-card .game-icon-bg { border-color: rgba(255,255,255,0.15); }
+    :host-context(.night-owl-mode) .roulette-card .game-icon-bg,
+    :host-context(.night-owl-mode) .fingerprint-card .game-icon-bg { border-color: rgba(255,255,255,0.15); }
   `],
   standalone: true,
-  imports: [CommonModule, IonIcon]
+  imports: [CommonModule, IonicModule]
 })
 export class GamesHubComponent {
   progress: any = null;
+  hasFingerprintGame = false;
   private api = inject(LoveApiService);
   private tutorialService = inject(TutorialService);
+  private modalCtrl = inject(ModalController);
 
   constructor(private router: Router) {
-    addIcons({ gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arrowBack, apertureOutline });
+    addIcons({ gameControllerOutline, swapHorizontalOutline, colorPaletteOutline, arrowBack, apertureOutline, fingerPrintOutline });
   }
 
   async ionViewDidEnter() {
+    this.api.unlockedAchievements$.subscribe(achievements => {
+      this.hasFingerprintGame = achievements.includes('secret_fingerprint');
+    });
     try {
       this.progress = await this.api.getGamesProgress();
     } catch (e) {
@@ -153,5 +169,19 @@ export class GamesHubComponent {
 
   goTo(route: string) {
     this.router.navigate([`/${route}`]);
+  }
+
+  async openFingerprintGame() {
+    let partnerNameStr = 'Tu amor';
+    const info = await this.api.getCoupleInfo();
+    if (info && info.partner_name) {
+      partnerNameStr = info.partner_name;
+    }
+    const modal = await this.modalCtrl.create({
+      component: FingerprintGameModalComponent,
+      componentProps: { partnerName: partnerNameStr },
+      cssClass: 'fullscreen-modal'
+    });
+    await modal.present();
   }
 }

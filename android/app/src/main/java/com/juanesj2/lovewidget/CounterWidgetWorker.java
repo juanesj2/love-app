@@ -287,14 +287,35 @@ public class CounterWidgetWorker extends Worker {
                     if (scaledBitmap != decodedBitmap) {
                         decodedBitmap.recycle();
                     }
-                    return scaledBitmap;
+                    return applyExifRotation(scaledBitmap, imageBytes);
                 }
             }
-            return decodedBitmap;
+            return applyExifRotation(decodedBitmap, imageBytes);
             
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private Bitmap applyExifRotation(Bitmap bitmap, byte[] imageBytes) {
+        if (bitmap == null) return null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            try {
+                java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(imageBytes);
+                android.media.ExifInterface exif = new android.media.ExifInterface(bais);
+                int orientation = exif.getAttributeInt(android.media.ExifInterface.TAG_ORIENTATION, android.media.ExifInterface.ORIENTATION_NORMAL);
+                android.graphics.Matrix matrix = new android.graphics.Matrix();
+                switch (orientation) {
+                    case android.media.ExifInterface.ORIENTATION_ROTATE_90: matrix.postRotate(90); break;
+                    case android.media.ExifInterface.ORIENTATION_ROTATE_180: matrix.postRotate(180); break;
+                    case android.media.ExifInterface.ORIENTATION_ROTATE_270: matrix.postRotate(270); break;
+                }
+                if (!matrix.isIdentity()) {
+                    return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                }
+            } catch (Exception e) {}
+        }
+        return bitmap;
     }
 }

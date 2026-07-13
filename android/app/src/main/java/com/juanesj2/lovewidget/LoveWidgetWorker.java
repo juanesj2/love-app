@@ -136,10 +136,10 @@ public class LoveWidgetWorker extends Worker {
                     Bitmap partnerAvatarBitmap = null;
                     
                     if (myAvatarUrl != null && !myAvatarUrl.isEmpty()) {
-                        myAvatarBitmap = myAvatarUrl.startsWith("data:") ? decodeBase64Bitmap(myAvatarUrl) : fetchBitmap(myAvatarUrl);
+                        myAvatarBitmap = myAvatarUrl.startsWith("data:") ? decodeBase64Bitmap(myAvatarUrl) : fetchAvatarBitmap(myAvatarUrl);
                     }
                     if (partnerAvatarUrl != null && !partnerAvatarUrl.isEmpty()) {
-                        partnerAvatarBitmap = partnerAvatarUrl.startsWith("data:") ? decodeBase64Bitmap(partnerAvatarUrl) : fetchBitmap(partnerAvatarUrl);
+                        partnerAvatarBitmap = partnerAvatarUrl.startsWith("data:") ? decodeBase64Bitmap(partnerAvatarUrl) : fetchAvatarBitmap(partnerAvatarUrl);
                     }
                 
                 // The avatars are drawn based on their offset from the center (which is now exactly at 256, 256)
@@ -288,7 +288,7 @@ public class LoveWidgetWorker extends Worker {
     }
 
     private void drawMoodBadge(Canvas canvas, String mood, int avatarX, int avatarY, int avatarRadius) {
-        if (mood == null || mood.isEmpty()) return;
+        if (mood == null || mood.isEmpty() || mood.equals("null")) return;
         
         int badgeX = (int)(avatarX + avatarRadius * 0.7); 
         int badgeY = (int)(avatarY - avatarRadius * 0.7);
@@ -463,6 +463,51 @@ public class LoveWidgetWorker extends Worker {
         return (int) Math.floor((1 - Math.log(Math.tan(Math.toRadians(lat)) + 1 / Math.cos(Math.toRadians(lat))) / Math.PI) / 2 * (1 << zoom));
     }
 
+    private Bitmap fetchAvatarBitmap(String urlString) {
+        try {
+            URL url = new URL(urlString);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+            conn.connect();
+            
+            java.io.InputStream in = conn.getInputStream();
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = in.read(buffer)) > -1) {
+                baos.write(buffer, 0, len);
+            }
+            baos.flush();
+            byte[] imageBytes = baos.toByteArray();
+            
+            Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+            return applyExifRotation(bitmap, imageBytes);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private Bitmap applyExifRotation(Bitmap bitmap, byte[] imageBytes) {
+        if (bitmap == null) return null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            try {
+                java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(imageBytes);
+                android.media.ExifInterface exif = new android.media.ExifInterface(bais);
+                int orientation = exif.getAttributeInt(android.media.ExifInterface.TAG_ORIENTATION, android.media.ExifInterface.ORIENTATION_NORMAL);
+                android.graphics.Matrix matrix = new android.graphics.Matrix();
+                switch (orientation) {
+                    case android.media.ExifInterface.ORIENTATION_ROTATE_90: matrix.postRotate(90); break;
+                    case android.media.ExifInterface.ORIENTATION_ROTATE_180: matrix.postRotate(180); break;
+                    case android.media.ExifInterface.ORIENTATION_ROTATE_270: matrix.postRotate(270); break;
+                }
+                if (!matrix.isIdentity()) {
+                    return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                }
+            } catch (Exception e) {}
+        }
+        return bitmap;
+    }
+
     private Bitmap decodeBase64Bitmap(String base64Str) {
         try {
             if (base64Str.startsWith("data:")) {
@@ -470,7 +515,8 @@ public class LoveWidgetWorker extends Worker {
                 if (commaIndex != -1) base64Str = base64Str.substring(commaIndex + 1);
             }
             byte[] decodedBytes = android.util.Base64.decode(base64Str, android.util.Base64.DEFAULT);
-            return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+            return applyExifRotation(bitmap, decodedBytes);
         } catch (Exception e) {
             return null;
         }

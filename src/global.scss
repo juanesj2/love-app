@@ -639,6 +639,50 @@ body.night-owl-mode {
     }
   }
 
+  /* Night Owl Mode for Custom Alerts */
+  .custom-love-alert, .premium-login-alert, .premium-success-alert, .premium-error-alert {
+    --background: rgba(18, 18, 18, 0.95);
+    
+    .alert-wrapper {
+      border-color: rgba(167, 139, 250, 0.3) !important;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6) !important;
+    }
+    
+    .alert-title {
+      color: #e9d5ff !important;
+    }
+    
+    .alert-message {
+      color: #c4b5fd !important;
+    }
+    
+    .alert-input {
+      background: rgba(255, 255, 255, 0.05) !important;
+      border-color: rgba(167, 139, 250, 0.2) !important;
+      color: #fdfdfd !important;
+    }
+    
+    .alert-input:focus {
+      border-color: #a78bfa !important;
+      box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2) !important;
+    }
+    
+    .alert-button-group {
+      border-top-color: rgba(255, 255, 255, 0.05) !important;
+    }
+    
+    .alert-button {
+      background: linear-gradient(135deg, #a78bfa, #8b5cf6) !important;
+      color: white !important;
+    }
+    
+    .alert-button.alert-button-role-cancel {
+      background: transparent !important;
+      color: #aaa !important;
+      border-color: #444 !important;
+    }
+  }
+
   .premium-mood-alert {
     --background: rgba(30, 30, 30, 0.95);
     

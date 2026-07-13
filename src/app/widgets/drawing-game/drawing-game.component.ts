@@ -6,6 +6,7 @@ import { IonIcon, ToastController, IonContent, IonRefresher, IonRefresherContent
 import { addIcons } from 'ionicons';
 import { arrowBack, trashOutline, checkmarkCircleOutline, arrowUndoOutline } from 'ionicons/icons';
 import { Location } from '@angular/common';
+import iro from '@jaames/iro';
 
 @Component({
   selector: 'app-drawing-game',
@@ -32,7 +33,7 @@ import { Location } from '@angular/common';
             <ion-icon name="play-circle-outline"></ion-icon> Jugar
           </div>
           <div class="toggle-pill" [class.active]="gameState === 'completed_list'" (click)="loadCompletedList()">
-            <ion-icon name="checkmark-circle-outline"></ion-icon> Ya hechas
+            <ion-icon name="images-outline"></ion-icon> Galería
           </div>
         </div>
 
@@ -51,8 +52,16 @@ import { Location } from '@angular/common';
         </div>
 
         <div class="completed-list-area" *ngIf="gameState === 'completed_list'">
-          <div *ngIf="completedPrompts.length === 0 && waitingPrompts.length === 0" class="empty-state">
-            <p>Aún no habéis completado ningún dibujo 🎨</p>
+          <div *ngIf="completedPrompts.length === 0 && waitingPrompts.length === 0 && waitingMePrompts.length === 0" class="empty-state">
+            <p>Aún no hay dibujos en la galería 🎨</p>
+          </div>
+
+          <div *ngIf="waitingMePrompts.length > 0" class="mb-20">
+            <h3 class="section-title">¡Es tu turno! Nuevos dibujos ({{waitingMePrompts.length}})</h3>
+            <div class="drawing-item unread-item" *ngFor="let p of waitingMePrompts" (click)="startSpecificPrompt(p)">
+              <h4 class="d-title">{{ p.prompt_text }} <span class="new-badge">NUEVO</span></h4>
+              <p class="action-text"><ion-icon name="brush-outline"></ion-icon> Tu pareja ha dibujado. ¡Dibuja tú para verlo!</p>
+            </div>
           </div>
 
           <div *ngIf="waitingPrompts.length > 0" class="mb-20">
@@ -102,12 +111,12 @@ import { Location } from '@angular/common';
           <div class="canvas-wrapper">
             <canvas #drawingCanvas (touchstart)="startDrawing($event)" (touchmove)="draw($event)" (touchend)="stopDrawing()" (mousedown)="startDrawing($event)" (mousemove)="draw($event)" (mouseup)="stopDrawing()" (mouseleave)="stopDrawing()"></canvas>
           </div>
-          <div class="color-picker">
-            <input type="color" [value]="currentColor" (input)="setColorFromPicker($event)" class="native-color-picker" />
-            <div class="color-btn" style="background: #000000;" (click)="setColor('#000000')"></div>
-            <div class="color-btn" style="background: #ff0000;" (click)="setColor('#ff0000')"></div>
-            <div class="color-btn" style="background: #0000ff;" (click)="setColor('#0000ff')"></div>
-            <div class="color-btn" style="background: #008000;" (click)="setColor('#008000')"></div>
+          <div class="color-picker-container" [class.hidden]="!showCustomPicker">
+            <div #colorPicker class="iro-picker-wrapper"></div>
+          </div>
+          <div class="color-picker-scrollable">
+            <div class="color-btn custom-color-btn" (click)="toggleCustomPicker()" [class.active-color]="showCustomPicker"></div>
+            <div class="color-btn" *ngFor="let c of predefinedColors" [style.background]="c" (click)="setColorFromBtn(c)" [class.active-color]="currentColor === c && !showCustomPicker"></div>
           </div>
           <div class="tools">
             <button class="tool-btn warning" (click)="undo()"><ion-icon name="arrow-undo-outline"></ion-icon> Deshacer</button>
@@ -202,11 +211,19 @@ import { Location } from '@angular/common';
     canvas { width: 100%; height: 100%; touch-action: none; display: block; }
     
     .tools { display: flex; gap: 10px; margin-top: 20px; }
-    .color-picker { display: flex; gap: 10px; justify-content: center; align-items: center; margin-top: 15px; }
-    .color-btn { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-    .native-color-picker { width: 40px; height: 40px; border: none; border-radius: 50%; cursor: pointer; padding: 0; background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red); overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-    .native-color-picker::-webkit-color-swatch-wrapper { padding: 4px; }
-    .native-color-picker::-webkit-color-swatch { border: 2px solid white; border-radius: 50%; }
+    .color-picker-container { display: flex; justify-content: center; margin-top: 20px; transition: all 0.3s; }
+    .color-picker-container.hidden { display: none; }
+    .iro-picker-wrapper { background: rgba(255,255,255,0.8); border-radius: 50%; padding: 5px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .color-picker-scrollable { display: flex; gap: 12px; overflow-x: auto; padding: 10px 5px; margin-top: 15px; align-items: center; scrollbar-width: none; }
+    .color-picker-scrollable::-webkit-scrollbar { display: none; }
+    .color-btn { width: 35px; height: 35px; border-radius: 50%; cursor: pointer; border: 2px solid #ddd; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.2s; }
+    .color-btn.active-color { transform: scale(1.2); border-color: #FF4D6D; border-width: 3px; }
+    .custom-color-btn { background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red); }
+
+    .unread-item { cursor: pointer; transition: transform 0.2s; background: linear-gradient(145deg, #ffffff, #fff0f3); border: 1px solid #ffb3c1; }
+    .unread-item:active { transform: scale(0.98); }
+    .new-badge { background: #FF4D6D; color: white; font-size: 0.7rem; padding: 3px 6px; border-radius: 10px; vertical-align: middle; margin-left: 5px; }
+    .action-text { margin: 0; color: #a4133c; font-size: 0.9rem; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px; }
     .tool-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 20px; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; color: white; }
     .tool-btn.warning { background: #f4a261; }
     .tool-btn.danger { background: #e63946; }
@@ -246,8 +263,11 @@ import { Location } from '@angular/common';
     :host-context(.night-owl-mode) .prompt-card p { color: #ccc; }
     :host-context(.night-owl-mode) .prompt-card h3 { color: #fdfdfd; }
     :host-context(.night-owl-mode) .canvas-wrapper { border-color: rgba(255,255,255,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-    :host-context(.night-owl-mode) .color-picker { background: #1a1a1a; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-    :host-context(.night-owl-mode) .tools { background: #1a1a1a; box-shadow: 0 -2px 10px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .iro-picker-wrapper { background: rgba(30,30,30,0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .color-btn { border-color: #444; }
+    :host-context(.night-owl-mode) .color-picker-scrollable { background: #1a1a1a; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5); border-radius: 15px; padding: 15px; }
+    :host-context(.night-owl-mode) .tools { background: #1a1a1a; box-shadow: 0 -2px 10px rgba(0,0,0,0.5); padding: 10px; border-radius: 15px; }
+    :host-context(.night-owl-mode) .unread-item { background: linear-gradient(145deg, #222, #331f24); border-color: #590d22; }
     :host-context(.night-owl-mode) .waiting-state h3 { color: #fdfdfd; }
     :host-context(.night-owl-mode) .waiting-state p { color: #ccc; }
     :host-context(.night-owl-mode) .results-view h3 { color: #fdfdfd; }
@@ -265,7 +285,9 @@ import { Location } from '@angular/common';
 })
 export class DrawingGameComponent implements OnInit, AfterViewInit {
   @ViewChild('drawingCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('colorPicker') colorPickerRef!: ElementRef<HTMLElement>;
   private ctx!: CanvasRenderingContext2D;
+  private colorPickerObj: any = null;
 
   categories: string[] = [];
   selectedCategory: string = '';
@@ -276,17 +298,24 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
 
   completedPrompts: any[] = [];
   waitingPrompts: any[] = [];
+  waitingMePrompts: any[] = [];
+
+  showCustomPicker: boolean = false;
 
   private isDrawing = false;
   private drawingHistory: ImageData[] = [];
   public currentColor: string = '#000000';
+  public predefinedColors = [
+    '#000000', '#ffffff', '#8b4513', '#a0522d', '#cd853f', '#f5deb3', 
+    '#ffb6c1', '#ff69b4', '#9370db', '#e6e6fa', '#add8e6', '#98fb98'
+  ];
   private api = inject(LoveApiService);
   private toastCtrl = inject(ToastController);
   private location = inject(Location);
   private tutorialService = inject(TutorialService);
 
   constructor() {
-    addIcons({ arrowBack, trashOutline, checkmarkCircleOutline, arrowUndoOutline, 'play-circle-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M112 111v290c0 17.44 17 28.52 31 20.16l247.9-148.37c12.12-7.25 12.12-26.33 0-33.58L143 90.84c-14-8.36-31 2.72-31 20.16z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/></svg>', 'lock-closed-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M336 208v-95a80 80 0 00-160 0v95" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="96" y="208" width="320" height="272" rx="48" ry="48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>', 'infinite-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M256 256s-48-96-126-96c-54.12 0-98 43-98 96s43.88 96 98 96c37.51 0 71-22.41 94-48M256 256s48 96 126 96c54.12 0 98-43 98-96s-43.88-96-98-96c-37.51 0-71 22.41-94 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="48"/></svg>' });
+    addIcons({ arrowBack, trashOutline, checkmarkCircleOutline, arrowUndoOutline, 'play-circle-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M112 111v290c0 17.44 17 28.52 31 20.16l247.9-148.37c12.12-7.25 12.12-26.33 0-33.58L143 90.84c-14-8.36-31 2.72-31 20.16z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/></svg>', 'lock-closed-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M336 208v-95a80 80 0 00-160 0v95" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="96" y="208" width="320" height="272" rx="48" ry="48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>', 'infinite-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M256 256s-48-96-126-96c-54.12 0-98 43-98 96s43.88 96 98 96c37.51 0 71-22.41 94-48M256 256s48 96 126 96c54.12 0 98-43 98-96s-43.88-96-98-96c-37.51 0-71 22.41-94 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="48"/></svg>', 'images-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M432 112V96a48.14 48.14 0 00-48-48H64a48.14 48.14 0 00-48 48v256a48.14 48.14 0 0048 48h16" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32"/><rect x="96" y="128" width="400" height="336" rx="45.99" ry="45.99" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32"/><ellipse cx="372.92" cy="219.64" rx="30.77" ry="30.55" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/><path d="M342.15 372.17L255 285.78a30.93 30.93 0 00-42.18-1.21L96 387.64M265.23 464l118.59-117.73a31 31 0 0141.46-1.87L496 402.91" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>', 'brush-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M452.37 59.63h0a40.49 40.49 0 00-57.26 0L184.54 270.17a64.12 64.12 0 00-17.72 31.78L160 336l34.05-6.81a64.12 64.12 0 0031.78-17.72L436.37 101.9a40.49 40.49 0 000-57.26z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path d="M160 336l-34.05 6.81A32 32 0 00104 368.53v0a32 32 0 0032 32h0a32 32 0 0025.72-12.78L192 352" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path d="M224 400h128" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>' });
   }
 
   async ngOnInit() {}
@@ -347,12 +376,30 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
   async loadCompletedList() {
     this.gameState = 'completed_list';
     try {
-      const allPrompts = await this.api.getAllDrawingPrompts();
+      const response: any = await this.api.getAllDrawingPrompts();
+      let allPrompts: any[] = [];
+      
+      if (Array.isArray(response)) {
+        allPrompts = response;
+      } else if (response && Array.isArray(response.data)) {
+        allPrompts = response.data;
+      } else if (response && Array.isArray(response.cards)) {
+        allPrompts = response.cards;
+      } else if (response && typeof response === 'object') {
+        allPrompts = Object.values(response).find(val => Array.isArray(val)) as any[] || [];
+      }
+
       this.completedPrompts = allPrompts.filter(p => p.status === 'completed');
       this.waitingPrompts = allPrompts.filter(p => p.status === 'waiting_partner');
+      this.waitingMePrompts = allPrompts.filter(p => p.status === 'waiting_you');
     } catch (e) {
       console.error(e);
     }
+  }
+
+  startSpecificPrompt(p: any) {
+    this.prompt = { id: p.id, prompt_text: p.prompt_text, category: p.category };
+    this.checkResult();
   }
 
   goBack() {
@@ -408,6 +455,26 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
 
           this.drawingHistory = [];
           this.saveHistory();
+
+          if (this.colorPickerRef && !this.colorPickerObj) {
+            this.colorPickerObj = (iro as any).ColorPicker(this.colorPickerRef.nativeElement, {
+              width: 150,
+              color: '#ff0000', // start bright
+              borderWidth: 2,
+              borderColor: '#ffffff',
+              layout: [
+                { 
+                  component: (iro as any).ui.Wheel,
+                  options: {}
+                }
+              ]
+            });
+            this.colorPickerObj.on('color:change', (color: any) => {
+              if (this.showCustomPicker) {
+                this.setColor(color.hexString);
+              }
+            });
+          }
         }
       }
     }, 100);
@@ -494,16 +561,32 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
     this.saveHistory();
   }
 
+  toggleCustomPicker() {
+    this.showCustomPicker = !this.showCustomPicker;
+    if (this.showCustomPicker) {
+      // Set to bright red initially if black, to avoid black wheel
+      if (this.currentColor === '#000000' || this.currentColor === '#ffffff') {
+        this.setColor('#ff0000');
+        if (this.colorPickerObj) this.colorPickerObj.color.hexString = '#ff0000';
+      } else {
+        if (this.colorPickerObj) this.colorPickerObj.color.hexString = this.currentColor;
+      }
+    }
+  }
+
+  setColorFromBtn(color: string) {
+    this.showCustomPicker = false;
+    this.setColor(color);
+    if (this.colorPickerObj) {
+      this.colorPickerObj.color.hexString = color;
+    }
+  }
+
   setColor(color: string) {
     this.currentColor = color;
     if (this.ctx) {
       this.ctx.strokeStyle = this.currentColor;
     }
-  }
-
-  setColorFromPicker(event: any) {
-    const color = event.target.value;
-    this.setColor(color);
   }
 
   saveHistory() {

@@ -386,7 +386,11 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
         <div class="streak-modal-content" (click)="$event.stopPropagation()">
           <button class="streak-close-btn" (click)="showStreakModal = false"><ion-icon name="close"></ion-icon></button>
           
-          <div class="streak-modal-icon">🔥</div>
+          <div class="streak-modal-icon">
+            <span *ngIf="coupleInfo?.current_streak > 0 && coupleInfo?.my_photo_today && coupleInfo?.partner_photo_today">🔥</span>
+            <span *ngIf="coupleInfo?.current_streak > 0 && (!coupleInfo?.my_photo_today || !coupleInfo?.partner_photo_today)">⏳</span>
+            <span *ngIf="!coupleInfo?.current_streak || coupleInfo?.current_streak === 0">🤍</span>
+          </div>
           <h3>Racha de {{coupleInfo?.current_streak || 0}} días</h3>
           
           <div class="streak-status">
@@ -974,6 +978,7 @@ export class PhotoWidgetComponent implements OnInit {
 
       // 2. Carga desde red en segundo plano
       this.coupleInfo = await this.api.getCoupleInfo();
+      console.log('DEBUG STREAK:', this.coupleInfo?.debug_streak);
       const response = await this.api.getPhotos(this.currentAlbum ? this.currentAlbum.id : undefined, this.currentPage);
       this.lastPage = response.last_page || 1;
       const newPhotos = response.data || response;
@@ -2052,15 +2057,9 @@ export class PhotoWidgetComponent implements OnInit {
                 dialogTitle: 'Compartir foto'
               });
             } else {
-              // Guardar en la galería usando el plugin Media
-              const savedFile = await Filesystem.writeFile({
-                path: `love_photo_${photo.id}.jpg`,
-                data: base64data,
-                directory: Directory.Cache
-              });
-              
+              // Guardar en la galería pasando el dataUrl directamente
               await Media.savePhoto({
-                path: savedFile.uri
+                path: dataUrl
               });
               
               this.playSaveSuccessLottie('Guardada en tu galería');

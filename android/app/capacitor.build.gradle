@@ -26,6 +26,7 @@ dependencies {
     implementation project(':capawesome-capacitor-google-sign-in')
     implementation project(':revenuecat-purchases-capacitor')
     implementation project(':capacitor-secure-storage-plugin')
+    implementation project(':capacitor-voice-recorder')
 
 }
 

@@ -13,13 +13,14 @@ import { LocationService } from '../../services/location.service';
 import { TutorialService } from '../../services/tutorial.service';
 import { OfflineSyncService } from '../../services/offline-sync.service';
 import { addIcons } from 'ionicons';
-import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, bookOutline, imageOutline, checkmarkCircleOutline, informationCircleOutline, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, lockClosed } from 'ionicons/icons';
+import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, bookOutline, imageOutline, checkmarkCircleOutline, informationCircleOutline, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, lockClosed, fingerPrintOutline } from 'ionicons/icons';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.component';
 import { PremiumService } from '../../services/premium.service';
 import { PaywallComponent } from '../../components/paywall/paywall.component';
 import { ModalController } from '@ionic/angular';
+import confetti from 'canvas-confetti';
 
 
 @Component({
@@ -43,7 +44,7 @@ import { ModalController } from '@ionic/angular';
       </ion-refresher>
       <div class="mas-container">
         <div class="header">
-          <h2 class="title">Panel de Control ✨</h2>
+          <h2 class="title">Panel de Control <span (click)="onSparklesClick()" class="sparkles-trigger">✨</span></h2>
           <p class="subtitle">Gestiona tu experiencia</p>
         </div>
 
@@ -62,7 +63,7 @@ import { ModalController } from '@ionic/angular';
           </div>
 
           <div class="live-counter" *ngIf="startDate">
-            <div class="heart-pulse">
+            <div class="heart-pulse" (click)="onHeartTap()">
               <ion-icon name="heart"></ion-icon>
             </div>
             <div class="time-grid">
@@ -839,6 +840,7 @@ import { ModalController } from '@ionic/angular';
     
     .icon-circle { width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 1.8rem; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
     .bg-purple { background: linear-gradient(135deg, #7209b7, #b5179e); box-shadow: 0 4px 15px rgba(114, 9, 183, 0.3); }
+    .bg-neon { background: linear-gradient(135deg, #0a0a1a, #1a1a2e); box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3); color: #00ff88; }
     .bg-blue { background: linear-gradient(135deg, #4361ee, #4cc9f0); box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3); }
     .text-pink { color: #FF4D6D; font-size: 1.4rem; }
     
@@ -1033,6 +1035,41 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
   timeTogether = { years: 0, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
   
+  // Secreto: Buzón de Cartitas de Amor
+  heartTapCount = 0;
+  heartTapTimer: any;
+
+  async onHeartTap() {
+    this.heartTapCount++;
+    if (this.heartTapTimer) clearTimeout(this.heartTapTimer);
+
+    if (this.heartTapCount >= 3) {
+      this.heartTapCount = 0;
+      this.openSecretNotesModal();
+    } else {
+      this.heartTapTimer = setTimeout(() => {
+        this.heartTapCount = 0;
+      }, 1000); // 1 segundo para dar los 3 toques
+    }
+  }
+
+  async openSecretNotesModal() {
+    // Primero intentamos desbloquear el logro (el backend ya sabe si es la primera vez)
+    await this.api.unlockAchievement('secret_love_letter').catch(() => {});
+    
+    // Importación dinámica del modal
+    const { SecretNotesModalComponent } = await import('../secret-notes-modal/secret-notes-modal.component');
+    
+    const modal = await this.modalCtrl.create({
+      component: SecretNotesModalComponent,
+      cssClass: 'glass-modal',
+      breakpoints: [0, 1],
+      initialBreakpoint: 1
+    });
+    
+    await modal.present();
+  }
+  
   annualEvents: { name: string, daysLeft: number, dateStr: string, icon: string, alwaysShow?: boolean }[] = [];
   visibleEvents: { name: string, daysLeft: number, dateStr: string, icon: string, alwaysShow?: boolean }[] = [];
   showAllEvents = false;
@@ -1041,11 +1078,17 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   selectedEvent: any = null;
 
   myBirthday: string = '';
-  partnerBirthday: string = '';
+  public partnerBirthday: string = '';
+  private prefsSub!: Subscription;
+  
+  // Easter Egg
+  private sparkleClicks = 0;
+  private sparkleTimeout: any;
 
   private timer: any;
   private appStateListener?: PluginListenerHandle;
   uploadingAvatar = false;
+
   myUserId: 'juan' | 'roberta' = 'juan';
 
   // --- Food Places & Movies ---
@@ -1150,7 +1193,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   isNightOwlEnabled = false;
 
   constructor() {
-    addIcons({ bookOutline, imageOutline, logOutOutline, addCircleOutline, starOutline, star, closeOutline, checkmarkCircleOutline, restaurantOutline, locationOutline, pencilOutline, filmOutline, gameControllerOutline, personCircleOutline, informationCircleOutline, heartOutline, heart, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, timeOutline, settingsOutline, flagOutline, checkmarkCircle, ellipseOutline, moonOutline, closeCircle, calendar, add, cameraOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, lockClosed });
+    addIcons({ fingerPrintOutline, bookOutline, imageOutline, logOutOutline, addCircleOutline, starOutline, star, closeOutline, checkmarkCircleOutline, restaurantOutline, locationOutline, pencilOutline, filmOutline, gameControllerOutline, personCircleOutline, informationCircleOutline, heartOutline, heart, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, timeOutline, settingsOutline, flagOutline, checkmarkCircle, ellipseOutline, moonOutline, closeCircle, calendar, add, cameraOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, lockClosed });
   }
 
   async checkNightOwl() {
@@ -1176,6 +1219,56 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
         }, 1000);
       }
     );
+  }
+
+  // --- EASTER EGG SPARKLES ---
+  async onSparklesClick() {
+    this.sparkleClicks++;
+    
+    if (this.sparkleClicks === 5) {
+      this.unlockSparkleAchievement();
+      this.sparkleClicks = 0;
+    }
+
+    clearTimeout(this.sparkleTimeout);
+    this.sparkleTimeout = setTimeout(() => {
+      this.sparkleClicks = 0;
+    }, 1000);
+  }
+
+  private async unlockSparkleAchievement() {
+    // Save to preferences
+    await Preferences.set({
+      key: 'sparkle_achievement_unlocked',
+      value: 'true'
+    });
+
+    // Golden confetti animation
+    const duration = 3000;
+    const end = Date.now() + duration;
+
+    const frame = () => {
+      confetti({
+        particleCount: 5,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: ['#FFD700', '#FFA500', '#FFF8DC', '#DAA520']
+      });
+      confetti({
+        particleCount: 5,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: ['#FFD700', '#FFA500', '#FFF8DC', '#DAA520']
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    };
+    
+    frame();
   }
 
   async confirmDeleteAccount() {

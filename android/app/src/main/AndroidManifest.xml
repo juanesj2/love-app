@@ -63,6 +63,12 @@
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_poke_info" />
         </receiver>
+
+        <!-- Background Geolocation Service -->
+        <service
+            android:name="com.equimaps.capacitor_background_geolocation.BackgroundGeolocationService"
+            android:exported="true"
+            android:foregroundServiceType="location" />
     </application>
 
     <!-- Permissions -->

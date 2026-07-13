@@ -31,7 +31,8 @@ import { ModalController } from '@ionic/angular';
         <div class="ghost-box">
           <ion-icon name="eye-off-outline"></ion-icon>
           <h3>Modo Fantasma Activo</h3>
-          <p>Tu ubicación está oculta. Actívala para ver dónde está tu pareja.</p>
+          <p>La notificación y tu ubicación están ocultas.</p>
+          <p class="warning-text"><small>(Atención: El widget y el mapa dejarán de actualizarse hasta que lo vuelvas a activar)</small></p>
         </div>
       </div>
 
@@ -415,6 +416,12 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
       L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         maxZoom: 19,
       }).addTo(this.map);
+      
+      // Asegurarse de que el mapa carga correctamente los mosaicos
+      setTimeout(() => {
+        if (this.map) this.map.invalidateSize();
+      }, 300);
+      
     } else {
       if (!this.premiumService.isPremium) {
         this.map.dragging.disable();
@@ -422,6 +429,7 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
         this.map.scrollWheelZoom.disable();
         this.map.doubleClickZoom.disable();
       }
+      setTimeout(() => this.map.invalidateSize(), 100);
     }
   }
 
@@ -480,17 +488,35 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
     });
   }
 
+  private getCoord(pos: any, type: 'lat' | 'lng'): number | undefined {
+    if (!pos) return undefined;
+    if (type === 'lat') {
+      if (typeof pos.latitude !== 'undefined') return pos.latitude;
+      if (typeof pos._lat !== 'undefined') return pos._lat;
+      if (typeof pos.lat !== 'undefined') return pos.lat;
+    } else {
+      if (typeof pos.longitude !== 'undefined') return pos.longitude;
+      if (typeof pos._long !== 'undefined') return pos._long;
+      if (typeof pos.lng !== 'undefined') return pos.lng;
+    }
+    return undefined;
+  }
+
   private renderMapState(me: any, partner: any) {
     if (!me || !partner) return;
 
     this.partnerIsGhost = partner?.is_sharing === false;
 
-    const myPos = me?.position 
-      ? L.latLng(me.position.latitude, me.position.longitude)
+    const myLat = me?.position ? this.getCoord(me.position, 'lat') : undefined;
+    const myLng = me?.position ? this.getCoord(me.position, 'lng') : undefined;
+    const myPos = (myLat !== undefined && myLng !== undefined)
+      ? L.latLng(myLat, myLng)
       : L.latLng(40.4168, -3.7038); // Madrid
 
-    const partnerPos = partner?.position
-      ? L.latLng(partner.position.latitude, partner.position.longitude)
+    const partnerLat = partner?.position ? this.getCoord(partner.position, 'lat') : undefined;
+    const partnerLng = partner?.position ? this.getCoord(partner.position, 'lng') : undefined;
+    const partnerPos = (partnerLat !== undefined && partnerLng !== undefined)
+      ? L.latLng(partnerLat, partnerLng)
       : L.latLng(41.3851, 2.1734); // Barcelona
 
     this.myLastPos = myPos;

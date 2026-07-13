@@ -5,6 +5,7 @@ import { Preferences } from '@capacitor/preferences';
 import { SecureStoragePlugin } from 'capacitor-secure-storage-plugin';
 import { firstValueFrom, BehaviorSubject, Subject } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { Router } from '@angular/router';
 
 export const API_BASE_URL = environment.apiUrl;
 
@@ -14,6 +15,7 @@ export const API_BASE_URL = environment.apiUrl;
 export class LoveApiService {
   private http = inject(HttpClient);
   private toastCtrl = inject(ToastController);
+  private router = inject(Router);
   public token$ = new BehaviorSubject<string | null>(null);
   public unlockedAchievements$ = new BehaviorSubject<string[]>([]);
   public avatarUpdated$ = new Subject<void>();
@@ -58,15 +60,29 @@ export class LoveApiService {
           duration: 4000,
           position: 'top',
           color: 'warning',
-          cssClass: 'achievement-toast'
+          buttons: [{ text: 'Ver', role: 'cancel', handler: () => { this.router.navigate(['/achievements']); } }]
         });
-        await toast.present();
+        toast.present();
       }
       return res;
-    } catch (e) {
-      console.error('Error unlocking achievement', e);
-      return null;
+    } catch (error) {
+      console.error('Error unlocking achievement:', error);
+      throw error;
     }
+  }
+
+  // --- Buzón Secreto (Cartitas de Amor) ---
+  
+  async getSecretNotes(): Promise<any> {
+    return firstValueFrom(this.http.get<any>(`${API_BASE_URL}/love-album/secret-notes`));
+  }
+
+  async saveSecretNote(content: string): Promise<any> {
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/secret-notes`, { content }));
+  }
+
+  async deleteSecretNote(id: number): Promise<any> {
+    return firstValueFrom(this.http.delete(`${API_BASE_URL}/love-album/secret-notes/${id}`));
   }
 
   // --- AUTH ---
@@ -157,8 +173,8 @@ export class LoveApiService {
     return res;
   }
 
-  async sendPoke(): Promise<any> {
-    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/poke`, {}));
+  async sendPoke(isSuper: boolean = false): Promise<any> {
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/poke`, { is_super: isSuper }));
   }
 
   // --- TIMELINE Y PLANES ---

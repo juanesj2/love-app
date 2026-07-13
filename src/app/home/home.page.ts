@@ -268,7 +268,11 @@ import { ModalController } from '@ionic/angular';
     .premium-input { width: 100%; border: 2px solid rgba(255, 77, 109, 0.2); border-radius: 15px; padding: 15px; font-size: 1.1rem; color: #590D22; background: rgba(255, 255, 255, 0.8); outline: none; transition: border-color 0.3s; font-weight: bold; }
     .premium-input:focus { border-color: #FF4D6D; }
     .premium-input::placeholder { color: #a08c92; font-weight: normal; }
-    .surprise-sheet { background: linear-gradient(to bottom, #ffffff, #fff5f8); }
+    @keyframes slideUpModal {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .surprise-sheet { background: linear-gradient(to bottom, #ffffff, #fff5f8); animation: slideUpModal 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
     
     .prompt-actions { display: flex; gap: 10px; }
     .prompt-btn { flex: 1; padding: 14px; border-radius: 20px; font-weight: bold; font-size: 1.1rem; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
@@ -668,6 +672,9 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   onPokeClick() {
+    // Cancelamos el timer por si el evento de soltar no se registró bien en el móvil
+    this.endPokeHold();
+
     // Si el long press ya disparó el super poke, ignorar el click
     if (this.pokeHoldFired) {
       this.pokeHoldFired = false;
@@ -681,7 +688,7 @@ export class HomePage implements OnInit, OnDestroy {
     this.pokeHoldTimer = setTimeout(() => {
       this.pokeHoldFired = true;
       this.sendSuperPoke();
-    }, 700);
+    }, 1000);
   }
 
   endPokeHold() {
@@ -697,7 +704,7 @@ export class HomePage implements OnInit, OnDestroy {
     try {
       // Vibrar de forma larga y continua
       await Haptics.vibrate({ duration: 800 });
-      await this.api.sendPoke();
+      await this.api.sendPoke(true);
       const toast = await this.toastController.create({
         message: '¡SUPER ZUMBIDO enviado! 💚💥',
         duration: 2000,
@@ -705,8 +712,19 @@ export class HomePage implements OnInit, OnDestroy {
         position: 'top'
       });
       toast.present();
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      let errorMsg = 'Error al enviar el súper zumbido';
+      if (e.status === 429 && e.error && e.error.message) {
+        errorMsg = e.error.message;
+      }
+      const toast = await this.toastController.create({
+        message: errorMsg,
+        duration: 3000,
+        color: 'warning',
+        position: 'top'
+      });
+      toast.present();
     }
     setTimeout(() => { this.superPokeAnimation = false; }, 1500);
   }
@@ -720,7 +738,7 @@ export class HomePage implements OnInit, OnDestroy {
     
     try {
       await Haptics.impact({ style: ImpactStyle.Heavy });
-      await this.api.sendPoke();
+      await this.api.sendPoke(false);
       const toast = await this.toastController.create({
         message: '¡Zumbido enviado! 🐝',
         duration: 2000,

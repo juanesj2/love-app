@@ -2,6 +2,7 @@ import { Component, inject, OnInit, ViewChild, ElementRef, AfterViewInit, OnDest
 import { Subscription } from 'rxjs';
 import { Preferences } from '@capacitor/preferences';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { VoiceRecorder } from 'capacitor-voice-recorder';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, ToastController, ActionSheetController, AlertController, IonContent, ModalController } from '@ionic/angular';
@@ -11,6 +12,8 @@ import { TutorialService } from '../../services/tutorial.service';
 import { PremiumService } from '../../services/premium.service';
 import { PaywallComponent } from '../../components/paywall/paywall.component';
 import { environment } from '../../../environments/environment';
+import confetti from 'canvas-confetti';
+import { FingerprintGameModalComponent } from '../fingerprint-game-modal/fingerprint-game-modal.component';
 import { addIcons } from 'ionicons';
 import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed, settingsOutline, imageOutline, partlySunnyOutline, waterOutline, moonOutline, planetOutline, heartOutline, colorPaletteOutline, chatbubbleEllipsesOutline, textOutline, musicalNotesOutline, personCircleOutline } from 'ionicons/icons';
 import { DotLottie } from '@lottiefiles/dotlottie-web';
@@ -1898,6 +1901,9 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
             if (this.isEmojiOnly(latestMsg.mensaje)) {
               this.triggerEmojiReaction(latestMsg.mensaje.trim());
             }
+            if (latestMsg.mensaje && latestMsg.mensaje.includes('✨')) {
+              this.triggerConfetti();
+            }
             if (this.chatSound && this.chatSound !== 'default' && this.chatSound !== 'none') {
               const audio = new Audio(`assets/sounds/${this.chatSound}.wav`);
               audio.play().catch(e => console.log('Audio play error:', e));
@@ -1962,6 +1968,14 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     // Trigger locally immediately if it's an emoji
     if (this.isEmojiOnly(payloadMessage)) {
       this.triggerEmojiReaction(payloadMessage.trim());
+    }
+    
+    if (payloadMessage.includes('✨')) {
+      this.triggerConfetti();
+    }
+    
+    if (payloadMessage.includes('🫆')) {
+      this.openFingerprintGame();
     }
     
     try {
@@ -2425,17 +2439,18 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     
     if (this.isDoodling) return;
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      this.mediaRecorder = new MediaRecorder(stream);
-      this.audioChunks = [];
+      let hasPermission = await VoiceRecorder.hasAudioRecordingPermission();
+      if (!hasPermission.value) {
+        hasPermission = await VoiceRecorder.requestAudioRecordingPermission();
+      }
       
-      this.mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) this.audioChunks.push(e.data);
-      };
+      if (!hasPermission.value) {
+        this.showError('Permiso de micrófono denegado');
+        return;
+      }
+
+      await VoiceRecorder.startRecording();
       
-      this.mediaRecorder.onstop = () => this.processAudio();
-      
-      this.mediaRecorder.start();
       this.isRecording = true;
       this.recordingTime = 0;
       this.recordingInterval = setInterval(() => this.recordingTime++, 1000);
@@ -2446,50 +2461,41 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   stopAudioRecording() {
-    if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
-      this.mediaRecorder.stop();
+    if (this.isRecording) {
+      this.processAudio();
     }
   }
 
   cancelAudioRecording() {
     this.isRecording = false;
     clearInterval(this.recordingInterval);
-    if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
-      this.mediaRecorder.onstop = null; // Prevent processing
-      this.mediaRecorder.stop();
-    }
+    VoiceRecorder.stopRecording().catch(e => console.error('Cancel recording error', e));
   }
 
   async processAudio() {
     this.isRecording = false;
     clearInterval(this.recordingInterval);
     this.cdr.detectChanges();
-    const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' }); // Default for MediaRecorder in most browsers
-    if (audioBlob.size === 0) return;
     
     this.sending = true;
     try {
-      const reader = new FileReader();
-      reader.readAsDataURL(audioBlob);
-      reader.onloadend = async () => {
-        try {
-          const base64Audio = reader.result as string;
-          const replyPayload = this.replyingTo ? { id: this.replyingTo.id, user: this.replyingTo.user?.name, text: '🎤 Audio' } : undefined;
-          await this.api.sendMessage('[AUDIO]' + base64Audio, undefined, replyPayload);
-          this.replyingTo = null;
-          await this.loadMessages();
-          this.safeTimeout(() => this.scrollToBottom(), 100);
-        } catch (e) {
-          console.error('Error sending base64 audio', e);
-          this.showError('Error al enviar audio. Puede ser demasiado largo.');
-        } finally {
-          this.sending = false;
-          this.cdr.detectChanges();
-        }
-      };
+      const result = await VoiceRecorder.stopRecording();
+      if (result.value && result.value.recordDataBase64) {
+        const mimeType = result.value.mimeType || 'audio/aac';
+        const base64Audio = `data:${mimeType};base64,${result.value.recordDataBase64}`;
+        
+        const replyPayload = this.replyingTo ? { id: this.replyingTo.id, user: this.replyingTo.user?.name, text: '🎤 Audio' } : undefined;
+        await this.api.sendMessage('[AUDIO]' + base64Audio, undefined, replyPayload);
+        this.replyingTo = null;
+        await this.loadMessages();
+        this.safeTimeout(() => this.scrollToBottom(), 100);
+      } else {
+        this.sending = false;
+      }
     } catch (e) {
-      console.error('Error preparing audio', e);
-      this.showError('Error al preparar audio');
+      console.error('Error sending base64 audio', e);
+      this.showError('Error al enviar audio. Puede ser demasiado largo.');
+    } finally {
       this.sending = false;
       this.cdr.detectChanges();
     }
@@ -2926,5 +2932,49 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       position: 'bottom'
     });
     await toast.present();
+  }
+
+  private triggerConfetti() {
+    const duration = 3000;
+    const end = Date.now() + duration;
+
+    const frame = () => {
+      confetti({
+        particleCount: 5,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: ['#00ff88', '#ff4d6d', '#ffffff']
+      });
+      confetti({
+        particleCount: 5,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: ['#00ff88', '#ff4d6d', '#ffffff']
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    };
+    frame();
+  }
+
+  private async openFingerprintGame() {
+    let partnerNameStr = 'Tu amor';
+    const info = await this.api.getCoupleInfo();
+    if (info && info.partner_name) {
+      partnerNameStr = info.partner_name;
+    }
+    
+    const modal = await this.modalCtrl.create({
+      component: FingerprintGameModalComponent,
+      componentProps: {
+        partnerName: partnerNameStr
+      },
+      cssClass: 'fullscreen-modal'
+    });
+    await modal.present();
   }
 }
