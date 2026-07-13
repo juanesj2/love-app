@@ -28,7 +28,28 @@ export class AppComponent {
 
   setupBackButton() {
     this.platform.backButton.subscribeWithPriority(10, async (processNextHandler) => {
-      if (this.router.url === '/home') {
+      // 1. Check for custom overlays and close the topmost one
+      const overlaySelectors = [
+        '.custom-overlay',
+        '.home-overlay',
+        '.lightbox-backdrop',
+        '.gif-modal-overlay',
+        '.reactions-overlay',
+        '.color-picker-overlay',
+        '.graffiti-context-overlay',
+        '.ghost-overlay',
+        '.map-premium-overlay',
+        '.global-date-overlay'
+      ];
+      const overlays = document.querySelectorAll(overlaySelectors.join(', '));
+      if (overlays.length > 0) {
+        const topmost = overlays[overlays.length - 1] as HTMLElement;
+        topmost.click();
+        return;
+      }
+
+      // 2. If no custom overlay, check if we're at home
+      if (this.router.url === '/home' || this.router.url === '/') {
         const now = Date.now();
         if (now - this.lastBackPress < 2000) {
           App.exitApp();
@@ -44,6 +65,7 @@ export class AppComponent {
           toast.present();
         }
       } else {
+        // 3. Otherwise, let Ionic navigate back in the router history
         processNextHandler();
       }
     });
