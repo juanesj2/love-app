@@ -2044,25 +2044,32 @@ export class PhotoWidgetComponent implements OnInit {
           const dataUrl = reader.result as string;
           const base64data = dataUrl.split(',')[1];
           try {
-            if (action === 'share') {
+            if (action === 'share' || action === 'save') {
               const savedFile = await Filesystem.writeFile({
                 path: `love_photo_${photo.id}.jpg`,
                 data: base64data,
                 directory: Directory.Cache
               });
-              this.showSaveOverlay = false;
-              await Share.share({
-                title: 'Foto de Love Widget',
-                url: savedFile.uri,
-                dialogTitle: 'Compartir foto'
-              });
-            } else {
-              // Guardar en la galería pasando el dataUrl directamente
-              await Media.savePhoto({
-                path: dataUrl
-              });
               
-              this.playSaveSuccessLottie('Guardada en tu galería');
+              if (action === 'share') {
+                this.showSaveOverlay = false;
+                await Share.share({
+                  title: 'Foto de Love Widget',
+                  url: savedFile.uri,
+                  dialogTitle: 'Compartir foto'
+                });
+              } else {
+                try {
+                  await Media.savePhoto({
+                    path: savedFile.uri
+                  });
+                  this.playSaveSuccessLottie('Guardada en tu galería');
+                } catch(err: any) {
+                  console.error('Error Media.savePhoto:', err);
+                  this.showSaveOverlay = false;
+                  this.showError('Error: ' + (err.message || JSON.stringify(err)));
+                }
+              }
             }
           } catch(e) {
             console.error('Error guardando archivo nativo:', e);
