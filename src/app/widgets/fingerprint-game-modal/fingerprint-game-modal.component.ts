@@ -47,7 +47,7 @@ import { closeOutline, fingerPrintOutline } from 'ionicons/icons';
 
     .close-btn {
       position: absolute;
-      top: env(safe-area-inset-top, 20px);
+      top: var(--safe-top);
       right: 20px;
       font-size: 32px;
       color: rgba(255,255,255,0.7);
@@ -253,3 +253,4 @@ export class FingerprintGameModalComponent implements OnInit, OnDestroy {
     frame();
   }
 }
+

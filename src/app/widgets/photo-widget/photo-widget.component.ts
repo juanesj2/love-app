@@ -457,7 +457,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     }
     .photo-widget-container { padding: 0; position: relative; height: 100%; display: flex; flex-direction: column; background: linear-gradient(135deg, #fff5f8 0%, #ffe3e9 100%); font-family: 'Inter', sans-serif; }
     
-    .floating-top-bar { position: absolute; top: calc(env(safe-area-inset-top) + 105px); left: 15px; right: 15px; z-index: 50; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
+    .floating-top-bar { position: absolute; top: calc(var(--safe-top) + 105px); left: 15px; right: 15px; z-index: 50; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
     .floating-top-bar > * { pointer-events: auto; }
     
     .floating-toggles { position: absolute; left: 50%; transform: translateX(-50%); display: flex; background: rgba(255,255,255,0.85); backdrop-filter: blur(10px); padding: 4px; border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); gap: 5px; }
@@ -481,8 +481,8 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     
     .scroll-content { flex: 1; --background: transparent; --padding-bottom: 95px; }
-    .photos-list { padding-top: calc(env(safe-area-inset-top) + 170px); padding-bottom: 95px; }
-    .grid-wrapper { padding-top: calc(env(safe-area-inset-top) + 170px); padding-bottom: 95px; }
+    .photos-list { padding-top: calc(var(--safe-top) + 170px); padding-bottom: 95px; }
+    .grid-wrapper { padding-top: calc(var(--safe-top) + 170px); padding-bottom: 95px; }
     
     .global-date-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; visibility: hidden; transition: opacity 0.8s ease-in-out, visibility 0.8s; pointer-events: none; border-radius: inherit; }
     .global-date-overlay.show { opacity: 1; visibility: visible; }
@@ -578,7 +578,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     
     /* Modals & Overlays */
     .albums-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 1000; display: flex; align-items: flex-end; }
-    .albums-sheet { background: #fff; width: 100%; border-radius: 25px 25px 0 0; padding: 20px 20px calc(env(safe-area-inset-bottom) + 30px) 20px; box-shadow: 0 -10px 20px rgba(0,0,0,0.1); max-height: 80vh; overflow-y: auto; }
+    .albums-sheet { background: #fff; width: 100%; border-radius: 25px 25px 0 0; padding: 20px 20px calc(var(--safe-bottom) + 30px) 20px; box-shadow: 0 -10px 20px rgba(0,0,0,0.1); max-height: 80vh; overflow-y: auto; }
     
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .modal-header h2 { margin: 0; font-size: 1.3rem; font-weight: 800; color: #590D22; }
@@ -626,7 +626,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     @keyframes slideInDown { 0% { transform: translateY(-100px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
 
     /* Custom Upload Prompt */
-    .prompt-sheet { padding-bottom: calc(env(safe-area-inset-bottom) + 30px); }
+    .prompt-sheet { padding-bottom: calc(var(--safe-bottom) + 30px); }
     .prompt-body { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
     .prompt-preview-container { width: 100%; display: flex; justify-content: center; background: #fff5f8; border-radius: 15px; overflow: hidden; max-height: 250px; }
     .prompt-preview { max-width: 100%; max-height: 250px; object-fit: contain; }
@@ -861,6 +861,8 @@ export class PhotoWidgetComponent implements OnInit {
       this.currentAlbum = { id: parseInt(albumIntent.value), name: 'Cargando...' };
       await Preferences.remove({ key: 'open_album_id_intent' });
     }
+    
+    Preferences.set({ key: 'last_photo_viewed_at', value: new Date().toISOString() });
     
     this.loadData();
   }
@@ -2342,3 +2344,4 @@ export class PhotoWidgetComponent implements OnInit {
     await alert.present();
   }
 }
+

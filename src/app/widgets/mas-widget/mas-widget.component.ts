@@ -720,7 +720,7 @@ import confetti from 'canvas-confetti';
     styles: [`
     :host { display: block; height: 100%; }
     .scroll-content { --background: transparent; }
-    .mas-container { padding: calc(env(safe-area-inset-top) + 85px) 20px 20px; font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #fff0f3 0%, #ffccd5 100%); min-height: 100%; padding-bottom: 100px; }
+    .mas-container { padding: calc(var(--safe-top) + 85px) 20px 20px; font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #fff0f3 0%, #ffccd5 100%); min-height: 100%; padding-bottom: 100px; }
     
     .header { margin-bottom: 25px; text-align: center; }
     .title { margin: 0; font-size: 1.8rem; font-weight: 900; color: #590D22; letter-spacing: -0.5px; text-shadow: 0 2px 10px rgba(255,255,255,0.8); }
@@ -740,14 +740,16 @@ import confetti from 'canvas-confetti';
     }
     
     .bottom-sheet-modal {
-      width: 100%; height: 90%; background: #fff0f3;
+      width: 100%; 
+      height: calc(100% - var(--safe-top) - 90px); 
+      background: #fff0f3;
       border-top-left-radius: 30px; border-top-right-radius: 30px;
       display: flex; flex-direction: column; overflow: hidden; position: relative;
     }
     
     .bottom-sheet-modal.auto-height-sheet {
       height: auto;
-      max-height: 90%;
+      max-height: calc(100% - var(--safe-top) - 90px);
       padding-bottom: 20px;
     }
     .bottom-sheet-header { padding: 25px 20px 10px; position: relative; background: #fff0f3; z-index: 2; text-align: left; transform: translateZ(0); }
@@ -1963,3 +1965,4 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     });
   }
 }
+

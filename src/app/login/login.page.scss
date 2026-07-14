@@ -59,19 +59,21 @@ ion-content.login-content {
   margin-bottom: 20px; /* Reduced from 30px */
   
   .icon-wrapper {
-    background: linear-gradient(135deg, #FF4D6D, #c9184a);
-    width: 50px; /* Reduced from 60px */
-    height: 50px; /* Reduced from 60px */
-    border-radius: 16px; /* Slightly smaller border radius */
+    background: transparent;
+    width: 90px;
+    height: 90px;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 10px; /* Reduced bottom margin */
-    box-shadow: 0 8px 20px rgba(255, 77, 109, 0.4);
+    margin: 0 auto 10px;
+    box-shadow: none;
 
-    ion-icon {
-      color: white;
-      font-size: 26px; /* Reduced from 32px */
+    .app-logo-icon {
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 20px rgba(255, 77, 109, 0.45));
     }
   }
 
@@ -266,3 +268,95 @@ ion-content.login-content {
   }
 }
 
+// ─────────────────────────────────────────
+// 🦉 MODO BÚHO NOCTURNO
+// ─────────────────────────────────────────
+:host-context(.night-owl-mode) {
+  ion-content.login-content {
+    --background: #0d0d1a;
+  }
+
+  .background-bubbles {
+    .bubble-1 { background: #4c1d95; }
+    .bubble-2 { background: #6d28d9; }
+    .bubble-3 { background: #7c3aed; }
+  }
+
+  .header-text {
+    h1 { color: #fdfdfd; }
+    p  { color: #c4b5fd; }
+
+    .icon-wrapper .app-logo-icon {
+      filter: drop-shadow(0 8px 20px rgba(167, 139, 250, 0.55));
+    }
+  }
+
+  .glass-form-container {
+    background: rgba(20, 14, 40, 0.75);
+    border-color: rgba(167, 139, 250, 0.15);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  }
+
+  .auth-form {
+    .input-group {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(167, 139, 250, 0.2);
+
+      &:focus-within {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: #a78bfa;
+        box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2);
+      }
+
+      ion-icon { color: #a78bfa; }
+
+      input {
+        color: #fdfdfd;
+        &::placeholder { color: rgba(196, 181, 253, 0.5); }
+
+        &:-webkit-autofill,
+        &:-webkit-autofill:hover,
+        &:-webkit-autofill:focus,
+        &:-webkit-autofill:active {
+          -webkit-text-fill-color: #fdfdfd !important;
+          transition: background-color 5000s ease-in-out 0s;
+        }
+      }
+
+      .eye-icon {
+        color: rgba(196, 181, 253, 0.6);
+        &:hover { color: #a78bfa; }
+      }
+    }
+
+    .forgot-password span {
+      color: #a78bfa;
+    }
+  }
+
+  .glass-btn {
+    background: linear-gradient(135deg, #a78bfa, #7c3aed);
+    box-shadow: 0 8px 20px rgba(167, 139, 250, 0.35);
+  }
+
+  .switch-mode span {
+    color: #c4b5fd;
+    background: rgba(167, 139, 250, 0.12);
+  }
+
+  .divider {
+    color: #a78bfa;
+    &::before, &::after {
+      border-bottom-color: rgba(167, 139, 250, 0.25);
+    }
+  }
+
+  .google-btn {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #fdfdfd !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    box-shadow: none !important;
+
+    ion-icon { color: #c4b5fd; }
+  }
+}

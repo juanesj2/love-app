@@ -42,6 +42,11 @@
 /* Leaflet CSS */
 @import 'leaflet/dist/leaflet.css';
 
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 /* Prevent mobile pull-to-refresh globally (especially for drawing canvas) */
 body {
   overscroll-behavior-y: none;
@@ -774,3 +779,4 @@ img.frame-fire, .avatar.frame-fire {
   0% { box-shadow: 0 0 10px #ff4500, inset 0 0 5px #ff4500, 0 0 15px #ffa500; }
   100% { box-shadow: 0 0 20px #ff4500, inset 0 0 15px #ff4500, 0 0 35px #ffa500; }
 }
+

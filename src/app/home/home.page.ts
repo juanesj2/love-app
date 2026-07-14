@@ -236,7 +236,7 @@ import { ModalController } from '@ionic/angular';
       @keyframes heartbeat { 0% { transform: scale(1); } 25% { transform: scale(1.4); } 50% { transform: scale(1); } 75% { transform: scale(1.4); } 100% { transform: scale(1); } }
       @keyframes superheartbeat { 0% { transform: scale(1); } 30% { transform: scale(1.5) rotate(-5deg); } 60% { transform: scale(0.9) rotate(5deg); } 100% { transform: scale(1); } }
   
-      .custom-footer { background: transparent; border: none; padding: 0 15px calc(env(safe-area-inset-bottom) + 15px) 15px; position: absolute; bottom: 0; width: 100%; pointer-events: none; z-index: 1000; }
+      .custom-footer { background: transparent; border: none; padding: 0 15px calc(var(--safe-bottom) + 15px) 15px; position: absolute; bottom: 0; width: 100%; pointer-events: none; z-index: 1000; }
       .custom-tab-bar { pointer-events: auto; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; padding: 5px 15px; height: 70px; border-radius: 35px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.5); position: relative; margin-bottom: 5px; }
       .tab-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #a08c92; width: 55px; font-size: 0.75rem; gap: 4px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; }
       .tab-btn.active { color: #FF4D6D; font-weight: 800; transform: translateY(-3px); }
@@ -246,7 +246,7 @@ import { ModalController } from '@ionic/angular';
       .tab-btn.active::after { content: ''; position: absolute; bottom: -8px; width: 6px; height: 6px; background: #FF4D6D; border-radius: 50%; box-shadow: 0 2px 5px rgba(255,77,109,0.4); }
       
       .center-btn { position: relative; width: 60px; height: 60px; }
-      .floating-center-wrapper { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom) + 20px); width: 60px; height: 70px; z-index: 1010; display: flex; justify-content: center; pointer-events: auto; }
+      .floating-center-wrapper { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(var(--safe-bottom) + 20px); width: 60px; height: 70px; z-index: 1010; display: flex; justify-content: center; pointer-events: auto; }
       .plus-circle { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; box-shadow: 0 10px 25px rgba(255, 77, 109, 0.5); border: 4px solid #ffffff; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 10; cursor: pointer; }
       .plus-circle::before { content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; border-radius: 50%; background: linear-gradient(135deg, #ff8fa3, #ffb3c1); z-index: -1; opacity: 0; transition: opacity 0.3s; }
       .plus-circle:active { transform: translateX(-50%) scale(0.9); box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4); }
@@ -906,3 +906,4 @@ export class HomePage implements OnInit, OnDestroy {
     }
   }
 }
+

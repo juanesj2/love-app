@@ -172,7 +172,7 @@ import iro from '@jaames/iro';
       display: block;
       height: 100%;
     }
-    .drawing-container { padding: calc(env(safe-area-inset-top) + 40px) 20px calc(env(safe-area-inset-bottom) + 80px); background: #fff0f3; min-height: 100vh; display: flex; flex-direction: column; overflow-y: auto; height: 100vh; box-sizing: border-box; overscroll-behavior-y: none; }
+    .drawing-container { padding: calc(var(--safe-top) + 40px) 20px calc(var(--safe-bottom) + 80px); background: #fff0f3; min-height: 100vh; display: flex; flex-direction: column; overflow-y: auto; height: 100vh; box-sizing: border-box; overscroll-behavior-y: none; }
     .header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
     .back-btn { background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; flex-shrink: 0; }
     .header-titles { flex: 1; text-align: center; display: flex; flex-direction: column; align-items: center; margin-right: 40px; }
@@ -633,3 +633,4 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
     }
   }
 }
+

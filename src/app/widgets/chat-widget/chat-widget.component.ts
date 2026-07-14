@@ -408,7 +408,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     audio { display: none; }
     
     .messages-content { flex: 1; --background: transparent; }
-    .messages-inner { padding: calc(env(safe-area-inset-top) + 85px) 15px 20px; display: flex; flex-direction: column; min-height: 100%; background: transparent !important; }
+    .messages-inner { padding: calc(var(--safe-top) + 85px) 15px 20px; display: flex; flex-direction: column; min-height: 100%; background: transparent !important; }
     
     .message-row { position: relative; width: 100%; display: flex; align-items: center; margin-bottom: 12px; }
     .message-content-wrapper { width: 100%; position: relative; z-index: 2; transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
@@ -467,13 +467,13 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     .cancel-record-btn { background: transparent; border: none; font-size: 1.5rem; color: #666; display: flex; align-items: center; }
 
     .doodle-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999; display: flex; flex-direction: column; }
-    .doodle-topbar { position: absolute; top: env(safe-area-inset-top, 20px); left: 20px; right: 20px; display: flex; justify-content: space-between; align-items: center; z-index: 10001; }
+    .doodle-topbar { position: absolute; top: var(--safe-top); left: 20px; right: 20px; display: flex; justify-content: space-between; align-items: center; z-index: 10001; }
     .doodle-tools { display: flex; gap: 15px; background: rgba(0,0,0,0.5); padding: 8px 15px; border-radius: 30px; backdrop-filter: blur(10px); }
     
     .doodle-slider-container { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); z-index: 10001; height: 200px; display: flex; flex-direction: column; align-items: center; background: rgba(0,0,0,0.5); border-radius: 20px; padding: 15px 0; backdrop-filter: blur(10px); }
     .doodle-slider { -webkit-appearance: slider-vertical; width: 8px; height: 100%; outline: none; }
     
-    .doodle-toolbar { position: absolute; bottom: calc(env(safe-area-inset-bottom, 20px) + 70px); left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: center; background: rgba(80, 80, 80, 0.95); backdrop-filter: blur(10px); padding: 8px 12px; border-radius: 40px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 10001; gap: 8px; }
+    .doodle-toolbar { position: absolute; bottom: calc(var(--safe-bottom) + 70px); left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: center; background: rgba(80, 80, 80, 0.95); backdrop-filter: blur(10px); padding: 8px 12px; border-radius: 40px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 10001; gap: 8px; }
     .doodle-left-actions { display: flex; gap: 4px; }
     .doodle-colors-wrapper { display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden; }
     .doodle-colors { display: flex; gap: 8px; overflow-x: auto; padding: 5px 0; scrollbar-width: none; }
@@ -553,7 +553,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     .close-reply { color: #999; font-size: 1.2rem; cursor: pointer; }
     .reply-text { font-size: 0.9rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .input-area { background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding-bottom: calc(env(safe-area-inset-bottom) + 102px); border-top: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; }
+    .input-area { background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding-bottom: calc(var(--safe-bottom) + 102px); border-top: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; }
     .input-container { padding: 10px 15px; display: flex; align-items: center; gap: 10px; position: relative; }
     
     .premium-input { flex: 1; background: #f8f9fa; border: 1px solid rgba(0,0,0,0.05); border-radius: 20px; padding: 12px 20px; font-size: 1rem; color: #333; outline: none; transition: all 0.3s ease; }
@@ -2996,3 +2996,4 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     await modal.present();
   }
 }
+

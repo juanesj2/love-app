@@ -108,7 +108,7 @@ import confetti from 'canvas-confetti';
 
     .absolute-close {
       position: absolute;
-      top: env(safe-area-inset-top, 15px);
+      top: var(--safe-top);
       right: 15px;
       z-index: 100;
       color: #333;
@@ -437,4 +437,5 @@ export class PaywallComponent {
     }
   }
 }
+
 

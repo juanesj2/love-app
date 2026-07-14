@@ -125,15 +125,15 @@ import { ModalController } from '@ionic/angular';
     #map { width: 100%; height: 100%; background: #fdfbfb; }
     ::ng-deep .leaflet-tile-pane { filter: brightness(1.02) saturate(1.2) hue-rotate(345deg); }
     ::ng-deep .leaflet-control-attribution { display: none !important; }
-        .partner-location-card { position: absolute; top: calc(env(safe-area-inset-top) + 15px); left: 50%; transform: translateX(-50%); z-index: 2000; background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); border-radius: 30px; padding: 8px 12px 8px 8px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 30px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.4); }
+        .partner-location-card { position: absolute; top: calc(var(--safe-top) + 15px); left: 50%; transform: translateX(-50%); z-index: 2000; background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); border-radius: 30px; padding: 8px 12px 8px 8px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 30px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.4); }
       .poke-btn-mini { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(255,77,109,0.4); }
       .avatar-container-mini { position: relative; width: 48px; height: 48px; }
       .avatar-mini { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
       .mood-badge-mini { position: absolute; bottom: -5px; right: -5px; background: white; border-radius: 50%; padding: 2px; font-size: 1.2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-      .center-map-btn { position: absolute; top: calc(env(safe-area-inset-top) + 16px); right: 16px; z-index: 2000; width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.95); border: none; color: #590D22; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15); font-size: 24px; backdrop-filter: blur(5px); transition: transform 0.2s; }
+      .center-map-btn { position: absolute; top: calc(var(--safe-top) + 16px); right: 16px; z-index: 2000; width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.95); border: none; color: #590D22; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15); font-size: 24px; backdrop-filter: blur(5px); transition: transform 0.2s; }
       .center-map-btn:active { transform: scale(0.9); }
     
-    .next-milestone-card { position: absolute; bottom: calc(env(safe-area-inset-bottom) + 115px); left: 15px; z-index: 2000; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border-radius: 20px; padding: 10px 18px 10px 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.6); max-width: 65%; cursor: pointer; transition: transform 0.2s; }
+    .next-milestone-card { position: absolute; bottom: calc(var(--safe-bottom) + 115px); left: 15px; z-index: 2000; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border-radius: 20px; padding: 10px 18px 10px 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.6); max-width: 65%; cursor: pointer; transition: transform 0.2s; }
     .next-milestone-card:active { transform: scale(0.95); }
     .nm-icon { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; box-shadow: 0 4px 10px rgba(255,77,109,0.3); }
     .nm-info { display: flex; flex-direction: column; overflow: hidden; }
@@ -733,3 +733,4 @@ export class LocationWidgetComponent implements OnInit, OnDestroy, AfterViewInit
     });
   }
 }
+
