@@ -146,7 +146,7 @@ import { ModalController } from '@ionic/angular';
     </div>
 
     <!-- Surprise Modal -->
-    <div class="home-overlay" *ngIf="showSurpriseModal" (click)="showSurpriseModal = false">
+    <div class="home-overlay" *ngIf="showSurpriseModal" (click)="closeSurpriseModal()">
       <div class="prompt-sheet surprise-sheet" (click)="$event.stopPropagation()">
         <div class="modal-header">
           <h2>¡Notificación Sorpresa! 🎁</h2>
@@ -159,7 +159,7 @@ import { ModalController } from '@ionic/angular';
         </div>
         
         <div class="prompt-actions">
-          <button class="prompt-btn cancel" (click)="showSurpriseModal = false" [disabled]="sendingSurprise">Cancelar</button>
+          <button class="prompt-btn cancel" (click)="closeSurpriseModal()" [disabled]="sendingSurprise">Cancelar</button>
           <button class="prompt-btn confirm" (click)="sendSurprise()" [disabled]="sendingSurprise || !surpriseTitle || !surpriseBody">
             <span *ngIf="!sendingSurprise">Enviar 🔥</span>
             <ion-spinner name="crescent" *ngIf="sendingSurprise"></ion-spinner>
@@ -395,6 +395,8 @@ export class HomePage implements OnInit, OnDestroy {
     }
     
     this.showPremiumCountdownModal = true;
+    document.body.classList.add('hide-tabs');
+    this.cdr.detectChanges();
     
     const updateCountdown = () => {
       const diff = expiresAt.getTime() - new Date().getTime();
@@ -416,6 +418,8 @@ export class HomePage implements OnInit, OnDestroy {
 
   closePremiumCountdown() {
     this.showPremiumCountdownModal = false;
+    document.body.classList.remove('hide-tabs');
+    this.cdr.detectChanges();
     if (this.premiumCountdownInterval) {
       clearInterval(this.premiumCountdownInterval);
     }
@@ -519,6 +523,15 @@ export class HomePage implements OnInit, OnDestroy {
     this.surpriseTitle = '';
     this.surpriseBody = '';
     this.showSurpriseModal = true;
+    document.body.classList.add('hide-tabs');
+    this.cdr.detectChanges();
+  }
+
+
+  closeSurpriseModal() {
+    this.showSurpriseModal = false;
+    document.body.classList.remove('hide-tabs');
+    this.cdr.detectChanges();
   }
 
   startGoldenPress() {
@@ -542,6 +555,7 @@ export class HomePage implements OnInit, OnDestroy {
   async sendSurprise() {
     if (!this.surpriseTitle || !this.surpriseBody) return;
     this.sendingSurprise = true;
+    this.cdr.detectChanges();
     try {
       await this.api.sendCustomNotification(this.surpriseTitle, this.surpriseBody);
       const toast = await this.toastController.create({
@@ -551,7 +565,7 @@ export class HomePage implements OnInit, OnDestroy {
         position: 'top'
       });
       toast.present();
-      this.showSurpriseModal = false;
+      this.closeSurpriseModal();
     } catch (e) {
       const toast = await this.toastController.create({
         message: 'Error al enviar notificación',
@@ -562,6 +576,7 @@ export class HomePage implements OnInit, OnDestroy {
       toast.present();
     } finally {
       this.sendingSurprise = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -700,6 +715,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   async sendSuperPoke() {
     this.superPokeAnimation = true;
+    this.cdr.detectChanges();
     this.api.unlockAchievement('secret_spammer');
     try {
       // Vibrar de forma larga y continua
@@ -726,11 +742,15 @@ export class HomePage implements OnInit, OnDestroy {
       });
       toast.present();
     }
-    setTimeout(() => { this.superPokeAnimation = false; }, 1500);
+    setTimeout(() => { 
+      this.superPokeAnimation = false; 
+      this.cdr.detectChanges();
+    }, 1500);
   }
 
   async sendPoke() {
     this.pokeAnimation = true;
+    this.cdr.detectChanges();
     this.pokeCount++;
     if (this.pokeCount === 10) {
       this.api.unlockAchievement('explorer_poke');
@@ -756,7 +776,10 @@ export class HomePage implements OnInit, OnDestroy {
       });
       toast.present();
     }
-    setTimeout(() => { this.pokeAnimation = false; }, 1500);
+    setTimeout(() => { 
+      this.pokeAnimation = false; 
+      this.cdr.detectChanges();
+    }, 1500);
   }
 
   async toggleDarkMode() {
@@ -823,6 +846,8 @@ export class HomePage implements OnInit, OnDestroy {
           this.pendingPhotoFile = new File([blob], "camera_photo.jpg", { type: blob.type });
           this.pendingPhotoPreview = URL.createObjectURL(this.pendingPhotoFile);
           this.pendingPhotoText = '';
+          document.body.classList.add('hide-tabs');
+          this.cdr.detectChanges();
         }
       } catch (e: any) {
         if (e.message && e.message.includes('User cancelled')) {
@@ -838,12 +863,15 @@ export class HomePage implements OnInit, OnDestroy {
     this.pendingPhotoFile = null;
     this.pendingPhotoPreview = '';
     this.pendingPhotoText = '';
+    document.body.classList.remove('hide-tabs');
+    this.cdr.detectChanges();
   }
 
   async confirmUpload() {
     if (!this.pendingPhotoFile) return;
 
     this.uploading = true;
+    this.cdr.detectChanges();
     try {
       await this.api.uploadPhoto(this.pendingPhotoFile, this.pendingPhotoText);
       this.cancelUpload();
@@ -874,6 +902,7 @@ export class HomePage implements OnInit, OnDestroy {
       await toast.present();
     } finally {
       this.uploading = false;
+      this.cdr.detectChanges();
     }
   }
 }
