@@ -257,7 +257,24 @@ export class QuestionsWidgetComponent implements OnInit {
 
   async loadQuestions() {
     try {
-      this.questions = await this.api.getQuestions();
+      const res = await this.api.getQuestions();
+      // Filter out duplicate questions by text, keeping the one with highest progress
+      const statusPriority: any = { 'answered': 4, 'waiting_partner': 3, 'waiting_you': 2, 'unanswered': 1 };
+      const uniqueMap = new Map();
+      for (const q of res) {
+        const text = q.question_text?.trim().toLowerCase();
+        if (!uniqueMap.has(text)) {
+          uniqueMap.set(text, q);
+        } else {
+          const existing = uniqueMap.get(text);
+          const p1 = statusPriority[q.status] || 0;
+          const p2 = statusPriority[existing.status] || 0;
+          if (p1 > p2) {
+            uniqueMap.set(text, q);
+          }
+        }
+      }
+      this.questions = Array.from(uniqueMap.values());
     } catch (e) {
       console.error(e);
     }

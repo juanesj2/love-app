@@ -2038,6 +2038,11 @@ export class PhotoWidgetComponent implements OnInit {
       const blob = await this.api.downloadPhotoBlob(photo.id);
       
       if (Capacitor.isNativePlatform()) {
+        try {
+          await Filesystem.requestPermissions();
+        } catch(e) {
+          console.warn('Could not request filesystem permissions', e);
+        }
         const reader = new FileReader();
         reader.readAsDataURL(blob);
         reader.onloadend = async () => {

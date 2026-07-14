@@ -1,11 +1,11 @@
-import { Component, inject, OnDestroy, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, Output, EventEmitter, AfterViewInit } from '@angular/core';
 import { App } from '@capacitor/app';
 import { PluginListenerHandle } from '@capacitor/core';
 import { CommonModule } from '@angular/common';
 import { IonIcon, ActionSheetController } from '@ionic/angular/standalone';
 import * as L from 'leaflet';
 import { LocationService } from '../../services/location.service';
-import { Subscription, combineLatest } from 'rxjs';
+import { Subscription, combineLatest, startWith } from 'rxjs';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Preferences } from '@capacitor/preferences';
 import { addIcons } from 'ionicons';
@@ -226,7 +226,7 @@ import { ModalController } from '@ionic/angular';
     :host-context(.night-owl-mode) .avatar-ring { background: rgba(30,30,30,0.9); border-color: rgba(255,255,255,0.1); }
   `]
 })
-export class LocationWidgetComponent implements OnInit, OnDestroy {
+export class LocationWidgetComponent implements OnInit, OnDestroy, AfterViewInit {
   @Output() poke = new EventEmitter<void>();
   private locationService = inject(LocationService);
   private api = inject(LoveApiService);
@@ -268,6 +268,7 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
 
   private locationsSub?: Subscription;
   private moodInterval: any;
+  private resizeObserver?: ResizeObserver;
 
   private hasCentered = false;
 
@@ -289,10 +290,6 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.isGhostMode = await this.locationService.getPrivacyMode();
-
-    setTimeout(() => {
-      this.initMap();
-    }, 100);
 
     try {
       const info = await this.api.getCoupleInfo();
@@ -326,6 +323,21 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
     });
   }
 
+  ngAfterViewInit() {
+    this.initMap();
+    
+    const mapElement = document.getElementById('map');
+    if (mapElement) {
+      this.resizeObserver = new ResizeObserver(() => {
+        if (this.map) {
+          this.map.invalidateSize();
+          this.centerMap();
+        }
+      });
+      this.resizeObserver.observe(mapElement);
+    }
+  }
+
   private startMoodInterval() {
     if (!this.moodInterval) {
       this.moodInterval = setInterval(() => this.loadMoods(), 15000);
@@ -344,6 +356,12 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
     this.stopMoodInterval();
     if (this.appStateListener) {
       this.appStateListener.remove();
+    }
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+    if (this.map) {
+      this.map.remove();
     }
   }
 
@@ -478,8 +496,8 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
   }
 
   private startTracking() {
-    const me$ = this.locationService.listenToUserLocation(this.myUserId);
-    const partner$ = this.locationService.listenToUserLocation(this.partnerId);
+    const me$ = this.locationService.listenToUserLocation(this.myUserId).pipe(startWith(null));
+    const partner$ = this.locationService.listenToUserLocation(this.partnerId).pipe(startWith(null));
 
     this.locationsSub = combineLatest([me$, partner$]).subscribe(([me, partner]) => {
       this.lastMeData = me;
@@ -503,49 +521,56 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
   }
 
   private renderMapState(me: any, partner: any) {
-    if (!me || !partner) return;
-
     this.partnerIsGhost = partner?.is_sharing === false;
 
-    const myLat = me?.position ? this.getCoord(me.position, 'lat') : undefined;
-    const myLng = me?.position ? this.getCoord(me.position, 'lng') : undefined;
-    const myPos = (myLat !== undefined && myLng !== undefined)
-      ? L.latLng(myLat, myLng)
-      : L.latLng(40.4168, -3.7038); // Madrid
+    let myPos: L.LatLng | undefined;
+    if (me && me.position) {
+      const myLat = this.getCoord(me.position, 'lat');
+      const myLng = this.getCoord(me.position, 'lng');
+      if (myLat !== undefined && myLng !== undefined) {
+        myPos = L.latLng(myLat, myLng);
+      }
+    }
 
-    const partnerLat = partner?.position ? this.getCoord(partner.position, 'lat') : undefined;
-    const partnerLng = partner?.position ? this.getCoord(partner.position, 'lng') : undefined;
-    const partnerPos = (partnerLat !== undefined && partnerLng !== undefined)
-      ? L.latLng(partnerLat, partnerLng)
-      : L.latLng(41.3851, 2.1734); // Barcelona
+    let partnerPos: L.LatLng | undefined;
+    if (partner && partner.position && !this.partnerIsGhost) {
+      const partnerLat = this.getCoord(partner.position, 'lat');
+      const partnerLng = this.getCoord(partner.position, 'lng');
+      if (partnerLat !== undefined && partnerLng !== undefined) {
+        partnerPos = L.latLng(partnerLat, partnerLng);
+      }
+    }
 
     this.myLastPos = myPos;
+    this.partnerLastPos = partnerPos;
     
     let distanceMeters = 0;
+    this.areTogether = false;
 
-    if (this.isGhostMode || this.partnerIsGhost) {
-      this.areTogether = false;
-      this.partnerLastPos = undefined;
-      
-      if (this.partnerMarker) {
-        this.map.removeLayer(this.partnerMarker);
-        this.partnerMarker = undefined;
-      }
-      if (this.distanceMarker) {
-        this.map.removeLayer(this.distanceMarker);
-        this.distanceMarker = undefined;
-      }
-      if (this.connectionLine) {
-        this.map.removeLayer(this.connectionLine);
-        this.connectionLine = undefined;
-      }
-    } else {
-      this.partnerLastPos = partnerPos;
-      if (!this.partnerCity && partnerPos && !this.areTogether) {
-        this.getCityName(partnerPos.lat, partnerPos.lng);
-      }
+    if (this.isGhostMode) {
+      myPos = undefined;
+    }
+
+    if (myPos && partnerPos) {
       distanceMeters = myPos.distanceTo(partnerPos);
       this.areTogether = distanceMeters < 50 && this.premiumService.isPremium;
+    }
+
+    if (!partnerPos && this.partnerMarker) {
+      this.map.removeLayer(this.partnerMarker);
+      this.partnerMarker = undefined;
+    }
+    if (!myPos && this.myMarker) {
+      this.map.removeLayer(this.myMarker);
+      this.myMarker = undefined;
+    }
+    if ((!myPos || !partnerPos) && this.connectionLine) {
+      this.map.removeLayer(this.connectionLine);
+      this.connectionLine = undefined;
+    }
+    if ((!myPos || !partnerPos) && this.distanceMarker) {
+      this.map.removeLayer(this.distanceMarker);
+      this.distanceMarker = undefined;
     }
 
     if (this.areTogether) {
@@ -555,22 +580,25 @@ export class LocationWidgetComponent implements OnInit, OnDestroy {
         this.hasCentered = true;
       }
     } else {
-      if (!this.isGhostMode) {
+      if (myPos) {
         this.updateMarker('me', myPos, this.myAvatarUrl);
-        
-        if (!this.partnerIsGhost) {
-          this.updateMarker('partner', partnerPos, this.partnerAvatarUrl);
-          this.drawConnection(myPos, partnerPos);
-          
-          const midPoint = L.latLng((myPos.lat + partnerPos.lat) / 2, (myPos.lng + partnerPos.lng) / 2);
-          const distText = distanceMeters > 1000
-            ? `${(distanceMeters / 1000).toLocaleString('es-ES', { maximumFractionDigits: 0 })} km`
-            : `${Math.round(distanceMeters)} m`;
-          this.updateDistanceMarker(midPoint, distText);
+      }
+      if (partnerPos) {
+        this.updateMarker('partner', partnerPos, this.partnerAvatarUrl);
+        if (!this.partnerCity) {
+           this.getCityName(partnerPos.lat, partnerPos.lng);
         }
       }
-      
-      if (!this.hasCentered) {
+      if (myPos && partnerPos) {
+        this.drawConnection(myPos, partnerPos);
+        const midPoint = L.latLng((myPos.lat + partnerPos.lat) / 2, (myPos.lng + partnerPos.lng) / 2);
+        const distText = distanceMeters > 1000
+          ? `${(distanceMeters / 1000).toLocaleString('es-ES', { maximumFractionDigits: 0 })} km`
+          : `${Math.round(distanceMeters)} m`;
+        this.updateDistanceMarker(midPoint, distText);
+      }
+
+      if (!this.hasCentered && (myPos || partnerPos)) {
         this.centerMap();
         this.hasCentered = true;
       }

@@ -408,6 +408,24 @@ export class SwipeGameComponent implements OnInit {
         all = Object.values(response).find(val => Array.isArray(val)) as any[] || [];
       }
 
+      // Filter duplicates by text, keeping the one with the highest progress
+      const statusPriority: any = { 'answered': 4, 'waiting_partner': 3, 'waiting_you': 2, 'unanswered': 1 };
+      const uniqueMap = new Map();
+      for (const c of all) {
+        const text = c.question_text?.trim().toLowerCase();
+        if (!uniqueMap.has(text)) {
+          uniqueMap.set(text, c);
+        } else {
+          const existing = uniqueMap.get(text);
+          const p1 = statusPriority[c.status] || 0;
+          const p2 = statusPriority[existing.status] || 0;
+          if (p1 > p2) {
+            uniqueMap.set(text, c);
+          }
+        }
+      }
+      all = Array.from(uniqueMap.values());
+
       this.allCards = this.selectedCategory ? all.filter(c => c.category === this.selectedCategory) : all;
       this.prepareStack();
     } catch (e) {

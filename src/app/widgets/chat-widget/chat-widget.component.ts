@@ -2462,7 +2462,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       }
       
       if (!hasPermission.value) {
-        this.showError('Permiso de micrófono denegado');
+        this.showError('Permiso de micrófono denegado. Habilítalo en Ajustes.');
         return;
       }
 
@@ -2471,9 +2471,10 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       this.isRecording = true;
       this.recordingTime = 0;
       this.recordingInterval = setInterval(() => this.recordingTime++, 1000);
-    } catch (e) {
+    } catch (e: any) {
       console.error('Error starting audio recording:', e);
-      this.showError('No se pudo acceder al micrófono');
+      let errorMsg = e?.message || JSON.stringify(e) || 'Desconocido';
+      this.showError('Error de micrófono: ' + errorMsg);
     }
   }
 
