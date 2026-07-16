@@ -115,7 +115,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
               </div>
 
               <div class="reply-box">
-                <input type="text" [(ngModel)]="replyTexts[photo.id]" placeholder="Escribe un mensaje para el chat..." (keyup.enter)="replyWithText(photo.id)" />
+                <input type="text" [(ngModel)]="replyTexts[photo.id]" placeholder="Escribe un mensaje para el chat..." (keyup.enter)="replyWithText(photo.id)" (focus)="onInputFocus()" (blur)="onInputBlur()" />
                 <button class="send-reply-btn" (click)="replyWithText(photo.id)" [disabled]="!replyTexts[photo.id]"><ion-icon name="send"></ion-icon></button>
               </div>
             </div>
@@ -283,7 +283,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
                 </div>
 
                 <div class="reply-box">
-                  <input type="text" [(ngModel)]="replyTexts[photo.id]" placeholder="Escribe un mensaje para el chat..." (keyup.enter)="replyWithText(photo.id)" />
+                  <input type="text" [(ngModel)]="replyTexts[photo.id]" placeholder="Escribe un mensaje para el chat..." (keyup.enter)="replyWithText(photo.id)" (focus)="onInputFocus()" (blur)="onInputBlur()" />
                   <button class="send-reply-btn" (click)="replyWithText(photo.id)" [disabled]="!replyTexts[photo.id]"><ion-icon name="send"></ion-icon></button>
                 </div>
               </div>
@@ -1711,6 +1711,14 @@ export class PhotoWidgetComponent implements OnInit {
   }
 
   replyTexts: { [key: number]: string } = {};
+
+  onInputFocus() {
+    document.body.classList.add('hide-tabs');
+  }
+
+  onInputBlur() {
+    document.body.classList.remove('hide-tabs');
+  }
 
   async replyWithText(photoId: number) {
     const text = this.replyTexts[photoId];
