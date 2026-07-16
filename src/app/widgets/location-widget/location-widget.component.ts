@@ -8,6 +8,7 @@ import { LocationService } from '../../services/location.service';
 import { Subscription, combineLatest, startWith } from 'rxjs';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Preferences } from '@capacitor/preferences';
+import { doc, getDoc, Firestore } from '@angular/fire/firestore';
 import { addIcons } from 'ionicons';
 import { locateOutline, flagOutline, camera, image, close, locationOutline, heart, eyeOutline, eyeOffOutline } from 'ionicons/icons';
 import { LoveApiService } from '../../services/love-api.service';
@@ -508,17 +509,43 @@ export class LocationWidgetComponent implements OnInit, OnDestroy, AfterViewInit
 
   private getCoord(pos: any, type: 'lat' | 'lng'): number | undefined {
     if (!pos) return undefined;
+    
+    // Si es un string (ej. "[40.07° N, 2.13° W]")
+    if (typeof pos === 'string') {
+      try {
+        const parsed = JSON.parse(pos);
+        if (Array.isArray(parsed)) pos = parsed;
+      } catch (e) {
+        // Intento bruto de sacar dos numeros del string
+        const matches = pos.match(/-?\d+(\.\d+)?/g);
+        if (matches && matches.length >= 2) {
+          const originalString = pos.toUpperCase();
+          pos = [Number(matches[0]), Number(matches[1])];
+          // Ajuste de signo basico si escribio W o S
+          if (originalString.includes('S')) pos[0] = -Math.abs(pos[0]);
+          if (originalString.includes('W')) pos[1] = -Math.abs(pos[1]);
+        }
+      }
+    }
+
+    // Si es un Array [lat, lng]
+    if (Array.isArray(pos) && pos.length >= 2) {
+      return type === 'lat' ? Number(pos[0]) : Number(pos[1]);
+    }
+    
     if (type === 'lat') {
-      if (typeof pos.latitude !== 'undefined') return pos.latitude;
-      if (typeof pos._lat !== 'undefined') return pos._lat;
-      if (typeof pos.lat !== 'undefined') return pos.lat;
+      if (typeof pos.latitude !== 'undefined') return Number(pos.latitude);
+      if (typeof pos._lat !== 'undefined') return Number(pos._lat);
+      if (typeof pos.lat !== 'undefined') return Number(pos.lat);
     } else {
-      if (typeof pos.longitude !== 'undefined') return pos.longitude;
-      if (typeof pos._long !== 'undefined') return pos._long;
-      if (typeof pos.lng !== 'undefined') return pos.lng;
+      if (typeof pos.longitude !== 'undefined') return Number(pos.longitude);
+      if (typeof pos._long !== 'undefined') return Number(pos._long);
+      if (typeof pos.lng !== 'undefined') return Number(pos.lng);
     }
     return undefined;
   }
+
+  public debugText: string = '';
 
   private renderMapState(me: any, partner: any) {
     this.partnerIsGhost = partner?.is_sharing === false;
@@ -540,6 +567,9 @@ export class LocationWidgetComponent implements OnInit, OnDestroy, AfterViewInit
         partnerPos = L.latLng(partnerLat, partnerLng);
       }
     }
+
+    // DEBUG INFO
+    this.debugText = `MyID: ${this.myUserId} | P_ID: ${this.partnerId} | P_Data: ${partner ? 'YES' : 'NO'} | P_Pos: ${partnerPos ? partnerPos.lat+','+partnerPos.lng : 'NO'} | Err: ${this.locationService.debugError}`;
 
     this.myLastPos = myPos;
     this.partnerLastPos = partnerPos;
@@ -674,7 +704,7 @@ export class LocationWidgetComponent implements OnInit, OnDestroy, AfterViewInit
   private updateDistanceMarker(latLng: L.LatLng, text: string) {
     const htmlIcon = L.divIcon({
       className: 'distance-pill-icon',
-      html: `<div style="background: #FF4D6D; color: white; font-weight: 800; border-radius: 24px; font-size: 1.1rem; box-shadow: 0 6px 20px rgba(255,77,109,0.4); border: 2px solid white; white-space: nowrap; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; box-sizing: border-box; font-family: 'Inter', sans-serif; letter-spacing: -0.5px;">${text}</div>`,
+      html: `<div style="background: #ffb3c1; color: #590D22; font-weight: 800; border-radius: 24px; font-size: 1.1rem; box-shadow: 0 6px 20px rgba(255,179,193,0.4); border: 2px solid white; white-space: nowrap; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; box-sizing: border-box; font-family: 'Inter', sans-serif; letter-spacing: -0.5px;">${text}</div>`,
       iconSize: [120, 40],
       iconAnchor: [60, 20]
     });
@@ -692,7 +722,7 @@ export class LocationWidgetComponent implements OnInit, OnDestroy, AfterViewInit
       this.connectionLine.setLatLngs([p1, p2]);
     } else {
       this.connectionLine = L.polyline([p1, p2], {
-        color: '#FF4D6D',
+        color: '#ffb3c1',
         weight: 3,
         dashArray: '10, 10',
         opacity: 0.8
