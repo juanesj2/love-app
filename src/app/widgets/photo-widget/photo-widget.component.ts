@@ -2067,8 +2067,38 @@ export class PhotoWidgetComponent implements OnInit {
                 });
               } else {
                 try {
+                  let albumIdentifier: string | undefined = undefined;
+                  if (Capacitor.getPlatform() === 'android') {
+                    try {
+                      let albumsRes = await Media.getAlbums();
+                      try {
+                        let albumsPath = (await Media.getAlbumsPath()).path;
+                        let album = albumsRes.albums.find(a => a.name === "LoveApp" && a.identifier.startsWith(albumsPath));
+                        if (!album) {
+                          await Media.createAlbum({ name: 'LoveApp' });
+                          albumsRes = await Media.getAlbums();
+                          album = albumsRes.albums.find(a => a.name === "LoveApp" && a.identifier.startsWith(albumsPath));
+                        }
+                        if (album) {
+                          albumIdentifier = album.identifier;
+                        }
+                      } catch (e) {
+                        console.warn("No se pudo crear/encontrar el album LoveApp, usando uno por defecto", e);
+                      }
+                      
+                      // Fallback si no hay albumIdentifier (Android lo requiere sí o sí)
+                      if (!albumIdentifier && albumsRes.albums && albumsRes.albums.length > 0) {
+                        const fallback = albumsRes.albums.find(a => a.name === 'Pictures' || a.name === 'Camera') || albumsRes.albums[0];
+                        albumIdentifier = fallback.identifier;
+                      }
+                    } catch (e) {
+                      console.error("Error obteniendo álbumes:", e);
+                    }
+                  }
+
                   await Media.savePhoto({
-                    path: savedFile.uri
+                    path: savedFile.uri,
+                    ...(albumIdentifier ? { albumIdentifier } : {})
                   });
                   this.playSaveSuccessLottie('Guardada en tu galería');
                 } catch(err: any) {
