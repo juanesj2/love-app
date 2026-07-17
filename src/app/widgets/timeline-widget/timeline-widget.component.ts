@@ -300,7 +300,6 @@ export class TimelineWidgetComponent implements OnInit, OnDestroy {
   albums: any[] = [];
   
   isEditing = false;
-  filteredPlans: any[] = [];
   
   // Swipe logic
   touchStartX = 0;
