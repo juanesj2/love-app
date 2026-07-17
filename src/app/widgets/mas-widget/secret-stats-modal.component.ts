@@ -12,7 +12,7 @@ import { LoveApiService } from '../../services/love-api.service';
   template: `
     <ion-header class="ion-no-border">
       <ion-toolbar style="--background: #111; color: #fff;">
-        <ion-title style="color: #00ffcc; font-family: monospace; font-size: 1rem;">Estadísticas 👁️</ion-title>
+        <ion-title style="color: #00ffcc; font-family: monospace; font-size: 1rem;">Estadísticas 👻</ion-title>
         <ion-buttons slot="end">
           <ion-button (click)="close()" style="color: #00ffcc;">
             <ion-icon name="close"></ion-icon>

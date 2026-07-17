@@ -75,8 +75,9 @@ import { PushNotifications } from '@capacitor/push-notifications';
             <!-- Spy Stats Button -->
             <div class="menu-toggle-btn" 
                  [class.show]="selectedWidget === 'mas' && hasSpyStatsUnlocked" 
-                 (click)="openSpyStats()">
-              <ion-icon name="eye"></ion-icon>
+                 (click)="openSpyStats()"
+                 style="font-size: 1.5rem;">
+              👻
             </div>
 
           </div>
