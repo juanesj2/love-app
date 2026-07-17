@@ -37,13 +37,13 @@ import { OfflineSyncService } from '../../services/offline-sync.service';
           <p>El pasado, presente y futuro de nosotros.</p>
           
           <div class="tabs">
-            <div class="tab" [class.active]="activeTab === 'idea'" (click)="activeTab = 'idea'">
+            <div class="tab" [class.active]="activeTab === 'idea'" (click)="switchTab('idea', 'right')">
               <ion-icon name="star-outline"></ion-icon> Ideas
             </div>
-            <div class="tab" [class.active]="activeTab === 'planned'" (click)="activeTab = 'planned'">
+            <div class="tab" [class.active]="activeTab === 'planned'" (click)="switchTab('planned', activeTab === 'idea' ? 'left' : 'right')">
               <ion-icon name="calendar-outline"></ion-icon> Próximos
             </div>
-            <div class="tab" [class.active]="activeTab === 'completed'" (click)="activeTab = 'completed'">
+            <div class="tab" [class.active]="activeTab === 'completed'" (click)="switchTab('completed', 'left')">
               <ion-icon name="flag-outline"></ion-icon> Historia
             </div>
           </div>
@@ -51,6 +51,7 @@ import { OfflineSyncService } from '../../services/offline-sync.service';
 
         <!-- Lista de Planes -->
         <div class="timeline-body" 
+             [ngClass]="swipeAnimationClass"
              (touchstart)="onTouchStart($event)" 
              (touchend)="onTouchEnd($event)">
           <div *ngIf="filteredPlans.length === 0 && !isEditing" class="empty-state">
@@ -281,6 +282,25 @@ import { OfflineSyncService } from '../../services/offline-sync.service';
     :host-context(.night-owl-mode) .packing-item { border-bottom-color: rgba(255,255,255,0.1) !important; }
     :host-context(.night-owl-mode) .small-glass-btn { background: rgba(167,139,250,0.1) !important; color: #a78bfa !important; }
     :host-context(.night-owl-mode) .dynamic-section h4 { color: #fdfdfd !important; border-bottom-color: rgba(255,255,255,0.1) !important; }
+
+    /* Animaciones de Swipe */
+    .timeline-body {
+      transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+    }
+    .swipe-left-enter {
+      animation: slideInRight 0.3s forwards;
+    }
+    .swipe-right-enter {
+      animation: slideInLeft 0.3s forwards;
+    }
+    @keyframes slideInRight {
+      from { transform: translateX(50px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideInLeft {
+      from { transform: translateX(-50px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
@@ -304,6 +324,7 @@ export class TimelineWidgetComponent implements OnInit, OnDestroy {
   // Swipe logic
   touchStartX = 0;
   touchEndX = 0;
+  swipeAnimationClass = '';
   editingPlan: any = {};
 
   constructor() {
@@ -525,18 +546,25 @@ export class TimelineWidgetComponent implements OnInit, OnDestroy {
     const swipeThreshold = 50;
     const diff = this.touchStartX - this.touchEndX;
     
-    // Si la diferencia es mayor al umbral, fue un swipe horizontal claro
     if (Math.abs(diff) > swipeThreshold) {
       if (diff > 0) {
-        // Swipe Left (dedo se mueve de derecha a izquierda -> ir a pestaña siguiente)
-        if (this.activeTab === 'idea') this.activeTab = 'planned';
-        else if (this.activeTab === 'planned') this.activeTab = 'completed';
+        // Swipe Left
+        if (this.activeTab === 'idea') this.switchTab('planned', 'left');
+        else if (this.activeTab === 'planned') this.switchTab('completed', 'left');
       } else {
-        // Swipe Right (dedo se mueve de izquierda a derecha -> ir a pestaña anterior)
-        if (this.activeTab === 'completed') this.activeTab = 'planned';
-        else if (this.activeTab === 'planned') this.activeTab = 'idea';
+        // Swipe Right
+        if (this.activeTab === 'completed') this.switchTab('planned', 'right');
+        else if (this.activeTab === 'planned') this.switchTab('idea', 'right');
       }
     }
+  }
+
+  switchTab(newTab: 'idea' | 'planned' | 'completed', direction: 'left' | 'right') {
+    this.activeTab = newTab;
+    this.swipeAnimationClass = direction === 'left' ? 'swipe-left-enter' : 'swipe-right-enter';
+    setTimeout(() => {
+      this.swipeAnimationClass = '';
+    }, 300);
   }
 
   async showToast(message: string, color: string) {
