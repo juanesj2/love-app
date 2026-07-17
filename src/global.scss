@@ -823,28 +823,4 @@ img.frame-fire, .avatar.frame-fire {
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .custom-action-sheet {
-    --background: rgba(30, 30, 30, 0.85);
-    --button-color: #fff;
-    --color: #ccc;
-    
-    .action-sheet-group {
-      background: rgba(30, 30, 30, 0.9) !important;
-      border: 1px solid rgba(255, 77, 109, 0.3);
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-    }
-    
-    .action-sheet-title {
-      color: #fff !important;
-    }
-    
-    .action-sheet-button {
-      color: #fff !important;
-      
-      &.action-sheet-cancel {
-        color: #FF4D6D !important;
-      }
-    }
-  }
-}
+
