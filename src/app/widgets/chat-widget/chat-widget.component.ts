@@ -76,7 +76,7 @@ import { Keyboard } from '@capacitor/keyboard';
               <div class="bubble-wrapper">
                 <div class="reply-context" *ngIf="msg.reply_to" (click)="scrollToMessage(msg.reply_to.id)">
                   <span class="reply-context-name">{{msg.reply_to.user}}</span>
-                  <span class="reply-context-text">{{msg.reply_to.text}}</span>
+                  <span class="reply-context-text">{{getDynamicReplyText(msg)}}</span>
                 </div>
 
                 <div class="bubble" [ngClass]="isMine(msg) ? 'bubble-' + myBubbleStyle : 'bubble-' + partnerBubbleStyle" [class.only-photo]="msg.photo && (!msg.mensaje || msg.mensaje === 'null')"
@@ -2772,6 +2772,15 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     }
 
     return txt || 'Mensaje';
+  }
+
+  getDynamicReplyText(msg: any): string {
+    if (!msg || !msg.reply_to) return '';
+    const originalMsg = this.regularMessages.find(m => m.id === msg.reply_to.id);
+    if (originalMsg) {
+      return this.getReplyPreviewText(originalMsg);
+    }
+    return msg.reply_to.text;
   }
 
   // --- Audio Player Logic ---
