@@ -34,9 +34,9 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
         </div>
       </div>
 
-      <!-- Interactive UI Toggle -->
-      <div class="top-bar-toggle" (click)="isTopBarHidden = !isTopBarHidden" [class.menu-hidden]="isTopBarHidden">
-        <ion-icon [name]="isTopBarHidden ? 'eye-outline' : 'eye-off-outline'"></ion-icon>
+      <!-- Interactive UI Puller Handle -->
+      <div class="top-bar-puller-handle" (click)="isTopBarHidden = !isTopBarHidden" [class.menu-hidden]="isTopBarHidden">
+        <div class="puller-line"></div>
       </div>
 
       <!-- Top actions (View toggles, Albums) -->
@@ -478,9 +478,10 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .floating-top-bar.hidden { transform: translateY(-50px) scale(0.9); opacity: 0; pointer-events: none !important; }
     .floating-top-bar.hidden > * { pointer-events: none !important; }
     
-    .top-bar-toggle { position: absolute; top: calc(var(--safe-top) + 65px); right: 15px; z-index: 60; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.8); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #555; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    .top-bar-toggle.menu-hidden { background: rgba(255,255,255,0.4); opacity: 0.5; }
-    .top-bar-toggle:active { transform: scale(0.9); }
+    .top-bar-puller-handle { position: absolute; top: calc(var(--safe-top) + 60px); left: 50%; transform: translateX(-50%); z-index: 60; width: 60px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .puller-line { width: 40px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: all 0.3s; }
+    .top-bar-puller-handle.menu-hidden .puller-line { background: rgba(255,255,255,0.4); }
+    .top-bar-puller-handle:active .puller-line { transform: scale(0.9); }
     
     .floating-toggles { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; padding: 4px; border-radius: 30px; }
     .floating-toggles button { background: transparent; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #555; transition: all 0.2s; cursor: pointer; text-shadow: 0 1px 4px rgba(255,255,255,0.8); }
@@ -799,7 +800,8 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     :host-context(.night-owl-mode) .sheet-input-row { background: #2a2a2a; border-color: #333; }
     :host-context(.night-owl-mode) .sheet-input-row input { color: #fdfdfd; }
     :host-context(.night-owl-mode) .sheet-send-btn { background: linear-gradient(135deg, #a78bfa, #8b5cf6); }
-    :host-context(.night-owl-mode) .top-bar-toggle { background: rgba(0,0,0,0.6); color: #ccc; }
+    :host-context(.night-owl-mode) .puller-line { background: rgba(255,255,255,0.3); box-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .top-bar-puller-handle.menu-hidden .puller-line { background: rgba(255,255,255,0.15); }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
