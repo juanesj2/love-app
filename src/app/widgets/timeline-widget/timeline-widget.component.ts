@@ -448,6 +448,7 @@ export class TimelineWidgetComponent implements OnInit, OnDestroy {
     const alert = await this.alertCtrl.create({
       header: '¿Eliminar Plan?',
       message: 'Se borrará para siempre.',
+      cssClass: 'custom-love-alert',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         { 
