@@ -240,7 +240,7 @@ import { Keyboard } from '@capacitor/keyboard';
           ></textarea>
           <button class="send-btn" 
                   [disabled]="sending" 
-                  [class.active]="newMessage.trim() || isRecording"
+                  [class.active]="newMessage.trim() || isRecording || !(premiumService.isFree$ | async)"
                   (pointerdown)="onSendBtnClick($event)">
             <ion-icon name="paper-plane" *ngIf="!sending && (newMessage.trim() || isRecording)"></ion-icon>
             <div class="mic-container" *ngIf="!sending && !newMessage.trim() && !isRecording">
