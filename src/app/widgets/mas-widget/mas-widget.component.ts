@@ -1990,15 +1990,22 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   }
 
   async openFeedback() {
+    const email = 'lovewidgetsupport@gmail.com';
     const alert = await this.alertCtrl.create({
       header: '¡Hola!',
-      message: 'Me encantaría leer tus sugerencias o los bugs que hayas encontrado. Puedes escribirme directamente a mi correo o dejar una reseña.<br><br><b>juanstivenalc@gmail.com</b>',
+      message: `Me encantaría leer tus sugerencias o los bugs que hayas encontrado. Puedes escribirme directamente a mi correo o dejar una reseña.\n\n${email}`,
       cssClass: 'love-alert',
       buttons: [
         {
+          text: 'Enviar correo',
+          handler: () => {
+            window.open(`mailto:${email}?subject=Feedback de Love Widget`, '_system');
+          }
+        },
+        {
           text: 'Copiar correo',
           handler: () => {
-            navigator.clipboard.writeText('juanstivenalc@gmail.com');
+            navigator.clipboard.writeText(email);
             this.showToast('Correo copiado al portapapeles', 'success');
           }
         },
