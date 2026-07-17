@@ -93,6 +93,9 @@ import { Keyboard } from '@capacitor/keyboard';
                     
                     <div class="photo-reply" *ngIf="msg.photo && !msg.mensaje?.startsWith('[DOODLE]') && !msg.mensaje?.startsWith('[AUDIO]')">
                       <img [src]="environment.storageUrl + msg.photo.image_path" loading="lazy" />
+                      <div class="photo-description" *ngIf="msg.photo.description">
+                        {{msg.photo.description}}
+                      </div>
                     </div>
 
                     <p class="text" *ngIf="msg.mensaje && msg.mensaje !== 'null' && !msg.mensaje.startsWith('[GIF]') && !msg.mensaje.startsWith('[DOODLE]') && !msg.mensaje.startsWith('[AUDIO]')">
@@ -530,7 +533,9 @@ import { Keyboard } from '@capacitor/keyboard';
     .msg-avatar-fallback { border-radius: 50%; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; font-weight: bold; font-size: 0.8rem; }
     
     
-    .photo-reply img { width: 100%; max-width: 200px; border-radius: 12px; margin-bottom: 8px; border: 2px solid rgba(255,255,255,0.2); display: block; overflow: hidden; }
+    .photo-reply img { width: 100%; height: auto; display: block; border-radius: 12px; }
+    .photo-description { padding: 8px 12px; font-size: 0.9rem; color: rgba(0,0,0,0.7); background: rgba(0,0,0,0.03); border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; border-top: 1px solid rgba(0,0,0,0.05); }
+    :host-context(.night-owl-mode) .photo-description { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.05); border-top-color: rgba(255,255,255,0.1); }
     .only-photo { padding: 4px; background: transparent !important; box-shadow: none !important; border: none !important; }
     .only-photo .photo-reply img { margin-bottom: 0; }
     
