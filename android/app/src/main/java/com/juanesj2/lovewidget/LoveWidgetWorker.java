@@ -58,6 +58,9 @@ public class LoveWidgetWorker extends Worker {
         String myAvatarUrl = null;
         String partnerAvatarUrl = null;
         
+        Location myLoc = null;
+        Location partnerLoc = null;
+        
         if (token != null && !token.isEmpty()) {
             JSONObject info = fetchCoupleInfo(token);
             if (info != null) {
@@ -66,6 +69,20 @@ public class LoveWidgetWorker extends Worker {
                 myAvatarUrl = info.optString("my_avatar", null);
                 partnerAvatarUrl = info.optString("partner_avatar", null);
                 partnerId = info.optString("partner_id", "");
+                
+                JSONObject myLocJson = info.optJSONObject("my_location");
+                if (myLocJson != null && myLocJson.optBoolean("is_sharing", true)) {
+                    myLoc = new Location("");
+                    myLoc.setLatitude(myLocJson.optDouble("latitude", 0));
+                    myLoc.setLongitude(myLocJson.optDouble("longitude", 0));
+                }
+                
+                JSONObject partnerLocJson = info.optJSONObject("partner_location");
+                if (partnerLocJson != null && partnerLocJson.optBoolean("is_sharing", true)) {
+                    partnerLoc = new Location("");
+                    partnerLoc.setLatitude(partnerLocJson.optDouble("latitude", 0));
+                    partnerLoc.setLongitude(partnerLocJson.optDouble("longitude", 0));
+                }
             }
         }
         
@@ -74,9 +91,6 @@ public class LoveWidgetWorker extends Worker {
         }
 
         try {
-            Location myLoc = fetchLocation(myUserId);
-            Location partnerLoc = fetchLocation(partnerId);
-            
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
             ComponentName thisWidget = new ComponentName(context, LoveWidgetProvider.class);
             int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
@@ -454,38 +468,7 @@ public class LoveWidgetWorker extends Worker {
         return Math.toDegrees(Math.atan(Math.sinh(n)));
     }
 
-    private Location fetchLocation(String userId) throws Exception {
-        URL url = new URL("https://firestore.googleapis.com/v1/projects/love-widget-app-ec037/databases/(default)/documents/locations/" + userId);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        
-        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        String inputLine;
-        StringBuilder content = new StringBuilder();
-        while ((inputLine = in.readLine()) != null) content.append(inputLine);
-        in.close();
-        conn.disconnect();
-        
-        JSONObject json = new JSONObject(content.toString());
-        JSONObject fields = json.getJSONObject("fields");
-        
-        if (fields.has("is_sharing")) {
-            boolean isSharing = fields.getJSONObject("is_sharing").getBoolean("booleanValue");
-            if (!isSharing) {
-                return null; // indicates ghost mode
-            }
-        }
-        
-        JSONObject position = fields.getJSONObject("position").getJSONObject("geoPointValue");
-        
-        double lat = position.getDouble("latitude");
-        double lng = position.getDouble("longitude");
-        
-        Location loc = new Location("");
-        loc.setLatitude(lat);
-        loc.setLongitude(lng);
-        return loc;
-    }
+
     
     private Bitmap fetchBitmap(String urlString) {
         try {
