@@ -1647,7 +1647,7 @@ export class PhotoWidgetComponent implements OnInit {
       this.menuHideTimeout = setTimeout(() => {
         this.isTopBarHidden = true;
         this.cdr.detectChanges();
-      }, 10000);
+      }, 5000);
     }
   }
 
