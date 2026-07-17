@@ -2520,7 +2520,6 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
 // --- Audio Recording Logic ---
   isRecording = false;
-  sending = false;
   sendingGraffiti = false;
   mediaRecorder: MediaRecorder | null = null;
   audioChunks: any[] = [];
