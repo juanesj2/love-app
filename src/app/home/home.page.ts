@@ -58,7 +58,7 @@ import { PushNotifications } from '@capacitor/push-notifications';
             </div>
 
             <!-- UI Toggle Button -->
-            <div class="menu-toggle-btn" *ngIf="selectedWidget === 'photo'" (click)="photoWidgetComp?.toggleMenu()" style="pointer-events: auto;">
+            <div class="menu-toggle-btn" [class.show]="selectedWidget === 'photo'" (click)="photoWidgetComp?.toggleMenu()">
               <ion-icon [name]="photoWidgetComp?.isTopBarHidden ? 'eye-outline' : 'eye-off-outline'"></ion-icon>
             </div>
 
@@ -242,7 +242,7 @@ import { PushNotifications } from '@capacitor/push-notifications';
       .premium-btn ion-icon { font-size: 1.1rem; }
       .premium-btn span { white-space: nowrap; }
 
-      .poke-btn { width: 55px; height: 55px; border-radius: 50%; background: linear-gradient(135deg, #fff0f3, #ffe5ec); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #FF4D6D; cursor: pointer; box-shadow: 0 8px 20px rgba(255,77,109,0.2), inset 0 2px 5px rgba(255,255,255,0.8); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid white; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+      .poke-btn { z-index: 2; position: relative; width: 55px; height: 55px; border-radius: 50%; background: linear-gradient(135deg, #fff0f3, #ffe5ec); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #FF4D6D; cursor: pointer; box-shadow: 0 8px 20px rgba(255,77,109,0.2), inset 0 2px 5px rgba(255,255,255,0.8); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid white; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
       .poke-btn:active { transform: scale(0.85); box-shadow: 0 4px 10px rgba(255,77,109,0.2); }
       .poke-btn ion-icon { filter: drop-shadow(0 2px 4px rgba(255,77,109,0.3)); transition: transform 0.3s; }
       .poke-btn ion-icon.poking { animation: heartbeat 0.8s ease-in-out 2; color: #c9184a; filter: drop-shadow(0 4px 8px rgba(201,24,74,0.5)); }
@@ -250,7 +250,8 @@ import { PushNotifications } from '@capacitor/push-notifications';
       @keyframes heartbeat { 0% { transform: scale(1); } 25% { transform: scale(1.4); } 50% { transform: scale(1); } 75% { transform: scale(1.4); } 100% { transform: scale(1); } }
       @keyframes superheartbeat { 0% { transform: scale(1); } 30% { transform: scale(1.5) rotate(-5deg); } 60% { transform: scale(0.9) rotate(5deg); } 100% { transform: scale(1); } }
   
-      .menu-toggle-btn { width: 42px; height: 42px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 2px solid white; font-size: 1.3rem; color: #555; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+      .menu-toggle-btn { z-index: 1; position: relative; width: 42px; height: 42px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 2px solid white; font-size: 1.3rem; color: #555; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0; transform: translateX(-40px) scale(0.5); margin-left: -57px; pointer-events: none; }
+      .menu-toggle-btn.show { opacity: 1; transform: translateX(0) scale(1); margin-left: 0; pointer-events: auto; }
       .menu-toggle-btn:active { transform: scale(0.88); }
       :host-context(.night-owl-mode) .menu-toggle-btn { background: #2a2a2a; border-color: #444; color: #ccc; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
 
