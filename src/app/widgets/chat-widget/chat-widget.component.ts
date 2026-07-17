@@ -2336,6 +2336,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     const touch = e.touches[0];
     const rect = e.target.getBoundingClientRect();
     this.currentStrokePoints = [{ x: touch.clientX - rect.left, y: touch.clientY - rect.top }];
+    this.redrawDoodle();
   }
 
   onDoodleMove(e: any) {
@@ -2386,8 +2387,12 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       
       this.ctx.beginPath();
       this.ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-      for (let i = 1; i < stroke.points.length; i++) {
-        this.ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+      if (stroke.points.length === 1) {
+        this.ctx.lineTo(stroke.points[0].x, stroke.points[0].y);
+      } else {
+        for (let i = 1; i < stroke.points.length; i++) {
+          this.ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+        }
       }
       
       if (stroke.type === 'neon') {
