@@ -23,9 +23,6 @@ import { Keyboard } from '@capacitor/keyboard';
   selector: 'app-chat-widget',
   template: `
     <div class="chat-wrapper" [style.background]="chatBackground || null" [ngClass]="'font-' + chatFont">
-      <button class="chat-bg-settings-btn" (click)="openChatSettings()" *ngIf="regularMessages.length > 0">
-        <ion-icon name="color-palette"></ion-icon>
-      </button>
       <ion-content class="messages-content" [style.--background]="chatBackground ? 'transparent' : null" #msgContainer [scrollEvents]="true" (ionScroll)="onScroll($event)">
         <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)" [disabled]="isDoodling">
           <ion-refresher-content></ion-refresher-content>
@@ -1771,19 +1768,28 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     await actionSheet.present();
   }
 
+  async setSoundPref(sound: string) {
+    this.setLocalPref('chat_sound', sound, 'chatSound');
+    try {
+      await this.api.updateNotificationSound(sound);
+    } catch (e) {
+      console.error('Error updating notification sound to API', e);
+    }
+  }
+
   async openSoundSettings() {
     if (this.premiumService.isFree$.value) {
       this.openPaywall();
       return;
     }
     const actionSheet = await this.actionSheetCtrl.create({
-      header: 'Sonido de Mensaje (Local)',
+      header: 'Sonido de Mensaje y Notificaciones',
       cssClass: 'premium-action-sheet',
       buttons: [
-        { text: 'Por Defecto', handler: () => this.setLocalPref('chat_sound', 'default', 'chatSound') },
-        { text: 'Burbuja de Agua 💧', handler: () => this.setLocalPref('chat_sound', 'water', 'chatSound') },
-        { text: 'Campanilla 🔔', handler: () => this.setLocalPref('chat_sound', 'bell', 'chatSound') },
-        { text: 'Silencio 🔇', handler: () => this.setLocalPref('chat_sound', 'none', 'chatSound') },
+        { text: 'Por Defecto', handler: () => this.setSoundPref('default') },
+        { text: 'Burbuja de Agua 💧', handler: () => this.setSoundPref('water') },
+        { text: 'Campanilla 🔔', handler: () => this.setSoundPref('bell') },
+        { text: 'Silencio 🔇', handler: () => this.setSoundPref('none') },
         { text: 'Cancelar', icon: 'close', role: 'cancel' }
       ]
     });

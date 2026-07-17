@@ -57,9 +57,18 @@ import { PushNotifications } from '@capacitor/push-notifications';
               <ion-icon name="heart" [class.poking]="pokeAnimation" [class.super-poking]="superPokeAnimation"></ion-icon>
             </div>
 
-            <!-- UI Toggle Button -->
-            <div class="menu-toggle-btn" [class.show]="selectedWidget === 'photo'" (click)="photoWidgetComp?.toggleMenu()">
+            <!-- Photo Widget Toggle Button -->
+            <div class="menu-toggle-btn" 
+                 [class.show]="selectedWidget === 'photo' && photoWidgetComp?.viewMode === 'feed' && !photoWidgetComp?.currentAlbum" 
+                 (click)="photoWidgetComp?.toggleMenu()">
               <ion-icon [name]="photoWidgetComp?.isTopBarHidden ? 'eye-outline' : 'eye-off-outline'"></ion-icon>
+            </div>
+
+            <!-- Chat Widget Settings Button -->
+            <div class="menu-toggle-btn" 
+                 [class.show]="selectedWidget === 'chat' && chatWidgetComp && chatWidgetComp.regularMessages.length > 0" 
+                 (click)="chatWidgetComp?.openChatSettings()">
+              <ion-icon name="color-palette"></ion-icon>
             </div>
 
           </div>
@@ -407,6 +416,15 @@ export class HomePage implements OnInit, OnDestroy {
     if (actionRes.value) {
       await Preferences.set({ key: 'action_intent', value: actionRes.value });
       await Preferences.remove({ key: 'widget_action' });
+
+      if (actionRes.value === 'open_camera') {
+        setTimeout(() => {
+          if (this.selectedWidget === 'photo' && this.photoWidgetComp) {
+            this.photoWidgetComp.uploadNewPhoto();
+            Preferences.remove({ key: 'action_intent' });
+          }
+        }, 1000);
+      }
     }
   }
 

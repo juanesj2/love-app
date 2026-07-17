@@ -42,6 +42,47 @@ export class NotificationService {
   }
 
   private async initPush() {
+    if (this.platform.is('android')) {
+      try {
+        await PushNotifications.createChannel({
+          id: 'love_app_channel_default',
+          name: 'Notificaciones (Defecto)',
+          description: 'Notificaciones de mensajes y fotos',
+          importance: 5,
+          visibility: 1,
+          vibration: true,
+        });
+        await PushNotifications.createChannel({
+          id: 'love_app_channel_water',
+          name: 'Notificaciones (Agua)',
+          description: 'Notificaciones con sonido de agua',
+          importance: 5,
+          visibility: 1,
+          vibration: true,
+          sound: 'water.wav'
+        });
+        await PushNotifications.createChannel({
+          id: 'love_app_channel_bell',
+          name: 'Notificaciones (Campanilla)',
+          description: 'Notificaciones con sonido de campanilla',
+          importance: 5,
+          visibility: 1,
+          vibration: true,
+          sound: 'bell.wav'
+        });
+        await PushNotifications.createChannel({
+          id: 'love_app_channel_none',
+          name: 'Notificaciones (Silencio)',
+          description: 'Notificaciones silenciosas',
+          importance: 3,
+          visibility: 1,
+          vibration: false,
+        });
+      } catch (e) {
+        console.error('Error creating push channels', e);
+      }
+    }
+
     // Request permission to use push notifications
     // iOS will prompt user and return if they granted permission or not
     // Android will just grant without prompting
@@ -96,6 +137,21 @@ export class NotificationService {
     const perm = await LocalNotifications.requestPermissions();
     if (perm.display !== 'granted') return;
 
+    if (this.platform.is('android')) {
+      try {
+        await LocalNotifications.createChannel({
+          id: 'love_app_local',
+          name: 'Recordatorios Love App',
+          description: 'Recordatorios de planes y eventos',
+          importance: 5,
+          visibility: 1,
+          vibration: true,
+        });
+      } catch (e) {
+        console.error('Error creating local notification channel', e);
+      }
+    }
+
     // La racha se maneja ahora inteligentemente desde el servidor (J2-API/routes/console.php)
     // por lo que eliminamos la notificación local estática para que no avise si ya han subido foto.
     
@@ -141,6 +197,7 @@ export class NotificationService {
           title: '¡Se acerca el plan! 🗺️',
           body: `Faltan 3 días para "${plan.title}"`,
           id: 10000 + plan.id,
+          channelId: 'love_app_local',
           schedule: { at: threeDaysBefore }
         });
       }
@@ -155,6 +212,7 @@ export class NotificationService {
           title: '¡Es mañana! 🎉',
           body: `Prepárate para "${plan.title}"`,
           id: 20000 + plan.id,
+          channelId: 'love_app_local',
           schedule: { at: oneDayBefore }
         });
       }

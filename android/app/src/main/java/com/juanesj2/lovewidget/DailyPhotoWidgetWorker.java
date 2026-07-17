@@ -180,6 +180,7 @@ public class DailyPhotoWidgetWorker extends Worker {
                             
                             android.content.Intent intent = new android.content.Intent(context, MainActivity.class);
                             intent.putExtra("open_tab", "photo");
+                            intent.putExtra("action", "open_camera");
                             android.app.PendingIntent pendingIntent = android.app.PendingIntent.getActivity(
                                 context, appWidgetId, intent, android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE
                             );

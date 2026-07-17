@@ -218,6 +218,10 @@ export class LoveApiService {
     return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/save-fcm-token`, { token }));
   }
 
+  async updateNotificationSound(sound: string): Promise<any> {
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/notification-sound`, { sound }));
+  }
+
   async answerQuestion(id: number, answer: string): Promise<any> {
     return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/questions/${id}/answer`, { answer }));
   }

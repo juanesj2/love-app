@@ -52,12 +52,12 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
         </div>
 
         <div class="floating-toggles" *ngIf="!currentAlbum">
-          <button [class.active]="viewMode === 'feed'" (click)="viewMode = 'feed'"><ion-icon name="list"></ion-icon></button>
-          <button [class.active]="viewMode === 'grid'" (click)="viewMode = 'grid'"><ion-icon name="grid"></ion-icon></button>
+          <button [class.active]="viewMode === 'feed'" (click)="viewMode = 'feed'; resetMenuTimeout()"><ion-icon name="list"></ion-icon></button>
+          <button [class.active]="viewMode === 'grid'" (click)="viewMode = 'grid'; resetMenuTimeout()"><ion-icon name="grid"></ion-icon></button>
         </div>
         
         <div class="floating-actions">
-          <button id="photo-album-selector" class="albums-btn-small" (click)="openAlbumsModal()">
+          <button id="photo-album-selector" class="albums-btn-small" *ngIf="!currentAlbum" (click)="openAlbumsModal()">
             <ion-icon name="images-outline"></ion-icon>
           </button>
           
@@ -471,14 +471,12 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .floating-top-bar { position: absolute; top: calc(var(--safe-top) + 105px); left: 15px; right: 15px; z-index: 50; display: flex; justify-content: space-between; align-items: center; pointer-events: none; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s; }
     .floating-top-bar > * { pointer-events: auto; }
     .floating-top-bar.hidden { transform: translateY(-50px) scale(0.9); opacity: 0; pointer-events: none !important; }
-    .floating-top-bar.hidden > * { pointer-events: none !important; }
+    .floating-toggles { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; padding: 6px 10px; border-radius: 30px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .floating-toggles button { background: transparent; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: #666; transition: all 0.2s; cursor: pointer; }
+    .floating-toggles button.active { background: white; color: #FF4D6D; transform: scale(1.1); box-shadow: 0 2px 8px rgba(255, 77, 109, 0.2); }
     
-    .floating-toggles { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; padding: 4px; border-radius: 30px; }
-    .floating-toggles button { background: transparent; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #555; transition: all 0.2s; cursor: pointer; text-shadow: 0 1px 4px rgba(255,255,255,0.8); }
-    .floating-toggles button.active { color: #FF4D6D; transform: scale(1.1); }
-    
-    .floating-actions { position: absolute; right: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 10; }
-    .albums-btn-small { background: transparent; border: none; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: #555; cursor: pointer; transition: transform 0.2s; text-shadow: 0 1px 4px rgba(255,255,255,0.8); }
+    .floating-actions { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: row; gap: 10px; z-index: 10; align-items: center; }
+    .albums-btn-small { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px); border: none; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: #555; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
     .albums-btn-small:active { transform: scale(0.9); }
     
     .custom-comment-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 2100; opacity: 0; pointer-events: none; transition: opacity 0.3s; display: flex; align-items: flex-end; }
@@ -679,7 +677,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
     /* Timeline Fast Scroller */
-    .timeline-track { position: absolute; top: 80px; bottom: 80px; right: 5px; width: 30px; z-index: 1500; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 20px 0; opacity: 0; transition: opacity 0.3s, background 0.3s; pointer-events: none; }
+    .timeline-track { position: absolute; top: calc(var(--safe-top) + 170px); bottom: 80px; right: 5px; width: 30px; z-index: 1500; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 20px 0; opacity: 0; transition: opacity 0.3s, background 0.3s; pointer-events: none; }
     .timeline-track.visible { opacity: 1; pointer-events: auto; }
     .timeline-track:active { background: rgba(0,0,0,0.05); border-radius: 15px; }
     
@@ -925,6 +923,14 @@ export class PhotoWidgetComponent implements OnInit {
     if (albumIntent.value) {
       this.currentAlbum = { id: parseInt(albumIntent.value), name: 'Cargando...' };
       await Preferences.remove({ key: 'open_album_id_intent' });
+    }
+    
+    const actionIntent = await Preferences.get({ key: 'action_intent' });
+    if (actionIntent.value === 'open_camera') {
+      await Preferences.remove({ key: 'action_intent' });
+      setTimeout(() => {
+        this.uploadNewPhoto();
+      }, 500);
     }
     
     Preferences.set({ key: 'last_photo_viewed_at', value: new Date().toISOString() });
@@ -1331,9 +1337,6 @@ export class PhotoWidgetComponent implements OnInit {
   // --- Scroll Logic ---
   async onScroll(e: any) {
     const scrollTop = e.detail.scrollTop;
-    
-    // Reset menu auto-hide timeout on scroll
-    this.resetMenuTimeout();
 
     // Timeline logic for grid view
     if (this.viewMode === 'grid') {
@@ -1643,17 +1646,32 @@ export class PhotoWidgetComponent implements OnInit {
     if (this.menuHideTimeout) {
       clearTimeout(this.menuHideTimeout);
     }
-    if (!this.isTopBarHidden) {
-      this.menuHideTimeout = setTimeout(() => {
-        this.isTopBarHidden = true;
-        this.cdr.detectChanges();
-      }, 5000);
+    if (this.viewMode === 'grid' || this.currentAlbum) {
+      this.isTopBarHidden = false;
+      this.cdr.detectChanges();
+      return;
     }
+    this.isTopBarHidden = false;
+    this.menuHideTimeout = setTimeout(() => {
+      this.isTopBarHidden = true;
+      this.cdr.detectChanges();
+    }, 5000);
   }
 
   toggleMenu() {
+    if (this.viewMode === 'grid' || this.currentAlbum) {
+      this.isTopBarHidden = false;
+      this.cdr.detectChanges();
+      return;
+    }
     this.isTopBarHidden = !this.isTopBarHidden;
-    this.resetMenuTimeout();
+    if (this.isTopBarHidden) {
+      // Manually hidden, clear the timeout
+      if (this.menuHideTimeout) clearTimeout(this.menuHideTimeout);
+    } else {
+      // Manually shown, start the timeout
+      this.resetMenuTimeout();
+    }
     this.cdr.detectChanges();
   }
   
