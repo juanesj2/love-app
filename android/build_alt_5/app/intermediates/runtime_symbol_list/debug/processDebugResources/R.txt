@@ -4532,9 +4532,11 @@ int mipmap ic_launcher_foreground 0x7f0e0003
 int mipmap ic_launcher_round 0x7f0e0004
 int mipmap rotate_left 0x7f0e0005
 int plurals mtrl_badge_content_description 0x7f0f0000
-int raw com_android_billingclient_heterodyne_info 0x7f100000
-int raw com_android_billingclient_registration_info 0x7f100001
-int raw firebase_common_keep 0x7f100002
+int raw bell 0x7f100000
+int raw com_android_billingclient_heterodyne_info 0x7f100001
+int raw com_android_billingclient_registration_info 0x7f100002
+int raw firebase_common_keep 0x7f100003
+int raw water 0x7f100004
 int string abc_action_bar_home_description 0x7f110000
 int string abc_action_bar_up_description 0x7f110001
 int string abc_action_menu_overflow_description 0x7f110002

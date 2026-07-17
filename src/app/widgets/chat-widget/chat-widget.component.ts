@@ -206,7 +206,7 @@ import { Keyboard } from '@capacitor/keyboard';
               </div>
               <ion-icon name="close" class="close-reply" (click)="cancelReplyOrEdit()"></ion-icon>
             </div>
-            <div class="reply-text" *ngIf="replyingTo">{{replyingTo.mensaje && replyingTo.mensaje !== 'null' ? replyingTo.mensaje : '📷 Foto'}}</div>
+            <div class="reply-text" *ngIf="replyingTo">{{ getReplyPreviewText(replyingTo) }}</div>
           </div>
         </div>
 
@@ -2172,7 +2172,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         const replyPayload = isReplyingTo ? {
           id: isReplyingTo.id,
           user: isReplyingTo.user?.name,
-          text: isReplyingTo.mensaje || '📷 Foto'
+          text: this.getReplyPreviewText(isReplyingTo)
         } : undefined;
         
         // Push a fake pending message immediately
@@ -2467,7 +2467,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       const res = await this.api.uploadPhoto(cropResult.blob, description);
       if (res && res.photo && res.photo.id) {
         const messageContent = `[GRAFFITI:${anchorMsgId}:${Math.round(offsetX)}:${Math.round(offsetY)}:${cropResult.w}:${cropResult.h}:${res.photo.image_path}]`;
-        const replyPayload = this.replyingTo ? { id: this.replyingTo.id, user: this.replyingTo.user?.name, text: '🎨 Graffiti' } : undefined;
+        const replyPayload = this.replyingTo ? { id: this.replyingTo.id, user: this.replyingTo.user?.name, text: this.getReplyPreviewText(this.replyingTo) } : undefined;
         await this.api.sendMessage(messageContent, undefined, replyPayload);
         this.replyingTo = null;
         await this.loadMessages();
@@ -2730,7 +2730,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         const mimeType = result.value.mimeType || 'audio/aac';
         const base64Audio = `data:${mimeType};base64,${result.value.recordDataBase64}`;
         
-        const replyPayload = this.replyingTo ? { id: this.replyingTo.id, user: this.replyingTo.user?.name, text: '🎤 Audio' } : undefined;
+        const replyPayload = this.replyingTo ? { id: this.replyingTo.id, user: this.replyingTo.user?.name, text: this.getReplyPreviewText(this.replyingTo) } : undefined;
         await this.api.sendMessage('[AUDIO]' + base64Audio, undefined, replyPayload);
         this.replyingTo = null;
         await this.loadMessages();
@@ -2752,6 +2752,26 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       return msg.mensaje.replace('[AUDIO]', '');
     }
     return this.environment.storageUrl + msg.photo?.image_path;
+  }
+
+  getReplyPreviewText(msg: any): string {
+    if (!msg) return '';
+    let txt = '';
+    if (msg.mensaje && msg.mensaje !== 'null' && !msg.mensaje.startsWith('[')) {
+      txt = msg.mensaje;
+    } else if (msg.mensaje?.startsWith('[GIF]')) {
+      return '🎬 GIF';
+    } else if (msg.mensaje?.startsWith('[DOODLE]')) {
+      return '🎨 Garabato';
+    } else if (msg.mensaje?.startsWith('[AUDIO]')) {
+      return '🎵 Audio';
+    }
+
+    if (msg.photo) {
+      return txt ? `📷 ${txt}` : '📷 Foto';
+    }
+
+    return txt || 'Mensaje';
   }
 
   // --- Audio Player Logic ---
