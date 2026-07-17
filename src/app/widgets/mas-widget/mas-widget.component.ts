@@ -1988,5 +1988,27 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
       } catch (e) {}
     });
   }
+
+  async openFeedback() {
+    const alert = await this.alertCtrl.create({
+      header: '¡Hola!',
+      message: 'Me encantaría leer tus sugerencias o los bugs que hayas encontrado. Puedes escribirme directamente a mi correo o dejar una reseña.<br><br><b>juanstivenalc@gmail.com</b>',
+      cssClass: 'love-alert',
+      buttons: [
+        {
+          text: 'Copiar correo',
+          handler: () => {
+            navigator.clipboard.writeText('juanstivenalc@gmail.com');
+            this.showToast('Correo copiado al portapapeles', 'success');
+          }
+        },
+        {
+          text: 'Cerrar',
+          role: 'cancel'
+        }
+      ]
+    });
+    await alert.present();
+  }
 }
 
