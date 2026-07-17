@@ -163,6 +163,15 @@ export class TutorialService {
             side: 'bottom',
             align: 'start'
           }
+        },
+        {
+          element: '.menu-toggle-btn',
+          popover: {
+            title: 'Ocultar Menú 👁️',
+            description: 'Este botón oculta el menú para que disfrutes de una vista a pantalla completa. Además, el menú se esconderá automáticamente tras 5 segundos de inactividad.',
+            side: 'bottom',
+            align: 'end'
+          }
         }
       ],
       onDestroyed: () => {
