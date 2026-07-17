@@ -10,7 +10,7 @@ import { environment } from '../../../environments/environment';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Capacitor } from '@capacitor/core';
 import { addIcons } from 'ionicons';
-import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline, lockClosed, shareSocialOutline } from 'ionicons/icons';
+import { arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline, lockClosed, shareSocialOutline, chatbubbleOutline, ellipsisHorizontal } from 'ionicons/icons';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { PremiumService } from '../../services/premium.service';
 import { PaywallComponent } from '../../components/paywall/paywall.component';
@@ -93,9 +93,6 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
                   <div *ngIf="!avatars[photo.user?.name]" class="card-avatar-fallback">{{ photo.user?.name?.charAt(0) || 'U' }}</div>
                   <span class="card-username">{{photo.user?.name}}</span>
                 </div>
-                <button *ngIf="isMine(photo)" class="delete-post-btn" (click)="deletePhoto(photo)">
-                  <ion-icon name="trash-outline"></ion-icon>
-                </button>
               </div>
             </div>
             
@@ -107,17 +104,18 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
                 <span class="reaction-bubble ellipsis-bubble" *ngIf="photo.reactions.length > 3">...</span>
               </div>
 
-              <div class="actions">
+              <div class="actions minimalist-actions">
                 <button class="reaction-btn" (click)="react(photo.id, '❤️')">❤️</button>
-                <button class="reaction-btn" (click)="react(photo.id, '😍')">😍</button>
-                <button class="reaction-btn" (click)="react(photo.id, '😂')">😂</button>
-                <button class="reaction-btn custom-reaction" (click)="reactCustom(photo.id)"><ion-icon name="add"></ion-icon></button>
-                <button class="reaction-btn download-btn" (click)="downloadPhoto(photo)"><ion-icon name="download-outline"></ion-icon></button>
-              </div>
-
-              <div class="reply-box">
-                <input type="text" [(ngModel)]="replyTexts[photo.id]" placeholder="Escribe un mensaje para el chat..." (keyup.enter)="replyWithText(photo.id)" (focus)="onInputFocus()" (blur)="onInputBlur()" />
-                <button class="send-reply-btn" (click)="replyWithText(photo.id)" [disabled]="!replyTexts[photo.id]"><ion-icon name="send"></ion-icon></button>
+                <button class="reaction-btn minimalist-icon" (click)="openCommentPrompt(photo)">
+                  <ion-icon name="chatbubble-outline"></ion-icon>
+                </button>
+                <button class="reaction-btn minimalist-icon" (click)="reactCustom(photo.id)">
+                  <ion-icon name="add"></ion-icon>
+                </button>
+                <div class="spacer" style="flex: 1;"></div>
+                <button class="reaction-btn minimalist-icon more-options-btn" (click)="openPhotoOptions(photo)">
+                  <ion-icon name="ellipsis-horizontal"></ion-icon>
+                </button>
               </div>
             </div>
           </div>
@@ -261,9 +259,6 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
                     <div *ngIf="!avatars[photo.user?.name]" class="card-avatar-fallback">{{ photo.user?.name?.charAt(0) || 'U' }}</div>
                     <span class="card-username">{{photo.user?.name}}</span>
                   </div>
-                  <button *ngIf="isMine(photo)" class="delete-post-btn" (click)="deletePhoto(photo)">
-                    <ion-icon name="trash-outline"></ion-icon>
-                  </button>
                 </div>
               </div>
               
@@ -275,17 +270,18 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
                   <span class="reaction-bubble ellipsis-bubble" *ngIf="photo.reactions.length > 3">...</span>
                 </div>
 
-                <div class="actions">
+                <div class="actions minimalist-actions">
                   <button class="reaction-btn" (click)="react(photo.id, '❤️')">❤️</button>
-                  <button class="reaction-btn" (click)="react(photo.id, '😍')">😍</button>
-                  <button class="reaction-btn" (click)="react(photo.id, '😂')">😂</button>
-                  <button class="reaction-btn custom-reaction" (click)="reactCustom(photo.id)"><ion-icon name="add"></ion-icon></button>
-                  <button class="reaction-btn download-btn" (click)="downloadPhoto(photo)"><ion-icon name="download-outline"></ion-icon></button>
-                </div>
-
-                <div class="reply-box">
-                  <input type="text" [(ngModel)]="replyTexts[photo.id]" placeholder="Escribe un mensaje para el chat..." (keyup.enter)="replyWithText(photo.id)" (focus)="onInputFocus()" (blur)="onInputBlur()" />
-                  <button class="send-reply-btn" (click)="replyWithText(photo.id)" [disabled]="!replyTexts[photo.id]"><ion-icon name="send"></ion-icon></button>
+                  <button class="reaction-btn minimalist-icon" (click)="openCommentPrompt(photo)">
+                    <ion-icon name="chatbubble-outline"></ion-icon>
+                  </button>
+                  <button class="reaction-btn minimalist-icon" (click)="reactCustom(photo.id)">
+                    <ion-icon name="add"></ion-icon>
+                  </button>
+                  <div class="spacer" style="flex: 1;"></div>
+                  <button class="reaction-btn minimalist-icon more-options-btn" (click)="openPhotoOptions(photo)">
+                    <ion-icon name="ellipsis-horizontal"></ion-icon>
+                  </button>
                 </div>
               </div>
             </div>
@@ -459,15 +455,19 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .photo-widget-container { padding: 0; position: relative; height: 100%; display: flex; flex-direction: column; background: linear-gradient(135deg, #fff5f8 0%, #ffe3e9 100%); font-family: 'Inter', sans-serif; }
     
     .floating-top-bar { position: absolute; top: calc(var(--safe-top) + 105px); left: 15px; right: 15px; z-index: 50; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
-    .floating-top-bar > * { pointer-events: auto; }
+    .floating-toggles { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; padding: 4px; border-radius: 30px; }
+    .floating-toggles button { background: transparent; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #555; transition: all 0.2s; cursor: pointer; text-shadow: 0 1px 4px rgba(255,255,255,0.8); }
+    .floating-toggles button.active { color: #FF4D6D; transform: scale(1.1); }
     
-    .floating-toggles { position: absolute; left: 50%; transform: translateX(-50%); display: flex; background: rgba(255,255,255,0.85); backdrop-filter: blur(10px); padding: 4px; border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); gap: 5px; }
-    .floating-toggles button { background: transparent; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #888; transition: all 0.2s; cursor: pointer; }
-    .floating-toggles button.active { background: white; color: #FF4D6D; box-shadow: 0 2px 8px rgba(255,77,109,0.2); transform: scale(1.05); }
-    
-    .floating-actions { display: flex; gap: 8px; align-items: center; }
-    .albums-btn-small { background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); color: #FF4D6D; border: none; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: transform 0.2s; }
+    .floating-actions { position: absolute; right: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 10; }
+    .albums-btn-small { background: transparent; border: none; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: #555; cursor: pointer; transition: transform 0.2s; text-shadow: 0 1px 4px rgba(255,255,255,0.8); }
     .albums-btn-small:active { transform: scale(0.9); }
+    
+    .minimalist-actions { padding: 5px 0 15px 0 !important; display: flex; align-items: center; gap: 12px; }
+    .minimalist-actions .reaction-btn { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; font-size: 1.6rem; box-shadow: none; color: #555; transition: transform 0.2s; }
+    .minimalist-actions .reaction-btn:active { transform: scale(0.8); }
+    .minimalist-actions .minimalist-icon { font-size: 1.6rem; color: #444; }
+    .minimalist-actions .more-options-btn { color: #888; }
     
     .header-upload-btn { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; box-shadow: 0 4px 10px rgba(255, 77, 109, 0.4); transition: transform 0.2s; }
     .header-upload-btn:active { transform: scale(0.9); }
@@ -860,7 +860,7 @@ export class PhotoWidgetComponent implements OnInit {
   timelineHideTimeout: any;
 
   constructor() {
-    addIcons({ arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline, calendarOutline: 'calendar-outline', chevronExpand: 'chevron-expand', lockClosed, shareSocialOutline });
+    addIcons({ arrowBack, chevronDownOutline, add, list, grid, downloadOutline, send, checkmarkCircle, ellipseOutline, imagesOutline, camera, close, download, heart, addCircle, checkmarkDoneOutline, trashOutline, settingsOutline, pencilOutline, calendarOutline: 'calendar-outline', chevronExpand: 'chevron-expand', lockClosed, shareSocialOutline, chatbubbleOutline, ellipsisHorizontal });
   }
 
   async ngOnInit() {
@@ -1683,6 +1683,66 @@ export class PhotoWidgetComponent implements OnInit {
       ]
     });
     await alert.present();
+  }
+
+  async openCommentPrompt(photo: any) {
+    const alert = await this.alertController.create({
+      header: 'Comentar',
+      message: 'Escribe un mensaje para esta foto',
+      cssClass: 'custom-love-alert',
+      inputs: [
+        { name: 'text', type: 'text', placeholder: 'Escribe tu mensaje...' }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Enviar',
+          handler: (data) => {
+            if (data.text && data.text.trim().length > 0) {
+              this.replyTexts[photo.id] = data.text.trim();
+              this.replyWithText(photo.id);
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  async openPhotoOptions(photo: any) {
+    const buttons: any[] = [
+      {
+        text: 'Descargar foto',
+        icon: 'download-outline',
+        handler: () => {
+          this.downloadPhoto(photo);
+        }
+      }
+    ];
+
+    if (this.isMine(photo)) {
+      buttons.push({
+        text: 'Eliminar foto',
+        icon: 'trash-outline',
+        role: 'destructive',
+        handler: () => {
+          this.deletePhoto(photo);
+        }
+      });
+    }
+
+    buttons.push({
+      text: 'Cancelar',
+      icon: 'close',
+      role: 'cancel'
+    });
+
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Opciones de la foto',
+      buttons: buttons,
+      cssClass: 'custom-love-action-sheet'
+    });
+    await actionSheet.present();
   }
 
   isMine(photo: any): boolean {
