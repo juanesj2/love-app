@@ -9,6 +9,10 @@ export class TutorialService {
 
   constructor() { }
 
+  public get isTourActive(): boolean {
+    return !!document.querySelector('.driver-active') || !!document.querySelector('.driver-popover');
+  }
+
   private async hasSeenTutorial(tutorialName: string): Promise<boolean> {
     const { value } = await Preferences.get({ key: `tutorial_${tutorialName}` });
     return value === 'true';
