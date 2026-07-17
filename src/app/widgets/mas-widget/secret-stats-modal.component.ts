@@ -2,7 +2,7 @@ import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { close, chatbubblesOutline, heartOutline, trophyOutline } from 'ionicons/icons';
+import { close, chatbubblesOutline, heartOutline, trophyOutline, imagesOutline, happyOutline } from 'ionicons/icons';
 import { LoveApiService } from '../../services/love-api.service';
 
 @Component({
@@ -73,6 +73,53 @@ import { LoveApiService } from '../../services/love-api.service';
             📳 Tu pareja quiere tu atención a gritos.
           </p>
         </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <ion-icon name="images-outline"></ion-icon>
+            <h3>Fotos Compartidas</h3>
+          </div>
+          <div class="progress-wrapper">
+            <div class="label-row">
+              <span>Tú ({{ getMyPhotos() }})</span>
+              <span>Pareja ({{ getPartnerPhotos() }})</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill me" [style.width.%]="getPhotoPercentage('me')"></div>
+              <div class="progress-bar-fill partner" [style.width.%]="getPhotoPercentage('partner')"></div>
+            </div>
+          </div>
+          <p class="winner-text" *ngIf="getMyPhotos() > getPartnerPhotos()">
+            📸 El/la paparazzi de la relación.
+          </p>
+          <p class="winner-text" *ngIf="getMyPhotos() < getPartnerPhotos()">
+            📸 Tu pareja guarda todos los recuerdos.
+          </p>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <ion-icon name="happy-outline"></ion-icon>
+            <h3>Reacciones a Fotos</h3>
+          </div>
+          <div class="progress-wrapper">
+            <div class="label-row">
+              <span>Tú ({{ getMyReactions() }})</span>
+              <span>Pareja ({{ getPartnerReactions() }})</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill me" [style.width.%]="getReactionPercentage('me')"></div>
+              <div class="progress-bar-fill partner" [style.width.%]="getReactionPercentage('partner')"></div>
+            </div>
+          </div>
+          <p class="winner-text" *ngIf="getMyReactions() > getPartnerReactions()">
+            🥰 Eres súper expresivo/a.
+          </p>
+          <p class="winner-text" *ngIf="getMyReactions() < getPartnerReactions()">
+            🥰 Tu pareja reacciona a absolutamente todo.
+          </p>
+        </div>
+
       </div>
     </ion-content>
   `,
@@ -187,7 +234,7 @@ export class SecretStatsModalComponent implements OnInit {
   private modalCtrl = inject(ModalController);
 
   constructor() {
-    addIcons({ close, chatbubblesOutline, heartOutline, trophyOutline });
+    addIcons({ close, chatbubblesOutline, heartOutline, trophyOutline, imagesOutline, happyOutline });
   }
 
   async ngOnInit() {
@@ -237,6 +284,42 @@ export class SecretStatsModalComponent implements OnInit {
   getPokePercentage(who: 'me'|'partner') {
     const me = this.getMyPokes();
     const partner = this.getPartnerPokes();
+    const total = me + partner;
+    if (total === 0) return 50;
+    return who === 'me' ? (me / total) * 100 : (partner / total) * 100;
+  }
+
+  getMyPhotos() {
+    if (!this.stats) return 0;
+    return this.stats.user1_id === this.myUserId ? this.stats.user1_photo_count : this.stats.user2_photo_count;
+  }
+
+  getPartnerPhotos() {
+    if (!this.stats) return 0;
+    return this.stats.user1_id === this.myUserId ? this.stats.user2_photo_count : this.stats.user1_photo_count;
+  }
+
+  getPhotoPercentage(who: 'me'|'partner') {
+    const me = this.getMyPhotos();
+    const partner = this.getPartnerPhotos();
+    const total = me + partner;
+    if (total === 0) return 50;
+    return who === 'me' ? (me / total) * 100 : (partner / total) * 100;
+  }
+
+  getMyReactions() {
+    if (!this.stats) return 0;
+    return this.stats.user1_id === this.myUserId ? this.stats.user1_reaction_count : this.stats.user2_reaction_count;
+  }
+
+  getPartnerReactions() {
+    if (!this.stats) return 0;
+    return this.stats.user1_id === this.myUserId ? this.stats.user2_reaction_count : this.stats.user1_reaction_count;
+  }
+
+  getReactionPercentage(who: 'me'|'partner') {
+    const me = this.getMyReactions();
+    const partner = this.getPartnerReactions();
     const total = me + partner;
     if (total === 0) return 50;
     return who === 'me' ? (me / total) * 100 : (partner / total) * 100;
