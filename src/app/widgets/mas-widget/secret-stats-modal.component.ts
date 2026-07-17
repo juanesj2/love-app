@@ -11,10 +11,10 @@ import { LoveApiService } from '../../services/love-api.service';
   imports: [CommonModule, IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon],
   template: `
     <ion-header class="ion-no-border">
-      <ion-toolbar color="dark">
-        <ion-title style="color: #fff; font-family: monospace;">Estadísticas Secretas 👻</ion-title>
+      <ion-toolbar style="--background: #111; color: #fff;">
+        <ion-title style="color: #00ffcc; font-family: monospace; font-size: 1rem;">Estadísticas 👻</ion-title>
         <ion-buttons slot="end">
-          <ion-button (click)="close()" style="color: #fff;">
+          <ion-button (click)="close()" style="color: #00ffcc;">
             <ion-icon name="close"></ion-icon>
           </ion-button>
         </ion-buttons>
@@ -87,7 +87,8 @@ import { LoveApiService } from '../../services/love-api.service';
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100%;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
       color: #00ffcc;
     }
     .radar-scan {
