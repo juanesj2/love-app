@@ -1953,6 +1953,11 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     if (cachedUserId) {
       this.myUserId = parseInt(cachedUserId, 10);
     }
+    
+    const cachedAvatars = localStorage.getItem('chat_avatars_cache');
+    if (cachedAvatars) {
+      try { this.avatars = JSON.parse(cachedAvatars); } catch(e){}
+    }
 
     this.loadAvatars();
     this.loadMessages();
@@ -1990,6 +1995,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         if (info.partner_name && info.partner_avatar) {
           this.avatars[info.partner_name] = info.partner_avatar;
         }
+        localStorage.setItem('chat_avatars_cache', JSON.stringify(this.avatars));
       }
     } catch (e) {
       console.error('Error loading avatars', e);
