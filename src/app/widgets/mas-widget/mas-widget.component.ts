@@ -230,7 +230,7 @@ import confetti from 'canvas-confetti';
         </button>
 
         <!-- Developer Feedback Banner -->
-        <div class="developer-banner" (click)="openFeedback()">
+        <div class="developer-banner" (click)="isFeedbackModalOpen = true">
           <ion-icon name="heart" class="dev-heart"></ion-icon>
           <div class="dev-content">
             <h4>Hecho con cariño</h4>
@@ -700,6 +700,26 @@ import confetti from 'canvas-confetti';
             </div>
           </div>
         </div>
+
+        <!-- Developer Feedback Modal -->
+        <div class="custom-overlay" *ngIf="isFeedbackModalOpen" (click)="isFeedbackModalOpen = false">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 30px; text-align: center; width: 85%; max-width: 350px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15);" (click)="$event.stopPropagation()">
+            <ion-icon name="mail-outline" style="font-size: 4rem; color: #FF4D6D; margin-bottom: 15px; background: rgba(255,77,109,0.1); padding: 15px; border-radius: 50%;"></ion-icon>
+            <h2 style="color: #590D22; margin-bottom: 10px; font-weight: 900; font-size: 1.5rem;">¡Hola!</h2>
+            <p style="color: #a4133c; font-size: 1rem; font-weight: 500; margin-bottom: 15px; line-height: 1.4;">
+              Me encantaría leer tus sugerencias o los bugs que hayas encontrado. Puedes escribirme directamente a mi correo.
+            </p>
+            <p style="color: #590D22; font-size: 1.05rem; font-weight: 800; margin-bottom: 25px;">
+              lovewidgetsupport&#64;gmail.com
+            </p>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <button class="glass-btn" style="width: 100%; background: #FF4D6D; color: white;" (click)="sendEmail()">Enviar Correo</button>
+              <button class="glass-btn" style="width: 100%; background: rgba(255,77,109,0.1); color: #FF4D6D;" (click)="copyEmail()">Copiar Correo</button>
+              <button class="glass-btn" style="width: 100%; background: transparent; color: #888; margin-top: 5px; box-shadow: none; border: none;" (click)="isFeedbackModalOpen = false">Cerrar</button>
+            </div>
+          </div>
+        </div>
           
         <!-- Map Modal -->
         <div class="custom-overlay" *ngIf="isMapModalOpen" style="z-index: 9999999;" (click)="isMapModalOpen = false">
@@ -1133,6 +1153,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   
   isFoodListModalOpen = false;
   isLogoutModalOpen = false;
+  isFeedbackModalOpen = false;
   isMovieListModalOpen = false;
 
   isAddingFoodPlace = false;
@@ -1989,33 +2010,13 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     });
   }
 
-  async openFeedback() {
-    const email = 'lovewidgetsupport@gmail.com';
-    const alert = await this.alertCtrl.create({
-      header: '¡Hola!',
-      message: `Me encantaría leer tus sugerencias o los bugs que hayas encontrado. Puedes escribirme directamente a mi correo o dejar una reseña.\n\n${email}`,
-      cssClass: 'love-alert',
-      buttons: [
-        {
-          text: 'Enviar correo',
-          handler: () => {
-            window.open(`mailto:${email}?subject=Feedback de Love Widget`, '_system');
-          }
-        },
-        {
-          text: 'Copiar correo',
-          handler: () => {
-            navigator.clipboard.writeText(email);
-            this.showToast('Correo copiado al portapapeles', 'success');
-          }
-        },
-        {
-          text: 'Cerrar',
-          role: 'cancel'
-        }
-      ]
-    });
-    await alert.present();
+  sendEmail() {
+    window.open('mailto:lovewidgetsupport@gmail.com?subject=Feedback de Love Widget', '_system');
+  }
+
+  copyEmail() {
+    navigator.clipboard.writeText('lovewidgetsupport@gmail.com');
+    this.showToast('Correo copiado al portapapeles', 'success');
   }
 }
 
