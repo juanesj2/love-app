@@ -549,11 +549,11 @@ import { Keyboard } from '@capacitor/keyboard';
       100% { background-color: var(--background, white); box-shadow: 0 2px 5px rgba(0,0,0,0.05); transform: scale(1); }
     }
     
-    .reply-context { background: rgba(0,0,0,0.05); padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; margin-bottom: 6px; z-index: 0; opacity: 0.95; cursor: pointer; border-left: 4px solid #FF4D6D; }
-    .mine .reply-context { background: rgba(255, 77, 109, 0.15); border-left: none; border-right: 4px solid #FF4D6D; color: #333; }
+    .reply-context { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px); padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; margin-bottom: 6px; z-index: 0; cursor: pointer; border-left: 4px solid #FF4D6D; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .mine .reply-context { background: rgba(255, 240, 243, 0.9); backdrop-filter: blur(8px); border-left: none; border-right: 4px solid #FF4D6D; color: #333; }
     .reply-context-name { font-weight: bold; color: #FF4D6D; display: block; font-size: 0.75rem; margin-bottom: 2px; }
     .mine .reply-context-name { color: #c9184a; }
-    .reply-context-text { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; color: #666; }
+    .reply-context-text { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; color: #555; font-weight: 500; }
     
     .reactions-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999; background: rgba(0,0,0,0.3); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; animation: fadeIn 0.15s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -672,7 +672,9 @@ import { Keyboard } from '@capacitor/keyboard';
     :host-context(.night-owl-mode) .mine .bubble { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
     :host-context(.night-owl-mode) .send-btn { background: rgba(255,255,255,0.1); color: #ccc; }
     :host-context(.night-owl-mode) .send-btn.active { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; }
-    :host-context(.night-owl-mode) .mine .reply-context { background: rgba(139, 92, 246, 0.15); border-right-color: #8b5cf6; color: #fdfdfd; }
+    :host-context(.night-owl-mode) .reply-context { background: rgba(30, 30, 30, 0.85); color: #ccc; }
+    :host-context(.night-owl-mode) .reply-context-text { color: #aaa; }
+    :host-context(.night-owl-mode) .mine .reply-context { background: rgba(40, 25, 60, 0.9); border-right-color: #8b5cf6; color: #fdfdfd; }
     :host-context(.night-owl-mode) .mine .reply-context-name { color: #a78bfa; }
     :host-context(.night-owl-mode) .reply-icon-circle ion-icon { color: #8b5cf6; }
     :host-context(.night-owl-mode) .mine .play-btn { color: #8b5cf6; }
