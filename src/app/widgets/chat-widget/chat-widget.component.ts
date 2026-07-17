@@ -2776,7 +2776,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   getDynamicReplyText(msg: any): string {
     if (!msg || !msg.reply_to) return '';
-    const originalMsg = this.regularMessages.find(m => m.id === msg.reply_to.id);
+    const originalMsg = this.regularMessages.find(m => m.id == msg.reply_to.id);
     if (originalMsg) {
       return this.getReplyPreviewText(originalMsg);
     }
