@@ -15,7 +15,7 @@ import { environment } from '../../../environments/environment';
 import confetti from 'canvas-confetti';
 import { FingerprintGameModalComponent } from '../fingerprint-game-modal/fingerprint-game-modal.component';
 import { addIcons } from 'ionicons';
-import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed, settingsOutline, imageOutline, partlySunnyOutline, waterOutline, moonOutline, planetOutline, heartOutline, colorPaletteOutline, chatbubbleEllipsesOutline, textOutline, musicalNotesOutline, personCircleOutline, timeOutline, checkmarkOutline, checkmarkDoneOutline } from 'ionicons/icons';
+import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed, settingsOutline, imageOutline, partlySunnyOutline, waterOutline, moonOutline, planetOutline, heartOutline, colorPaletteOutline, chatbubbleEllipsesOutline, textOutline, musicalNotesOutline, personCircleOutline, timeOutline, checkmarkOutline, checkmarkDoneOutline, chevronDownOutline } from 'ionicons/icons';
 import { DotLottie } from '@lottiefiles/dotlottie-web';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Keyboard } from '@capacitor/keyboard';
@@ -26,7 +26,7 @@ import { Keyboard } from '@capacitor/keyboard';
       <button class="chat-bg-settings-btn" (click)="openChatSettings()" *ngIf="regularMessages.length > 0">
         <ion-icon name="color-palette"></ion-icon>
       </button>
-      <ion-content class="messages-content" [style.--background]="chatBackground ? 'transparent' : null" #msgContainer>
+      <ion-content class="messages-content" [style.--background]="chatBackground ? 'transparent' : null" #msgContainer [scrollEvents]="true" (ionScroll)="onScroll($event)">
         <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)" [disabled]="isDoodling">
           <ion-refresher-content></ion-refresher-content>
         </ion-refresher>
@@ -191,6 +191,12 @@ import { Keyboard } from '@capacitor/keyboard';
         <!-- Sending Graffiti Indicator -->
         <div class="sending-graffiti-badge" *ngIf="sendingGraffiti">
           <ion-spinner name="crescent"></ion-spinner> <span>Enviando garabato...</span>
+        </div>
+
+        <!-- Unread Bubble -->
+        <div class="unread-bubble" *ngIf="unreadCount > 0" (click)="scrollToBottomAndClear()">
+          <ion-icon name="chevron-down-outline"></ion-icon>
+          <span class="badge">{{unreadCount}}</span>
         </div>
 
         <div class="reply-preview-container" *ngIf="replyingTo || isEditing">
@@ -1562,6 +1568,48 @@ import { Keyboard } from '@capacitor/keyboard';
         transform: translate(-50%, 0);
       }
     }
+    
+    .unread-bubble {
+      position: absolute;
+      top: -55px;
+      right: 15px;
+      background: #ffffff;
+      color: #FF4D6D;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      z-index: 100;
+      cursor: pointer;
+      animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    @keyframes scaleIn {
+      0% { transform: scale(0); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .unread-bubble ion-icon {
+      font-size: 24px;
+    }
+    .unread-bubble .badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #FF4D6D;
+      color: white;
+      font-size: 11px;
+      font-weight: bold;
+      border-radius: 10px;
+      min-width: 18px;
+      height: 18px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0 4px;
+      border: 2px solid white;
+    }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
@@ -1592,13 +1640,15 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   showReactionsMsgId: number | null = null;
   currentUser: string = '';
   myUserId: number = 0;
+  unreadCount = 0;
+  isUserScrolledUp = false;
   private timeouts: any[] = [];
 
   @ViewChild('doodleCanvas', { static: false }) doodleCanvas: any;
   @ViewChild('chatInput', { static: false }) chatInput: any;
   
   constructor() {
-    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed, 'time-outline': timeOutline, 'checkmark-outline': checkmarkOutline, 'checkmark-done-outline': checkmarkDoneOutline, 'image-outline': imageOutline, 'partly-sunny-outline': partlySunnyOutline, 'water-outline': waterOutline, 'moon-outline': moonOutline, 'planet-outline': planetOutline, 'heart-outline': heartOutline, 'color-palette-outline': colorPaletteOutline, 'chatbubble-ellipses-outline': chatbubbleEllipsesOutline, 'text-outline': textOutline, 'musical-notes-outline': musicalNotesOutline, 'person-circle-outline': personCircleOutline });
+    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed, 'time-outline': timeOutline, 'checkmark-outline': checkmarkOutline, 'checkmark-done-outline': checkmarkDoneOutline, 'image-outline': imageOutline, 'partly-sunny-outline': partlySunnyOutline, 'water-outline': waterOutline, 'moon-outline': moonOutline, 'planet-outline': planetOutline, 'heart-outline': heartOutline, 'color-palette-outline': colorPaletteOutline, 'chatbubble-ellipses-outline': chatbubbleEllipsesOutline, 'text-outline': textOutline, 'musical-notes-outline': musicalNotesOutline, 'person-circle-outline': personCircleOutline, 'chevron-down-outline': chevronDownOutline });
   }
 
   // --- Background Feature ---
@@ -1977,7 +2027,23 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         if (this.messages.length > 0) {
           const latestMsg = this.messages[this.messages.length - 1];
           if (this.lastKnownMessageId > 0 && latestMsg.id > this.lastKnownMessageId && !this.isMine(latestMsg)) {
-            shouldScrollToBottom = true;
+            let newMessagesCount = 0;
+            for (let i = this.messages.length - 1; i >= 0; i--) {
+              if (this.messages[i].id > this.lastKnownMessageId && !this.isMine(this.messages[i])) {
+                newMessagesCount++;
+              } else if (this.messages[i].id <= this.lastKnownMessageId) {
+                break;
+              }
+            }
+            
+            if (this.isUserScrolledUp) {
+              shouldScrollToBottom = false;
+              this.unreadCount += newMessagesCount;
+            } else {
+              shouldScrollToBottom = true;
+              this.unreadCount = 0;
+            }
+            
             if (this.isEmojiOnly(latestMsg.mensaje)) {
               this.triggerEmojiReaction(latestMsg.mensaje.trim());
             }
@@ -2005,6 +2071,25 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         this.showError('No pudimos cargar los mensajes. ¿Hay conexión?');
       }
     }
+  }
+
+  async onScroll(event: any) {
+    if (!this.msgContainer) return;
+    const scrollElement = await this.msgContainer.getScrollElement();
+    if (!scrollElement) return;
+    
+    const distanceFromBottom = scrollElement.scrollHeight - scrollElement.scrollTop - scrollElement.clientHeight;
+    // Consider scrolled up if distance is > 100px from bottom
+    this.isUserScrolledUp = distanceFromBottom > 100;
+    
+    if (!this.isUserScrolledUp) {
+      this.unreadCount = 0; // Clear badge if user scrolls to bottom
+    }
+  }
+
+  scrollToBottomAndClear() {
+    this.unreadCount = 0;
+    this.scrollToBottom(true);
   }
 
   private processMessages() {
