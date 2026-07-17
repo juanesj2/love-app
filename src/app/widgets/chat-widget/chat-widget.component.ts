@@ -148,7 +148,7 @@ import { Keyboard } from '@capacitor/keyboard';
             </div>
           </div>
         </div>
-          <div class="empty-state" *ngIf="regularMessages.length === 0">
+          <div class="empty-state" *ngIf="!isLoading && regularMessages.length === 0">
             <canvas #sadLottie width="200" height="200" style="margin: 0 auto 15px auto;"></canvas>
             <p>No hay mensajes aún.</p>
             <p>¡Dile algo bonito para empezar!</p>
@@ -1634,6 +1634,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   regularMessages: any[] = [];
   graffitisByAnchorId: {[key: number]: any[]} = {};
   deletedLocalMessages: number[] = [];
+  isLoading = true;
   newMessage = '';
   sending = false;
   avatars: { [key: string]: string } = {};
@@ -2021,6 +2022,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
             this.lastKnownMessageId = this.messages[this.messages.length - 1].id;
           }
           this.processMessages();
+          this.isLoading = false;
+          this.cdr.detectChanges();
           this.safeTimeout(() => this.scrollToBottom(false), 50);
           this.safeTimeout(() => this.scrollToBottom(false), 300);
         }
@@ -2081,6 +2084,9 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         console.error(e);
         this.showError('No pudimos cargar los mensajes. ¿Hay conexión?');
       }
+    } finally {
+      this.isLoading = false;
+      this.cdr.detectChanges();
     }
   }
 
