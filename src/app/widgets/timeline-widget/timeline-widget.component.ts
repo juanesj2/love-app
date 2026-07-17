@@ -50,7 +50,9 @@ import { OfflineSyncService } from '../../services/offline-sync.service';
         </div>
 
         <!-- Lista de Planes -->
-        <div class="timeline-body">
+        <div class="timeline-body" 
+             (touchstart)="onTouchStart($event)" 
+             (touchend)="onTouchEnd($event)">
           <div *ngIf="filteredPlans.length === 0 && !isEditing" class="empty-state">
             No hay planes aquí todavía. ¡Añade uno nuevo!
           </div>
@@ -298,6 +300,11 @@ export class TimelineWidgetComponent implements OnInit, OnDestroy {
   albums: any[] = [];
   
   isEditing = false;
+  filteredPlans: any[] = [];
+  
+  // Swipe logic
+  touchStartX = 0;
+  touchEndX = 0;
   editingPlan: any = {};
 
   constructor() {
@@ -501,6 +508,36 @@ export class TimelineWidgetComponent implements OnInit, OnDestroy {
     if (diff === 0) return '¡Hoy!';
     if (diff === 1) return 'Ayer';
     return `Hace ${diff} días`;
+  }
+
+  // --- Swipe Gesture Logic ---
+  onTouchStart(e: TouchEvent) {
+    if (this.isEditing) return; // Disable swipe while editing
+    this.touchStartX = e.changedTouches[0].screenX;
+  }
+  
+  onTouchEnd(e: TouchEvent) {
+    if (this.isEditing) return;
+    this.touchEndX = e.changedTouches[0].screenX;
+    this.handleSwipe();
+  }
+
+  handleSwipe() {
+    const swipeThreshold = 50;
+    const diff = this.touchStartX - this.touchEndX;
+    
+    // Si la diferencia es mayor al umbral, fue un swipe horizontal claro
+    if (Math.abs(diff) > swipeThreshold) {
+      if (diff > 0) {
+        // Swipe Left (dedo se mueve de derecha a izquierda -> ir a pestaña siguiente)
+        if (this.activeTab === 'idea') this.activeTab = 'planned';
+        else if (this.activeTab === 'planned') this.activeTab = 'completed';
+      } else {
+        // Swipe Right (dedo se mueve de izquierda a derecha -> ir a pestaña anterior)
+        if (this.activeTab === 'completed') this.activeTab = 'planned';
+        else if (this.activeTab === 'planned') this.activeTab = 'idea';
+      }
+    }
   }
 
   async showToast(message: string, color: string) {
