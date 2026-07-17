@@ -86,6 +86,11 @@ export class LoveApiService {
     return firstValueFrom(this.http.delete(`${API_BASE_URL}/love-album/secret-notes/${id}`));
   }
 
+  // --- Estadísticas Secretas ---
+  async getSecretStats(): Promise<any> {
+    return firstValueFrom(this.http.get<any>(`${API_BASE_URL}/love-album/secret-stats`));
+  }
+
   // --- AUTH ---
   async login(email: string, password: string): Promise<any> {
     const res: any = await firstValueFrom(this.http.post(`${API_BASE_URL}/login`, { email, password }, { headers: { 'Accept': 'application/json' } }));

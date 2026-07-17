@@ -25,6 +25,7 @@ import { App } from '@capacitor/app';
 import { PremiumService } from '../services/premium.service';
 import { PaywallComponent } from '../components/paywall/paywall.component';
 import { ModalController, Platform } from '@ionic/angular';
+import { SecretStatsModalComponent } from '../widgets/mas-widget/secret-stats-modal.component';
 
 import { NotificationService } from '../services/notification.service';
 import { PushNotifications } from '@capacitor/push-notifications';
@@ -69,6 +70,13 @@ import { PushNotifications } from '@capacitor/push-notifications';
                  [class.show]="selectedWidget === 'chat' && chatWidgetComp && chatWidgetComp.regularMessages.length > 0" 
                  (click)="chatWidgetComp?.openChatSettings()">
               <ion-icon name="color-palette"></ion-icon>
+            </div>
+
+            <!-- Spy Stats Button -->
+            <div class="menu-toggle-btn" 
+                 [class.show]="selectedWidget === 'mas' && hasSpyStatsUnlocked" 
+                 (click)="openSpyStats()">
+              <ion-icon name="eye"></ion-icon>
             </div>
 
           </div>
@@ -339,6 +347,11 @@ export class HomePage implements OnInit, OnDestroy {
   uploading = false;
   pokeAnimation = false;
   superPokeAnimation = false;
+
+  spySequenceStep = 0;
+  spySequenceTimeout: any = null;
+  hasSpyStatsUnlocked = false;
+
   pokeCount = 0;
   private pokeHoldTimer: any = null;
   private pokeHoldFired = false;
@@ -371,6 +384,7 @@ export class HomePage implements OnInit, OnDestroy {
   surpriseTitle = '';
   surpriseBody = '';
   sendingSurprise = false;
+  hasSurpriseUnlocked = false;
 
   public premiumService = inject(PremiumService);
   private api = inject(LoveApiService);
@@ -540,6 +554,17 @@ export class HomePage implements OnInit, OnDestroy {
       document.documentElement.classList.remove('night-owl-mode');
     }
 
+    const [goldenRes, surpriseRes, nightOwlRes, spyRes] = await Promise.all([
+      Preferences.get({ key: 'golden_frame_unlocked' }),
+      Preferences.get({ key: 'surprise_notification_unlocked' }),
+      Preferences.get({ key: 'night_owl_unlocked' }),
+      Preferences.get({ key: 'spy_stats_unlocked' })
+    ]);
+    this.hasGoldenFrame = goldenRes.value === 'true';
+    this.hasSurpriseUnlocked = surpriseRes.value === 'true';
+    this.hasNightOwlSecret = nightOwlRes.value === 'true';
+    this.hasSpyStatsUnlocked = spyRes.value === 'true';
+
     await this.loadHeaderData();
 
     // Suscribirse a los logros para el búho nocturno y marco dorado
@@ -620,6 +645,11 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   startSurprisePress() {
+    if (this.selectedWidget === 'mas' && this.spySequenceStep === 1) {
+      this.spySequenceStep = 2;
+      clearTimeout(this.spySequenceTimeout);
+      this.spySequenceTimeout = setTimeout(() => { this.spySequenceStep = 0; }, 4000);
+    }
     this.surpriseTimeout = setTimeout(() => {
       this.openSurpriseModal();
     }, 800); // 800ms para considerarlo long press
@@ -647,6 +677,11 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   startGoldenPress() {
+    if (this.selectedWidget === 'mas') {
+      this.spySequenceStep = 1;
+      clearTimeout(this.spySequenceTimeout);
+      this.spySequenceTimeout = setTimeout(() => { this.spySequenceStep = 0; }, 4000);
+    }
     this.goldenTimeout = setTimeout(() => {
       this.goldenTimeout = null;
       try { navigator.vibrate?.([50, 50, 50]); } catch(e){}
@@ -817,6 +852,15 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   startPokeHold() {
+    if (this.selectedWidget === 'mas' && this.spySequenceStep === 2) {
+      this.spySequenceStep = 3;
+      clearTimeout(this.spySequenceTimeout);
+      this.spySequenceTimeout = setTimeout(() => {
+        if (this.spySequenceStep === 3) {
+          this.unlockSpyStats();
+        }
+      }, 2000);
+    }
     this.pokeHoldFired = false;
     this.pokeHoldTimer = setTimeout(() => {
       this.pokeHoldFired = true;
@@ -825,6 +869,10 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   endPokeHold() {
+    if (this.spySequenceStep === 3) {
+      this.spySequenceStep = 0;
+      clearTimeout(this.spySequenceTimeout);
+    }
     if (this.pokeHoldTimer) {
       clearTimeout(this.pokeHoldTimer);
       this.pokeHoldTimer = null;
@@ -1023,6 +1071,29 @@ export class HomePage implements OnInit, OnDestroy {
       this.uploading = false;
       this.cdr.detectChanges();
     }
+  }
+
+  async unlockSpyStats() {
+    this.spySequenceStep = 0;
+    clearTimeout(this.spySequenceTimeout);
+    if (!this.hasSpyStatsUnlocked) {
+      this.hasSpyStatsUnlocked = true;
+      await Preferences.set({ key: 'spy_stats_unlocked', value: 'true' });
+      this.api.unlockAchievement('secret_stats_unlocked').catch(e => console.error(e));
+      try { await Haptics.impact({ style: ImpactStyle.Heavy }); } catch (e) {}
+    }
+    this.openSpyStats();
+  }
+
+  async openSpyStats() {
+    document.body.classList.add('hide-tabs');
+    const modal = await this.modalController.create({
+      component: SecretStatsModalComponent,
+      componentProps: { myUserId: this.api.myUserId }
+    });
+    await modal.present();
+    await modal.onDidDismiss();
+    document.body.classList.remove('hide-tabs');
   }
 }
 
