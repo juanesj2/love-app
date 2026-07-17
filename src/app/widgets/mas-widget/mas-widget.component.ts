@@ -751,7 +751,7 @@ import confetti from 'canvas-confetti';
     styles: [`
     :host { display: block; height: 100%; }
     .scroll-content { --background: transparent; }
-    .mas-container { padding: calc(var(--safe-top) + 85px) 20px 20px; font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #fff0f3 0%, #ffccd5 100%); min-height: 100%; padding-bottom: 100px; }
+    .mas-container { padding: calc(var(--safe-top) + 85px) 20px 20px; font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #fff0f3 0%, #ffccd5 100%); min-height: 100%; padding-bottom: 150px; }
     
     .header { margin-bottom: 25px; text-align: center; }
     .title { margin: 0; font-size: 1.8rem; font-weight: 900; color: #590D22; letter-spacing: -0.5px; text-shadow: 0 2px 10px rgba(255,255,255,0.8); }
