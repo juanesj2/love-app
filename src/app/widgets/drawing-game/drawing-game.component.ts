@@ -545,6 +545,8 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
     const { x, y } = this.getXY(e);
     this.ctx.beginPath();
     this.ctx.moveTo(x, y);
+    this.ctx.lineTo(x, y);
+    this.ctx.stroke();
   }
 
   draw(e: TouchEvent | MouseEvent) {
