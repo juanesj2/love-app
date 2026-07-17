@@ -1665,7 +1665,7 @@ export class PhotoWidgetComponent implements OnInit {
   async reactCustom(photoId: number) {
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Elige una reacción',
-      cssClass: 'custom-love-action-sheet',
+      cssClass: 'premium-action-sheet',
       buttons: [
         { text: '😍 Me encanta', handler: () => this.react(photoId, '😍') },
         { text: '😂 Me divierte', handler: () => this.react(photoId, '😂') },
@@ -1733,7 +1733,7 @@ export class PhotoWidgetComponent implements OnInit {
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Opciones de la foto',
       buttons: buttons,
-      cssClass: 'custom-love-action-sheet'
+      cssClass: 'premium-action-sheet'
     });
     await actionSheet.present();
   }
