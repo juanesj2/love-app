@@ -34,7 +34,7 @@ import { PushNotifications } from '@capacitor/push-notifications';
   template: `
     <!-- ... html was here ... -->
     <ion-header class="ion-no-border" style="position: absolute; top: 0; width: 100%; background: transparent; z-index: 20; pointer-events: none;">
-      <div class="custom-header" *ngIf="selectedWidget !== 'location'" style="pointer-events: auto;">
+      <div class="custom-header" [class.hide-header]="selectedWidget === 'location'" style="pointer-events: auto;">
           
           <div class="avatar-container"
                (click)="openAvatarSettings()"
@@ -219,7 +219,8 @@ import { PushNotifications } from '@capacitor/push-notifications';
       
       :host-context(.night-owl-mode) .c-box { background: linear-gradient(135deg, #FF9F1C, #E85D04); }
 
-      .custom-header { display: flex; justify-content: space-between; align-items: center; padding: calc(var(--ion-safe-area-top, 0px) + 15px) 25px 15px 25px; background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); border-radius: 0 0 25px 25px; margin-bottom: 10px; position: relative; z-index: 20; }
+      .custom-header { display: flex; justify-content: space-between; align-items: center; padding: calc(var(--ion-safe-area-top, 0px) + 15px) 25px 15px 25px; background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); border-radius: 0 0 25px 25px; margin-bottom: 10px; position: relative; z-index: 20; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+      .custom-header.hide-header { transform: translateY(-120px) scale(0.9); opacity: 0; pointer-events: none !important; }
       .avatar-container { position: relative; cursor: pointer; z-index: 2; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
       .avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.15); object-fit: cover; border: 2px solid white; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; }
       .avatar-container:active .avatar { transform: scale(0.9); }
