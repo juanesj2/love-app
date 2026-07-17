@@ -34,8 +34,8 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
         </div>
       </div>
 
-      <!-- Floating Top Bar -->
-      <div class="floating-top-bar">
+      <!-- Top actions (View toggles, Albums) -->
+      <div class="floating-top-bar" [class.hidden]="isTopBarHidden">
         <div class="streak-badge" *ngIf="coupleInfo && !currentAlbum" (click)="openStreakModal()"
              [ngClass]="{
                'active': coupleInfo.current_streak > 0 && coupleInfo.my_photo_today && coupleInfo.partner_photo_today,
@@ -74,7 +74,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
         </div>
       </div>
 
-      <ion-content class="scroll-content" [class.snap-feed]="true" [class.ion-hide]="viewMode !== 'feed'">
+      <ion-content class="scroll-content" [class.snap-feed]="true" [class.ion-hide]="viewMode !== 'feed'" [scrollEvents]="true" (ionScroll)="onScroll($event)">
         <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
           <ion-refresher-content></ion-refresher-content>
         </ion-refresher>
@@ -129,7 +129,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
       </ion-content>
 
       <!-- VISTA GRID (GALERÍA) -->
-      <ion-content #gridContent class="scroll-content" [class.ion-hide]="viewMode !== 'grid'" [scrollEvents]="true" (ionScroll)="onContentScroll($event)">
+      <ion-content #gridContent class="scroll-content" [class.ion-hide]="viewMode !== 'grid'" [scrollEvents]="true" (ionScroll)="onScroll($event)">
         <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
           <ion-refresher-content></ion-refresher-content>
         </ion-refresher>
@@ -468,8 +468,11 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     }
     .photo-widget-container { padding: 0; position: relative; height: 100%; display: flex; flex-direction: column; background: linear-gradient(135deg, #fff5f8 0%, #ffe3e9 100%); font-family: 'Inter', sans-serif; }
     
-    .floating-top-bar { position: absolute; top: calc(var(--safe-top) + 105px); left: 15px; right: 15px; z-index: 50; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
+    .floating-top-bar { position: absolute; top: calc(var(--safe-top) + 105px); left: 15px; right: 15px; z-index: 50; display: flex; justify-content: space-between; align-items: center; pointer-events: none; transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.3s; }
     .floating-top-bar > * { pointer-events: auto; }
+    .floating-top-bar.hidden { transform: translateY(-120px); opacity: 0; pointer-events: none !important; }
+    .floating-top-bar.hidden > * { pointer-events: none !important; }
+    
     .floating-toggles { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; padding: 4px; border-radius: 30px; }
     .floating-toggles button { background: transparent; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #555; transition: all 0.2s; cursor: pointer; text-shadow: 0 1px 4px rgba(255,255,255,0.8); }
     .floating-toggles button.active { color: #FF4D6D; transform: scale(1.1); }
@@ -813,6 +816,9 @@ export class PhotoWidgetComponent implements OnInit {
   
   activeCommentPhoto: any = null;
   commentText: string = '';
+  
+  isTopBarHidden = false;
+  private lastScrollTop = 0;
 
   viewMode: 'feed' | 'grid' = 'feed';
   @ViewChild(IonContent, { static: false }) content!: IonContent;
@@ -1314,28 +1320,44 @@ export class PhotoWidgetComponent implements OnInit {
     return Math.hypot(t1.pageX - t2.pageX, t1.pageY - t2.pageY);
   }
 
-  // --- Fast Scroller Timeline ---
-  async onContentScroll(e: any) {
-    if (this.viewMode !== 'grid') return;
+  // --- Scroll Logic ---
+  async onScroll(e: any) {
+    const scrollTop = e.detail.scrollTop;
     
-    this.isTimelineVisible = true;
-    clearTimeout(this.timelineHideTimeout);
-    
-    if (!this.isDraggingTimeline && this.content) {
-      try {
-        const scrollEl = await this.content.getScrollElement();
-        const scrollTop = e.detail.scrollTop;
-        const scrollHeight = scrollEl.scrollHeight - scrollEl.clientHeight;
-        if (scrollHeight > 0) {
-          this.timelineThumbY = (scrollTop / scrollHeight) * 100;
-          this.timelineThumbY = Math.max(0, Math.min(100, this.timelineThumbY));
-        }
-      } catch (err) {}
+    // Hide/show top bar based on scroll direction
+    if (scrollTop > this.lastScrollTop && scrollTop > 50) {
+      if (!this.isTopBarHidden) {
+        this.isTopBarHidden = true;
+        this.cdr.detectChanges();
+      }
+    } else if (scrollTop < this.lastScrollTop || scrollTop <= 50) {
+      if (this.isTopBarHidden) {
+        this.isTopBarHidden = false;
+        this.cdr.detectChanges();
+      }
     }
+    this.lastScrollTop = scrollTop;
 
-    this.timelineHideTimeout = setTimeout(() => {
-      this.isTimelineVisible = false;
-    }, 1500);
+    // Timeline logic for grid view
+    if (this.viewMode === 'grid') {
+      this.isTimelineVisible = true;
+      clearTimeout(this.timelineHideTimeout);
+      
+      if (!this.isDraggingTimeline && this.content) {
+        try {
+          const scrollEl = await this.content.getScrollElement();
+          const scrollHeight = scrollEl.scrollHeight - scrollEl.clientHeight;
+          if (scrollHeight > 0) {
+            this.timelineThumbY = (scrollTop / scrollHeight) * 100;
+            this.timelineThumbY = Math.max(0, Math.min(100, this.timelineThumbY));
+          }
+        } catch (err) {}
+      }
+
+      this.timelineHideTimeout = setTimeout(() => {
+        this.isTimelineVisible = false;
+      }, 1500);
+    }
   }
 
   onTimelineTouchStart(e: TouchEvent) {
