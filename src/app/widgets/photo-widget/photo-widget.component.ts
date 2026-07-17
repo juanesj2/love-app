@@ -822,6 +822,7 @@ export class PhotoWidgetComponent implements OnInit {
   commentText: string = '';
   
   isTopBarHidden = false;
+  menuHideTimeout: any;
   private lastScrollTop = 0;
 
   viewMode: 'feed' | 'grid' = 'feed';
@@ -918,6 +919,7 @@ export class PhotoWidgetComponent implements OnInit {
 
     this.loadAvatars();
     this.startMidnightTimer();
+    this.resetMenuTimeout();
     
     const albumIntent = await Preferences.get({ key: 'open_album_id_intent' });
     if (albumIntent.value) {
@@ -930,9 +932,11 @@ export class PhotoWidgetComponent implements OnInit {
     this.loadData();
   }
   
+
   ngOnDestroy() {
     if (this.observer) this.observer.disconnect();
     if (this.midnightTimer) clearInterval(this.midnightTimer);
+    if (this.menuHideTimeout) clearTimeout(this.menuHideTimeout);
   }
 
   startMidnightTimer() {
@@ -1328,6 +1332,9 @@ export class PhotoWidgetComponent implements OnInit {
   async onScroll(e: any) {
     const scrollTop = e.detail.scrollTop;
     
+    // Reset menu auto-hide timeout on scroll
+    this.resetMenuTimeout();
+
     // Timeline logic for grid view
     if (this.viewMode === 'grid') {
       this.isTimelineVisible = true;
@@ -1632,8 +1639,22 @@ export class PhotoWidgetComponent implements OnInit {
   }
 
   // Photo Actions
+  resetMenuTimeout() {
+    if (this.menuHideTimeout) {
+      clearTimeout(this.menuHideTimeout);
+    }
+    if (!this.isTopBarHidden) {
+      this.menuHideTimeout = setTimeout(() => {
+        this.isTopBarHidden = true;
+        this.cdr.detectChanges();
+      }, 10000);
+    }
+  }
+
   toggleMenu() {
     this.isTopBarHidden = !this.isTopBarHidden;
+    this.resetMenuTimeout();
+    this.cdr.detectChanges();
   }
   
   openAlbumsModal() {
