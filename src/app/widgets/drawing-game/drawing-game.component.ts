@@ -124,6 +124,11 @@ import iro from '@jaames/iro';
             <div class="color-btn custom-color-btn" (click)="toggleCustomPicker()" [class.active-color]="showCustomPicker"></div>
             <div class="color-btn" *ngFor="let c of predefinedColors" [style.background]="c" (click)="setColorFromBtn(c)" [class.active-color]="currentColor === c && !showCustomPicker"></div>
           </div>
+          <div class="thickness-slider-container">
+            <ion-icon name="remove-outline" style="font-size: 0.8rem;"></ion-icon>
+            <input type="range" min="1" max="40" [value]="currentThickness" (input)="setThickness($event)" class="thickness-slider">
+            <ion-icon name="ellipse" style="font-size: 1.2rem;"></ion-icon>
+          </div>
           <div class="tools">
             <button class="tool-btn warning" (click)="undo()"><ion-icon name="arrow-undo-outline"></ion-icon> Deshacer</button>
             <button class="tool-btn danger" (click)="clearCanvas()"><ion-icon name="trash-outline"></ion-icon> Borrar</button>
@@ -229,6 +234,9 @@ import iro from '@jaames/iro';
     .color-btn.active-color { transform: scale(1.2); border-color: #FF4D6D; border-width: 3px; }
     .custom-color-btn { background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red); }
 
+    .thickness-slider-container { display: flex; align-items: center; gap: 10px; margin: 10px 0; background: rgba(255,255,255,0.6); padding: 10px 15px; border-radius: 20px; color: #FF4D6D; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+    .thickness-slider { flex: 1; accent-color: #FF4D6D; }
+
     .unread-item { cursor: pointer; transition: transform 0.2s; background: linear-gradient(145deg, #ffffff, #fff0f3); border: 1px solid #ffb3c1; }
     .unread-item:active { transform: scale(0.98); }
     .new-badge { background: #FF4D6D; color: white; font-size: 0.7rem; padding: 3px 6px; border-radius: 10px; vertical-align: middle; margin-left: 5px; }
@@ -315,6 +323,7 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
   private isDrawing = false;
   private drawingHistory: ImageData[] = [];
   public currentColor: string = '#000000';
+  public currentThickness: number = 4;
   public predefinedColors = [
     '#000000', '#ffffff', '#8b4513', '#a0522d', '#cd853f', '#f5deb3', 
     '#ffb6c1', '#ff69b4', '#9370db', '#e6e6fa', '#add8e6', '#98fb98'
@@ -456,7 +465,7 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
           this.ctx = context;
           this.ctx.lineCap = 'round';
           this.ctx.lineJoin = 'round';
-          this.ctx.lineWidth = 4;
+          this.ctx.lineWidth = this.currentThickness;
           this.ctx.strokeStyle = this.currentColor;
           
           // White background
@@ -598,6 +607,13 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
     this.currentColor = color;
     if (this.ctx) {
       this.ctx.strokeStyle = this.currentColor;
+    }
+  }
+
+  setThickness(e: any) {
+    this.currentThickness = e.target.value;
+    if (this.ctx) {
+      this.ctx.lineWidth = this.currentThickness;
     }
   }
 
