@@ -40,6 +40,7 @@ import { Keyboard } from '@capacitor/keyboard';
                    [src]="environment.storageUrl + (graf.custom_image_path || graf.photo?.image_path)" 
                    class="graffiti-overlay" 
                    (touchstart)="startGraffitiPress(graf, $event)"
+                   (touchmove)="moveGraffitiPress($event)"
                    (mousedown)="startGraffitiPress(graf, $event)"
                    (touchend)="endGraffitiPress()"
                    (mouseup)="endGraffitiPress()"
@@ -2367,7 +2368,15 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     return `${day}/${month}/${year} ${time}`;
   }
 
+  graffitiSwipeStartX = 0;
+  graffitiSwipeStartY = 0;
+
   startGraffitiPress(graf: any, event: any) {
+    if (event.touches && event.touches.length > 0) {
+      this.graffitiSwipeStartX = event.touches[0].clientX;
+      this.graffitiSwipeStartY = event.touches[0].clientY;
+    }
+
     this.graffitiPressTimer = setTimeout(async () => {
       try { await Haptics.impact({ style: ImpactStyle.Heavy }); } catch (e) {}
       
@@ -2412,6 +2421,18 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   endGraffitiPress() {
     clearTimeout(this.graffitiPressTimer);
+  }
+
+  moveGraffitiPress(event: any) {
+    if (!event.touches) return;
+    const x = event.touches[0].clientX;
+    const y = event.touches[0].clientY;
+    const deltaX = x - this.graffitiSwipeStartX;
+    const deltaY = y - this.graffitiSwipeStartY;
+    
+    if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) {
+      this.endGraffitiPress();
+    }
   }
 
   closeGraffitiOptions() {
