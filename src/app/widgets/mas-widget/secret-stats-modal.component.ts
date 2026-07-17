@@ -2,7 +2,7 @@ import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { close, chatbubblesOutline, heartOutline, trophyOutline, imagesOutline, happyOutline } from 'ionicons/icons';
+import { close, chatbubblesOutline, heartOutline, trophyOutline, imagesOutline, happyOutline, gameControllerOutline, flameOutline } from 'ionicons/icons';
 import { LoveApiService } from '../../services/love-api.service';
 
 @Component({
@@ -120,6 +120,52 @@ import { LoveApiService } from '../../services/love-api.service';
           </p>
         </div>
 
+        <div class="stat-card">
+          <div class="stat-header">
+            <ion-icon name="game-controller-outline"></ion-icon>
+            <h3>Preguntas Diarias</h3>
+          </div>
+          <div class="progress-wrapper">
+            <div class="label-row">
+              <span>Tú ({{ getMyQuestions() }})</span>
+              <span>Pareja ({{ getPartnerQuestions() }})</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill me" [style.width.%]="getQuestionPercentage('me')"></div>
+              <div class="progress-bar-fill partner" [style.width.%]="getQuestionPercentage('partner')"></div>
+            </div>
+          </div>
+          <p class="winner-text" *ngIf="getMyQuestions() > getPartnerQuestions()">
+            🎮 Siempre juegas tus cartas primero.
+          </p>
+          <p class="winner-text" *ngIf="getMyQuestions() < getPartnerQuestions()">
+            🎮 Tu pareja nunca se pierde el juego.
+          </p>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <ion-icon name="flame-outline"></ion-icon>
+            <h3>Matches (Swipes)</h3>
+          </div>
+          <div class="progress-wrapper">
+            <div class="label-row">
+              <span>Tú ({{ getMySwipes() }})</span>
+              <span>Pareja ({{ getPartnerSwipes() }})</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill me" [style.width.%]="getSwipePercentage('me')"></div>
+              <div class="progress-bar-fill partner" [style.width.%]="getSwipePercentage('partner')"></div>
+            </div>
+          </div>
+          <p class="winner-text" *ngIf="getMySwipes() > getPartnerSwipes()">
+            🔥 Tienes el dedo calentito de tanto swipe.
+          </p>
+          <p class="winner-text" *ngIf="getMySwipes() < getPartnerSwipes()">
+            🔥 Tu pareja le da like a todo.
+          </p>
+        </div>
+
       </div>
     </ion-content>
   `,
@@ -234,7 +280,7 @@ export class SecretStatsModalComponent implements OnInit {
   private modalCtrl = inject(ModalController);
 
   constructor() {
-    addIcons({ close, chatbubblesOutline, heartOutline, trophyOutline, imagesOutline, happyOutline });
+    addIcons({ close, chatbubblesOutline, heartOutline, trophyOutline, imagesOutline, happyOutline, gameControllerOutline, flameOutline });
   }
 
   async ngOnInit() {
@@ -320,6 +366,42 @@ export class SecretStatsModalComponent implements OnInit {
   getReactionPercentage(who: 'me'|'partner') {
     const me = this.getMyReactions();
     const partner = this.getPartnerReactions();
+    const total = me + partner;
+    if (total === 0) return 50;
+    return who === 'me' ? (me / total) * 100 : (partner / total) * 100;
+  }
+
+  getMyQuestions() {
+    if (!this.stats) return 0;
+    return this.stats.user1_id === this.myUserId ? this.stats.user1_question_count : this.stats.user2_question_count;
+  }
+
+  getPartnerQuestions() {
+    if (!this.stats) return 0;
+    return this.stats.user1_id === this.myUserId ? this.stats.user2_question_count : this.stats.user1_question_count;
+  }
+
+  getQuestionPercentage(who: 'me'|'partner') {
+    const me = this.getMyQuestions();
+    const partner = this.getPartnerQuestions();
+    const total = me + partner;
+    if (total === 0) return 50;
+    return who === 'me' ? (me / total) * 100 : (partner / total) * 100;
+  }
+
+  getMySwipes() {
+    if (!this.stats) return 0;
+    return this.stats.user1_id === this.myUserId ? this.stats.user1_swipe_count : this.stats.user2_swipe_count;
+  }
+
+  getPartnerSwipes() {
+    if (!this.stats) return 0;
+    return this.stats.user1_id === this.myUserId ? this.stats.user2_swipe_count : this.stats.user1_swipe_count;
+  }
+
+  getSwipePercentage(who: 'me'|'partner') {
+    const me = this.getMySwipes();
+    const partner = this.getPartnerSwipes();
     const total = me + partner;
     if (total === 0) return 50;
     return who === 'me' ? (me / total) * 100 : (partner / total) * 100;
