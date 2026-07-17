@@ -469,6 +469,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .photo-widget-container { padding: 0; position: relative; height: 100%; display: flex; flex-direction: column; background: linear-gradient(135deg, #fff5f8 0%, #ffe3e9 100%); font-family: 'Inter', sans-serif; }
     
     .floating-top-bar { position: absolute; top: calc(var(--safe-top) + 105px); left: 15px; right: 15px; z-index: 50; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
+    .floating-top-bar > * { pointer-events: auto; }
     .floating-toggles { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; padding: 4px; border-radius: 30px; }
     .floating-toggles button { background: transparent; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #555; transition: all 0.2s; cursor: pointer; text-shadow: 0 1px 4px rgba(255,255,255,0.8); }
     .floating-toggles button.active { color: #FF4D6D; transform: scale(1.1); }
