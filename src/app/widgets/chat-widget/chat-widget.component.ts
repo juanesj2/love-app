@@ -187,12 +187,12 @@ import { Keyboard } from '@capacitor/keyboard';
         </div>
       </div>
 
-      <!-- Sending Graffiti Indicator -->
-      <div class="sending-graffiti-badge" *ngIf="sendingGraffiti">
-        <ion-spinner name="crescent"></ion-spinner> <span>Enviando garabato...</span>
-      </div>
-
       <div class="input-area">
+        <!-- Sending Graffiti Indicator -->
+        <div class="sending-graffiti-badge" *ngIf="sendingGraffiti">
+          <ion-spinner name="crescent"></ion-spinner> <span>Enviando garabato...</span>
+        </div>
+
         <div class="reply-preview-container" *ngIf="replyingTo || isEditing">
           <div class="reply-preview">
             <div class="reply-header">
@@ -1529,7 +1529,7 @@ import { Keyboard } from '@capacitor/keyboard';
 
     .sending-graffiti-badge {
       position: absolute;
-      bottom: 80px; /* Above input area */
+      top: -45px; /* Above input area */
       left: 50%;
       transform: translateX(-50%);
       background: rgba(255, 255, 255, 0.9);
@@ -1551,6 +1551,16 @@ import { Keyboard } from '@capacitor/keyboard';
       width: 18px;
       height: 18px;
       color: #FF4D6D;
+    }
+    @keyframes slideUpFade {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, 20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
     }
   `],
   standalone: true,
