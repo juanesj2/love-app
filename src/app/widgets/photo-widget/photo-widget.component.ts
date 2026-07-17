@@ -444,6 +444,20 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
           {{ fe.emoji }}
         </div>
       </div>
+      
+      <!-- Custom Comment Bottom Sheet Overlay -->
+      <div class="custom-comment-overlay" [class.active]="activeCommentPhoto" (click)="closeCommentOverlay()">
+        <div class="comment-sheet" (click)="$event.stopPropagation()">
+          <div class="sheet-handle"></div>
+          <h3 class="sheet-title">Añadir comentario</h3>
+          <div class="sheet-input-row">
+            <input type="text" [(ngModel)]="commentText" placeholder="Escribe tu mensaje..." id="floating-comment-input" (keyup.enter)="sendFloatingComment()" />
+            <button class="sheet-send-btn" (click)="sendFloatingComment()" [disabled]="!commentText || commentText.trim().length === 0">
+              <ion-icon name="send"></ion-icon>
+            </button>
+          </div>
+        </div>
+      </div>
 
     </div>
   `,
@@ -462,6 +476,18 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .floating-actions { position: absolute; right: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 10; }
     .albums-btn-small { background: transparent; border: none; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: #555; cursor: pointer; transition: transform 0.2s; text-shadow: 0 1px 4px rgba(255,255,255,0.8); }
     .albums-btn-small:active { transform: scale(0.9); }
+    
+    .custom-comment-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 2100; opacity: 0; pointer-events: none; transition: opacity 0.3s; display: flex; align-items: flex-end; }
+    .custom-comment-overlay.active { opacity: 1; pointer-events: auto; }
+    .comment-sheet { background: white; width: 100%; border-top-left-radius: 24px; border-top-right-radius: 24px; padding: 15px 20px 25px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 -10px 40px rgba(0,0,0,0.1); }
+    .custom-comment-overlay.active .comment-sheet { transform: translateY(0); }
+    .sheet-handle { width: 40px; height: 5px; background: #e0e0e0; border-radius: 5px; margin: 0 auto 15px; }
+    .sheet-title { margin: 0 0 15px; font-size: 1.1rem; color: #590D22; text-align: center; font-weight: 700; }
+    .sheet-input-row { display: flex; align-items: center; gap: 10px; background: #f8f9fa; padding: 8px 15px; border-radius: 20px; border: 1px solid #eee; }
+    .sheet-input-row input { flex: 1; border: none; background: transparent; outline: none; font-size: 1rem; color: #333; }
+    .sheet-send-btn { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s; }
+    .sheet-send-btn:disabled { background: #ccc; opacity: 0.5; }
+    .sheet-send-btn:active:not(:disabled) { transform: scale(0.9); }
     
     .minimalist-actions { padding: 5px 0 15px 0 !important; display: flex; align-items: center; gap: 12px; }
     .minimalist-actions .reaction-btn { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; font-size: 1.6rem; box-shadow: none; color: #555; transition: transform 0.2s; }
@@ -750,6 +776,12 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     :host-context(.night-owl-mode) .album-cover.empty { background: rgba(0,0,0,0.4); border-color: #a78bfa; color: #a78bfa; }
     :host-context(.night-owl-mode) .album-name { color: #ccc; }
     :host-context(.night-owl-mode) .change-cover-btn { background: rgba(30,30,30,0.9); color: #a78bfa; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .comment-sheet { background: #1e1e1e; box-shadow: 0 -10px 40px rgba(0,0,0,0.5); }
+    :host-context(.night-owl-mode) .sheet-handle { background: #333; }
+    :host-context(.night-owl-mode) .sheet-title { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .sheet-input-row { background: #2a2a2a; border-color: #333; }
+    :host-context(.night-owl-mode) .sheet-input-row input { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .sheet-send-btn { background: linear-gradient(135deg, #a78bfa, #8b5cf6); }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
@@ -777,6 +809,9 @@ export class PhotoWidgetComponent implements OnInit {
   pendingPhotoFile: any = null;
   pendingPhotoPreview: string = '';
   pendingPhotoText: string = '';
+  
+  activeCommentPhoto: any = null;
+  commentText: string = '';
 
   viewMode: 'feed' | 'grid' = 'feed';
   @ViewChild(IonContent, { static: false }) content!: IonContent;
@@ -1678,28 +1713,27 @@ export class PhotoWidgetComponent implements OnInit {
     await actionSheet.present();
   }
 
-  async openCommentPrompt(photo: any) {
-    const alert = await this.alertController.create({
-      header: 'Comentar',
-      message: 'Escribe un mensaje para esta foto',
-      cssClass: 'custom-love-alert',
-      inputs: [
-        { name: 'text', type: 'text', placeholder: 'Escribe tu mensaje...' }
-      ],
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Enviar',
-          handler: (data) => {
-            if (data.text && data.text.trim().length > 0) {
-              this.replyTexts[photo.id] = data.text.trim();
-              this.replyWithText(photo.id);
-            }
-          }
-        }
-      ]
-    });
-    await alert.present();
+  openCommentPrompt(photo: any) {
+    this.activeCommentPhoto = photo;
+    this.commentText = '';
+    // Let angular detect changes and render the overlay, then focus
+    setTimeout(() => {
+      const input = document.getElementById('floating-comment-input');
+      if (input) input.focus();
+    }, 100);
+  }
+
+  closeCommentOverlay() {
+    this.activeCommentPhoto = null;
+    this.commentText = '';
+  }
+
+  sendFloatingComment() {
+    if (this.commentText && this.commentText.trim().length > 0 && this.activeCommentPhoto) {
+      this.replyTexts[this.activeCommentPhoto.id] = this.commentText.trim();
+      this.replyWithText(this.activeCommentPhoto.id);
+      this.closeCommentOverlay();
+    }
   }
 
   async openPhotoOptions(photo: any) {
