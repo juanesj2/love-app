@@ -38,7 +38,7 @@ import { PushNotifications } from '@capacitor/push-notifications';
       <div class="custom-header" [class.hide-header]="selectedWidget === 'location'" style="pointer-events: auto;">
           
           <div class="avatar-container"
-               (click)="openAvatarSettings()"
+               (click)="onAvatarClick()"
                (pointerdown)="startGoldenPress()" (pointerup)="endGoldenPress()" (pointercancel)="endGoldenPress()" (pointerleave)="endGoldenPress()">
             <img *ngIf="myAvatarUrl" [src]="myAvatarUrl" class="avatar" [ngClass]="'frame-' + myAvatarFrame" [class.golden-frame]="hasGoldenFrame && myAvatarFrame === 'default'" />
             <div *ngIf="!myAvatarUrl" class="avatar my-avatar" [ngClass]="'frame-' + myAvatarFrame" [class.golden-frame]="hasGoldenFrame && myAvatarFrame === 'default'">Tú</div>
@@ -680,13 +680,17 @@ export class HomePage implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  isGoldenLongPress = false;
+
   startGoldenPress() {
+    this.isGoldenLongPress = false;
     if (this.selectedWidget === 'mas') {
       this.spySequenceStep = 1;
       clearTimeout(this.spySequenceTimeout);
       this.spySequenceTimeout = setTimeout(() => { this.spySequenceStep = 0; }, 4000);
     }
     this.goldenTimeout = setTimeout(() => {
+      this.isGoldenLongPress = true;
       this.goldenTimeout = null;
       try { navigator.vibrate?.([50, 50, 50]); } catch(e){}
       this.api.unlockAchievement('secret_golden_frame');
@@ -698,9 +702,14 @@ export class HomePage implements OnInit, OnDestroy {
     if (this.goldenTimeout) {
       clearTimeout(this.goldenTimeout);
       this.goldenTimeout = null;
-      // Si se suelta antes, es un click normal
+    }
+  }
+
+  onAvatarClick() {
+    if (!this.isGoldenLongPress) {
       this.openAvatarSettings();
     }
+    this.isGoldenLongPress = false;
   }
 
   async sendSurprise() {
