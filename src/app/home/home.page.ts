@@ -627,7 +627,11 @@ export class HomePage implements OnInit, OnDestroy {
       switch (tab) {
         case 'photo': this.tutorialService.showPhotosTour(); break;
         case 'chat': this.tutorialService.showChatTour(); break;
-        case 'location': this.tutorialService.showMapTour(); break;
+        case 'location': 
+          if (!this.premiumService.isFree$.value) {
+            this.tutorialService.showMapTour(); 
+          }
+          break;
         case 'mas': this.tutorialService.showMasTour(); break;
       }
     }, 300);
