@@ -355,6 +355,8 @@ export class HomePage implements OnInit, OnDestroy {
   pokeCount = 0;
   private pokeHoldTimer: any = null;
   private pokeHoldFired = false;
+  
+  myUserId: number = 0;
   hasNightOwlSecret = false;
   isDarkMode = false;
   hasGoldenFrame = false;
@@ -388,11 +390,12 @@ export class HomePage implements OnInit, OnDestroy {
 
   public premiumService = inject(PremiumService);
   private api = inject(LoveApiService);
-  private locationService = inject(LocationService);
+  private router = inject(Router);
+  private modalController = inject(ModalController);
   private toastController = inject(ToastController);
+  private locationService = inject(LocationService);
   private alertController = inject(AlertController);
   private actionSheetCtrl = inject(ActionSheetController);
-  private router = inject(Router);
   private tutorialService = inject(TutorialService);
   private themeService = inject(ThemeService);
   private modalCtrl = inject(ModalController);
@@ -745,6 +748,10 @@ export class HomePage implements OnInit, OnDestroy {
       const myIdStr = data.my_id?.toString();
       const partnerIdStr = data.partner_id?.toString();
 
+      if (data.my_id) {
+        this.myUserId = data.my_id;
+      }
+
       if (myIdStr && partnerIdStr) {
         // Clear previous subscriptions to avoid duplicate listeners
         this.subscriptions.forEach(s => s.unsubscribe());
@@ -1089,7 +1096,7 @@ export class HomePage implements OnInit, OnDestroy {
     document.body.classList.add('hide-tabs');
     const modal = await this.modalController.create({
       component: SecretStatsModalComponent,
-      componentProps: { myUserId: this.api.myUserId }
+      componentProps: { myUserId: this.myUserId }
     });
     await modal.present();
     await modal.onDidDismiss();
