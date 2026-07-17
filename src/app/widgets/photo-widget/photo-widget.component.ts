@@ -1663,26 +1663,19 @@ export class PhotoWidgetComponent implements OnInit {
   }
 
   async reactCustom(photoId: number) {
-    const alert = await this.alertController.create({
-      header: 'Reacción',
-      message: 'Pon el emoji o sticker con el que quieres reaccionar',
-      cssClass: 'custom-love-alert',
-      inputs: [
-        { name: 'emoji', type: 'text', placeholder: 'Escribe un emoji...' }
-      ],
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Elige una reacción',
+      cssClass: 'custom-love-action-sheet',
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Enviar',
-          handler: (data) => {
-            if (data.emoji) {
-              this.react(photoId, data.emoji);
-            }
-          }
-        }
+        { text: '😍 Me encanta', handler: () => this.react(photoId, '😍') },
+        { text: '😂 Me divierte', handler: () => this.react(photoId, '😂') },
+        { text: '🥺 Qué tierno', handler: () => this.react(photoId, '🥺') },
+        { text: '🔥 Fuego', handler: () => this.react(photoId, '🔥') },
+        { text: '🥳 Celebración', handler: () => this.react(photoId, '🥳') },
+        { text: 'Cancelar', icon: 'close', role: 'cancel' }
       ]
     });
-    await alert.present();
+    await actionSheet.present();
   }
 
   async openCommentPrompt(photo: any) {
