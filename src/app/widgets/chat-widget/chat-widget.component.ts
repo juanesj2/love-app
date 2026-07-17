@@ -187,6 +187,11 @@ import { Keyboard } from '@capacitor/keyboard';
         </div>
       </div>
 
+      <!-- Sending Graffiti Indicator -->
+      <div class="sending-graffiti-badge" *ngIf="sendingGraffiti">
+        <ion-spinner name="crescent"></ion-spinner> <span>Enviando garabato...</span>
+      </div>
+
       <div class="input-area">
         <div class="reply-preview-container" *ngIf="replyingTo || isEditing">
           <div class="reply-preview">
@@ -1522,6 +1527,31 @@ import { Keyboard } from '@capacitor/keyboard';
     .mine .bubble-tiktok-co::before { content: '🦋'; position: absolute; top: -10px; right: -10px; font-size: 20px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));}
     .mine .bubble-tiktok-co::after { content: ''; width: 24px; height: 24px; background: url(/assets/bubbles/flag_4.svg) no-repeat center/contain; position: absolute; bottom: -10px; left: -10px; font-size: 24px; z-index: 10; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));}
 
+    .sending-graffiti-badge {
+      position: absolute;
+      bottom: 80px; /* Above input area */
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 8px 16px;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #FF4D6D;
+      z-index: 100;
+      animation: slideUpFade 0.3s ease forwards;
+    }
+    .sending-graffiti-badge ion-spinner {
+      width: 18px;
+      height: 18px;
+      color: #FF4D6D;
+    }
   `],
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
@@ -2490,6 +2520,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
 // --- Audio Recording Logic ---
   isRecording = false;
+  sending = false;
+  sendingGraffiti = false;
   mediaRecorder: MediaRecorder | null = null;
   audioChunks: any[] = [];
   recordingTime = 0;
