@@ -161,6 +161,12 @@ export class NotificationService {
     } catch (e) {
       console.log('No prev notification to cancel', e);
     }
+    
+    // Programar aniversarios en base a la caché si existe
+    const startDatePref = await Preferences.get({ key: 'relationshipStartDate' });
+    if (startDatePref.value) {
+      this.scheduleAnniversaryReminders(startDatePref.value);
+    }
   }
 
   async scheduleTripReminders(plans: any[]) {
@@ -215,6 +221,65 @@ export class NotificationService {
           channelId: 'love_app_local',
           schedule: { at: oneDayBefore }
         });
+      }
+    }
+
+    if (notificationsToSchedule.length > 0) {
+      await LocalNotifications.schedule({
+        notifications: notificationsToSchedule
+      });
+    }
+  }
+
+  async scheduleAnniversaryReminders(startDateStr: string) {
+    if (!this.platform.is('capacitor') || !startDateStr) return;
+    const perm = await LocalNotifications.requestPermissions();
+    if (perm.display !== 'granted') return;
+
+    const pending = await LocalNotifications.getPending();
+    const annivIdsToCancel = pending.notifications
+      .filter(n => n.id >= 30000 && n.id < 40000)
+      .map(n => ({ id: n.id }));
+      
+    if (annivIdsToCancel.length > 0) {
+      await LocalNotifications.cancel({ notifications: annivIdsToCancel });
+    }
+
+    const notificationsToSchedule: any[] = [];
+    const now = new Date();
+    const startDate = new Date(startDateStr);
+    if (isNaN(startDate.getTime())) return;
+
+    for (let i = 0; i < 12; i++) {
+      const targetDate = new Date(now.getFullYear(), now.getMonth() + i, startDate.getDate(), 10, 0, 0);
+      
+      const notificationDate = new Date(targetDate);
+      notificationDate.setDate(notificationDate.getDate() - 1);
+      
+      if (notificationDate > now) {
+        let monthsDiff = (targetDate.getFullYear() - startDate.getFullYear()) * 12 + (targetDate.getMonth() - startDate.getMonth());
+        
+        if (monthsDiff > 0) {
+          let message = '';
+          if (monthsDiff % 12 === 0) {
+            const years = monthsDiff / 12;
+            message = `¡Mañana hacéis ${years} año${years > 1 ? 's' : ''}! 🎉❤️`;
+          } else if (monthsDiff > 12) {
+            const years = Math.floor(monthsDiff / 12);
+            const remainingMonths = monthsDiff % 12;
+            message = `¡Mañana hacéis ${years} año${years > 1 ? 's' : ''} y ${remainingMonths} mes${remainingMonths > 1 ? 'es' : ''}! 🥰`;
+          } else {
+            message = `¡Mañana hacéis ${monthsDiff} mes${monthsDiff > 1 ? 'es' : ''}! 💕`;
+          }
+
+          notificationsToSchedule.push({
+            title: '¡Aniversario a la vista! 💘',
+            body: message,
+            id: 30000 + i,
+            channelId: 'love_app_local',
+            schedule: { at: notificationDate }
+          });
+        }
       }
     }
 

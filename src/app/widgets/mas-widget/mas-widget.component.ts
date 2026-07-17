@@ -20,6 +20,7 @@ import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.comp
 import { PremiumService } from '../../services/premium.service';
 import { PaywallComponent } from '../../components/paywall/paywall.component';
 import { ModalController } from '@ionic/angular';
+import { NotificationService } from '../../services/notification.service';
 import confetti from 'canvas-confetti';
 
 
@@ -984,6 +985,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   private tutorialService = inject(TutorialService);
   private offlineSync = inject(OfflineSyncService);
   private router = inject(Router);
+  private notificationService = inject(NotificationService);
 
   private locationSub?: Subscription;
 
@@ -1422,6 +1424,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   async saveStartDate() {
     await Preferences.set({ key: 'relationshipStartDate', value: this.startDate });
     this.calculateTime();
+    this.notificationService.scheduleAnniversaryReminders(this.startDate);
     
     // Sync with backend
     try {
