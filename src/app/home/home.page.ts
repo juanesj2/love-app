@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { ToastController, IonIcon, IonSpinner } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { imagesOutline, images, chatbubblesOutline, chatbubbles, add, hourglassOutline, mapOutline, map, ellipsisHorizontalOutline, ellipsisHorizontal, heart, happyOutline, sadOutline, flameOutline, bedOutline, camera, image, close, eyeOutline, eyeOffOutline, eye } from 'ionicons/icons';
+import { imagesOutline, images, chatbubblesOutline, chatbubbles, add, hourglassOutline, mapOutline, map, ellipsisHorizontalOutline, ellipsisHorizontal, heart, happyOutline, sadOutline, flameOutline, bedOutline, camera, image, close, eyeOutline, eyeOffOutline, eye, colorPalette, person } from 'ionicons/icons';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 import { LocationWidgetComponent } from '../widgets/location-widget/location-widget.component';
@@ -62,7 +62,7 @@ import { PushNotifications } from '@capacitor/push-notifications';
             <div class="menu-toggle-btn" 
                  [class.show]="selectedWidget === 'photo' && photoWidgetComp?.viewMode === 'feed' && !photoWidgetComp?.currentAlbum" 
                  (click)="photoWidgetComp?.toggleMenu()">
-              <ion-icon [name]="photoWidgetComp?.isTopBarHidden ? 'eye-outline' : 'eye-off-outline'"></ion-icon>
+              <ion-icon *ngIf="selectedWidget === 'photo'" [name]="photoWidgetComp?.isTopBarHidden ? 'eye-outline' : 'eye-off-outline'"></ion-icon>
             </div>
 
             <!-- Chat Widget Settings Button -->
@@ -411,7 +411,7 @@ export class HomePage implements OnInit, OnDestroy {
   @ViewChild('gameWidget') gameWidgetComp?: QuestionsWidgetComponent;
 
   constructor() {
-    addIcons({ imagesOutline, images, chatbubblesOutline, chatbubbles, add, hourglassOutline, mapOutline, map, ellipsisHorizontalOutline, ellipsisHorizontal, heart, happyOutline, sadOutline, flameOutline, bedOutline, camera, image, close, eyeOutline, eyeOffOutline, eye });
+    addIcons({ imagesOutline, images, chatbubblesOutline, chatbubbles, add, hourglassOutline, mapOutline, map, ellipsisHorizontalOutline, ellipsisHorizontal, heart, happyOutline, sadOutline, flameOutline, bedOutline, camera, image, close, eyeOutline, eyeOffOutline, eye, colorPalette, person });
   }
 
   async checkWidgetIntent() {
