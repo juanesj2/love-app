@@ -100,24 +100,39 @@
       <form *ngIf="authMode === 'forgot'" (submit)="sendForgotPassword($event)" class="auth-form">
         <div class="input-group">
           <ion-icon name="mail-outline"></ion-icon>
-          <input type="email" name="email" [(ngModel)]="forgotData.email" placeholder="Tu correo electrónico" required />
+          <input type="email" name="email" [(ngModel)]="forgotData.email" placeholder="Correo electrónico" required />
         </div>
 
         <button type="submit" class="glass-btn primary" [disabled]="isLoading">
-          <span *ngIf="!isLoading">Enviar Enlace</span>
-          <div class="spinner" *ngIf="isLoading"></div>
+          <span *ngIf="!isLoading">Enviar enlace</span>
+        </button>
+
+        <div class="divider">
+          <span>o</span>
+        </div>
+
+        <button type="button" class="glass-btn secondary" (click)="toggleMode()" [disabled]="isLoading">
+          <span>Volver al Login</span>
         </button>
       </form>
 
-    </div>
+      <div class="auth-footer" *ngIf="authMode !== 'forgot'">
+        <p *ngIf="authMode === 'login'">
+          ¿No tienes cuenta? <a (click)="toggleMode()">Regístrate aquí</a>
+        </p>
+        <p *ngIf="authMode === 'register'">
+          ¿Ya tienes cuenta? <a (click)="toggleMode()">Inicia Sesión</a>
+        </p>
+      </div>
 
-    <div class="switch-mode glass-footer" (click)="toggleMode()">
-      <span>
-        {{ authMode === 'login' ? '¿No tienes cuenta? Regístrate' : 
-           authMode === 'register' ? '¿Ya tienes cuenta? Inicia sesión' : 
-           'Volver a Iniciar Sesión' }}
-      </span>
     </div>
+  </div>
 
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="lottie-container">
+      <canvas id="loading-canvas"></canvas>
+    </div>
+    <p class="loading-text">Cargando...</p>
   </div>
 </ion-content>

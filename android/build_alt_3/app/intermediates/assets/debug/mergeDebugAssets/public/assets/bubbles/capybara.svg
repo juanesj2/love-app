@@ -1,0 +1,22 @@
+<svg width="120" height="80" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body -->
+  <rect x="20" y="10" width="80" height="60" rx="15" fill="#D2B48C" />
+  
+  <!-- Capybara Snout/Head (Left side) -->
+  <path d="M 30 10 L 10 20 Q 0 40 10 70 L 30 70 Z" fill="#D2B48C" />
+  <!-- Ear -->
+  <circle cx="20" cy="15" r="6" fill="#B08D6A" />
+  <!-- Eye -->
+  <line x1="15" y1="35" x2="22" y2="35" stroke="#4A3B32" stroke-width="2" stroke-linecap="round"/>
+  <!-- Nose/Mouth -->
+  <path d="M 5 50 Q 8 50 10 55 Q 12 50 15 50" fill="none" stroke="#4A3B32" stroke-width="2" stroke-linecap="round"/>
+  <!-- Blush -->
+  <circle cx="20" cy="45" r="4" fill="#FF9999" opacity="0.6" />
+
+  <!-- Capybara Little Feet (Bottom) -->
+  <rect x="25" y="65" width="10" height="15" rx="5" fill="#B08D6A" />
+  <rect x="85" y="65" width="10" height="15" rx="5" fill="#B08D6A" />
+
+  <!-- Capybara Tail (Right side) -->
+  <path d="M 100 50 Q 115 50 110 65" fill="none" stroke="#D2B48C" stroke-width="12" stroke-linecap="round" />
+</svg>

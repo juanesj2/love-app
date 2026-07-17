@@ -7,15 +7,19 @@ import { switchMap, catchError } from 'rxjs/operators';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const getToken = async () => {
     try {
-      const res = await SecureStoragePlugin.get({ key: 'auth_token' });
+      // Add a 1-second timeout to prevent deadlocks on Android Keystore
+      const res = await Promise.race([
+        SecureStoragePlugin.get({ key: 'auth_token' }),
+        new Promise<any>((_, reject) => setTimeout(() => reject(new Error('SecureStorage Timeout')), 1000))
+      ]);
       return res;
     } catch (e) {
-      // Fallback for web development or older users
+      // Fallback for web development or older users, or if SecureStorage hangs
       const pref = await Preferences.get({ key: 'auth_token' });
       if (pref && pref.value) {
-        // Removed: We need to keep auth_token in Preferences so Android Widgets can read it
         try {
-          await SecureStoragePlugin.set({ key: 'auth_token', value: pref.value }).catch(() => {});
+          // Don't await this so we don't hang again
+          SecureStoragePlugin.set({ key: 'auth_token', value: pref.value }).catch(() => {});
         } catch (err) {}
         return { value: pref.value };
       }

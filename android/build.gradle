@@ -22,7 +22,7 @@ allprojects {
         google()
         mavenCentral()
     }
-    buildDir = new File(rootProject.projectDir, "build_alt/${project.name}")
+    buildDir = new File(rootProject.projectDir, "build_alt_5/${project.name}")
 }
 
 task clean(type: Delete) {

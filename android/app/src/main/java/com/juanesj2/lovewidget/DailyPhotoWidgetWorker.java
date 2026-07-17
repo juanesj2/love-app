@@ -62,12 +62,19 @@ public class DailyPhotoWidgetWorker extends Worker {
             JSONArray photos = fetchPhotos(token);
             
             int streak = fetchCurrentStreak(token);
+            int unreadCount = 0;
+            
+            String lastViewed = prefs.getString("_cap_last_photo_viewed_at", "");
+            if (lastViewed == null || lastViewed.isEmpty()) {
+                lastViewed = prefs.getString("last_photo_viewed_at", "");
+            }
 
             if (photos != null && photos.length() > 0) {
                 String partnerPhotoPath = null;
                 String uploaderName = "";
                 String uploaderEmail = "";
                 String photoDescription = "";
+                String uploaderAvatar = "";
                 int uploaderId = -1;
                 String newestPartnerDate = "";
                 
@@ -75,6 +82,7 @@ public class DailyPhotoWidgetWorker extends Worker {
                 String newestAnyDesc = "";
                 String newestAnyName = "";
                 String newestAnyEmail = "";
+                String newestAnyAvatar = "";
                 String newestAnyDate = "";
                 
                 for (int i = 0; i < photos.length(); i++) {
@@ -96,6 +104,9 @@ public class DailyPhotoWidgetWorker extends Worker {
                     }
 
                     if (!isMyPhoto) {
+                        if (lastViewed != null && !lastViewed.isEmpty() && createdAt.compareTo(lastViewed) > 0) {
+                            unreadCount++;
+                        }
                         if (createdAt.compareTo(newestPartnerDate) > 0) {
                             newestPartnerDate = createdAt;
                             partnerPhotoPath = photo.optString("image_path", "");
@@ -103,6 +114,7 @@ public class DailyPhotoWidgetWorker extends Worker {
                             if (userObj != null) {
                                 uploaderName = userObj.optString("name", "");
                                 uploaderEmail = userObj.optString("email", "");
+                                uploaderAvatar = userObj.optString("avatar_url", "");
                             }
                             uploaderId = photoUserId;
                         }
@@ -115,6 +127,7 @@ public class DailyPhotoWidgetWorker extends Worker {
                         if (userObj != null) {
                             newestAnyName = userObj.optString("name", "");
                             newestAnyEmail = userObj.optString("email", "");
+                            newestAnyAvatar = userObj.optString("avatar_url", "");
                         }
                     }
                 }
@@ -124,22 +137,30 @@ public class DailyPhotoWidgetWorker extends Worker {
                     photoDescription = newestAnyDesc;
                     uploaderName = newestAnyName;
                     uploaderEmail = newestAnyEmail;
+                    uploaderAvatar = newestAnyAvatar;
                 }
                 
                 if (uploaderName.isEmpty()) {
                     uploaderName = uploaderEmail.split("@")[0];
                 }
                 
-                // Fetch Partner Avatar from Firestore
-                String partnerIdForFirestore = "roberta";
-                if (cleanUsername.equals("roberta")) partnerIdForFirestore = "juan";
-                else if (uploaderEmail.startsWith("juan")) partnerIdForFirestore = "juan";
-                else if (uploaderEmail.startsWith("roberta")) partnerIdForFirestore = "roberta";
-                
                 Bitmap avatarBitmap = null;
-                String avatarUrl = fetchAvatar(partnerIdForFirestore);
-                if (avatarUrl != null && !avatarUrl.isEmpty()) {
-                    avatarBitmap = avatarUrl.startsWith("data:") ? decodeBase64Bitmap(avatarUrl) : fetchBitmap(avatarUrl, null);
+                if (uploaderAvatar != null && !uploaderAvatar.isEmpty()) {
+                    String fullAvatarUrl = STORAGE_BASE + uploaderAvatar;
+                    avatarBitmap = fetchBitmap(fullAvatarUrl, token);
+                }
+                
+                // Fallback to old Firestore logic
+                if (avatarBitmap == null) {
+                    String partnerIdForFirestore = "roberta";
+                    if (cleanUsername.equals("roberta")) partnerIdForFirestore = "juan";
+                    else if (uploaderEmail.startsWith("juan")) partnerIdForFirestore = "juan";
+                    else if (uploaderEmail.startsWith("roberta")) partnerIdForFirestore = "roberta";
+                    
+                    String avatarUrl = fetchAvatar(partnerIdForFirestore);
+                    if (avatarUrl != null && !avatarUrl.isEmpty()) {
+                        avatarBitmap = avatarUrl.startsWith("data:") ? decodeBase64Bitmap(avatarUrl) : fetchBitmap(avatarUrl, null);
+                    }
                 }
 
                 if (partnerPhotoPath != null) {
@@ -147,7 +168,7 @@ public class DailyPhotoWidgetWorker extends Worker {
                     Bitmap photoBitmap = fetchBitmap(imageUrl, token);
 
                     if (photoBitmap != null) {
-                        Bitmap compositedBitmap = createCompositedWidgetBitmap(photoBitmap, streak, avatarBitmap, uploaderName, photoDescription);
+                        Bitmap compositedBitmap = createCompositedWidgetBitmap(photoBitmap, streak, avatarBitmap, uploaderName, photoDescription, unreadCount);
 
                         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
                         ComponentName thisWidget = new ComponentName(context, DailyPhotoWidgetProvider.class);
@@ -177,7 +198,7 @@ public class DailyPhotoWidgetWorker extends Worker {
         return Result.retry();
     }
     
-    private Bitmap createCompositedWidgetBitmap(Bitmap photo, int streak, Bitmap avatar, String name, String description) {
+    private Bitmap createCompositedWidgetBitmap(Bitmap photo, int streak, Bitmap avatar, String name, String description, int unreadCount) {
         int width = 600;
         int height = 900;
         Bitmap output = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -200,10 +221,10 @@ public class DailyPhotoWidgetWorker extends Worker {
         canvas.drawBitmap(photo, matrix, new Paint(Paint.FILTER_BITMAP_FLAG));
         
         // Draw Badges
-        boolean hasDescription = description != null && !description.trim().isEmpty() && !description.equals("null");
-        drawStreakBadge(canvas, streak, hasDescription);
-        drawAvatarBadge(canvas, avatar, name, height);
+        drawStreakBadge(canvas, streak);
         drawDescriptionBadge(canvas, description, width, height);
+        drawAvatarBadge(canvas, avatar, name, height);
+        drawUnreadBadge(canvas, unreadCount, width);
         
         return output;
     }
@@ -216,9 +237,12 @@ public class DailyPhotoWidgetWorker extends Worker {
         textPaint.setTextSize(34f);
         textPaint.setAntiAlias(true);
         textPaint.setShadowLayer(3f, 1f, 1f, Color.BLACK);
+        textPaint.setTypeface(android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL));
 
-        int margin = 30;
-        int maxWidth = canvasWidth - margin * 2;
+        int avatarSize = 110;
+        int marginLeft = 60 + avatarSize + 20; // Avatar is at 60, size 110, plus 20 padding
+        int marginRight = 40;
+        int maxWidth = canvasWidth - marginLeft - marginRight;
         
         if (description.length() > 80) {
             description = description.substring(0, 77) + "...";
@@ -236,38 +260,77 @@ public class DailyPhotoWidgetWorker extends Worker {
         }
         
         int textHeight = staticLayout.getHeight();
-        int padding = 15;
+        int padding = 25;
         int bgHeight = textHeight + padding * 2;
         
-        int yOffset = 70; // top margin, we can place description at the top center
+        int yOffset = canvasHeight - 160 - avatarSize + (avatarSize - bgHeight) / 2;
         
         Paint bgPaint = new Paint();
         bgPaint.setColor(Color.parseColor("#70000000"));
         bgPaint.setAntiAlias(true);
         
-        RectF bgRect = new RectF(margin, yOffset, canvasWidth - margin, yOffset + bgHeight);
-        canvas.drawRoundRect(bgRect, 20f, 20f, bgPaint);
+        RectF bgRect = new RectF(marginLeft, yOffset, canvasWidth - marginRight, yOffset + bgHeight);
+        canvas.drawRoundRect(bgRect, 40f, 40f, bgPaint);
         
         canvas.save();
-        canvas.translate(margin, yOffset + padding);
+        canvas.translate(marginLeft + (maxWidth - staticLayout.getWidth()) / 2f, yOffset + padding);
         staticLayout.draw(canvas);
         canvas.restore();
     }
     
-    private void drawStreakBadge(Canvas canvas, int streak, boolean hasDescription) {
+    private void drawStreakBadge(Canvas canvas, int streak) {
         if (streak <= 0) return;
         
         Paint bgPaint = new Paint();
-        bgPaint.setColor(Color.parseColor("#80000000"));
+        bgPaint.setColor(Color.parseColor("#90000000"));
         bgPaint.setAntiAlias(true);
         
         Paint borderPaint = new Paint();
-        borderPaint.setColor(Color.parseColor("#44FFFFFF"));
+        borderPaint.setColor(Color.parseColor("#66FFFFFF"));
         borderPaint.setStyle(Paint.Style.STROKE);
-        borderPaint.setStrokeWidth(3f);
+        borderPaint.setStrokeWidth(4f);
         borderPaint.setAntiAlias(true);
 
         String text = "🔥 " + streak;
+        
+        Paint textPaint = new Paint();
+        textPaint.setColor(Color.WHITE);
+        textPaint.setTextSize(50f);
+        textPaint.setFakeBoldText(true);
+        textPaint.setAntiAlias(true);
+        
+        Rect textBounds = new Rect();
+        textPaint.getTextBounds(text, 0, text.length(), textBounds);
+        
+        int paddingX = 35;
+        int paddingY = 20;
+        int width = textBounds.width() + paddingX * 2;
+        int height = textBounds.height() + paddingY * 2;
+        
+        int x = 100; // margin left
+        int y = 110; // fixed margin top
+        
+        RectF rect = new RectF(x, y, x + width, y + height);
+        canvas.drawRoundRect(rect, 50f, 50f, bgPaint);
+        canvas.drawRoundRect(rect, 50f, 50f, borderPaint);
+        
+        canvas.drawText(text, x + paddingX, y + height - paddingY - 5, textPaint);
+    }
+    
+    private void drawUnreadBadge(Canvas canvas, int unreadCount, int canvasWidth) {
+        if (unreadCount <= 0) return;
+        
+        Paint bgPaint = new Paint();
+        bgPaint.setColor(Color.parseColor("#FF3B30")); // iOS red
+        bgPaint.setAntiAlias(true);
+        
+        Paint borderPaint = new Paint();
+        borderPaint.setColor(Color.WHITE);
+        borderPaint.setStyle(Paint.Style.STROKE);
+        borderPaint.setStrokeWidth(5f);
+        borderPaint.setAntiAlias(true);
+        
+        String text = String.valueOf(unreadCount);
         
         Paint textPaint = new Paint();
         textPaint.setColor(Color.WHITE);
@@ -278,25 +341,29 @@ public class DailyPhotoWidgetWorker extends Worker {
         Rect textBounds = new Rect();
         textPaint.getTextBounds(text, 0, text.length(), textBounds);
         
-        int paddingX = 25;
+        int paddingX = 20;
         int paddingY = 15;
         int width = textBounds.width() + paddingX * 2;
+        if (width < textBounds.height() + paddingY * 2) {
+            width = textBounds.height() + paddingY * 2; // Make it at least a circle
+        }
         int height = textBounds.height() + paddingY * 2;
         
-        int x = 60; // margin left
-        int y = hasDescription ? 210 : 120; // margin top (baja si hay descripción)
+        int x = canvasWidth - 100 - width; // margin right
+        int y = 110; // margin top
         
         RectF rect = new RectF(x, y, x + width, y + height);
-        canvas.drawRoundRect(rect, 40f, 40f, bgPaint);
-        canvas.drawRoundRect(rect, 40f, 40f, borderPaint);
+        float cornerRadius = height / 2f;
+        canvas.drawRoundRect(rect, cornerRadius, cornerRadius, bgPaint);
+        canvas.drawRoundRect(rect, cornerRadius, cornerRadius, borderPaint);
         
-        canvas.drawText(text, x + paddingX, y + height - paddingY - 5, textPaint);
+        canvas.drawText(text, x + (width - textBounds.width()) / 2f, y + height - paddingY - 5, textPaint);
     }
 
     private void drawAvatarBadge(Canvas canvas, Bitmap avatarBitmap, String name, int canvasHeight) {
         int radius = 55;
         int x = 60 + radius;
-        int y = canvasHeight - 120 - radius; // Increased bottom margin
+        int y = canvasHeight - 160 - radius; // Increased bottom margin
         
         Paint bgPaint = new Paint();
         bgPaint.setColor(Color.parseColor("#80000000"));
@@ -330,6 +397,7 @@ public class DailyPhotoWidgetWorker extends Worker {
             textPaint.setFakeBoldText(true);
             textPaint.setAntiAlias(true);
             textPaint.setTextAlign(Paint.Align.CENTER);
+            textPaint.setTypeface(android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL));
             
             Rect textBounds = new Rect();
             textPaint.getTextBounds(initial, 0, initial.length(), textBounds);

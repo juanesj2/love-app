@@ -1,16 +1,17 @@
 import { Injectable, inject } from '@angular/core';
-import { Firestore, doc, docData, setDoc, GeoPoint } from '@angular/fire/firestore';
 import { Geolocation } from '@capacitor/geolocation';
 import { Capacitor, registerPlugin } from '@capacitor/core';
-import { Observable } from 'rxjs';
+import { Observable, of, interval, BehaviorSubject, switchMap, timer } from 'rxjs';
+import { catchError, map, startWith } from 'rxjs/operators';
 import { Preferences } from '@capacitor/preferences';
 import type { BackgroundGeolocationPlugin } from '@capacitor-community/background-geolocation';
+import { LoveApiService } from './love-api.service';
 
 const BackgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>('BackgroundGeolocation');
 
 export interface UserLocation {
   name: string;
-  position: GeoPoint;
+  position: { latitude: number; longitude: number };
   avatar: string;
   is_sharing?: boolean;
 }
@@ -19,7 +20,8 @@ export interface UserLocation {
   providedIn: 'root'
 })
 export class LocationService {
-  private firestore = inject(Firestore);
+  private loveApi = inject(LoveApiService);
+  public debugError = '';
 
   async getPrivacyMode(): Promise<boolean> {
     const { value } = await Preferences.get({ key: 'ghost_mode' });
@@ -28,18 +30,17 @@ export class LocationService {
 
   async setPrivacyMode(isGhost: boolean): Promise<void> {
     await Preferences.set({ key: 'ghost_mode', value: isGhost ? 'true' : 'false' });
+    if (isGhost) {
+      await this.loveApi.updateLocation(0, 0, false).catch(() => {});
+    }
   }
 
   async updateMyLocation(userId: string, name: string) {
     try {
       const isGhost = await this.getPrivacyMode();
-      const userDocRef = doc(this.firestore, `locations/${userId}`);
       
       if (isGhost) {
-        await setDoc(userDocRef, {
-          name: name,
-          is_sharing: false
-        }, { merge: true });
+        await this.loveApi.updateLocation(0, 0, false);
         
         const savedWatcher = localStorage.getItem('bg_watcher_id');
         if (savedWatcher) {
@@ -49,17 +50,17 @@ export class LocationService {
         return;
       }
 
-      // 1. Pedir permisos explícitamente (evita bloqueos silenciosos)
+      // 1. Pedir permisos
       try {
         const permissions = await Geolocation.checkPermissions();
         if (permissions.location !== 'granted') {
           await Geolocation.requestPermissions();
         }
       } catch (e) {
-        console.warn('CheckPermissions no soportado o falló, intentando obtener posición directamente', e);
+        console.warn('CheckPermissions no soportado', e);
       }
 
-      // 2. Pedir posición con alta precisión
+      // 2. Obtener ubicación
       let coordinates;
       try {
         coordinates = await Geolocation.getCurrentPosition({
@@ -69,36 +70,33 @@ export class LocationService {
         });
       } catch (e) {
         console.error('Error getCurrentPosition:', e);
-        return; // Detener si falla la ubicación principal
+        return;
       }
 
-      const geoPoint = new GeoPoint(coordinates.coords.latitude, coordinates.coords.longitude);
+      await this.loveApi.updateLocation(coordinates.coords.latitude, coordinates.coords.longitude, true);
+      console.log('Ubicación actualizada APIREST:', userId);
 
-      await setDoc(userDocRef, {
-        name: name,
-        position: geoPoint,
-        is_sharing: true
-      }, { merge: true });
-
-      console.log('Ubicación actualizada:', userId);
-
-      // 3. Setup Background Geolocation watcher (Solo en nativo)
+      // 3. Background Geolocation watcher
       if (Capacitor.isNativePlatform()) {
         try {
+          const existingWatcher = localStorage.getItem('bg_watcher_id');
+          if (existingWatcher) {
+            return;
+          }
+
           BackgroundGeolocation.addWatcher(
             {
               backgroundMessage: "La aplicación está usando tu ubicación.",
               backgroundTitle: "Ubicación en segundo plano",
               requestPermissions: true,
               stale: false,
-              distanceFilter: 10
-            },
+              distanceFilter: 10,
+              icon: "ic_notification"
+            } as any,
             async (location, error) => {
               if (error) {
                 if (error.code === 'NOT_AUTHORIZED') {
-                  if (window.confirm(
-                    "La aplicación necesita acceso a la ubicación en segundo plano. ¿Ir a ajustes?"
-                  )) {
+                  if (window.confirm("La aplicación necesita acceso a la ubicación en segundo plano. ¿Ir a ajustes?")) {
                     BackgroundGeolocation.openSettings();
                   }
                 }
@@ -107,9 +105,8 @@ export class LocationService {
               if (location) {
                 const currentGhost = await this.getPrivacyMode();
                 if (currentGhost) return;
-                const bgGeoPoint = new GeoPoint(location.latitude, location.longitude);
-                await setDoc(userDocRef, { position: bgGeoPoint, is_sharing: true }, { merge: true });
-                console.log('Fondo actualizado:', location);
+                await this.loveApi.updateLocation(location.latitude, location.longitude, true).catch(()=>console.error('bg fail'));
+                console.log('Fondo actualizado APIREST:', location);
               }
             }
           ).then(watcherId => {
@@ -122,12 +119,41 @@ export class LocationService {
 
     } catch (error) {
       console.error('Error actualizando ubicación:', error);
-      throw error; // Lanzamos el error para que la UI lo pueda mostrar
     }
   }
 
-  listenToUserLocation(userId: string): Observable<UserLocation> {
-    const userDocRef = doc(this.firestore, `locations/${userId}`);
-    return docData(userDocRef) as Observable<UserLocation>;
+  async testDirectGetDoc(userId: string): Promise<string> {
+    try {
+      const partner = await this.loveApi.getPartnerLocation();
+      return `REST getDoc: FOUND (${partner.latitude}, ${partner.longitude})`;
+    } catch (e: any) {
+      return `REST getDoc ERR: ${e.message}`;
+    }
+  }
+
+  listenToUserLocation(userId: string): Observable<any> {
+    if (!userId) return of(null);
+    
+    // Polling cada 5 segundos
+    return timer(0, 5000).pipe(
+      switchMap(() => this.loveApi.getPartnerLocation()),
+      map((partner: any) => {
+        return {
+          name: partner.name,
+          avatar: partner.avatar,
+          is_sharing: true,
+          position: {
+            latitude: partner.latitude,
+            longitude: partner.longitude
+          }
+        };
+      }),
+      catchError(err => {
+        console.error('Error polling location:', err);
+        this.debugError = err.message || err.toString();
+        // Return false/null mapping to handle offline/sharing off gracefully
+        return of({ is_sharing: false });
+      })
+    );
   }
 }

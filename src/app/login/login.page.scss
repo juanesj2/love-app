@@ -268,6 +268,30 @@ ion-content.login-content {
   }
 }
 
+.auth-footer {
+  text-align: center;
+  margin-top: 15px;
+  
+  p {
+    color: #590D22;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0;
+    
+    a {
+      color: #FF4D6D;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: color 0.3s;
+      
+      &:hover {
+        color: #c9184a;
+      }
+    }
+  }
+}
+
 // ─────────────────────────────────────────
 // 🦉 MODO BÚHO NOCTURNO
 // ─────────────────────────────────────────
@@ -359,4 +383,65 @@ ion-content.login-content {
 
     ion-icon { color: #c4b5fd; }
   }
+
+  .auth-footer {
+    p {
+      color: #c4b5fd;
+      
+      a {
+        color: #a78bfa;
+        
+        &:hover {
+          color: #ddd6fe;
+        }
+      }
+    }
+  }
+}
+
+/* Loading Overlay */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .lottie-container {
+    width: 200px;
+    height: 200px;
+    
+    canvas {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .loading-text {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #FF4D6D;
+    animation: pulse 1.5s infinite;
+  }
+}
+
+body.dark .loading-overlay {
+  background: rgba(15, 23, 42, 0.85);
+  .loading-text {
+    color: #a78bfa;
+  }
+}
+
+@keyframes pulse {
+  0% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 0.7; transform: scale(1); }
 }

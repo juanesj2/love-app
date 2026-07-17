@@ -1715,9 +1715,9 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     });
   }
 
-  doLogout() {
+  async doLogout() {
     this.isLogoutModalOpen = false;
-    this.api.logout();
+    await this.api.logout();
     this.router.navigate(['/login']);
   }
 

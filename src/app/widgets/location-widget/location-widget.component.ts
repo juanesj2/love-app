@@ -8,7 +8,6 @@ import { LocationService } from '../../services/location.service';
 import { Subscription, combineLatest, startWith } from 'rxjs';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Preferences } from '@capacitor/preferences';
-import { doc, getDoc, Firestore } from '@angular/fire/firestore';
 import { addIcons } from 'ionicons';
 import { locateOutline, flagOutline, camera, image, close, locationOutline, heart, eyeOutline, eyeOffOutline } from 'ionicons/icons';
 import { LoveApiService } from '../../services/love-api.service';

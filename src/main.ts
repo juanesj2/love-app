@@ -4,8 +4,9 @@ import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalo
 
 // Importaciones de Firebase
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+import { provideFirestore, initializeFirestore } from '@angular/fire/firestore';
 import { GoogleSignIn } from '@capawesome/capacitor-google-sign-in';
+import { getApp } from '@angular/fire/app';
 
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
@@ -16,6 +17,7 @@ import { defineCustomElements } from '@ionic/pwa-elements/loader';
 
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './app/interceptors/auth.interceptor';
+import { nativeHttpInterceptor } from './app/interceptors/native-http.interceptor';
 import { LOCALE_ID } from '@angular/core';
 import localeEs from '@angular/common/locales/es';
 import { registerLocaleData } from '@angular/common';
@@ -32,7 +34,7 @@ bootstrapApplication(AppComponent, {
     
     // Inicialización de Firebase
     provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideFirestore(() => getFirestore()),
+    provideFirestore(() => initializeFirestore(getApp(), { experimentalForceLongPolling: true })),
   ],
 });
 

@@ -16,6 +16,7 @@ import { PremiumService } from '../../services/premium.service';
 import { PaywallComponent } from '../../components/paywall/paywall.component';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
+import { Keyboard } from '@capacitor/keyboard';
 import { Media } from '@capacitor-community/media';
 import { DotLottie } from '@lottiefiles/dotlottie-web';
 
@@ -178,7 +179,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
             <div class="grid-view" [ngStyle]="{'grid-template-columns': 'repeat(' + gridColumns + ', 1fr)'}">
               <div class="grid-photo-container" *ngFor="let photo of group.photos" 
                    (mousedown)="startPress(photo)" (mouseup)="endPress()" (mouseleave)="endPress()"
-                   (touchstart)="startPress(photo)" (touchend)="endPress()"
+                   (touchstart)="startPress(photo)" (touchend)="endPress()" (touchmove)="endPress()" (touchcancel)="endPress()"
                    (click)="openLightbox(photo)"
                    [class.selected]="selectedPhotos.has(photo.id)"
                    [class.large]="photo.isLarge">
@@ -430,11 +431,11 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
       </div>
 
       <!-- Save Overlay -->
-      <div class="albums-overlay" *ngIf="showSaveOverlay" style="z-index: 3000; justify-content: center; align-items: center;">
-        <div class="albums-sheet prompt-sheet" style="width: 250px; max-width: 90%; border-radius: 25px; text-align: center; padding: 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; max-height: auto;">
-          <ion-spinner name="crescent" *ngIf="saveState === 'loading'" style="width: 60px; height: 60px; color: #FF4D6D; margin: 20px auto;"></ion-spinner>
-          <canvas #saveLottie width="120" height="120" style="margin: 0 auto; max-width: 100%; object-fit: contain;" [style.display]="saveState === 'success' ? 'block' : 'none'"></canvas>
-          <h3 style="color: #590D22; margin-top: 15px; font-weight: bold;">{{ saveText }}</h3>
+      <div class="save-overlay" *ngIf="showSaveOverlay">
+        <div class="save-box">
+          <ion-spinner name="crescent" *ngIf="saveState === 'loading'" class="save-spinner"></ion-spinner>
+          <canvas #saveLottie width="120" height="120" class="save-lottie" [style.display]="saveState === 'success' ? 'block' : 'none'"></canvas>
+          <h3 class="save-title">{{ saveText }}</h3>
         </div>
       </div>
       <!-- Floating Emojis Overlay -->
@@ -667,11 +668,17 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .timeline-bubble::after { content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); border-width: 6px 0 6px 6px; border-style: solid; border-color: transparent transparent transparent #FF4D6D; }
     @keyframes fadeInBubble { from { opacity: 0; transform: translate(-10px, -50%); } to { opacity: 1; transform: translate(0, -50%); } }
     
-    .prompt-actions { display: flex; gap: 10px; }
-    .prompt-btn { flex: 1; padding: 14px; border-radius: 20px; font-weight: bold; font-size: 1.1rem; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+    .prompt-buttons { display: flex; gap: 15px; width: 100%; }
+    .prompt-btn { flex: 1; padding: 15px; border-radius: 15px; font-weight: bold; font-size: 1rem; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
     .prompt-btn.cancel { background: #f1f3f5; color: #888; }
     .prompt-btn.confirm { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3); }
     .prompt-btn:disabled { opacity: 0.7; pointer-events: none; }
+
+    .save-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 3000; display: flex; justify-content: center; align-items: center; }
+    .save-box { background: rgba(255, 255, 255, 0.85); border: 1px solid rgba(255, 77, 109, 0.2); box-shadow: 0 15px 35px rgba(255, 77, 109, 0.15); border-radius: 30px; width: 240px; padding: 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    .save-spinner { width: 60px; height: 60px; color: #FF4D6D; margin: 10px auto 20px; }
+    .save-lottie { margin: 0 auto; max-width: 100%; object-fit: contain; }
+    .save-title { color: #590D22; margin-top: 15px; font-weight: bold; font-size: 1.1rem; text-align: center; margin-bottom: 0; }
 
     /* Premium Locks */
     .premium-lock {
@@ -736,6 +743,10 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     :host-context(.night-owl-mode) .albums-sheet { background: rgba(30,30,30,0.95); box-shadow: 0 -10px 20px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); }
     :host-context(.night-owl-mode) .modal-header h2 { color: #fdfdfd; }
     :host-context(.night-owl-mode) .close-btn { background: rgba(255,255,255,0.1); color: #fdfdfd; }
+    :host-context(.night-owl-mode) .prompt-btn.cancel { background: rgba(255,255,255,0.1); color: #fff; }
+    :host-context(.night-owl-mode) .save-overlay { background: rgba(0, 0, 0, 0.5); }
+    :host-context(.night-owl-mode) .save-box { background: rgba(30, 30, 30, 0.85); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); }
+    :host-context(.night-owl-mode) .save-title { color: #FFB3C6; }
     :host-context(.night-owl-mode) .album-cover.empty { background: rgba(0,0,0,0.4); border-color: #a78bfa; color: #a78bfa; }
     :host-context(.night-owl-mode) .album-name { color: #ccc; }
     :host-context(.night-owl-mode) .change-cover-btn { background: rgba(30,30,30,0.9); color: #a78bfa; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
@@ -763,7 +774,7 @@ export class PhotoWidgetComponent implements OnInit {
   private modalCtrl = inject(ModalController);
   public environment = environment;
   
-  pendingPhotoFile: File | null = null;
+  pendingPhotoFile: any = null;
   pendingPhotoPreview: string = '';
   pendingPhotoText: string = '';
 
@@ -853,6 +864,12 @@ export class PhotoWidgetComponent implements OnInit {
   }
 
   async ngOnInit() {
+    Keyboard.addListener('keyboardWillHide', () => {
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+    });
+
     this.loadAvatars();
     this.startMidnightTimer();
     
@@ -1717,7 +1734,10 @@ export class PhotoWidgetComponent implements OnInit {
   }
 
   onInputBlur() {
-    document.body.classList.remove('hide-tabs');
+    // Solo mostramos las tabs si no hay un modal abierto (albums o subida)
+    if (!this.isAlbumsModalOpen && !this.pendingPhotoFile) {
+      document.body.classList.remove('hide-tabs');
+    }
   }
 
   async replyWithText(photoId: number) {
@@ -1797,8 +1817,8 @@ export class PhotoWidgetComponent implements OnInit {
       if (image.webPath) {
         const response = await fetch(image.webPath);
         const blob = await response.blob();
-        this.pendingPhotoFile = new File([blob], `photo_${new Date().getTime()}.jpg`, { type: blob.type });
-        this.pendingPhotoPreview = URL.createObjectURL(this.pendingPhotoFile);
+        this.pendingPhotoFile = blob;
+        this.pendingPhotoPreview = URL.createObjectURL(blob);
         this.pendingPhotoText = '';
         document.body.classList.add('hide-tabs');
       }
@@ -2011,6 +2031,7 @@ export class PhotoWidgetComponent implements OnInit {
       }
       const actionSheet = await this.actionSheetCtrl.create({
         header: '¿Qué deseas hacer con la foto?',
+        cssClass: 'custom-action-sheet',
         buttons: [
           {
             text: 'Compartir',
@@ -2078,29 +2099,22 @@ export class PhotoWidgetComponent implements OnInit {
                   let albumIdentifier: string | undefined = undefined;
                   if (Capacitor.getPlatform() === 'android') {
                     try {
-                      let albumsRes = await Media.getAlbums();
-                      try {
-                        let albumsPath = (await Media.getAlbumsPath()).path;
-                        let album = albumsRes.albums.find(a => a.name === "LoveApp" && a.identifier.startsWith(albumsPath));
-                        if (!album) {
-                          await Media.createAlbum({ name: 'LoveApp' });
-                          albumsRes = await Media.getAlbums();
-                          album = albumsRes.albums.find(a => a.name === "LoveApp" && a.identifier.startsWith(albumsPath));
-                        }
-                        if (album) {
-                          albumIdentifier = album.identifier;
-                        }
-                      } catch (e) {
-                        console.warn("No se pudo crear/encontrar el album LoveApp, usando uno por defecto", e);
-                      }
+                      try { await Media.createAlbum({ name: 'LoveApp' }); } catch (e) {}
+                      const albumsRes = await Media.getAlbums();
+                      const loveAlbum = albumsRes.albums.find(a => a.name === 'LoveApp');
                       
-                      // Fallback si no hay albumIdentifier (Android lo requiere sí o sí)
-                      if (!albumIdentifier && albumsRes.albums && albumsRes.albums.length > 0) {
-                        const fallback = albumsRes.albums.find(a => a.name === 'Pictures' || a.name === 'Camera') || albumsRes.albums[0];
-                        albumIdentifier = fallback.identifier;
+                      if (loveAlbum) {
+                        albumIdentifier = loveAlbum.identifier;
+                      } else if (albumsRes.albums.length > 0) {
+                        // Fallback to any valid album if LoveApp not found
+                        albumIdentifier = albumsRes.albums[0].identifier;
+                      } else {
+                        // Fallback to absolute path construction
+                        const albumsPathRes = await Media.getAlbumsPath();
+                        albumIdentifier = albumsPathRes.path + '/LoveApp';
                       }
                     } catch (e) {
-                      console.error("Error obteniendo álbumes:", e);
+                      console.error("Error configurando álbum en Android:", e);
                     }
                   }
 

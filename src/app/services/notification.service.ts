@@ -4,6 +4,7 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 import { Preferences } from '@capacitor/preferences';
 import { Platform } from '@ionic/angular';
 import { LoveApiService } from './love-api.service';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,7 @@ import { LoveApiService } from './love-api.service';
 export class NotificationService {
   private platform = inject(Platform);
   private api = inject(LoveApiService);
+  public newNotification$ = new Subject<any>();
 
   async init() {
     if (!this.platform.is('capacitor')) {
@@ -77,6 +79,7 @@ export class NotificationService {
     PushNotifications.addListener('pushNotificationReceived',
       (notification: any) => {
         console.log('Push received: ' + JSON.stringify(notification));
+        this.newNotification$.next(notification);
       }
     );
 

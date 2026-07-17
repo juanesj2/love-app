@@ -1,6 +1,6 @@
 import { Component, inject, ViewChild, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { PluginListenerHandle } from '@capacitor/core';
-import { IonContent, IonFooter, IonHeader, IonToolbar, AlertController, ActionSheetController } from '@ionic/angular/standalone';
+import { IonContent, IonFooter, IonHeader, AlertController, ActionSheetController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -24,14 +24,17 @@ import { Preferences } from '@capacitor/preferences';
 import { App } from '@capacitor/app';
 import { PremiumService } from '../services/premium.service';
 import { PaywallComponent } from '../components/paywall/paywall.component';
-import { ModalController } from '@ionic/angular';
+import { ModalController, Platform } from '@ionic/angular';
+
+import { NotificationService } from '../services/notification.service';
+import { PushNotifications } from '@capacitor/push-notifications';
 
 @Component({
   selector: 'app-home',
   template: `
-    <ion-header class="ion-no-border">
-      <ion-toolbar>
-        <div class="custom-header" *ngIf="selectedWidget !== 'location'">
+    <!-- ... html was here ... -->
+    <ion-header class="ion-no-border" style="position: absolute; top: 0; width: 100%; background: transparent; z-index: 20; pointer-events: none;">
+      <div class="custom-header" *ngIf="selectedWidget !== 'location'" style="pointer-events: auto;">
           
           <div class="avatar-container"
                (click)="openAvatarSettings()"
@@ -64,7 +67,6 @@ import { ModalController } from '@ionic/angular';
           </div>
 
         </div>
-      </ion-toolbar>
     </ion-header>
 
     <ion-content [scrollY]="false">
@@ -88,8 +90,11 @@ import { ModalController } from '@ionic/angular';
       <div class="custom-tab-bar">
         <!-- Album -->
         <div id="tab-photo" class="tab-btn" (click)="selectTab('photo')" [class.active]="selectedWidget === 'photo'">
-          <ion-icon name="images-outline" *ngIf="selectedWidget !== 'photo'"></ion-icon>
-          <ion-icon name="images" *ngIf="selectedWidget === 'photo'"></ion-icon>
+          <div style="position: relative; display: flex;">
+            <ion-icon name="images-outline" *ngIf="selectedWidget !== 'photo'"></ion-icon>
+            <ion-icon name="images" *ngIf="selectedWidget === 'photo'"></ion-icon>
+            <div class="notification-badge" *ngIf="unreadPhoto"></div>
+          </div>
           <span>Álbum</span>
         </div>
         
@@ -98,6 +103,7 @@ import { ModalController } from '@ionic/angular';
           <div style="position: relative; display: flex;">
             <ion-icon name="chatbubbles-outline" *ngIf="selectedWidget !== 'chat'"></ion-icon>
             <ion-icon name="chatbubbles" *ngIf="selectedWidget === 'chat'"></ion-icon>
+            <div class="notification-badge" *ngIf="unreadChat"></div>
           </div>
           <span>Chat</span>
         </div>
@@ -107,8 +113,11 @@ import { ModalController } from '@ionic/angular';
         
         <!-- Map -->
         <div id="tab-map" class="tab-btn" (click)="selectTab('location')" [class.active]="selectedWidget === 'location'">
-          <ion-icon name="map-outline" *ngIf="selectedWidget !== 'location'"></ion-icon>
-          <ion-icon name="map" *ngIf="selectedWidget === 'location'"></ion-icon>
+          <div style="position: relative; display: flex;">
+            <ion-icon name="map-outline" *ngIf="selectedWidget !== 'location'"></ion-icon>
+            <ion-icon name="map" *ngIf="selectedWidget === 'location'"></ion-icon>
+            <div class="notification-badge" *ngIf="unreadMap"></div>
+          </div>
           <span>Mapa</span>
         </div>
         
@@ -204,8 +213,7 @@ import { ModalController } from '@ionic/angular';
       
       :host-context(.night-owl-mode) .c-box { background: linear-gradient(135deg, #FF9F1C, #E85D04); }
 
-      ion-toolbar { --background: transparent; position: absolute; top: 0; width: 100%; }
-      .custom-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); border-radius: 0 0 25px 25px; margin-bottom: 10px; position: relative; z-index: 20; }
+      .custom-header { display: flex; justify-content: space-between; align-items: center; padding: calc(var(--ion-safe-area-top, 0px) + 15px) 25px 15px 25px; background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); border-radius: 0 0 25px 25px; margin-bottom: 10px; position: relative; z-index: 20; }
       .avatar-container { position: relative; cursor: pointer; z-index: 2; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
       .avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.15); object-fit: cover; border: 2px solid white; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; }
       .avatar-container:active .avatar { transform: scale(0.9); }
@@ -244,6 +252,7 @@ import { ModalController } from '@ionic/angular';
       .tab-btn ion-icon { font-size: 1.6rem; transition: transform 0.3s; }
       .tab-btn.active ion-icon { transform: scale(1.15); filter: drop-shadow(0 4px 8px rgba(255,77,109,0.3)); }
       .tab-btn.active::after { content: ''; position: absolute; bottom: -8px; width: 6px; height: 6px; background: #FF4D6D; border-radius: 50%; box-shadow: 0 2px 5px rgba(255,77,109,0.4); }
+      .notification-badge { position: absolute; top: -2px; right: -4px; width: 10px; height: 10px; background-color: #ff3b30; border-radius: 50%; box-shadow: 0 0 5px rgba(255, 59, 48, 0.5); }
       
       .center-btn { position: relative; width: 60px; height: 60px; }
       .floating-center-wrapper { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(var(--safe-bottom) + 20px); width: 60px; height: 70px; z-index: 1010; display: flex; justify-content: center; pointer-events: auto; }
@@ -302,7 +311,7 @@ import { ModalController } from '@ionic/angular';
     :host-context(.night-owl-mode) .prompt-preview-container { background: rgba(0,0,0,0.3); }
   `],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonContent, IonFooter, IonIcon, IonSpinner, CommonModule, FormsModule, LocationWidgetComponent, PhotoWidgetComponent, ChatWidgetComponent, MasWidgetComponent, QuestionsWidgetComponent],
+  imports: [IonHeader, IonContent, IonFooter, IonIcon, IonSpinner, CommonModule, FormsModule, LocationWidgetComponent, PhotoWidgetComponent, ChatWidgetComponent, MasWidgetComponent, QuestionsWidgetComponent],
 })
 export class HomePage implements OnInit, OnDestroy {
   selectedWidget: 'location' | 'photo' | 'chat' | 'mas' | 'game' = 'photo';
@@ -325,10 +334,14 @@ export class HomePage implements OnInit, OnDestroy {
   partnerMood = '';
   partnerInitial = 'P';
   
+  unreadChat = false;
+  unreadPhoto = false;
+  unreadMap = false;
+  
   myAvatarUrl = '';
   partnerAvatarUrl = '';
 
-  pendingPhotoFile: File | null = null;
+  pendingPhotoFile: any = null;
   pendingPhotoPreview: string = '';
   pendingPhotoText: string = '';
   
@@ -349,6 +362,8 @@ export class HomePage implements OnInit, OnDestroy {
   private themeService = inject(ThemeService);
   private modalCtrl = inject(ModalController);
   private cdr = inject(ChangeDetectorRef);
+  private notificationService = inject(NotificationService);
+  private platform = inject(Platform);
 
   @ViewChild('photoWidget') photoWidgetComp?: PhotoWidgetComponent;
   @ViewChild('chatWidget') chatWidgetComp?: ChatWidgetComponent;
@@ -433,7 +448,50 @@ export class HomePage implements OnInit, OnDestroy {
     }, 100);
   }
 
+  async checkDeliveredNotifications() {
+    if (!this.platform.is('capacitor')) return;
+    try {
+      const delivered = await PushNotifications.getDeliveredNotifications();
+      let changed = false;
+      for (const notif of delivered.notifications) {
+        const title = notif.title ? notif.title.toLowerCase() : '';
+        const body = notif.body ? notif.body.toLowerCase() : '';
+        const text = title + ' ' + body;
+        
+        if (text.includes('mensaje')) {
+          if (this.selectedWidget !== 'chat') { this.unreadChat = true; changed = true; }
+        } else if (text.includes('foto') || text.includes('álbum') || text.includes('reaccion') || text.includes('garabato')) {
+          if (this.selectedWidget !== 'photo') { this.unreadPhoto = true; changed = true; }
+        } else if (text.includes('zumbido')) {
+          if (this.selectedWidget !== 'location') { this.unreadMap = true; changed = true; }
+        }
+      }
+      if (changed) this.cdr.detectChanges();
+    } catch (e) {
+      console.log('Error checking delivered notifications', e);
+    }
+  }
+
   async ngOnInit() {
+    this.subscriptions.push(
+      this.notificationService.newNotification$.subscribe((notif: any) => {
+        const title = notif.title ? notif.title.toLowerCase() : '';
+        const body = notif.body ? notif.body.toLowerCase() : '';
+        const text = title + ' ' + body;
+        
+        if (text.includes('mensaje')) {
+          if (this.selectedWidget !== 'chat') this.unreadChat = true;
+        } else if (text.includes('foto') || text.includes('álbum') || text.includes('reaccion') || text.includes('garabato')) {
+          if (this.selectedWidget !== 'photo') this.unreadPhoto = true;
+        } else if (text.includes('zumbido')) {
+          if (this.selectedWidget !== 'location') this.unreadMap = true;
+        }
+        this.cdr.detectChanges();
+      })
+    );
+    
+    this.checkDeliveredNotifications();
+
     const nightPref = await Preferences.get({ key: 'night_owl_enabled' });
     if (nightPref.value === 'true') {
       this.isDarkMode = true;
@@ -479,8 +537,32 @@ export class HomePage implements OnInit, OnDestroy {
     this.tutorialService.showWelcomeTour();
   }
 
-  public selectTab(tab: string) {
+  public async selectTab(tab: string) {
     this.selectedWidget = tab as 'location' | 'photo' | 'chat' | 'mas' | 'game';
+    
+    if (tab === 'chat') this.unreadChat = false;
+    if (tab === 'photo') this.unreadPhoto = false;
+    if (tab === 'location') this.unreadMap = false;
+
+    // Remove OS notifications associated with the selected tab
+    if (this.platform.is('capacitor')) {
+      try {
+        const delivered = await PushNotifications.getDeliveredNotifications();
+        const toRemove = delivered.notifications.filter(notif => {
+          const text = ((notif.title || '') + ' ' + (notif.body || '')).toLowerCase();
+          if (tab === 'chat' && text.includes('mensaje')) return true;
+          if (tab === 'photo' && (text.includes('foto') || text.includes('álbum') || text.includes('reaccion') || text.includes('garabato'))) return true;
+          if (tab === 'location' && text.includes('zumbido')) return true;
+          return false;
+        });
+        if (toRemove.length > 0) {
+          await PushNotifications.removeDeliveredNotifications({ notifications: toRemove });
+        }
+      } catch (e) {
+        console.log('Error removing notifications', e);
+      }
+    }
+
     // Damos un pequeño respiro de 300ms para que el DOM renderice el componente antes de mostrar el tutorial
     setTimeout(() => {
       switch (tab) {
@@ -582,6 +664,8 @@ export class HomePage implements OnInit, OnDestroy {
 
   async loadHeaderData() {
     try {
+      this.api.markMessagesDelivered().catch(e => console.log('Error marking messages delivered', e));
+      
       const data = await this.api.getCoupleInfo();
       
       if (data.my_mood) this.myMood = data.my_mood;
@@ -613,6 +697,10 @@ export class HomePage implements OnInit, OnDestroy {
       console.log('No se pudo cargar la info de la cabecera', e);
       if (e.status === 403 || e.error?.message?.includes('No estás vinculado')) {
         this.router.navigate(['/pairing'], { replaceUrl: true });
+      } else if (e.status === 401) {
+        // Token is invalid/expired
+        await this.api.logout();
+        this.router.navigate(['/login'], { replaceUrl: true });
       }
     }
   }
@@ -843,8 +931,8 @@ export class HomePage implements OnInit, OnDestroy {
           // Convert webPath to File object
           const response = await fetch(image.webPath);
           const blob = await response.blob();
-          this.pendingPhotoFile = new File([blob], "camera_photo.jpg", { type: blob.type });
-          this.pendingPhotoPreview = URL.createObjectURL(this.pendingPhotoFile);
+          this.pendingPhotoFile = blob;
+          this.pendingPhotoPreview = URL.createObjectURL(blob);
           this.pendingPhotoText = '';
           document.body.classList.add('hide-tabs');
           this.cdr.detectChanges();
@@ -891,11 +979,12 @@ export class HomePage implements OnInit, OnDestroy {
         position: 'top',
       });
       await toast.present();
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      const errMsg = e.message ? e.message : JSON.stringify(e);
       const toast = await this.toastController.create({
-        message: 'Error al subir la foto',
-        duration: 2500,
+        message: 'Error al subir la foto: ' + errMsg,
+        duration: 5000,
         color: 'danger',
         position: 'top',
       });

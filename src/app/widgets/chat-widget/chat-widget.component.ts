@@ -15,9 +15,10 @@ import { environment } from '../../../environments/environment';
 import confetti from 'canvas-confetti';
 import { FingerprintGameModalComponent } from '../fingerprint-game-modal/fingerprint-game-modal.component';
 import { addIcons } from 'ionicons';
-import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed, settingsOutline, imageOutline, partlySunnyOutline, waterOutline, moonOutline, planetOutline, heartOutline, colorPaletteOutline, chatbubbleEllipsesOutline, textOutline, musicalNotesOutline, personCircleOutline } from 'ionicons/icons';
+import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed, settingsOutline, imageOutline, partlySunnyOutline, waterOutline, moonOutline, planetOutline, heartOutline, colorPaletteOutline, chatbubbleEllipsesOutline, textOutline, musicalNotesOutline, personCircleOutline, timeOutline, checkmarkOutline, checkmarkDoneOutline } from 'ionicons/icons';
 import { DotLottie } from '@lottiefiles/dotlottie-web';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Keyboard } from '@capacitor/keyboard';
 @Component({
   selector: 'app-chat-widget',
   template: `
@@ -128,6 +129,13 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
                   <div class="reactions-container" *ngIf="hasReactions(msg) && !msg.isDeletedLocally && msg.mensaje !== '[DELETED]'">
                     <span class="reaction" *ngFor="let r of getReactions(msg)">{{r}}</span>
                   </div>
+                  
+                  <div class="msg-status" *ngIf="isMine(msg) && !msg.isDeletedLocally && msg.mensaje !== '[DELETED]'">
+                    <ion-icon name="time-outline" *ngIf="msg.status === 'pending'"></ion-icon>
+                    <ion-icon name="checkmark-outline" *ngIf="msg.status === 'sent' || !msg.status"></ion-icon>
+                    <ion-icon name="checkmark-done-outline" *ngIf="msg.status === 'delivered'"></ion-icon>
+                    <ion-icon name="checkmark-done-outline" class="read-check" *ngIf="msg.status === 'read'"></ion-icon>
+                  </div>
                 </div>
               </div>
 
@@ -208,18 +216,20 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
             <div class="recording-indicator"><div class="pulse-dot"></div> Grabando... {{recordingTime}}s</div>
             <button class="cancel-record-btn" (click)="cancelAudioRecording()"><ion-icon name="trash-outline"></ion-icon></button>
           </div>
-          <input *ngIf="!isRecording"
-            type="text" 
+          <textarea *ngIf="!isRecording"
             [(ngModel)]="newMessage" 
             placeholder="Dile algo bonito..." 
-            (keyup.enter)="sendMessage()" 
-            class="premium-input"
-            [disabled]="sending"
-          />
+            (focus)="onInputFocus()"
+            (blur)="onInputBlur()"
+            (input)="autoResize()"
+            class="premium-input textarea-input"
+            rows="1"
+            #chatInput
+          ></textarea>
           <button class="send-btn" 
                   [disabled]="sending" 
                   [class.active]="newMessage.trim() || isRecording"
-                  (click)="onSendBtnClick($event)">
+                  (pointerdown)="onSendBtnClick($event)">
             <ion-icon name="paper-plane" *ngIf="!sending && (newMessage.trim() || isRecording)"></ion-icon>
             <div class="mic-container" *ngIf="!sending && !newMessage.trim() && !isRecording">
               <ion-icon name="mic"></ion-icon>
@@ -447,6 +457,13 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     .mine .bubble { background: linear-gradient(135deg, #FF758C 0%, #FF7EB3 100%); color: white; border-bottom-right-radius: 6px; border-bottom-left-radius: 18px; box-shadow: 0 4px 15px rgba(255, 117, 140, 0.35), inset 0 2px 0 rgba(255,255,255,0.25); border: none; }
     .message-wrapper:not(.mine) .bubble { background: white; color: #333; border-bottom-left-radius: 4px; border: 1px solid rgba(0,0,0,0.05); }
     
+    .msg-status { display: flex; align-items: center; justify-content: flex-end; gap: 2px; margin-top: 4px; opacity: 0.9; height: 16px; margin-right: -4px; margin-bottom: -4px; }
+    .msg-status ion-icon { font-size: 1.15rem; }
+    .msg-status .read-check { color: #4db8ff; opacity: 1; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2)); }
+    .transparent-bubble .msg-status { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.5); padding: 2px 4px; border-radius: 12px; color: white; margin: 0; }
+    .only-photo .msg-status { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.5); padding: 2px 4px; border-radius: 12px; color: white; margin: 0; }
+
+    
     .sender { font-size: 0.75rem; font-weight: 700; color: #FF4D6D; margin-bottom: 4px; display: block; }
     .text { margin: 0; word-break: break-word; white-space: pre-wrap; }
     .edited-label { font-size: 0.7rem; opacity: 0.7; margin-left: 4px; font-style: italic; }
@@ -553,11 +570,13 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     .close-reply { color: #999; font-size: 1.2rem; cursor: pointer; }
     .reply-text { font-size: 0.9rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .input-area { background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding-bottom: calc(var(--safe-bottom) + 102px); border-top: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; }
+    .input-area { background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding-bottom: calc(var(--safe-bottom) + 102px); border-top: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; transition: padding-bottom 0.2s ease-out; }
+    :host-context(body.hide-tabs) .input-area { padding-bottom: calc(var(--safe-bottom) + 5px); }
     .input-container { padding: 10px 15px; display: flex; align-items: center; gap: 10px; position: relative; }
     
-    .premium-input { flex: 1; background: #f8f9fa; border: 1px solid rgba(0,0,0,0.05); border-radius: 20px; padding: 12px 20px; font-size: 1rem; color: #333; outline: none; transition: all 0.3s ease; }
+    .premium-input { flex: 1; background: #f8f9fa; border: 1px solid rgba(0,0,0,0.05); border-radius: 20px; padding: 12px 20px; font-size: 1rem; color: #333; outline: none; transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; }
     .premium-input:focus { background: white; border-color: #FF4D6D; box-shadow: 0 0 0 3px rgba(255,77,109,0.1); }
+    .textarea-input { resize: none; min-height: 44px; max-height: 120px; overflow-y: auto; line-height: 1.4; font-family: inherit; box-sizing: border-box; }
     
     .send-btn { width: 44px; height: 44px; border-radius: 50%; border: none; background: #e0d4d7; color: white; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; }
     .send-btn.active { background: linear-gradient(135deg, #FF4D6D 0%, #c9184a 100%); box-shadow: 0 4px 12px rgba(255, 77, 109, 0.4); transform: rotate(-10deg); }
@@ -1535,9 +1554,10 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   private timeouts: any[] = [];
 
   @ViewChild('doodleCanvas', { static: false }) doodleCanvas: any;
+  @ViewChild('chatInput', { static: false }) chatInput: any;
   
   constructor() {
-    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed, 'image-outline': imageOutline, 'partly-sunny-outline': partlySunnyOutline, 'water-outline': waterOutline, 'moon-outline': moonOutline, 'planet-outline': planetOutline, 'heart-outline': heartOutline, 'color-palette-outline': colorPaletteOutline, 'chatbubble-ellipses-outline': chatbubbleEllipsesOutline, 'text-outline': textOutline, 'musical-notes-outline': musicalNotesOutline, 'person-circle-outline': personCircleOutline });
+    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed, 'time-outline': timeOutline, 'checkmark-outline': checkmarkOutline, 'checkmark-done-outline': checkmarkDoneOutline, 'image-outline': imageOutline, 'partly-sunny-outline': partlySunnyOutline, 'water-outline': waterOutline, 'moon-outline': moonOutline, 'planet-outline': planetOutline, 'heart-outline': heartOutline, 'color-palette-outline': colorPaletteOutline, 'chatbubble-ellipses-outline': chatbubbleEllipsesOutline, 'text-outline': textOutline, 'musical-notes-outline': musicalNotesOutline, 'person-circle-outline': personCircleOutline });
   }
 
   // --- Background Feature ---
@@ -1808,6 +1828,12 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   private subscriptions: Subscription[] = [];
 
   async ngOnInit() {
+    Keyboard.addListener('keyboardWillHide', () => {
+      document.body.classList.remove('hide-tabs');
+      if (this.chatInput && this.chatInput.nativeElement) {
+        this.chatInput.nativeElement.blur();
+      }
+    });
     this.currentUser = localStorage.getItem('love_widget_user') === 'juan' ? 'Juan' : 'Roberta';
     this.loadChatBackground();
     
@@ -1975,12 +2001,22 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     });
   }
 
+  onInputFocus() {
+    document.body.classList.add('hide-tabs');
+  }
+
+  onInputBlur() {
+    document.body.classList.remove('hide-tabs');
+  }
+
   async sendMessage() {
-    if (!this.newMessage.trim() || this.sending) return;
+    if (!this.newMessage.trim()) return;
     
-    this.sending = true;
-    const isReplyingTo = this.replyingTo;
     const payloadMessage = this.newMessage;
+    this.newMessage = ''; // Limpiar el input inmediatamente para seguir escribiendo
+    this.safeTimeout(() => this.autoResize(), 10); // Reset textarea height
+    const isReplyingTo = this.replyingTo;
+    this.replyingTo = null; // Limpiar el reply también
     
     // Trigger locally immediately if it's an emoji
     if (this.isEmojiOnly(payloadMessage)) {
@@ -1997,30 +2033,37 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     
     try {
       if (this.isEditing && this.editingMsgId) {
-        await this.api.editMessage(this.editingMsgId, this.newMessage);
+        await this.api.editMessage(this.editingMsgId, payloadMessage);
+        this.isEditing = false;
+        this.editingMsgId = null;
       } else {
         const replyPayload = isReplyingTo ? {
           id: isReplyingTo.id,
           user: isReplyingTo.user?.name,
           text: isReplyingTo.mensaje || '📷 Foto'
         } : undefined;
-        await this.api.sendMessage(this.newMessage, undefined, replyPayload);
+        
+        // Push a fake pending message immediately
+        const fakeMsg = {
+          id: Date.now() + Math.floor(Math.random() * 1000),
+          user_id: this.myUserId,
+          mensaje: payloadMessage,
+          status: 'pending',
+          user: { name: this.currentUser },
+          reply_to: replyPayload
+        };
+        this.regularMessages.push(fakeMsg);
+        this.safeTimeout(() => this.scrollToBottom(true), 50);
+
+        await this.api.sendMessage(payloadMessage, undefined, replyPayload);
       }
-      
-      this.newMessage = '';
-      this.replyingTo = null;
-      this.isEditing = false;
-      this.editingMsgId = null;
       
       await this.loadMessages();
       
       this.safeTimeout(() => this.scrollToBottom(true), 100);
-      // Removed success toast so it doesn't interrupt chat flow
     } catch (e) {
       console.error(e);
       this.showError('Ocurrió un error al enviar tu mensaje. Inténtalo de nuevo.');
-    } finally {
-      this.sending = false;
     }
   }
 
@@ -2287,10 +2330,9 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     this.isDoodling = false;
     this.sending = true;
     try {
-      const file = new File([cropResult.blob], 'doodle.png', { type: 'image/png' });
-      // Upload with graffiti tag
+      // Use Blob directly to avoid 'Illegal constructor' error on some Capacitor webviews
       const description = `[GRAFFITI:${anchorMsgId}:${Math.round(offsetX)}:${Math.round(offsetY)}:${cropResult.w}:${cropResult.h}]`;
-      const res = await this.api.uploadPhoto(file, description);
+      const res = await this.api.uploadPhoto(cropResult.blob, description);
       if (res && res.photo && res.photo.id) {
         const messageContent = `[GRAFFITI:${anchorMsgId}:${Math.round(offsetX)}:${Math.round(offsetY)}:${cropResult.w}:${cropResult.h}:${res.photo.image_path}]`;
         const replyPayload = this.replyingTo ? { id: this.replyingTo.id, user: this.replyingTo.user?.name, text: '🎨 Graffiti' } : undefined;
@@ -2299,12 +2341,13 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         await this.loadMessages();
         this.safeTimeout(() => this.scrollToBottom(), 100);
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error('Error sending doodle', e);
-      this.showError('Error al enviar garabato');
+      const errMsg = e.message ? e.message : JSON.stringify(e);
+      this.showError('Error al enviar garabato: ' + errMsg);
     } finally {
-    this.sending = false;
-  }
+      this.sending = false;
+    }
 }
 
 // --- Graffiti Long Press Menu ---
@@ -2431,7 +2474,10 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   recordingTime = 0;
   recordingInterval: any;
   
-  onSendBtnClick(e: any) {
+  onSendBtnClick(e: Event) {
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (this.isRecording) {
       this.stopAudioRecording();
     } else if (this.newMessage.trim()) {
@@ -2439,6 +2485,13 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     } else {
       this.startAudioRecording();
     }
+  }
+
+  autoResize() {
+    if (!this.chatInput) return;
+    const el = this.chatInput.nativeElement;
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
   }
 
   async openPaywall() {
@@ -2456,9 +2509,30 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     
     if (this.isDoodling) return;
     try {
-      let hasPermission = await VoiceRecorder.hasAudioRecordingPermission();
+      // 1. Verify if device supports recording
+      const canRecord = await VoiceRecorder.canDeviceVoiceRecord();
+      if (!canRecord.value) {
+        this.showError('Tu dispositivo no soporta grabación de voz nativa.');
+        return;
+      }
+
+      // 2. Check current permissions
+      let hasPermission;
+      try {
+        hasPermission = await VoiceRecorder.hasAudioRecordingPermission();
+      } catch (err: any) {
+        alert('Error al chequear permiso: ' + (err?.message || JSON.stringify(err)));
+        return;
+      }
+
+      // 3. Request if missing
       if (!hasPermission.value) {
-        hasPermission = await VoiceRecorder.requestAudioRecordingPermission();
+        try {
+          hasPermission = await VoiceRecorder.requestAudioRecordingPermission();
+        } catch (err: any) {
+          alert('Error al pedir permiso: ' + (err?.message || JSON.stringify(err)));
+          return;
+        }
       }
       
       if (!hasPermission.value) {
@@ -2466,6 +2540,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         return;
       }
 
+      // 4. Start recording
       await VoiceRecorder.startRecording();
       
       this.isRecording = true;
@@ -2474,7 +2549,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     } catch (e: any) {
       console.error('Error starting audio recording:', e);
       let errorMsg = e?.message || JSON.stringify(e) || 'Desconocido';
-      this.showError('Error de micrófono: ' + errorMsg);
+      alert('Error de grabación: ' + errorMsg);
     }
   }
 

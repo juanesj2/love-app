@@ -77,6 +77,43 @@ public class LoveWidgetWorker extends Worker {
             Location myLoc = fetchLocation(myUserId);
             Location partnerLoc = fetchLocation(partnerId);
             
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+            ComponentName thisWidget = new ComponentName(context, LoveWidgetProvider.class);
+            int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
+            
+            if (myLoc == null || partnerLoc == null) {
+                // Someone is in ghost mode, or both
+                for (int appWidgetId : appWidgetIds) {
+                    RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
+                    
+                    // Show ghost overlay, hide map text
+                    views.setViewVisibility(R.id.widget_ghost_overlay, android.view.View.VISIBLE);
+                    
+                    if (myLoc == null) {
+                        views.setTextViewText(R.id.widget_ghost_title, "Modo Fantasma Activo");
+                        views.setTextViewText(R.id.widget_ghost_desc, "La notificación y tu ubicación están ocultas.");
+                        views.setTextViewText(R.id.widget_ghost_icon, "🙈");
+                    } else {
+                        views.setTextViewText(R.id.widget_ghost_title, "Pareja en Modo Fantasma");
+                        views.setTextViewText(R.id.widget_ghost_desc, "Tu pareja ha ocultado su ubicación temporalmente.");
+                        views.setTextViewText(R.id.widget_ghost_icon, "👻");
+                    }
+                    
+                    android.content.Intent intent = new android.content.Intent(context, MainActivity.class);
+                    intent.putExtra("open_tab", "location");
+                    android.app.PendingIntent pendingIntent = android.app.PendingIntent.getActivity(
+                        context, 
+                        appWidgetId, 
+                        intent, 
+                        android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE
+                    );
+                    views.setOnClickPendingIntent(R.id.widget_ghost_overlay, pendingIntent);
+                    
+                    appWidgetManager.updateAppWidget(appWidgetId, views);
+                }
+                return Result.success();
+            }
+            
             if (myLoc != null && partnerLoc != null) {
                 float distance = myLoc.distanceTo(partnerLoc);
                 String distanceText = "";
@@ -255,14 +292,15 @@ public class LoveWidgetWorker extends Worker {
                     }
 
                     // Update Widget
-                    AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-                    ComponentName thisWidget = new ComponentName(context, LoveWidgetProvider.class);
-                    int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
+                    // Variables appWidgetManager, thisWidget, appWidgetIds are already declared above
 
                     for (int appWidgetId : appWidgetIds) {
                         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
                         views.setImageViewBitmap(R.id.widget_map_bg, mutableBitmap);
                         views.setTextViewText(R.id.widget_time, timeText);
+                        
+                        // Hide Ghost Mode overlay if map is shown
+                        views.setViewVisibility(R.id.widget_ghost_overlay, android.view.View.GONE);
                         
                         android.content.Intent intent = new android.content.Intent(context, MainActivity.class);
                         intent.putExtra("open_tab", "location");
@@ -430,6 +468,14 @@ public class LoveWidgetWorker extends Worker {
         
         JSONObject json = new JSONObject(content.toString());
         JSONObject fields = json.getJSONObject("fields");
+        
+        if (fields.has("is_sharing")) {
+            boolean isSharing = fields.getJSONObject("is_sharing").getBoolean("booleanValue");
+            if (!isSharing) {
+                return null; // indicates ghost mode
+            }
+        }
+        
         JSONObject position = fields.getJSONObject("position").getJSONObject("geoPointValue");
         
         double lat = position.getDouble("latitude");

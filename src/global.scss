@@ -780,3 +780,71 @@ img.frame-fire, .avatar.frame-fire {
   100% { box-shadow: 0 0 20px #ff4500, inset 0 0 15px #ff4500, 0 0 35px #ffa500; }
 }
 
+/* Premium Action Sheet Styling */
+.custom-action-sheet {
+  --background: rgba(255, 255, 255, 0.85);
+  --backdrop-opacity: 0.4;
+  --button-color: #590D22;
+  --color: #a4133c;
+  
+  .action-sheet-group {
+    border-radius: 20px !important;
+    margin-bottom: 12px !important;
+    margin-inline: 16px !important;
+    border: 1px solid rgba(255, 77, 109, 0.2);
+    box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15);
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+  }
+  
+  .action-sheet-title {
+    color: #590D22 !important;
+    font-weight: 800 !important;
+    font-size: 1.15rem !important;
+    text-align: center !important;
+    padding: 24px 16px 16px 16px !important;
+  }
+  
+  .action-sheet-button {
+    font-weight: 600 !important;
+    color: #590D22 !important;
+    font-size: 1.05rem !important;
+    padding: 20px !important;
+    
+    &.action-sheet-cancel {
+      color: #FF4D6D !important;
+      font-weight: 700 !important;
+    }
+  }
+
+  .action-sheet-icon {
+    color: #FF4D6D !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .custom-action-sheet {
+    --background: rgba(30, 30, 30, 0.85);
+    --button-color: #fff;
+    --color: #ccc;
+    
+    .action-sheet-group {
+      background: rgba(30, 30, 30, 0.9) !important;
+      border: 1px solid rgba(255, 77, 109, 0.3);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+    
+    .action-sheet-title {
+      color: #fff !important;
+    }
+    
+    .action-sheet-button {
+      color: #fff !important;
+      
+      &.action-sheet-cancel {
+        color: #FF4D6D !important;
+      }
+    }
+  }
+}

@@ -1,0 +1,1012 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.juanesj2.lovewidget"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="24"
+9        android:targetSdkVersion="36" />
+10
+11    <!-- Permissions -->
+12    <uses-permission android:name="android.permission.INTERNET" />
+12-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:79:5-67
+12-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:79:22-64
+13    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+13-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:80:5-81
+13-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:80:22-78
+14    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+14-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:81:5-79
+14-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:81:22-76
+15    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+15-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:82:5-85
+15-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:82:22-82
+16    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+16-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:83:5-77
+16-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:83:22-74
+17    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+17-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:84:5-86
+17-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:84:22-83
+18    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+18-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:85:5-77
+18-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:85:22-74
+19
+20    <!-- Camera & Storage Permissions -->
+21    <uses-permission android:name="android.permission.CAMERA" />
+21-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:88:5-65
+21-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:88:22-62
+22    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+22-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:89:5-80
+22-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:89:22-77
+23    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+23-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:90:5-81
+23-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:90:22-78
+24    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+24-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:91:5-76
+24-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:91:22-73
+25    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+25-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:92:5-71
+25-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:92:22-68
+26
+27    <uses-feature
+27-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:93:5-85
+28        android:name="android.hardware.camera"
+28-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:93:19-57
+29        android:required="false" />
+29-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:93:58-82
+30    <uses-feature android:name="android.hardware.location.gps" />
+30-->[:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:21:5-66
+30-->[:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:21:19-63
+31
+32    <queries>
+32-->[:capacitor-browser] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-browser\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-11:15
+33        <intent>
+33-->[:capacitor-browser] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-browser\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-10:18
+34            <action android:name="android.support.customtabs.action.CustomTabsService" />
+34-->[:capacitor-browser] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-browser\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-90
+34-->[:capacitor-browser] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-browser\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:21-87
+35        </intent>
+36        <intent>
+36-->[:capacitor-camera] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-camera\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-10:18
+37            <action android:name="android.media.action.IMAGE_CAPTURE" />
+37-->[:capacitor-camera] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-camera\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-73
+37-->[:capacitor-camera] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-camera\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:21-70
+38        </intent>
+39        <intent>
+39-->[:capacitor-camera] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-camera\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:9-13:18
+40            <action android:name="android.intent.action.GET_CONTENT" />
+40-->[:capacitor-camera] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-camera\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:13-72
+40-->[:capacitor-camera] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-camera\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:21-69
+41        </intent>
+42        <intent>
+42-->[:capacitor-camera] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-camera\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:9-16:18
+43            <action android:name="android.intent.action.PICK" />
+43-->[:capacitor-camera] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-camera\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:13-65
+43-->[:capacitor-camera] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-camera\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:21-62
+44        </intent>
+45        <intent>
+45-->[com.android.billingclient:billing:8.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\8d7a56ebef10384c94e6232e72c18c63\transformed\billing-8.3.0\AndroidManifest.xml:13:9-15:18
+46            <action android:name="com.android.vending.billing.InAppBillingService.BIND" />
+46-->[com.android.billingclient:billing:8.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\8d7a56ebef10384c94e6232e72c18c63\transformed\billing-8.3.0\AndroidManifest.xml:14:13-91
+46-->[com.android.billingclient:billing:8.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\8d7a56ebef10384c94e6232e72c18c63\transformed\billing-8.3.0\AndroidManifest.xml:14:21-88
+47        </intent>
+48        <intent>
+48-->[com.android.billingclient:billing:8.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\8d7a56ebef10384c94e6232e72c18c63\transformed\billing-8.3.0\AndroidManifest.xml:16:9-18:18
+49            <action android:name="com.google.android.apps.play.billingtestcompanion.BillingOverrideService.BIND" />
+49-->[com.android.billingclient:billing:8.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\8d7a56ebef10384c94e6232e72c18c63\transformed\billing-8.3.0\AndroidManifest.xml:17:13-116
+49-->[com.android.billingclient:billing:8.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\8d7a56ebef10384c94e6232e72c18c63\transformed\billing-8.3.0\AndroidManifest.xml:17:21-113
+50        </intent>
+51    </queries>
+52
+53    <uses-permission android:name="android.permission.VIBRATE" />
+53-->[:capacitor-haptics] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-haptics\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-66
+53-->[:capacitor-haptics] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-haptics\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:22-63
+54    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+54-->[:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-81
+54-->[:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:22-78
+55    <uses-permission android:name="android.permission.WAKE_LOCK" />
+55-->[:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-68
+55-->[:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:22-65
+56    <uses-permission android:name="android.permission.USE_BIOMETRIC" /> <!-- suppress DeprecatedClassUsageInspection -->
+56-->[androidx.biometric:biometric:1.1.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\17ef906cf8180b1e2bbb18e5c144ebdb\transformed\biometric-1.1.0\AndroidManifest.xml:24:5-72
+56-->[androidx.biometric:biometric:1.1.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\17ef906cf8180b1e2bbb18e5c144ebdb\transformed\biometric-1.1.0\AndroidManifest.xml:24:22-69
+57    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+57-->[androidx.biometric:biometric:1.1.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\17ef906cf8180b1e2bbb18e5c144ebdb\transformed\biometric-1.1.0\AndroidManifest.xml:27:5-74
+57-->[androidx.biometric:biometric:1.1.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\17ef906cf8180b1e2bbb18e5c144ebdb\transformed\biometric-1.1.0\AndroidManifest.xml:27:22-71
+58    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+58-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:24:5-79
+58-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:24:22-76
+59    <uses-permission android:name="com.android.vending.BILLING" /> <!-- Required by older versions of Google Play services to create IID tokens -->
+59-->[com.android.billingclient:billing:8.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\8d7a56ebef10384c94e6232e72c18c63\transformed\billing-8.3.0\AndroidManifest.xml:10:5-67
+59-->[com.android.billingclient:billing:8.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\8d7a56ebef10384c94e6232e72c18c63\transformed\billing-8.3.0\AndroidManifest.xml:10:22-64
+60    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+60-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:26:5-82
+60-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:26:22-79
+61
+62    <permission
+62-->[androidx.core:core:1.17.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:22:5-24:47
+63        android:name="com.juanesj2.lovewidget.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+63-->[androidx.core:core:1.17.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:23:9-81
+64        android:protectionLevel="signature" />
+64-->[androidx.core:core:1.17.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:24:9-44
+65
+66    <uses-permission android:name="com.juanesj2.lovewidget.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+66-->[androidx.core:core:1.17.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:26:5-97
+66-->[androidx.core:core:1.17.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:26:22-94
+67
+68    <application
+68-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:3:5-76:19
+69        android:allowBackup="true"
+69-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:4:9-35
+70        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+70-->[androidx.core:core:1.17.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:28:18-86
+71        android:debuggable="true"
+72        android:extractNativeLibs="false"
+73        android:icon="@mipmap/ic_launcher"
+73-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:5:9-43
+74        android:label="@string/app_name"
+74-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:6:9-41
+75        android:requestLegacyExternalStorage="true"
+75-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:8:18-61
+76        android:roundIcon="@mipmap/ic_launcher_round"
+76-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:7:9-54
+77        android:supportsRtl="true"
+77-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:8:9-35
+78        android:theme="@style/AppTheme" >
+78-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:9:9-40
+79
+80        <!-- Default Notification Icon and Color -->
+81        <meta-data
+81-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:11:9-138
+82            android:name="com.google.firebase.messaging.default_notification_icon"
+82-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:11:20-90
+83            android:resource="@drawable/ic_notification" />
+83-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:11:91-135
+84        <meta-data
+84-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:12:9-133
+85            android:name="com.google.firebase.messaging.default_notification_color"
+85-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:12:20-91
+86            android:resource="@color/colorPrimary" />
+86-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:12:92-130
+87
+88        <activity
+88-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:14:9-25:20
+89            android:name="com.juanesj2.lovewidget.MainActivity"
+89-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:16:13-41
+90            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
+90-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:15:13-148
+91            android:exported="true"
+91-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:20:13-36
+92            android:label="@string/title_activity_main"
+92-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:17:13-56
+93            android:launchMode="singleTask"
+93-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:19:13-44
+94            android:theme="@style/AppTheme.NoActionBarLaunch" >
+94-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:18:13-62
+95            <intent-filter>
+95-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:21:13-24:29
+96                <action android:name="android.intent.action.MAIN" />
+96-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:22:17-69
+96-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:22:25-66
+97
+98                <category android:name="android.intent.category.LAUNCHER" />
+98-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:23:17-77
+98-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:23:27-74
+99            </intent-filter>
+100        </activity>
+101
+102        <provider
+103            android:name="androidx.core.content.FileProvider"
+103-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:28:13-62
+104            android:authorities="com.juanesj2.lovewidget.fileprovider"
+104-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:29:13-64
+105            android:exported="false"
+105-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:30:13-37
+106            android:grantUriPermissions="true" >
+106-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:31:13-47
+107            <meta-data
+107-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:32:13-112
+108                android:name="android.support.FILE_PROVIDER_PATHS"
+108-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:32:24-74
+109                android:resource="@xml/file_paths" />
+109-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:32:75-109
+110        </provider>
+111
+112        <receiver
+112-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:35:9-40:20
+113            android:name="com.juanesj2.lovewidget.LoveWidgetProvider"
+113-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:35:19-53
+114            android:exported="true"
+114-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:35:54-77
+115            android:label="@string/widget_love_label" >
+115-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:35:78-119
+116            <intent-filter>
+116-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:36:13-38:29
+117                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+117-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:37:17-84
+117-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:37:25-81
+118            </intent-filter>
+119
+120            <meta-data
+120-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:39:13-104
+121                android:name="android.appwidget.provider"
+121-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:39:24-65
+122                android:resource="@xml/widget_info" />
+122-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:39:66-101
+123        </receiver>
+124        <receiver
+124-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:42:9-47:20
+125            android:name="com.juanesj2.lovewidget.Counter1x1WidgetProvider"
+125-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:42:19-59
+126            android:exported="true"
+126-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:42:60-83
+127            android:label="@string/widget_counter_1x1_label" >
+127-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:42:84-132
+128            <intent-filter>
+128-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:36:13-38:29
+129                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+129-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:37:17-84
+129-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:37:25-81
+130            </intent-filter>
+131
+132            <meta-data
+132-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:39:13-104
+133                android:name="android.appwidget.provider"
+133-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:39:24-65
+134                android:resource="@xml/widget_counter_1x1_info" />
+134-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:39:66-101
+135        </receiver>
+136        <receiver
+136-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:49:9-54:20
+137            android:name="com.juanesj2.lovewidget.CounterPhotoWidgetProvider"
+137-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:49:19-61
+138            android:exported="true"
+138-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:49:62-85
+139            android:label="@string/widget_counter_photo_label" >
+139-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:49:86-136
+140            <intent-filter>
+140-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:36:13-38:29
+141                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+141-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:37:17-84
+141-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:37:25-81
+142            </intent-filter>
+143
+144            <meta-data
+144-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:39:13-104
+145                android:name="android.appwidget.provider"
+145-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:39:24-65
+146                android:resource="@xml/widget_counter_photo_info" />
+146-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:39:66-101
+147        </receiver>
+148        <receiver
+148-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:56:9-61:20
+149            android:name="com.juanesj2.lovewidget.DailyPhotoWidgetProvider"
+149-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:56:19-59
+150            android:exported="true"
+150-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:56:60-83
+151            android:label="@string/widget_daily_photo_label" >
+151-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:56:84-132
+152            <intent-filter>
+152-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:36:13-38:29
+153                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+153-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:37:17-84
+153-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:37:25-81
+154            </intent-filter>
+155
+156            <meta-data
+156-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:39:13-104
+157                android:name="android.appwidget.provider"
+157-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:39:24-65
+158                android:resource="@xml/widget_daily_photo_info" />
+158-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:39:66-101
+159        </receiver>
+160        <receiver
+160-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:63:9-69:20
+161            android:name="com.juanesj2.lovewidget.PokeWidgetProvider"
+161-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:63:19-53
+162            android:exported="true"
+162-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:63:54-77
+163            android:label="@string/widget_poke_label" >
+163-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:63:78-119
+164            <intent-filter>
+164-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:64:13-67:29
+165                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+165-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:37:17-84
+165-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:37:25-81
+166                <action android:name="com.juanesj2.lovewidget.ACTION_POKE" />
+166-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:66:17-78
+166-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:66:25-75
+167            </intent-filter>
+168
+169            <meta-data
+169-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:39:13-104
+170                android:name="android.appwidget.provider"
+170-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:39:24-65
+171                android:resource="@xml/widget_poke_info" />
+171-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:39:66-101
+172        </receiver>
+173
+174        <!-- Background Geolocation Service -->
+175        <service
+175-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:72:9-75:56
+176            android:name="com.equimaps.capacitor_background_geolocation.BackgroundGeolocationService"
+176-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:73:13-102
+177            android:enabled="true"
+177-->[:capacitor-community-background-geolocation] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-community-background-geolocation\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:26:13-35
+178            android:exported="true"
+178-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:74:13-36
+179            android:foregroundServiceType="location|location" />
+179-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:75:13-53
+180
+181        <activity
+181-->[:capacitor-browser] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-browser\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:9-18:75
+182            android:name="com.capacitorjs.plugins.browser.BrowserControllerActivity"
+182-->[:capacitor-browser] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-browser\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:13-85
+183            android:exported="false"
+183-->[:capacitor-browser] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-browser\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:13-37
+184            android:launchMode="singleTask"
+184-->[:capacitor-browser] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-browser\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:17:13-44
+185            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+185-->[:capacitor-browser] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-browser\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:18:13-72
+186
+187        <receiver android:name="com.capacitorjs.plugins.localnotifications.TimedNotificationPublisher" />
+187-->[:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:9-106
+187-->[:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:19-103
+188        <receiver android:name="com.capacitorjs.plugins.localnotifications.NotificationDismissReceiver" />
+188-->[:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:9-107
+188-->[:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:19-104
+189        <receiver
+189-->[:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:9-23:20
+190            android:name="com.capacitorjs.plugins.localnotifications.LocalNotificationRestoreReceiver"
+190-->[:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:13-103
+191            android:directBootAware="true"
+191-->[:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:13-43
+192            android:exported="false" >
+192-->[:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:17:13-37
+193            <intent-filter>
+193-->[:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:18:13-22:29
+194                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+194-->[:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:19:17-86
+194-->[:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:19:25-83
+195                <action android:name="android.intent.action.BOOT_COMPLETED" />
+195-->[:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:20:17-79
+195-->[:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:20:25-76
+196                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+196-->[:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:21:17-82
+196-->[:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:21:25-79
+197            </intent-filter>
+198        </receiver>
+199
+200        <service
+200-->[:capacitor-push-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-push-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-14:19
+201            android:name="com.capacitorjs.plugins.pushnotifications.MessagingService"
+201-->[:capacitor-push-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-push-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-86
+202            android:exported="false" >
+202-->[:capacitor-push-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-push-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-37
+203            <intent-filter>
+203-->[:capacitor-push-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-push-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-13:29
+204                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+204-->[:capacitor-push-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-push-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:17-78
+204-->[:capacitor-push-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-push-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:25-75
+205            </intent-filter>
+206        </service>
+207
+208        <activity
+208-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:9:9-11:86
+209            android:name="io.ionic.libs.ioncameralib.view.IONCAMRLoadingActivity"
+209-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:10:13-82
+210            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+210-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:11:13-83
+211        <activity
+211-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:12:9-16:36
+212            android:name="io.ionic.libs.ioncameralib.view.IONCAMRImageEditorActivity"
+212-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:13:13-86
+213            android:enableOnBackInvokedCallback="true"
+213-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:14:13-55
+214            android:theme="@android:style/Theme.Black.NoTitleBar" />
+214-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:15:13-66
+215        <activity
+215-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:17:9-20:86
+216            android:name="io.ionic.libs.ioncameralib.view.IONCAMROpenPhotoPickerActivity"
+216-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:18:13-90
+217            android:exported="false"
+217-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:19:13-37
+218            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" /> <!-- Trigger Google Play services to install the backported photo picker module. -->
+218-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:20:13-83
+219        <service
+219-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:22:9-34:19
+220            android:name="com.google.android.gms.metadata.ModuleDependencies"
+220-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:23:13-78
+221            android:enabled="false"
+221-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:24:13-36
+222            android:exported="false" >
+222-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:25:13-37
+223            <intent-filter>
+223-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:27:13-29:29
+224                <action android:name="com.google.android.gms.metadata.MODULE_DEPENDENCIES" />
+224-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:28:17-94
+224-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:28:25-91
+225            </intent-filter>
+226
+227            <meta-data
+227-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:31:13-33:36
+228                android:name="photopicker_activity:0:required"
+228-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:32:17-63
+229                android:value="" />
+229-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:33:17-33
+230        </service>
+231
+232        <provider
+232-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:36:9-44:20
+233            android:name="io.ionic.libs.ioncameralib.IONCAMRFileProvider"
+233-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:37:13-74
+234            android:authorities="com.juanesj2.lovewidget.camera.provider"
+234-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:38:13-67
+235            android:exported="false"
+235-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:39:13-37
+236            android:grantUriPermissions="true" >
+236-->[io.ionic.libs:ioncamera-android:1.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\a295b38db932f479cec579b2dc812c1a\transformed\ioncamera-android-1.0.1\AndroidManifest.xml:40:13-47
+237            <meta-data
+237-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:32:13-112
+238                android:name="android.support.FILE_PROVIDER_PATHS"
+238-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:32:24-74
+239                android:resource="@xml/ioncamera_paths" />
+239-->C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\app\src\main\AndroidManifest.xml:32:75-109
+240        </provider>
+241
+242        <service
+242-->[androidx.credentials:credentials-play-services-auth:1.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\05cdb77dd29d96d2e3a7842cb35c76ce\transformed\credentials-play-services-auth-1.5.0\AndroidManifest.xml:24:9-32:19
+243            android:name="androidx.credentials.playservices.CredentialProviderMetadataHolder"
+243-->[androidx.credentials:credentials-play-services-auth:1.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\05cdb77dd29d96d2e3a7842cb35c76ce\transformed\credentials-play-services-auth-1.5.0\AndroidManifest.xml:25:13-94
+244            android:enabled="true"
+244-->[androidx.credentials:credentials-play-services-auth:1.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\05cdb77dd29d96d2e3a7842cb35c76ce\transformed\credentials-play-services-auth-1.5.0\AndroidManifest.xml:26:13-35
+245            android:exported="false" >
+245-->[androidx.credentials:credentials-play-services-auth:1.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\05cdb77dd29d96d2e3a7842cb35c76ce\transformed\credentials-play-services-auth-1.5.0\AndroidManifest.xml:27:13-37
+246            <meta-data
+246-->[androidx.credentials:credentials-play-services-auth:1.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\05cdb77dd29d96d2e3a7842cb35c76ce\transformed\credentials-play-services-auth-1.5.0\AndroidManifest.xml:29:13-31:104
+247                android:name="androidx.credentials.CREDENTIAL_PROVIDER_KEY"
+247-->[androidx.credentials:credentials-play-services-auth:1.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\05cdb77dd29d96d2e3a7842cb35c76ce\transformed\credentials-play-services-auth-1.5.0\AndroidManifest.xml:30:17-76
+248                android:value="androidx.credentials.playservices.CredentialProviderPlayServicesImpl" />
+248-->[androidx.credentials:credentials-play-services-auth:1.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\05cdb77dd29d96d2e3a7842cb35c76ce\transformed\credentials-play-services-auth-1.5.0\AndroidManifest.xml:31:17-101
+249        </service>
+250
+251        <activity
+251-->[androidx.credentials:credentials-play-services-auth:1.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\05cdb77dd29d96d2e3a7842cb35c76ce\transformed\credentials-play-services-auth-1.5.0\AndroidManifest.xml:34:9-41:20
+252            android:name="androidx.credentials.playservices.HiddenActivity"
+252-->[androidx.credentials:credentials-play-services-auth:1.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\05cdb77dd29d96d2e3a7842cb35c76ce\transformed\credentials-play-services-auth-1.5.0\AndroidManifest.xml:35:13-76
+253            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+253-->[androidx.credentials:credentials-play-services-auth:1.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\05cdb77dd29d96d2e3a7842cb35c76ce\transformed\credentials-play-services-auth-1.5.0\AndroidManifest.xml:36:13-87
+254            android:enabled="true"
+254-->[androidx.credentials:credentials-play-services-auth:1.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\05cdb77dd29d96d2e3a7842cb35c76ce\transformed\credentials-play-services-auth-1.5.0\AndroidManifest.xml:37:13-35
+255            android:exported="false"
+255-->[androidx.credentials:credentials-play-services-auth:1.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\05cdb77dd29d96d2e3a7842cb35c76ce\transformed\credentials-play-services-auth-1.5.0\AndroidManifest.xml:38:13-37
+256            android:fitsSystemWindows="true"
+256-->[androidx.credentials:credentials-play-services-auth:1.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\05cdb77dd29d96d2e3a7842cb35c76ce\transformed\credentials-play-services-auth-1.5.0\AndroidManifest.xml:39:13-45
+257            android:theme="@style/Theme.Hidden" >
+257-->[androidx.credentials:credentials-play-services-auth:1.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\05cdb77dd29d96d2e3a7842cb35c76ce\transformed\credentials-play-services-auth-1.5.0\AndroidManifest.xml:40:13-48
+258        </activity>
+259        <activity
+259-->[androidx.credentials:credentials-play-services-auth:1.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\05cdb77dd29d96d2e3a7842cb35c76ce\transformed\credentials-play-services-auth-1.5.0\AndroidManifest.xml:42:9-49:20
+260            android:name="androidx.credentials.playservices.IdentityCredentialApiHiddenActivity"
+260-->[androidx.credentials:credentials-play-services-auth:1.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\05cdb77dd29d96d2e3a7842cb35c76ce\transformed\credentials-play-services-auth-1.5.0\AndroidManifest.xml:43:13-97
+261            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+261-->[androidx.credentials:credentials-play-services-auth:1.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\05cdb77dd29d96d2e3a7842cb35c76ce\transformed\credentials-play-services-auth-1.5.0\AndroidManifest.xml:44:13-87
+262            android:enabled="true"
+262-->[androidx.credentials:credentials-play-services-auth:1.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\05cdb77dd29d96d2e3a7842cb35c76ce\transformed\credentials-play-services-auth-1.5.0\AndroidManifest.xml:45:13-35
+263            android:exported="false"
+263-->[androidx.credentials:credentials-play-services-auth:1.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\05cdb77dd29d96d2e3a7842cb35c76ce\transformed\credentials-play-services-auth-1.5.0\AndroidManifest.xml:46:13-37
+264            android:fitsSystemWindows="true"
+264-->[androidx.credentials:credentials-play-services-auth:1.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\05cdb77dd29d96d2e3a7842cb35c76ce\transformed\credentials-play-services-auth-1.5.0\AndroidManifest.xml:47:13-45
+265            android:theme="@style/Theme.Hidden" >
+265-->[androidx.credentials:credentials-play-services-auth:1.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\05cdb77dd29d96d2e3a7842cb35c76ce\transformed\credentials-play-services-auth-1.5.0\AndroidManifest.xml:48:13-48
+266        </activity>
+267
+268        <provider
+268-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:29:9-37:20
+269            android:name="androidx.startup.InitializationProvider"
+269-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:30:13-67
+270            android:authorities="com.juanesj2.lovewidget.androidx-startup"
+270-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:31:13-68
+271            android:exported="false" >
+271-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:32:13-37
+272            <meta-data
+272-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:34:13-36:52
+273                android:name="androidx.work.WorkManagerInitializer"
+273-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:35:17-68
+274                android:value="androidx.startup" />
+274-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:36:17-49
+275            <meta-data
+275-->[androidx.emoji2:emoji2:1.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\353d69426d62513a7e19e841051a3a44\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+276                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+276-->[androidx.emoji2:emoji2:1.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\353d69426d62513a7e19e841051a3a44\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
+277                android:value="androidx.startup" />
+277-->[androidx.emoji2:emoji2:1.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\353d69426d62513a7e19e841051a3a44\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
+278            <meta-data
+278-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\14a3b51da1167f75215e7e32d2231e74\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:29:13-31:52
+279                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+279-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\14a3b51da1167f75215e7e32d2231e74\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:30:17-78
+280                android:value="androidx.startup" />
+280-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\14a3b51da1167f75215e7e32d2231e74\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:31:17-49
+281            <meta-data
+281-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:29:13-31:52
+282                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+282-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:30:17-85
+283                android:value="androidx.startup" />
+283-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:31:17-49
+284        </provider>
+285
+286        <service
+286-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:39:9-45:35
+287            android:name="androidx.work.impl.background.systemalarm.SystemAlarmService"
+287-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:40:13-88
+288            android:directBootAware="false"
+288-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:41:13-44
+289            android:enabled="@bool/enable_system_alarm_service_default"
+289-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:42:13-72
+290            android:exported="false" />
+290-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:43:13-37
+291        <service
+291-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:46:9-52:35
+292            android:name="androidx.work.impl.background.systemjob.SystemJobService"
+292-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:47:13-84
+293            android:directBootAware="false"
+293-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:48:13-44
+294            android:enabled="@bool/enable_system_job_service_default"
+294-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:49:13-70
+295            android:exported="true"
+295-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:50:13-36
+296            android:permission="android.permission.BIND_JOB_SERVICE" />
+296-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:51:13-69
+297        <service
+297-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:53:9-59:35
+298            android:name="androidx.work.impl.foreground.SystemForegroundService"
+298-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:54:13-81
+299            android:directBootAware="false"
+299-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:55:13-44
+300            android:enabled="@bool/enable_system_foreground_service_default"
+300-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:56:13-77
+301            android:exported="false" />
+301-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:57:13-37
+302
+303        <receiver
+303-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:61:9-66:35
+304            android:name="androidx.work.impl.utils.ForceStopRunnable$BroadcastReceiver"
+304-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:62:13-88
+305            android:directBootAware="false"
+305-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:63:13-44
+306            android:enabled="true"
+306-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:64:13-35
+307            android:exported="false" />
+307-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:65:13-37
+308        <receiver
+308-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:67:9-77:20
+309            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryChargingProxy"
+309-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:68:13-106
+310            android:directBootAware="false"
+310-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:69:13-44
+311            android:enabled="false"
+311-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:70:13-36
+312            android:exported="false" >
+312-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:71:13-37
+313            <intent-filter>
+313-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:73:13-76:29
+314                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+314-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:74:17-87
+314-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:74:25-84
+315                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+315-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:75:17-90
+315-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:75:25-87
+316            </intent-filter>
+317        </receiver>
+318        <receiver
+318-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:78:9-88:20
+319            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$BatteryNotLowProxy"
+319-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:79:13-104
+320            android:directBootAware="false"
+320-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:80:13-44
+321            android:enabled="false"
+321-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:81:13-36
+322            android:exported="false" >
+322-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:82:13-37
+323            <intent-filter>
+323-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:84:13-87:29
+324                <action android:name="android.intent.action.BATTERY_OKAY" />
+324-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:85:17-77
+324-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:85:25-74
+325                <action android:name="android.intent.action.BATTERY_LOW" />
+325-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:86:17-76
+325-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:86:25-73
+326            </intent-filter>
+327        </receiver>
+328        <receiver
+328-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:89:9-99:20
+329            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$StorageNotLowProxy"
+329-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:90:13-104
+330            android:directBootAware="false"
+330-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:91:13-44
+331            android:enabled="false"
+331-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:92:13-36
+332            android:exported="false" >
+332-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:93:13-37
+333            <intent-filter>
+333-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:95:13-98:29
+334                <action android:name="android.intent.action.DEVICE_STORAGE_LOW" />
+334-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:96:17-83
+334-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:96:25-80
+335                <action android:name="android.intent.action.DEVICE_STORAGE_OK" />
+335-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:97:17-82
+335-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:97:25-79
+336            </intent-filter>
+337        </receiver>
+338        <receiver
+338-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:100:9-109:20
+339            android:name="androidx.work.impl.background.systemalarm.ConstraintProxy$NetworkStateProxy"
+339-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:101:13-103
+340            android:directBootAware="false"
+340-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:102:13-44
+341            android:enabled="false"
+341-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:103:13-36
+342            android:exported="false" >
+342-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:104:13-37
+343            <intent-filter>
+343-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:106:13-108:29
+344                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+344-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:107:17-79
+344-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:107:25-76
+345            </intent-filter>
+346        </receiver>
+347        <receiver
+347-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:110:9-121:20
+348            android:name="androidx.work.impl.background.systemalarm.RescheduleReceiver"
+348-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:111:13-88
+349            android:directBootAware="false"
+349-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:112:13-44
+350            android:enabled="false"
+350-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:113:13-36
+351            android:exported="false" >
+351-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:114:13-37
+352            <intent-filter>
+352-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:116:13-120:29
+353                <action android:name="android.intent.action.BOOT_COMPLETED" />
+353-->[:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:20:17-79
+353-->[:capacitor-local-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-local-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:20:25-76
+354                <action android:name="android.intent.action.TIME_SET" />
+354-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:118:17-73
+354-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:118:25-70
+355                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+355-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:119:17-81
+355-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:119:25-78
+356            </intent-filter>
+357        </receiver>
+358        <receiver
+358-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:122:9-131:20
+359            android:name="androidx.work.impl.background.systemalarm.ConstraintProxyUpdateReceiver"
+359-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:123:13-99
+360            android:directBootAware="false"
+360-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:124:13-44
+361            android:enabled="@bool/enable_system_alarm_service_default"
+361-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:125:13-72
+362            android:exported="false" >
+362-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:126:13-37
+363            <intent-filter>
+363-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:128:13-130:29
+364                <action android:name="androidx.work.impl.background.systemalarm.UpdateProxies" />
+364-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:129:17-98
+364-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:129:25-95
+365            </intent-filter>
+366        </receiver>
+367        <receiver
+367-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:132:9-142:20
+368            android:name="androidx.work.impl.diagnostics.DiagnosticsReceiver"
+368-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:133:13-78
+369            android:directBootAware="false"
+369-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:134:13-44
+370            android:enabled="true"
+370-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:135:13-35
+371            android:exported="true"
+371-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:136:13-36
+372            android:permission="android.permission.DUMP" >
+372-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:137:13-57
+373            <intent-filter>
+373-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:139:13-141:29
+374                <action android:name="androidx.work.diagnostics.REQUEST_DIAGNOSTICS" />
+374-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:140:17-88
+374-->[androidx.work:work-runtime:2.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\bafc7c730218e3855c32aee21079001d\transformed\work-runtime-2.9.0\AndroidManifest.xml:140:25-85
+375            </intent-filter>
+376        </receiver>
+377
+378        <activity
+378-->[com.google.android.gms:play-services-auth:21.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\40000f3bab929d60495041de3ce112fb\transformed\play-services-auth-21.5.0\AndroidManifest.xml:23:9-27:75
+379            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+379-->[com.google.android.gms:play-services-auth:21.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\40000f3bab929d60495041de3ce112fb\transformed\play-services-auth-21.5.0\AndroidManifest.xml:24:13-93
+380            android:excludeFromRecents="true"
+380-->[com.google.android.gms:play-services-auth:21.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\40000f3bab929d60495041de3ce112fb\transformed\play-services-auth-21.5.0\AndroidManifest.xml:25:13-46
+381            android:exported="false"
+381-->[com.google.android.gms:play-services-auth:21.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\40000f3bab929d60495041de3ce112fb\transformed\play-services-auth-21.5.0\AndroidManifest.xml:26:13-37
+382            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+382-->[com.google.android.gms:play-services-auth:21.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\40000f3bab929d60495041de3ce112fb\transformed\play-services-auth-21.5.0\AndroidManifest.xml:27:13-72
+383        <!--
+384            Service handling Google Sign-In user revocation. For apps that do not integrate with
+385            Google Sign-In, this service will never be started.
+386        -->
+387        <service
+387-->[com.google.android.gms:play-services-auth:21.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\40000f3bab929d60495041de3ce112fb\transformed\play-services-auth-21.5.0\AndroidManifest.xml:33:9-37:51
+388            android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
+388-->[com.google.android.gms:play-services-auth:21.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\40000f3bab929d60495041de3ce112fb\transformed\play-services-auth-21.5.0\AndroidManifest.xml:34:13-89
+389            android:exported="true"
+389-->[com.google.android.gms:play-services-auth:21.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\40000f3bab929d60495041de3ce112fb\transformed\play-services-auth-21.5.0\AndroidManifest.xml:35:13-36
+390            android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
+390-->[com.google.android.gms:play-services-auth:21.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\40000f3bab929d60495041de3ce112fb\transformed\play-services-auth-21.5.0\AndroidManifest.xml:36:13-107
+391            android:visibleToInstantApps="true" />
+391-->[com.google.android.gms:play-services-auth:21.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\40000f3bab929d60495041de3ce112fb\transformed\play-services-auth-21.5.0\AndroidManifest.xml:37:13-48
+392
+393        <receiver
+393-->[com.revenuecat.purchases:purchases-store-amazon:10.9.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\09c8bb334f2d9679ce6a3f72816e9385\transformed\purchases-store-amazon-10.9.1\AndroidManifest.xml:8:9-15:20
+394            android:name="com.amazon.device.iap.ResponseReceiver"
+394-->[com.revenuecat.purchases:purchases-store-amazon:10.9.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\09c8bb334f2d9679ce6a3f72816e9385\transformed\purchases-store-amazon-10.9.1\AndroidManifest.xml:9:13-66
+395            android:exported="true"
+395-->[com.revenuecat.purchases:purchases-store-amazon:10.9.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\09c8bb334f2d9679ce6a3f72816e9385\transformed\purchases-store-amazon-10.9.1\AndroidManifest.xml:10:13-36
+396            android:permission="com.amazon.inapp.purchasing.Permission.NOTIFY" >
+396-->[com.revenuecat.purchases:purchases-store-amazon:10.9.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\09c8bb334f2d9679ce6a3f72816e9385\transformed\purchases-store-amazon-10.9.1\AndroidManifest.xml:11:13-79
+397            <intent-filter>
+397-->[com.revenuecat.purchases:purchases-store-amazon:10.9.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\09c8bb334f2d9679ce6a3f72816e9385\transformed\purchases-store-amazon-10.9.1\AndroidManifest.xml:12:13-14:29
+398                <action android:name="com.amazon.inapp.purchasing.NOTIFY" />
+398-->[com.revenuecat.purchases:purchases-store-amazon:10.9.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\09c8bb334f2d9679ce6a3f72816e9385\transformed\purchases-store-amazon-10.9.1\AndroidManifest.xml:13:17-77
+398-->[com.revenuecat.purchases:purchases-store-amazon:10.9.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\09c8bb334f2d9679ce6a3f72816e9385\transformed\purchases-store-amazon-10.9.1\AndroidManifest.xml:13:25-74
+399            </intent-filter>
+400        </receiver>
+401
+402        <activity
+402-->[com.revenuecat.purchases:purchases:10.9.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\af0183122a016c4e2799cff59b2884bc\transformed\purchases-10.9.1\AndroidManifest.xml:10:9-13:75
+403            android:name="com.revenuecat.purchases.amazon.purchasing.ProxyAmazonBillingActivity"
+403-->[com.revenuecat.purchases:purchases:10.9.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\af0183122a016c4e2799cff59b2884bc\transformed\purchases-10.9.1\AndroidManifest.xml:11:13-97
+404            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+404-->[com.revenuecat.purchases:purchases:10.9.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\af0183122a016c4e2799cff59b2884bc\transformed\purchases-10.9.1\AndroidManifest.xml:12:13-96
+405            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+405-->[com.revenuecat.purchases:purchases:10.9.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\af0183122a016c4e2799cff59b2884bc\transformed\purchases-10.9.1\AndroidManifest.xml:13:13-72
+406        <activity
+406-->[com.revenuecat.purchases:purchases:10.9.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\af0183122a016c4e2799cff59b2884bc\transformed\purchases-10.9.1\AndroidManifest.xml:14:9-18:74
+407            android:name="com.revenuecat.purchases.SimulatedStoreErrorDialogActivity"
+407-->[com.revenuecat.purchases:purchases:10.9.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\af0183122a016c4e2799cff59b2884bc\transformed\purchases-10.9.1\AndroidManifest.xml:15:13-86
+408            android:configChanges="orientation|screenSize"
+408-->[com.revenuecat.purchases:purchases:10.9.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\af0183122a016c4e2799cff59b2884bc\transformed\purchases-10.9.1\AndroidManifest.xml:16:13-59
+409            android:excludeFromRecents="true"
+409-->[com.revenuecat.purchases:purchases:10.9.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\af0183122a016c4e2799cff59b2884bc\transformed\purchases-10.9.1\AndroidManifest.xml:17:13-46
+410            android:theme="@android:style/Theme.Material.Dialog.Alert" />
+410-->[com.revenuecat.purchases:purchases:10.9.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\af0183122a016c4e2799cff59b2884bc\transformed\purchases-10.9.1\AndroidManifest.xml:18:13-71
+411
+412        <meta-data
+412-->[com.android.billingclient:billing:8.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\8d7a56ebef10384c94e6232e72c18c63\transformed\billing-8.3.0\AndroidManifest.xml:22:9-24:37
+413            android:name="com.google.android.play.billingclient.version"
+413-->[com.android.billingclient:billing:8.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\8d7a56ebef10384c94e6232e72c18c63\transformed\billing-8.3.0\AndroidManifest.xml:23:13-73
+414            android:value="8.3.0" />
+414-->[com.android.billingclient:billing:8.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\8d7a56ebef10384c94e6232e72c18c63\transformed\billing-8.3.0\AndroidManifest.xml:24:13-34
+415
+416        <activity
+416-->[com.android.billingclient:billing:8.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\8d7a56ebef10384c94e6232e72c18c63\transformed\billing-8.3.0\AndroidManifest.xml:26:9-30:75
+417            android:name="com.android.billingclient.api.ProxyBillingActivity"
+417-->[com.android.billingclient:billing:8.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\8d7a56ebef10384c94e6232e72c18c63\transformed\billing-8.3.0\AndroidManifest.xml:27:13-78
+418            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+418-->[com.android.billingclient:billing:8.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\8d7a56ebef10384c94e6232e72c18c63\transformed\billing-8.3.0\AndroidManifest.xml:28:13-96
+419            android:exported="false"
+419-->[com.android.billingclient:billing:8.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\8d7a56ebef10384c94e6232e72c18c63\transformed\billing-8.3.0\AndroidManifest.xml:29:13-37
+420            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+420-->[com.android.billingclient:billing:8.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\8d7a56ebef10384c94e6232e72c18c63\transformed\billing-8.3.0\AndroidManifest.xml:30:13-72
+421        <activity
+421-->[com.android.billingclient:billing:8.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\8d7a56ebef10384c94e6232e72c18c63\transformed\billing-8.3.0\AndroidManifest.xml:31:9-35:75
+422            android:name="com.android.billingclient.api.ProxyBillingActivityV2"
+422-->[com.android.billingclient:billing:8.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\8d7a56ebef10384c94e6232e72c18c63\transformed\billing-8.3.0\AndroidManifest.xml:32:13-80
+423            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+423-->[com.android.billingclient:billing:8.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\8d7a56ebef10384c94e6232e72c18c63\transformed\billing-8.3.0\AndroidManifest.xml:33:13-96
+424            android:exported="false"
+424-->[com.android.billingclient:billing:8.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\8d7a56ebef10384c94e6232e72c18c63\transformed\billing-8.3.0\AndroidManifest.xml:34:13-37
+425            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+425-->[com.android.billingclient:billing:8.3.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\8d7a56ebef10384c94e6232e72c18c63\transformed\billing-8.3.0\AndroidManifest.xml:35:13-72
+426
+427        <receiver
+427-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:29:9-40:20
+428            android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver"
+428-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:30:13-78
+429            android:exported="true"
+429-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:31:13-36
+430            android:permission="com.google.android.c2dm.permission.SEND" >
+430-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:32:13-73
+431            <intent-filter>
+431-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:33:13-35:29
+432                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+432-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:34:17-81
+432-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:34:25-78
+433            </intent-filter>
+434
+435            <meta-data
+435-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:37:13-39:40
+436                android:name="com.google.android.gms.cloudmessaging.FINISHED_AFTER_HANDLED"
+436-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:38:17-92
+437                android:value="true" />
+437-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:39:17-37
+438        </receiver>
+439        <!--
+440             FirebaseMessagingService performs security checks at runtime,
+441             but set to not exported to explicitly avoid allowing another app to call it.
+442        -->
+443        <service
+443-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:46:9-53:19
+444            android:name="com.google.firebase.messaging.FirebaseMessagingService"
+444-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:47:13-82
+445            android:directBootAware="true"
+445-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:48:13-43
+446            android:exported="false" >
+446-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:49:13-37
+447            <intent-filter android:priority="-500" >
+447-->[:capacitor-push-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-push-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-13:29
+448                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+448-->[:capacitor-push-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-push-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:17-78
+448-->[:capacitor-push-notifications] C:\Users\JuanStivenAlcañizAuñ\OneDrive - TECON SOLUCIONES INFORMATICAS S.L\Documentos\widget\love-widget\android\build_alt_3\capacitor-push-notifications\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:25-75
+449            </intent-filter>
+450        </service>
+451        <service
+451-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:54:9-63:19
+452            android:name="com.google.firebase.components.ComponentDiscoveryService"
+452-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:55:13-84
+453            android:directBootAware="true"
+453-->[com.google.firebase:firebase-common:22.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\cb546919c09df4bb1e2d2127157bcaa2\transformed\firebase-common-22.0.1\AndroidManifest.xml:32:13-43
+454            android:exported="false" >
+454-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:56:13-37
+455            <meta-data
+455-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:57:13-59:85
+456                android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingKtxRegistrar"
+456-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:58:17-122
+457                android:value="com.google.firebase.components.ComponentRegistrar" />
+457-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:59:17-82
+458            <meta-data
+458-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:60:13-62:85
+459                android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar"
+459-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:61:17-119
+460                android:value="com.google.firebase.components.ComponentRegistrar" />
+460-->[com.google.firebase:firebase-messaging:25.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\fee7827030cf30b9c64fc7d59fae02bb\transformed\firebase-messaging-25.0.1\AndroidManifest.xml:62:17-82
+461            <meta-data
+461-->[com.google.firebase:firebase-installations:18.0.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\df907beae055c1d2434697ac5cd0594d\transformed\firebase-installations-18.0.0\AndroidManifest.xml:15:13-17:85
+462                android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsKtxRegistrar"
+462-->[com.google.firebase:firebase-installations:18.0.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\df907beae055c1d2434697ac5cd0594d\transformed\firebase-installations-18.0.0\AndroidManifest.xml:16:17-130
+463                android:value="com.google.firebase.components.ComponentRegistrar" />
+463-->[com.google.firebase:firebase-installations:18.0.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\df907beae055c1d2434697ac5cd0594d\transformed\firebase-installations-18.0.0\AndroidManifest.xml:17:17-82
+464            <meta-data
+464-->[com.google.firebase:firebase-installations:18.0.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\df907beae055c1d2434697ac5cd0594d\transformed\firebase-installations-18.0.0\AndroidManifest.xml:18:13-20:85
+465                android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar"
+465-->[com.google.firebase:firebase-installations:18.0.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\df907beae055c1d2434697ac5cd0594d\transformed\firebase-installations-18.0.0\AndroidManifest.xml:19:17-127
+466                android:value="com.google.firebase.components.ComponentRegistrar" />
+466-->[com.google.firebase:firebase-installations:18.0.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\df907beae055c1d2434697ac5cd0594d\transformed\firebase-installations-18.0.0\AndroidManifest.xml:20:17-82
+467            <meta-data
+467-->[com.google.firebase:firebase-common:22.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\cb546919c09df4bb1e2d2127157bcaa2\transformed\firebase-common-22.0.1\AndroidManifest.xml:35:13-37:85
+468                android:name="com.google.firebase.components:com.google.firebase.FirebaseCommonKtxRegistrar"
+468-->[com.google.firebase:firebase-common:22.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\cb546919c09df4bb1e2d2127157bcaa2\transformed\firebase-common-22.0.1\AndroidManifest.xml:36:17-109
+469                android:value="com.google.firebase.components.ComponentRegistrar" />
+469-->[com.google.firebase:firebase-common:22.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\cb546919c09df4bb1e2d2127157bcaa2\transformed\firebase-common-22.0.1\AndroidManifest.xml:37:17-82
+470            <meta-data
+470-->[com.google.firebase:firebase-datatransport:18.2.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\37804962654ec3e9f031e2012e83e63f\transformed\firebase-datatransport-18.2.0\AndroidManifest.xml:25:13-27:85
+471                android:name="com.google.firebase.components:com.google.firebase.datatransport.TransportRegistrar"
+471-->[com.google.firebase:firebase-datatransport:18.2.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\37804962654ec3e9f031e2012e83e63f\transformed\firebase-datatransport-18.2.0\AndroidManifest.xml:26:17-115
+472                android:value="com.google.firebase.components.ComponentRegistrar" />
+472-->[com.google.firebase:firebase-datatransport:18.2.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\37804962654ec3e9f031e2012e83e63f\transformed\firebase-datatransport-18.2.0\AndroidManifest.xml:27:17-82
+473        </service>
+474
+475        <activity
+475-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\c1b0052ae712299163f2612d6db27779\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:9-173
+476            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+476-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\c1b0052ae712299163f2612d6db27779\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:19-85
+477            android:exported="false"
+477-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\c1b0052ae712299163f2612d6db27779\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:146-170
+478            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+478-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\c1b0052ae712299163f2612d6db27779\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:86-145
+479        <!--
+480        Service for holding metadata. Cannot be instantiated.
+481        Metadata will be merged from other manifests.
+482        -->
+483        <service
+483-->[androidx.camera:camera-core:1.4.2] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\1bed5d73aa0783bafdf646ee8d6db11d\transformed\camera-core-1.4.2\AndroidManifest.xml:29:9-33:78
+484            android:name="androidx.camera.core.impl.MetadataHolderService"
+484-->[androidx.camera:camera-core:1.4.2] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\1bed5d73aa0783bafdf646ee8d6db11d\transformed\camera-core-1.4.2\AndroidManifest.xml:30:13-75
+485            android:enabled="false"
+485-->[androidx.camera:camera-core:1.4.2] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\1bed5d73aa0783bafdf646ee8d6db11d\transformed\camera-core-1.4.2\AndroidManifest.xml:31:13-36
+486            android:exported="false" />
+486-->[androidx.camera:camera-core:1.4.2] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\1bed5d73aa0783bafdf646ee8d6db11d\transformed\camera-core-1.4.2\AndroidManifest.xml:32:13-37
+487
+488        <provider
+488-->[com.google.firebase:firebase-common:22.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\cb546919c09df4bb1e2d2127157bcaa2\transformed\firebase-common-22.0.1\AndroidManifest.xml:23:9-28:39
+489            android:name="com.google.firebase.provider.FirebaseInitProvider"
+489-->[com.google.firebase:firebase-common:22.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\cb546919c09df4bb1e2d2127157bcaa2\transformed\firebase-common-22.0.1\AndroidManifest.xml:24:13-77
+490            android:authorities="com.juanesj2.lovewidget.firebaseinitprovider"
+490-->[com.google.firebase:firebase-common:22.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\cb546919c09df4bb1e2d2127157bcaa2\transformed\firebase-common-22.0.1\AndroidManifest.xml:25:13-72
+491            android:directBootAware="true"
+491-->[com.google.firebase:firebase-common:22.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\cb546919c09df4bb1e2d2127157bcaa2\transformed\firebase-common-22.0.1\AndroidManifest.xml:26:13-43
+492            android:exported="false"
+492-->[com.google.firebase:firebase-common:22.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\cb546919c09df4bb1e2d2127157bcaa2\transformed\firebase-common-22.0.1\AndroidManifest.xml:27:13-37
+493            android:initOrder="100" />
+493-->[com.google.firebase:firebase-common:22.0.1] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\cb546919c09df4bb1e2d2127157bcaa2\transformed\firebase-common-22.0.1\AndroidManifest.xml:28:13-36
+494
+495        <meta-data
+495-->[com.google.android.gms:play-services-basement:18.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\2d58e25df94a3d638cead9f8942fb04d\transformed\play-services-basement-18.9.0\AndroidManifest.xml:21:9-23:69
+496            android:name="com.google.android.gms.version"
+496-->[com.google.android.gms:play-services-basement:18.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\2d58e25df94a3d638cead9f8942fb04d\transformed\play-services-basement-18.9.0\AndroidManifest.xml:22:13-58
+497            android:value="@integer/google_play_services_version" />
+497-->[com.google.android.gms:play-services-basement:18.9.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\2d58e25df94a3d638cead9f8942fb04d\transformed\play-services-basement-18.9.0\AndroidManifest.xml:23:13-66
+498
+499        <service
+499-->[androidx.room:room-runtime:2.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\42a88e3aad6086953a21850e92cb2d01\transformed\room-runtime-2.5.0\AndroidManifest.xml:24:9-28:63
+500            android:name="androidx.room.MultiInstanceInvalidationService"
+500-->[androidx.room:room-runtime:2.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\42a88e3aad6086953a21850e92cb2d01\transformed\room-runtime-2.5.0\AndroidManifest.xml:25:13-74
+501            android:directBootAware="true"
+501-->[androidx.room:room-runtime:2.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\42a88e3aad6086953a21850e92cb2d01\transformed\room-runtime-2.5.0\AndroidManifest.xml:26:13-43
+502            android:exported="false" />
+502-->[androidx.room:room-runtime:2.5.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\42a88e3aad6086953a21850e92cb2d01\transformed\room-runtime-2.5.0\AndroidManifest.xml:27:13-37
+503
+504        <receiver
+504-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:34:9-52:20
+505            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+505-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:35:13-76
+506            android:directBootAware="false"
+506-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:36:13-44
+507            android:enabled="true"
+507-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:37:13-35
+508            android:exported="true"
+508-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:38:13-36
+509            android:permission="android.permission.DUMP" >
+509-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:39:13-57
+510            <intent-filter>
+510-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:40:13-42:29
+511                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+511-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:17-91
+511-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:25-88
+512            </intent-filter>
+513            <intent-filter>
+513-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:43:13-45:29
+514                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+514-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:17-85
+514-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:25-82
+515            </intent-filter>
+516            <intent-filter>
+516-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:46:13-48:29
+517                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+517-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:17-88
+517-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:25-85
+518            </intent-filter>
+519            <intent-filter>
+519-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:49:13-51:29
+520                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+520-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:17-95
+520-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\f95ab50c54d3211c648684c462933e30\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:25-92
+521            </intent-filter>
+522        </receiver>
+523
+524        <service
+524-->[com.google.android.datatransport:transport-backend-cct:3.1.9] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\ea620a6b5afc7c5e432bbec109041d91\transformed\transport-backend-cct-3.1.9\AndroidManifest.xml:28:9-34:19
+525            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
+525-->[com.google.android.datatransport:transport-backend-cct:3.1.9] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\ea620a6b5afc7c5e432bbec109041d91\transformed\transport-backend-cct-3.1.9\AndroidManifest.xml:29:13-103
+526            android:exported="false" >
+526-->[com.google.android.datatransport:transport-backend-cct:3.1.9] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\ea620a6b5afc7c5e432bbec109041d91\transformed\transport-backend-cct-3.1.9\AndroidManifest.xml:30:13-37
+527            <meta-data
+527-->[com.google.android.datatransport:transport-backend-cct:3.1.9] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\ea620a6b5afc7c5e432bbec109041d91\transformed\transport-backend-cct-3.1.9\AndroidManifest.xml:31:13-33:39
+528                android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"
+528-->[com.google.android.datatransport:transport-backend-cct:3.1.9] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\ea620a6b5afc7c5e432bbec109041d91\transformed\transport-backend-cct-3.1.9\AndroidManifest.xml:32:17-94
+529                android:value="cct" />
+529-->[com.google.android.datatransport:transport-backend-cct:3.1.9] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\ea620a6b5afc7c5e432bbec109041d91\transformed\transport-backend-cct-3.1.9\AndroidManifest.xml:33:17-36
+530        </service>
+531        <service
+531-->[com.google.android.datatransport:transport-runtime:3.1.9] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\1491c73c5d15eb22051217da9a2fb39c\transformed\transport-runtime-3.1.9\AndroidManifest.xml:26:9-30:19
+532            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
+532-->[com.google.android.datatransport:transport-runtime:3.1.9] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\1491c73c5d15eb22051217da9a2fb39c\transformed\transport-runtime-3.1.9\AndroidManifest.xml:27:13-117
+533            android:exported="false"
+533-->[com.google.android.datatransport:transport-runtime:3.1.9] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\1491c73c5d15eb22051217da9a2fb39c\transformed\transport-runtime-3.1.9\AndroidManifest.xml:28:13-37
+534            android:permission="android.permission.BIND_JOB_SERVICE" >
+534-->[com.google.android.datatransport:transport-runtime:3.1.9] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\1491c73c5d15eb22051217da9a2fb39c\transformed\transport-runtime-3.1.9\AndroidManifest.xml:29:13-69
+535        </service>
+536
+537        <receiver
+537-->[com.google.android.datatransport:transport-runtime:3.1.9] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\1491c73c5d15eb22051217da9a2fb39c\transformed\transport-runtime-3.1.9\AndroidManifest.xml:32:9-34:40
+538            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"
+538-->[com.google.android.datatransport:transport-runtime:3.1.9] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\1491c73c5d15eb22051217da9a2fb39c\transformed\transport-runtime-3.1.9\AndroidManifest.xml:33:13-132
+539            android:exported="false" />
+539-->[com.google.android.datatransport:transport-runtime:3.1.9] C:\Users\JuanStivenAlcañizAuñ\.gradle\caches\8.14.3\transforms\1491c73c5d15eb22051217da9a2fb39c\transformed\transport-runtime-3.1.9\AndroidManifest.xml:34:13-37
+540    </application>
+541
+542</manifest>

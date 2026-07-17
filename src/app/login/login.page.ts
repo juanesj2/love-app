@@ -12,6 +12,7 @@ import { Browser } from '@capacitor/browser';
 import { Preferences } from '@capacitor/preferences';
 import { GoogleSignIn } from '@capawesome/capacitor-google-sign-in';
 import { SecureStoragePlugin } from 'capacitor-secure-storage-plugin';
+import { DotLottie } from '@lottiefiles/dotlottie-web';
 
 @Component({
   selector: 'app-login',
@@ -29,7 +30,34 @@ export class LoginPage implements OnInit {
   private toastCtrl = inject(ToastController);
 
   public authMode: 'login' | 'register' | 'forgot' = 'login';
-  public isLoading = false;
+  private _isLoading = false;
+  private lottieInstance: DotLottie | null = null;
+
+  get isLoading(): boolean {
+    return this._isLoading;
+  }
+
+  set isLoading(value: boolean) {
+    this._isLoading = value;
+    if (value) {
+      setTimeout(() => {
+        const canvas = document.getElementById('loading-canvas') as HTMLCanvasElement;
+        if (canvas && !this.lottieInstance) {
+          this.lottieInstance = new DotLottie({
+            autoplay: true,
+            loop: true,
+            canvas,
+            src: 'assets/lottie/Loading with Heart.lottie'
+          });
+        }
+      }, 50);
+    } else {
+      if (this.lottieInstance) {
+        this.lottieInstance.destroy();
+        this.lottieInstance = null;
+      }
+    }
+  }
   
   public showPassword = false;
   public showConfirmPassword = false;
@@ -83,25 +111,24 @@ export class LoginPage implements OnInit {
     // Auto-login si ya hay token
     let token = null;
     try {
-      const res = await SecureStoragePlugin.get({ key: 'auth_token' }).catch(async () => await Preferences.get({ key: 'auth_token' }));
-      token = res.value;
+      const res = await Promise.race([
+        SecureStoragePlugin.get({ key: 'auth_token' }),
+        new Promise<any>((_, reject) => setTimeout(() => reject(new Error('SecureStorage Timeout')), 1000))
+      ]).catch(async () => await Preferences.get({ key: 'auth_token' }));
+      token = res?.value;
     } catch (e) {
       token = null;
     }
     
     if (token) {
+      this.loveApi.token$.next(token); // Fix: Set token synchronously for authGuard
+      this.isLoading = true;
       try {
-        const info = await this.loveApi.getCoupleInfo();
-        const userId = info.my_id.toString();
-        localStorage.setItem('love_widget_user', userId);
-        
-        this.notificationService.init();
-        this.locationService.updateMyLocation(userId, info.my_name || userId);
-        this.router.navigate(['/home'], { replaceUrl: true });
-      } catch (e: any) {
-        if (e.status === 403 || e.error?.message?.includes('No estás vinculado')) {
-          this.router.navigate(['/pairing'], { replaceUrl: true });
-        }
+        await this.handleSuccessfulAuth('auto');
+      } catch (e) {
+        console.error('Auto-login error', e);
+      } finally {
+        this.isLoading = false;
       }
     }
   }
@@ -144,7 +171,8 @@ export class LoginPage implements OnInit {
       await this.handleSuccessfulAuth(this.loginData.email);
     } catch (e: any) {
       console.log('Error login:', e);
-      this.showToast('Credenciales incorrectas o error en el servidor.', 'danger');
+      const errMsg = e.error?.message || e.message || JSON.stringify(e);
+      this.showToast(`Error: ${errMsg}`, 'danger');
     } finally {
       this.isLoading = false;
     }
@@ -187,8 +215,9 @@ export class LoginPage implements OnInit {
         this.showToast('No se pudo obtener información de Google.', 'danger');
       }
     } catch (e: any) {
-      console.log('Error Google Login:', e);
-      this.showToast('Error al iniciar sesión con Google.', 'danger');
+      console.log('Error Google Sign-In:', e);
+      const errMsg = e.error?.message || e.message || JSON.stringify(e);
+      this.showToast(`Error Google: ${errMsg}`, 'danger');
     } finally {
       this.isLoading = false;
     }
@@ -213,9 +242,19 @@ export class LoginPage implements OnInit {
       if (e.status === 403 || e.error?.message?.includes('No estás vinculado')) {
         // Not paired yet, redirect to pairing page
         this.router.navigate(['/pairing'], { replaceUrl: true });
+      } else if (e.status === 401 || (e.status >= 500)) {
+        // Token is invalid or expired, or server is down. We should NOT go to home.
+        // If it was an auto-login, we clear the bad token so they can log in manually.
+        await this.loveApi.logout();
+        if (email !== 'auto') {
+          this.showToast('Sesión caducada o error de conexión. Por favor, inicia sesión de nuevo.', 'warning');
+        }
       } else {
-        // Other errors, probably token issues, but we'll try home just in case
-        this.router.navigate(['/home'], { replaceUrl: true });
+        // Other errors, we clear and stay on login
+        await this.loveApi.logout();
+        if (email !== 'auto') {
+          this.showToast('Error de autenticación. Intenta de nuevo.', 'danger');
+        }
       }
     }
   }

@@ -3,7 +3,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ToastController } from '@ionic/angular/standalone';
 import { Preferences } from '@capacitor/preferences';
 import { SecureStoragePlugin } from 'capacitor-secure-storage-plugin';
-import { firstValueFrom, BehaviorSubject, Subject } from 'rxjs';
+import { firstValueFrom, BehaviorSubject, Subject, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
 
@@ -87,31 +88,34 @@ export class LoveApiService {
 
   // --- AUTH ---
   async login(email: string, password: string): Promise<any> {
-    const res: any = await firstValueFrom(this.http.post(`${API_BASE_URL}/login`, { email, password }));
-    if (res && res.access_token) {
-      await Preferences.set({ key: 'auth_token', value: res.access_token });
-      await SecureStoragePlugin.set({ key: 'auth_token', value: res.access_token }).catch(() => {});
-      this.token$.next(res.access_token);
+    const res: any = await firstValueFrom(this.http.post(`${API_BASE_URL}/login`, { email, password }, { headers: { 'Accept': 'application/json' } }));
+    const token = res?.access_token || res?.token;
+    if (token) {
+      await Preferences.set({ key: 'auth_token', value: token });
+      SecureStoragePlugin.set({ key: 'auth_token', value: token }).catch(() => {}); // Don't await to prevent Android keystore hang
+      this.token$.next(token);
     }
     return res;
   }
 
   async googleLogin(email: string, name: string, uid: string): Promise<any> {
-    const res: any = await firstValueFrom(this.http.post(`${API_BASE_URL}/google-login`, { email, name, uid }));
-    if (res && res.access_token) {
-      await Preferences.set({ key: 'auth_token', value: res.access_token });
-      await SecureStoragePlugin.set({ key: 'auth_token', value: res.access_token }).catch(() => {});
-      this.token$.next(res.access_token);
+    const res: any = await firstValueFrom(this.http.post(`${API_BASE_URL}/google-login`, { email, name, uid }, { headers: { 'Accept': 'application/json' } }));
+    const token = res?.access_token || res?.token;
+    if (token) {
+      await Preferences.set({ key: 'auth_token', value: token });
+      SecureStoragePlugin.set({ key: 'auth_token', value: token }).catch(() => {}); // Don't await
+      this.token$.next(token);
     }
     return res;
   }
 
   async register(data: {name: string, email: string, password: string, password_confirmation: string, app: string}): Promise<any> {
-    const res: any = await firstValueFrom(this.http.post(`${API_BASE_URL}/register`, data));
-    if (res && res.access_token) {
-      await Preferences.set({ key: 'auth_token', value: res.access_token });
-      await SecureStoragePlugin.set({ key: 'auth_token', value: res.access_token }).catch(() => {});
-      this.token$.next(res.access_token);
+    const res: any = await firstValueFrom(this.http.post(`${API_BASE_URL}/register`, data, { headers: { 'Accept': 'application/json' } }));
+    const token = res?.access_token || res?.token;
+    if (token) {
+      await Preferences.set({ key: 'auth_token', value: token });
+      SecureStoragePlugin.set({ key: 'auth_token', value: token }).catch(() => {}); // Don't await
+      this.token$.next(token);
     }
     return res;
   }
@@ -129,6 +133,17 @@ export class LoveApiService {
   }
 
   async logout(): Promise<void> {
+    try {
+      // Intentar invalidar la sesion en el backend para borrar cookies de Sanctum
+      await firstValueFrom(this.http.post(`${API_BASE_URL}/logout`, {}).pipe(catchError(() => of(null))));
+    } catch (e) {}
+
+    try {
+      // Limpiar cookies de Capacitor para evitar que Sanctum nos redirija a /home en el proximo login
+      const { CapacitorCookies } = await import('@capacitor/core');
+      await CapacitorCookies.clearAllCookies();
+    } catch (e) {}
+
     await Preferences.remove({ key: 'auth_token' });
     await SecureStoragePlugin.remove({ key: 'auth_token' }).catch(() => {});
     this.token$.next(null);
@@ -244,9 +259,10 @@ export class LoveApiService {
     return res.album;
   }
 
-  async uploadPhoto(file: File, description: string = '', albumId?: number): Promise<any> {
+  async uploadPhoto(file: File | Blob, description: string = '', albumId?: number): Promise<any> {
     const formData = new FormData();
-    formData.append('image', file);
+    const fileName = (file instanceof File) ? file.name : 'image.png';
+    formData.append('image', file, fileName);
     if (description) formData.append('description', description);
     if (albumId) formData.append('album_id', albumId.toString());
     
@@ -276,6 +292,10 @@ export class LoveApiService {
   // --- CHAT ---
   async getChatMessages(): Promise<any[]> {
     return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/chat`));
+  }
+
+  async markMessagesDelivered(): Promise<any> {
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/chat/delivered`, {}));
   }
 
   async sendMessage(mensaje: string, photoId?: number, replyTo?: any): Promise<any> {
@@ -379,7 +399,8 @@ export class LoveApiService {
       try {
         const response = await fetch(imageBase64);
         const blob = await response.blob();
-        formData.append('image', blob, `place_${Date.now()}.jpg`);
+        const file = new File([blob], `place_${Date.now()}.jpg`, { type: blob.type || 'image/jpeg' });
+        formData.append('image', file);
       } catch (e) {
         console.error('Error attaching image', e);
       }
@@ -410,7 +431,8 @@ export class LoveApiService {
       try {
         const response = await fetch(imageBase64);
         const blob = await response.blob();
-        formData.append('image', blob, 'place.jpg');
+        const file = new File([blob], 'place.jpg', { type: blob.type || 'image/jpeg' });
+        formData.append('image', file);
       } catch (e) {
         console.error('Error converting base64 to blob', e);
       }
@@ -435,7 +457,8 @@ export class LoveApiService {
       try {
         const response = await fetch(imageBase64);
         const blob = await response.blob();
-        formData.append('image', blob, `dish_${Date.now()}.jpg`);
+        const file = new File([blob], `dish_${Date.now()}.jpg`, { type: blob.type || 'image/jpeg' });
+        formData.append('image', file);
       } catch (e) {
         console.error('Error attaching image', e);
       }
@@ -461,7 +484,8 @@ export class LoveApiService {
       try {
         const response = await fetch(imageBase64);
         const blob = await response.blob();
-        formData.append('image', blob, `dish_${Date.now()}.jpg`);
+        const file = new File([blob], `dish_${Date.now()}.jpg`, { type: blob.type || 'image/jpeg' });
+        formData.append('image', file);
       } catch (e) {
         console.error('Error attaching image', e);
       }
@@ -500,7 +524,8 @@ export class LoveApiService {
       try {
         const response = await fetch(imageBase64);
         const blob = await response.blob();
-        formData.append('image', blob, `movie_${Date.now()}.jpg`);
+        const file = new File([blob], `movie_${Date.now()}.jpg`, { type: blob.type || 'image/jpeg' });
+        formData.append('image', file);
       } catch (e) {
         console.error('Error attaching image', e);
       }
@@ -531,7 +556,8 @@ export class LoveApiService {
       try {
         const response = await fetch(imageBase64);
         const blob = await response.blob();
-        formData.append('image', blob, 'movie.jpg');
+        const file = new File([blob], 'movie.jpg', { type: blob.type || 'image/jpeg' });
+        formData.append('image', file);
       } catch (e) {
         console.error('Error converting base64 to blob', e);
       }
@@ -542,5 +568,14 @@ export class LoveApiService {
 
   async deleteMovie(id: number): Promise<any> {
     return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/love-album/widget/movies/${id}`));
+  }
+
+  // --- LOCATION (REST) ---
+  async updateLocation(latitude: number, longitude: number, isSharing: boolean = true): Promise<any> {
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/location`, { latitude, longitude, is_sharing_location: isSharing }));
+  }
+
+  async getPartnerLocation(): Promise<any> {
+    return firstValueFrom(this.http.get(`${API_BASE_URL}/location/partner`));
   }
 }
