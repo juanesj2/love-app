@@ -56,6 +56,12 @@ import { PushNotifications } from '@capacitor/push-notifications';
               (pointerdown)="startPokeHold()" (pointerup)="endPokeHold()" (pointercancel)="endPokeHold()" (pointerleave)="endPokeHold()">
               <ion-icon name="heart" [class.poking]="pokeAnimation" [class.super-poking]="superPokeAnimation"></ion-icon>
             </div>
+
+            <!-- UI Toggle Button -->
+            <div class="menu-toggle-btn" *ngIf="selectedWidget === 'photo'" (click)="photoWidgetComp?.toggleMenu()" style="pointer-events: auto;">
+              <ion-icon [name]="photoWidgetComp?.isTopBarHidden ? 'eye-outline' : 'eye-off-outline'"></ion-icon>
+            </div>
+
           </div>
 
           
@@ -244,6 +250,10 @@ import { PushNotifications } from '@capacitor/push-notifications';
       @keyframes heartbeat { 0% { transform: scale(1); } 25% { transform: scale(1.4); } 50% { transform: scale(1); } 75% { transform: scale(1.4); } 100% { transform: scale(1); } }
       @keyframes superheartbeat { 0% { transform: scale(1); } 30% { transform: scale(1.5) rotate(-5deg); } 60% { transform: scale(0.9) rotate(5deg); } 100% { transform: scale(1); } }
   
+      .menu-toggle-btn { width: 42px; height: 42px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 2px solid white; font-size: 1.3rem; color: #555; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+      .menu-toggle-btn:active { transform: scale(0.88); }
+      :host-context(.night-owl-mode) .menu-toggle-btn { background: #2a2a2a; border-color: #444; color: #ccc; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+
       .custom-footer { background: transparent; border: none; padding: 0 15px calc(var(--safe-bottom) + 15px) 15px; position: absolute; bottom: 0; width: 100%; pointer-events: none; z-index: 1000; }
       .custom-tab-bar { pointer-events: auto; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; padding: 5px 15px; height: 70px; border-radius: 35px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.5); position: relative; margin-bottom: 5px; }
       .tab-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #a08c92; width: 55px; font-size: 0.75rem; gap: 4px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; }
