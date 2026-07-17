@@ -23,6 +23,8 @@ export class LocationService {
   private loveApi = inject(LoveApiService);
   public debugError = '';
 
+  public myLocation$ = new BehaviorSubject<any>(null);
+
   async getPrivacyMode(): Promise<boolean> {
     const { value } = await Preferences.get({ key: 'ghost_mode' });
     return value === 'true';
@@ -32,6 +34,7 @@ export class LocationService {
     await Preferences.set({ key: 'ghost_mode', value: isGhost ? 'true' : 'false' });
     if (isGhost) {
       await this.loveApi.updateLocation(0, 0, false).catch(() => {});
+      this.myLocation$.next({ is_sharing: false });
     }
   }
 
@@ -41,6 +44,7 @@ export class LocationService {
       
       if (isGhost) {
         await this.loveApi.updateLocation(0, 0, false);
+        this.myLocation$.next({ is_sharing: false });
         
         const savedWatcher = localStorage.getItem('bg_watcher_id');
         if (savedWatcher) {
@@ -74,6 +78,14 @@ export class LocationService {
       }
 
       await this.loveApi.updateLocation(coordinates.coords.latitude, coordinates.coords.longitude, true);
+      this.myLocation$.next({
+          name: name,
+          is_sharing: true,
+          position: {
+            latitude: coordinates.coords.latitude,
+            longitude: coordinates.coords.longitude
+          }
+      });
       console.log('Ubicación actualizada APIREST:', userId);
 
       // 3. Background Geolocation watcher
@@ -106,6 +118,14 @@ export class LocationService {
                 const currentGhost = await this.getPrivacyMode();
                 if (currentGhost) return;
                 await this.loveApi.updateLocation(location.latitude, location.longitude, true).catch(()=>console.error('bg fail'));
+                this.myLocation$.next({
+                    name: name,
+                    is_sharing: true,
+                    position: {
+                        latitude: location.latitude,
+                        longitude: location.longitude
+                    }
+                });
                 console.log('Fondo actualizado APIREST:', location);
               }
             }
@@ -122,18 +142,7 @@ export class LocationService {
     }
   }
 
-  async testDirectGetDoc(userId: string): Promise<string> {
-    try {
-      const partner = await this.loveApi.getPartnerLocation();
-      return `REST getDoc: FOUND (${partner.latitude}, ${partner.longitude})`;
-    } catch (e: any) {
-      return `REST getDoc ERR: ${e.message}`;
-    }
-  }
-
-  listenToUserLocation(userId: string): Observable<any> {
-    if (!userId) return of(null);
-    
+  listenToPartnerLocation(): Observable<any> {
     // Polling cada 5 segundos
     return timer(0, 5000).pipe(
       switchMap(() => this.loveApi.getPartnerLocation()),

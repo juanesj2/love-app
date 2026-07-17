@@ -496,8 +496,8 @@ export class LocationWidgetComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   private startTracking() {
-    const me$ = this.locationService.listenToUserLocation(this.myUserId).pipe(startWith(null));
-    const partner$ = this.locationService.listenToUserLocation(this.partnerId).pipe(startWith(null));
+    const me$ = this.locationService.myLocation$.pipe(startWith(null));
+    const partner$ = this.locationService.listenToPartnerLocation().pipe(startWith(null));
 
     this.locationsSub = combineLatest([me$, partner$]).subscribe(([me, partner]) => {
       this.lastMeData = me;
