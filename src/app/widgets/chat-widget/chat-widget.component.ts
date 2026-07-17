@@ -1949,8 +1949,13 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       try { this.deletedLocalMessages = JSON.parse(deletedPref.value); } catch(e){}
     }
 
-    await this.loadAvatars();
-    await this.loadMessages();
+    const cachedUserId = localStorage.getItem('my_user_id');
+    if (cachedUserId) {
+      this.myUserId = parseInt(cachedUserId, 10);
+    }
+
+    this.loadAvatars();
+    this.loadMessages();
     this.tutorialService.showChatTour();
 
     this.subscriptions.push(this.api.avatarUpdated$.subscribe(() => {
@@ -1978,6 +1983,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       const info = await this.api.getCoupleInfo();
       if (info) {
         this.myUserId = info.my_id;
+        localStorage.setItem('my_user_id', info.my_id.toString());
         if (info.my_name && info.my_avatar) {
           this.avatars[info.my_name] = info.my_avatar;
         }
@@ -2077,7 +2083,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
           this.safeTimeout(() => this.scrollToBottom(false), 100);
           this.safeTimeout(() => this.scrollToBottom(true), 500);
         }
-        await Preferences.set({ key: 'chat_cache', value: JSON.stringify(this.messages) });
+        const limitMessages = this.messages.slice(-30);
+        await Preferences.set({ key: 'chat_cache', value: JSON.stringify(limitMessages) });
       }
     } catch (e) {
       if (!isBackground) {
