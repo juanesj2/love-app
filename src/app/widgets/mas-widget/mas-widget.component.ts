@@ -228,6 +228,16 @@ import confetti from 'canvas-confetti';
         <button class="logout-btn" (click)="isLogoutModalOpen = true">
           <ion-icon name="log-out-outline"></ion-icon> Cerrar sesión
         </button>
+
+        <!-- Developer Feedback Banner -->
+        <div class="developer-banner" (click)="openFeedback()">
+          <ion-icon name="heart" class="dev-heart"></ion-icon>
+          <div class="dev-content">
+            <h4>Hecho con cariño</h4>
+            <p>Soy un desarrollador independiente creando esto en mi tiempo libre. Si encuentras algún bug o tienes sugerencias, ¡me encantaría leerte!</p>
+            <span class="feedback-link">Enviar feedback →</span>
+          </div>
+        </div>
       </div>
 
       <!-- Modal for Event Details -->
@@ -865,6 +875,14 @@ import confetti from 'canvas-confetti';
     .logout-btn:active { background: rgba(208, 0, 0, 0.2); transform: scale(0.98); }
     .logout-btn ion-icon { font-size: 1.4rem; }
 
+    /* Developer Banner */
+    .developer-banner { margin-top: 25px; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(255, 77, 109, 0.2); border-radius: 20px; padding: 20px; display: flex; gap: 15px; align-items: center; cursor: pointer; transition: transform 0.2s; }
+    .developer-banner:active { transform: scale(0.98); }
+    .dev-heart { font-size: 2.5rem; color: #FF4D6D; animation: pulse 2s infinite; }
+    .dev-content h4 { margin: 0; color: #590D22; font-weight: 800; font-size: 1.1rem; }
+    .dev-content p { margin: 5px 0 10px; color: #6c757d; font-size: 0.85rem; line-height: 1.3; }
+    .feedback-link { color: #FF4D6D; font-weight: 700; font-size: 0.9rem; }
+
       .star { --star-color: #FF4D6D; position: relative; width: 44px; height: 44px; transition: transform 0.3s ease; cursor: pointer; }
       .star .svg-container { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
       .star .svg-outline, .star .svg-filled { fill: var(--star-color); position: absolute; left: 0; top: 0; width: 100%; height: 100%; transition: all 0.3s ease; }
@@ -951,6 +969,9 @@ import confetti from 'canvas-confetti';
       :host-context(.night-owl-mode) .settings-item h4 { color: #fdfdfd !important; }
       :host-context(.night-owl-mode) .settings-item p { color: #aaa !important; }
       :host-context(.night-owl-mode) .logout-btn { background: rgba(255,77,109,0.1); color: #FF4D6D; border-color: rgba(255,77,109,0.3); }
+      :host-context(.night-owl-mode) .developer-banner { background: rgba(0,0,0,0.4) !important; border: 1px solid #333; }
+      :host-context(.night-owl-mode) .dev-content h4 { color: #fdfdfd !important; }
+      :host-context(.night-owl-mode) .dev-content p { color: #aaa !important; }
 
       /* Inside Modals Night Owl Fixes */
       :host-context(.night-owl-mode) .modal-content div[style*="background: rgba(255,255,255,0.9)"] { background: rgba(30,30,30,0.8) !important; box-shadow: 0 4px 10px rgba(0,0,0,0.5) !important; }
