@@ -29,8 +29,10 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
       <div class="global-date-overlay" [class.show]="showingGlobalDate" [class.fade-out]="fadingGlobalDate">
         <div class="overlay-content">
           <ion-icon name="calendar-outline"></ion-icon>
-          <h2>{{ globalDateText }}</h2>
-          <p>{{ globalDateSubtext }}</p>
+          <div>
+            <h2>{{ globalDateText }}</h2>
+            <p>{{ globalDateSubtext }}</p>
+          </div>
         </div>
       </div>
 
@@ -513,13 +515,13 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .photos-list { padding-top: calc(var(--safe-top) + 170px); padding-bottom: 95px; }
     .grid-wrapper { padding-top: calc(var(--safe-top) + 170px); padding-bottom: 95px; }
     
-    .global-date-overlay { position: absolute; top: calc(var(--safe-top, 0px) + 80px); left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(255, 77, 109, 0.85); backdrop-filter: blur(10px); color: white; display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; visibility: hidden; transition: opacity 0.4s, transform 0.4s, visibility 0.4s; pointer-events: none; border-radius: 30px; padding: 8px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); width: auto; max-width: 80%; }
+    .global-date-overlay { position: absolute; top: calc(var(--safe-top, 0px) + 70px); left: 50%; transform: translateX(-50%) translateY(-20px); background: linear-gradient(135deg, rgba(255, 77, 109, 0.95), rgba(201, 24, 74, 0.95)); backdrop-filter: blur(12px); color: white; display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; visibility: hidden; transition: opacity 0.4s, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), visibility 0.4s; pointer-events: none; border-radius: 24px; padding: 12px 24px; box-shadow: 0 8px 25px rgba(255, 77, 109, 0.4); width: auto; min-width: 220px; max-width: 85%; }
     .global-date-overlay.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
     .global-date-overlay.fade-out { opacity: 0; visibility: hidden; transform: translateX(-50%) translateY(-20px); }
-    .overlay-content { display: flex; align-items: center; gap: 8px; animation: none; }
-    .global-date-overlay ion-icon { font-size: 1.4rem; margin-bottom: 0; opacity: 0.9; }
-    .global-date-overlay h2 { font-size: 1.1rem; font-weight: 700; margin: 0; text-transform: capitalize; letter-spacing: 0; }
-    .global-date-overlay p { display: none; }
+    .overlay-content { display: flex; align-items: center; gap: 14px; animation: none; text-align: left; }
+    .global-date-overlay ion-icon { font-size: 2.2rem; margin-bottom: 0; opacity: 1; }
+    .global-date-overlay h2 { font-size: 1.3rem; font-weight: 800; margin: 0; text-transform: capitalize; letter-spacing: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .global-date-overlay p { display: block; font-size: 0.9rem; margin: 4px 0 0 0; opacity: 0.95; font-weight: 600; }
     .month-header { display: flex; justify-content: space-between; align-items: center; margin: 0 10px 10px 10px; border-bottom: 2px solid rgba(255, 77, 109, 0.2); padding-bottom: 5px; }
     .gallery-month-title { margin: 0; font-size: 1.1rem; font-weight: 800; color: #590D22; text-transform: capitalize; }
     .select-month-wrapper { font-size: 1.5rem; color: #FF4D6D; cursor: pointer; display: flex; align-items: center; }
@@ -998,6 +1000,8 @@ export class PhotoWidgetComponent implements OnInit {
     this.showingGlobalDate = true;
     this.fadingGlobalDate = false;
     this.cdr.detectChanges();
+    
+    this.triggerEmojiRain(date);
 
     if (this.dateOverlayTimeout) clearTimeout(this.dateOverlayTimeout);
 
@@ -1010,7 +1014,67 @@ export class PhotoWidgetComponent implements OnInit {
         this.fadingGlobalDate = false;
         this.cdr.detectChanges();
       }, 800); // Wait for CSS transition
-    }, 1200);
+    }, 1800);
+  }
+
+  triggerEmojiRain(date: string) {
+    let emojis: string[] = [];
+    const d = date.toLowerCase();
+    
+    // Fechas especiales
+    if (d.includes('oct') && d.includes('31')) emojis = ['🎃', '🦇', '👻', '🍬'];
+    else if (d.includes('feb') && d.includes('14')) emojis = ['💖', '💘', '🌹', '🥰'];
+    else if (d.includes('dic') && d.includes('25')) emojis = ['🎄', '🎅', '❄️', '🎁'];
+    else if (d.includes('dic') && d.includes('31') || (d.includes('ene') && d.includes('1'))) emojis = ['🎆', '🥂', '🎉', '✨'];
+    else if (this.coupleInfo?.start_date) {
+      const start = new Date(this.coupleInfo.start_date);
+      const months = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+      if (!isNaN(start.getTime())) {
+        const monthName = months[start.getMonth()];
+        const day = start.getDate();
+        if (d.includes(day.toString()) && d.includes(monthName)) {
+          emojis = ['💍', '🥂', '❤️', '🎉'];
+        }
+      }
+    }
+
+    if (emojis.length === 0) return;
+
+    // Crear lluvia de emojis
+    const container = document.createElement('div');
+    container.className = 'emoji-rain-container';
+    container.style.position = 'absolute';
+    container.style.top = '0';
+    container.style.left = '0';
+    container.style.width = '100%';
+    container.style.height = '100%';
+    container.style.pointerEvents = 'none';
+    container.style.zIndex = '9998';
+    container.style.overflow = 'hidden';
+    
+    const widgetContainer = document.querySelector('.photo-widget-container') || document.body;
+    widgetContainer.appendChild(container);
+
+    for (let i = 0; i < 35; i++) {
+      const emoji = document.createElement('div');
+      emoji.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+      emoji.style.position = 'absolute';
+      emoji.style.fontSize = (Math.random() * 20 + 20) + 'px';
+      emoji.style.left = (Math.random() * 100) + 'vw';
+      emoji.style.top = '-50px';
+      emoji.style.transition = 'transform 3s linear, opacity 3s linear';
+      emoji.style.opacity = '1';
+      container.appendChild(emoji);
+
+      setTimeout(() => {
+        emoji.style.transform = `translateY(${window.innerHeight + 100}px) rotate(${Math.random() * 360}deg)`;
+        emoji.style.opacity = '0';
+      }, 50);
+    }
+
+    setTimeout(() => {
+      container.remove();
+    }, 3100);
   }
 
   async loadAvatars() {
