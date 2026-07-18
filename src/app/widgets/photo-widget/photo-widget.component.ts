@@ -513,13 +513,13 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .photos-list { padding-top: calc(var(--safe-top) + 170px); padding-bottom: 95px; }
     .grid-wrapper { padding-top: calc(var(--safe-top) + 170px); padding-bottom: 95px; }
     
-    .global-date-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; visibility: hidden; transition: opacity 0.8s ease-in-out, visibility 0.8s; pointer-events: none; border-radius: inherit; }
-    .global-date-overlay.show { opacity: 1; visibility: visible; }
-    .global-date-overlay.fade-out { opacity: 0; visibility: hidden; }
-    .overlay-content { text-align: center; animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    .global-date-overlay ion-icon { font-size: 5rem; margin-bottom: 15px; opacity: 0.9; }
-    .global-date-overlay h2 { font-size: 3.5rem; font-weight: 800; margin: 0; text-transform: capitalize; letter-spacing: -1px; }
-    .global-date-overlay p { font-size: 1.2rem; opacity: 0.85; margin: 10px 0 0 0; font-weight: 600; }
+    .global-date-overlay { position: absolute; top: calc(var(--safe-top, 0px) + 80px); left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(255, 77, 109, 0.85); backdrop-filter: blur(10px); color: white; display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; visibility: hidden; transition: opacity 0.4s, transform 0.4s, visibility 0.4s; pointer-events: none; border-radius: 30px; padding: 8px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); width: auto; max-width: 80%; }
+    .global-date-overlay.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+    .global-date-overlay.fade-out { opacity: 0; visibility: hidden; transform: translateX(-50%) translateY(-20px); }
+    .overlay-content { display: flex; align-items: center; gap: 8px; animation: none; }
+    .global-date-overlay ion-icon { font-size: 1.4rem; margin-bottom: 0; opacity: 0.9; }
+    .global-date-overlay h2 { font-size: 1.1rem; font-weight: 700; margin: 0; text-transform: capitalize; letter-spacing: 0; }
+    .global-date-overlay p { display: none; }
     .month-header { display: flex; justify-content: space-between; align-items: center; margin: 0 10px 10px 10px; border-bottom: 2px solid rgba(255, 77, 109, 0.2); padding-bottom: 5px; }
     .gallery-month-title { margin: 0; font-size: 1.1rem; font-weight: 800; color: #590D22; text-transform: capitalize; }
     .select-month-wrapper { font-size: 1.5rem; color: #FF4D6D; cursor: pointer; display: flex; align-items: center; }
@@ -743,7 +743,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     :host-context(.night-owl-mode) .filter-chip.active { background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: white; border-color: transparent; }
     :host-context(.night-owl-mode) .gallery-month-title { color: #fdfdfd; }
     :host-context(.night-owl-mode) .photo-card { background: rgba(30,30,30,0.85); border-color: rgba(255,255,255,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-    :host-context(.night-owl-mode) .global-date-overlay { background: linear-gradient(135deg, #8b5cf6, #5b21b6); }
+    :host-context(.night-owl-mode) .global-date-overlay { background: rgba(139, 92, 246, 0.85); }
     :host-context(.night-owl-mode) .card-username { color: #fdfdfd; }
     :host-context(.night-owl-mode) .card-time { color: #aaa; }
     :host-context(.night-owl-mode) .action-btn { color: #ccc; background: rgba(255,255,255,0.05); }
