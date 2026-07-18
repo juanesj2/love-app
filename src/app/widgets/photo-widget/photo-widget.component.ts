@@ -868,6 +868,7 @@ export class PhotoWidgetComponent implements OnInit {
   
   @ViewChild('dateLottieCanvas') dateLottieCanvas?: ElementRef<HTMLCanvasElement>;
   private dateDotLottie?: DotLottie;
+  private currentDateLottieSrc = '';
   
   globalDateText = '';
   globalDateIcon = '📅';
@@ -1000,13 +1001,41 @@ export class PhotoWidgetComponent implements OnInit {
 
     this.globalDateText = date;
     
-    if (!this.dateDotLottie && this.dateLottieCanvas?.nativeElement) {
-      this.dateDotLottie = new DotLottie({
-        canvas: this.dateLottieCanvas.nativeElement,
-        src: 'assets/lottie/Loading with Heart.lottie',
-        loop: true,
-        autoplay: true
-      });
+    this.globalDateText = date;
+    
+    // Determinar la animación según la fecha
+    const d = date.toLowerCase();
+    let lottieSrc = 'assets/lottie/Calendar.lottie'; // por defecto para fechas pasadas
+    
+    if (d === 'hoy') lottieSrc = 'assets/lottie/heart icon.lottie';
+    else if (d === 'ayer') lottieSrc = 'assets/lottie/Clock.lottie';
+    else if (d.includes('oct') && d.includes('31')) lottieSrc = 'assets/lottie/Halloween Pumpkin Black Cat.lottie';
+    else if (d.includes('dic') && d.includes('25')) lottieSrc = 'assets/lottie/Christmas Tree Animation - 1699891737968.lottie';
+    else {
+      let isSpecial = false;
+      if (this.coupleInfo?.start_date) {
+        const start = new Date(this.coupleInfo.start_date);
+        if (!isNaN(start.getTime()) && d.includes(start.getDate().toString())) {
+          isSpecial = true; // cumple mes o aniversario
+        }
+      }
+      if (isSpecial) lottieSrc = 'assets/lottie/Paper Plane Heart.lottie';
+    }
+
+    if (this.currentDateLottieSrc !== lottieSrc || !this.dateDotLottie) {
+      if (this.dateDotLottie) {
+        this.dateDotLottie.destroy();
+        this.dateDotLottie = undefined;
+      }
+      this.currentDateLottieSrc = lottieSrc;
+      if (this.dateLottieCanvas?.nativeElement) {
+        this.dateDotLottie = new DotLottie({
+          canvas: this.dateLottieCanvas.nativeElement,
+          src: lottieSrc,
+          loop: true,
+          autoplay: true
+        });
+      }
     } else if (this.dateDotLottie) {
       this.dateDotLottie.play();
     }
