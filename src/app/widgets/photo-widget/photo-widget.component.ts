@@ -28,7 +28,9 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
       <!-- Global Date Overlay -->
       <div class="global-date-overlay" [class.show]="showingGlobalDate" [class.fade-out]="fadingGlobalDate">
         <div class="overlay-content">
-          <ion-icon name="calendar-outline"></ion-icon>
+          <div class="date-icon-container">
+            <span class="animated-date-icon">{{ globalDateIcon }}</span>
+          </div>
           <div>
             <h2>{{ globalDateText }}</h2>
             <p>{{ globalDateSubtext }}</p>
@@ -519,7 +521,8 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .global-date-overlay.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
     .global-date-overlay.fade-out { opacity: 0; visibility: hidden; transform: translateX(-50%) translateY(-20px); }
     .overlay-content { display: flex; align-items: center; gap: 14px; animation: none; text-align: left; }
-    .global-date-overlay ion-icon { font-size: 2.2rem; margin-bottom: 0; opacity: 1; }
+    .date-icon-container { display: flex; align-items: center; justify-content: center; font-size: 2.8rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25)); animation: floatIcon 3.5s ease-in-out infinite; margin-right: 4px; }
+    @keyframes floatIcon { 0% { transform: translateY(0px) scale(1) rotate(0deg); } 50% { transform: translateY(-6px) scale(1.08) rotate(6deg); } 100% { transform: translateY(0px) scale(1) rotate(0deg); } }
     .global-date-overlay h2 { font-size: 1.3rem; font-weight: 800; margin: 0; text-transform: capitalize; letter-spacing: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     .global-date-overlay p { display: block; font-size: 0.9rem; margin: 4px 0 0 0; opacity: 0.95; font-weight: 600; }
     .month-header { display: flex; justify-content: space-between; align-items: center; margin: 0 10px 10px 10px; border-bottom: 2px solid rgba(255, 77, 109, 0.2); padding-bottom: 5px; }
@@ -865,6 +868,7 @@ export class PhotoWidgetComponent implements OnInit {
   private observer: IntersectionObserver | null = null;
   
   globalDateText = '';
+  globalDateIcon = '📅';
   globalDateSubtext = '';
   showingGlobalDate = false;
   fadingGlobalDate = false;
@@ -993,6 +997,26 @@ export class PhotoWidgetComponent implements OnInit {
     this.lastShownDate = date;
 
     this.globalDateText = date;
+    
+    // Calcular el icono dinámico
+    const d = date.toLowerCase();
+    if (d === 'hoy') this.globalDateIcon = '🌟';
+    else if (d === 'ayer') this.globalDateIcon = '🕰️';
+    else if (d.includes('oct') && d.includes('31')) this.globalDateIcon = '🎃';
+    else if (d.includes('feb') && d.includes('14')) this.globalDateIcon = '💖';
+    else if (d.includes('dic') && d.includes('25')) this.globalDateIcon = '🎄';
+    else if (d.includes('dic') && d.includes('31') || (d.includes('ene') && d.includes('1'))) this.globalDateIcon = '🎆';
+    else {
+      let isAnniv = false;
+      if (this.coupleInfo?.start_date) {
+        const start = new Date(this.coupleInfo.start_date);
+        const months = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+        if (!isNaN(start.getTime()) && d.includes(start.getDate().toString()) && d.includes(months[start.getMonth()])) {
+          isAnniv = true;
+        }
+      }
+      this.globalDateIcon = isAnniv ? '💍' : '📅';
+    }
     if (date === 'Hoy') this.globalDateSubtext = 'Tus recuerdos de hoy';
     else if (date === 'Ayer') this.globalDateSubtext = 'Lo que vivisteis ayer';
     else this.globalDateSubtext = 'Tus recuerdos';
