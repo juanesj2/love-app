@@ -29,7 +29,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
       <div class="global-date-overlay" [class.show]="showingGlobalDate" [class.fade-out]="fadingGlobalDate">
         <div class="overlay-content">
           <div class="date-icon-container" style="width: 45px; height: 45px; margin-right: 5px;">
-            <canvas #dateLottieCanvas style="width: 100%; height: 100%;"></canvas>
+            <canvas #dateLottieCanvas style="width: 100%; height: 100%; transition: transform 0.3s;" [style.transform]="'scale(' + currentLottieScale + ')'"></canvas>
           </div>
           <div>
             <h2>{{ globalDateText }}</h2>
@@ -868,7 +868,8 @@ export class PhotoWidgetComponent implements OnInit {
   
   @ViewChild('dateLottieCanvas') dateLottieCanvas?: ElementRef<HTMLCanvasElement>;
   private dateDotLottie?: DotLottie;
-  private currentDateLottieSrc = '';
+  currentDateLottieSrc = '';
+  currentLottieScale = 1;
   
   globalDateText = '';
   globalDateIcon = '📅';
@@ -1006,11 +1007,12 @@ export class PhotoWidgetComponent implements OnInit {
     // Determinar la animación según la fecha
     const d = date.toLowerCase();
     let lottieSrc = 'assets/lottie/Calendar.lottie'; // por defecto para fechas pasadas
+    let scale = 1;
     
-    if (d === 'hoy') lottieSrc = 'assets/lottie/heart icon.lottie';
-    else if (d === 'ayer') lottieSrc = 'assets/lottie/Clock.lottie';
-    else if (d.includes('oct') && d.includes('31')) lottieSrc = 'assets/lottie/Halloween Pumpkin Black Cat.lottie';
-    else if (d.includes('dic') && d.includes('25')) lottieSrc = 'assets/lottie/Christmas Tree Animation - 1699891737968.lottie';
+    if (d === 'hoy') { lottieSrc = 'assets/lottie/heart icon.lottie'; scale = 1.4; }
+    else if (d === 'ayer') { lottieSrc = 'assets/lottie/Clock.lottie'; scale = 1.3; }
+    else if (d.includes('oct') && d.includes('31')) { lottieSrc = 'assets/lottie/Halloween Pumpkin Black Cat.lottie'; scale = 1.3; }
+    else if (d.includes('dic') && d.includes('25')) { lottieSrc = 'assets/lottie/Christmas Tree Animation - 1699891737968.lottie'; scale = 1.3; }
     else {
       let isSpecial = false;
       if (this.coupleInfo?.start_date) {
@@ -1019,8 +1021,16 @@ export class PhotoWidgetComponent implements OnInit {
           isSpecial = true; // cumple mes o aniversario
         }
       }
-      if (isSpecial) lottieSrc = 'assets/lottie/Paper Plane Heart.lottie';
+      if (isSpecial) {
+        lottieSrc = 'assets/lottie/Paper Plane Heart.lottie';
+        scale = 1.4;
+      } else {
+        lottieSrc = 'assets/lottie/Calendar.lottie';
+        scale = 2.6; // El calendario viene con mucho padding interno, lo escalamos
+      }
     }
+
+    this.currentLottieScale = scale;
 
     if (this.currentDateLottieSrc !== lottieSrc || !this.dateDotLottie) {
       if (this.dateDotLottie) {
