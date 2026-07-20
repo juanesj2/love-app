@@ -1168,8 +1168,8 @@ export class PhotoWidgetComponent implements OnInit {
       const infiniteScrolls = document.querySelectorAll('ion-infinite-scroll');
       infiniteScrolls.forEach((is: any) => is.disabled = false);
       
-      // 1. Mostrar caché primero si no estamos en un álbum específico y no hay filtro por mes
-      if (!this.currentAlbum && !targetMonth) {
+      // 1. Mostrar caché primero si no estamos en un álbum específico
+      if (!this.currentAlbum) {
         const cachePhotos = await Preferences.get({ key: 'feed_photos_cache' });
         const cacheCouple = await Preferences.get({ key: 'couple_info_cache' });
         const cacheAlbums = await Preferences.get({ key: 'albums_cache' });
