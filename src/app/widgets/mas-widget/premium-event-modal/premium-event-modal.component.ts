@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, OnDestroy, Output, EventEmitter, inject } from "@angular/core";
+import { Component, OnInit, OnDestroy, Output, EventEmitter, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { IonIcon } from "@ionic/angular/standalone";
@@ -128,9 +128,9 @@ interface EventPreset {
 
     .custom-toggle { display: flex; align-items: center; gap: 7px; font-size: 0.87rem; font-weight: 700; color: #FF4D6D; margin-bottom: 10px; cursor: pointer; }
     .custom-fields { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
-    .custom-input, .custom-textarea { width: 100%; border: 2px solid #f0f0f0; border-radius: 12px; padding: 11px 14px; font-size: 0.95rem; font-family: inherit; background: #fafafa; transition: 0.2s; }
-    .custom-input:focus, .custom-textarea:focus { border-color: #FF4D6D; outline: none; background: #fff; }
-    .custom-textarea { resize: none; }
+    .custom-input, .custom-textarea { width: 100%; border: 2px solid #f0f0f0; border-radius: 12px; padding: 11px 14px; font-size: 0.95rem; font-family: inherit; background: #fafafa; color: #222; transition: 0.2s; box-sizing: border-box; }
+    .custom-input:focus, .custom-textarea:focus { border-color: #FF4D6D; outline: none; background: #fff; color: #222; }
+    .custom-textarea { resize: none; color: #222; }
 
     .preview-box { border-radius: 16px; overflow: hidden; margin-bottom: 18px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
     .preview-bar { height: 7px; }
