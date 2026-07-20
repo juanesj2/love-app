@@ -842,6 +842,8 @@ export class PhotoWidgetComponent implements OnInit {
   photos: any[] = [];
   groupedPhotos: any[] = [];
   galleryGroups: any[] = [];
+  fullTimeline: any[] = [];
+  currentTargetMonth: string | undefined = undefined;
 
   albums: any[] = [];
   isAlbumsModalOpen = false;
@@ -1160,16 +1162,19 @@ export class PhotoWidgetComponent implements OnInit {
 
   currentPage = 1;
   lastPage = 1;
+  fullTimeline = [];
+  currentTargetMonth?: string;
 
-  async loadData() {
+  async loadData(targetMonth?: string) {
     try {
       this.currentPage = 1;
+      this.currentTargetMonth = targetMonth;
       
       const infiniteScrolls = document.querySelectorAll('ion-infinite-scroll');
       infiniteScrolls.forEach((is: any) => is.disabled = false);
       
-      // 1. Mostrar caché primero si no estamos en un álbum específico
-      if (!this.currentAlbum) {
+      // 1. Mostrar caché primero si no estamos en un álbum específico y no hay filtro por mes
+      if (!this.currentAlbum && !targetMonth) {
         const cachePhotos = await Preferences.get({ key: 'feed_photos_cache' });
         const cacheCouple = await Preferences.get({ key: 'couple_info_cache' });
         const cacheAlbums = await Preferences.get({ key: 'albums_cache' });
@@ -1183,10 +1188,15 @@ export class PhotoWidgetComponent implements OnInit {
         if (cacheAlbums.value) this.albums = JSON.parse(cacheAlbums.value);
       }
 
-      // 2. Carga desde red en segundo plano
+      // 2. Cargar en segundo plano
       this.coupleInfo = await this.api.getCoupleInfo();
       console.log('DEBUG STREAK:', this.coupleInfo?.debug_streak);
-      const response = await this.api.getPhotos(this.currentAlbum ? this.currentAlbum.id : undefined, this.currentPage);
+      const [response, timelineResponse] = await Promise.all([
+        this.api.getPhotos(this.currentAlbum ? this.currentAlbum.id : undefined, this.currentPage, this.currentTargetMonth),
+        this.api.getTimeline(this.currentAlbum ? this.currentAlbum.id : undefined)
+      ]);
+      
+      this.fullTimeline = timelineResponse || [];
       this.lastPage = response.last_page || 1;
       const newPhotos = response.data || response;
       
@@ -1227,7 +1237,7 @@ export class PhotoWidgetComponent implements OnInit {
     }
     this.currentPage++;
     try {
-      const response = await this.api.getPhotos(this.currentAlbum ? this.currentAlbum.id : undefined, this.currentPage);
+      const response = await this.api.getPhotos(this.currentAlbum ? this.currentAlbum.id : undefined, this.currentPage, this.currentTargetMonth);
       const newPhotos = response.data || [];
       this.photos = [...this.photos, ...newPhotos];
       this.groupPhotosByDate();
@@ -1479,7 +1489,17 @@ export class PhotoWidgetComponent implements OnInit {
         try {
           const scrollEl = await this.gridContent.getScrollElement();
           const scrollHeight = scrollEl.scrollHeight - scrollEl.clientHeight;
-          if (scrollHeight > 0) {
+          if (scrollHeight > 0 && this.fullTimeline && this.fullTimeline.length > 0) {
+            let matchIndex = 0;
+            if (this.currentTargetMonth) {
+              matchIndex = this.fullTimeline.findIndex(t => t.month_year === this.currentTargetMonth);
+              if (matchIndex < 0) matchIndex = 0;
+            }
+            const basePct = (matchIndex / this.fullTimeline.length) * 100;
+            const domPct = (scrollTop / scrollHeight) * (100 / this.fullTimeline.length);
+            this.timelineThumbY = basePct + domPct;
+            this.timelineThumbY = Math.max(0, Math.min(100, this.timelineThumbY));
+          } else if (scrollHeight > 0) {
             this.timelineThumbY = (scrollTop / scrollHeight) * 100;
             this.timelineThumbY = Math.max(0, Math.min(100, this.timelineThumbY));
           }
@@ -1512,6 +1532,24 @@ export class PhotoWidgetComponent implements OnInit {
     this.timelineHideTimeout = setTimeout(() => {
       this.isTimelineVisible = false;
     }, 1500);
+
+    if (this.fullTimeline && this.fullTimeline.length > 0) {
+      const track = (e.target as HTMLElement).closest('.timeline-track');
+      if (track) {
+        const rect = track.getBoundingClientRect();
+        let y = e.changedTouches[0].clientY - rect.top;
+        y = Math.max(0, Math.min(y, rect.height));
+        const index = Math.floor((y / rect.height) * this.fullTimeline.length);
+        const safeIndex = Math.max(0, Math.min(index, this.fullTimeline.length - 1));
+        const targetMonth = this.fullTimeline[safeIndex].month_year;
+        if (this.currentTargetMonth !== targetMonth) {
+          this.photos = [];
+          this.groupedPhotos = [];
+          this.galleryGroups = [];
+          this.loadData(targetMonth);
+        }
+      }
+    }
   }
 
   handleTimelineDrag(touch: Touch) {
@@ -1525,18 +1563,19 @@ export class PhotoWidgetComponent implements OnInit {
     // Calcular porcentaje (0 a 100)
     this.timelineThumbY = (y / rect.height) * 100;
     
-    // Mapear el porcentaje al índice del grupo de fotos
-    if (this.galleryGroups.length === 0) return;
+    // Mapear el porcentaje al índice de fullTimeline
+    if (!this.fullTimeline || this.fullTimeline.length === 0) return;
     
-    const index = Math.floor((y / rect.height) * this.galleryGroups.length);
-    const safeIndex = Math.max(0, Math.min(index, this.galleryGroups.length - 1));
+    const index = Math.floor((y / rect.height) * this.fullTimeline.length);
+    const safeIndex = Math.max(0, Math.min(index, this.fullTimeline.length - 1));
     
-    const targetGroup = this.galleryGroups[safeIndex];
-    if (targetGroup) {
-      this.timelineActiveLabel = targetGroup.monthYear;
-      const el = document.getElementById('group-' + safeIndex);
-      if (el) {
-        this.gridContent.scrollToPoint(0, el.offsetTop, 10);
+    const targetGroup = this.fullTimeline[safeIndex];
+    if (targetGroup && targetGroup.month_year) {
+      const parts = targetGroup.month_year.split('-');
+      if (parts.length === 2) {
+        const dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, 1);
+        const monthStr = dateObj.toLocaleString('es-ES', { month: 'short' });
+        this.timelineActiveLabel = `${monthStr.charAt(0).toUpperCase() + monthStr.slice(1)} ${parts[0]}`;
       }
     }
   }

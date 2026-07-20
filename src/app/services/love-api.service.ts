@@ -232,10 +232,21 @@ export class LoveApiService {
   }
 
   // --- FOTOGRAFÍAS ---
-  async getPhotos(albumId?: number, page: number = 1): Promise<any> {
+  async getPhotos(albumId?: number, page: number = 1, targetMonth?: string): Promise<any> {
     let url = `${API_BASE_URL}/love-album/photos?page=${page}`;
     if (albumId) {
       url += `&album_id=${albumId}`;
+    }
+    if (targetMonth) {
+      url += `&target_month=${targetMonth}`;
+    }
+    return firstValueFrom(this.http.get<any>(url));
+  }
+
+  async getTimeline(albumId?: number): Promise<any> {
+    let url = `${API_BASE_URL}/love-album/photos/timeline`;
+    if (albumId) {
+      url += `?album_id=${albumId}`;
     }
     return firstValueFrom(this.http.get<any>(url));
   }
