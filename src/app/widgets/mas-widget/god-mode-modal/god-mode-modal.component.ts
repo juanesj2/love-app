@@ -5,7 +5,7 @@ import { GlobalEventService } from '../../../services/global-event.service';
 import { ToastController } from '@ionic/angular/standalone';
 import { IonIcon, IonToggle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, starOutline } from 'ionicons/icons';
+import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, starOutline, eyeOutline, imageOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-god-mode-modal',
@@ -25,6 +25,17 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
         <p class="subtitle">Diseña y lanza un evento global</p>
 
         <div class="scrollable-form">
+          <div class="feature-box presets-box" style="margin-bottom: 20px;">
+            <label class="feature-label">Eventos Rápidos</label>
+            <div class="preset-row" style="margin-top: 10px; overflow-x: auto; padding-bottom: 5px;">
+              <button class="event-preset-btn" (click)="loadTheme('cumple')">🎂 Cumple</button>
+              <button class="event-preset-btn" (click)="loadTheme('amor')">❤️ Amor</button>
+              <button class="event-preset-btn" (click)="loadTheme('espana')">🇪🇸 España</button>
+              <button class="event-preset-btn" (click)="loadTheme('halloween')">🎃 Halloween</button>
+              <button class="event-preset-btn" (click)="loadTheme('matrix')">💻 Matrix</button>
+            </div>
+          </div>
+
           <div class="form-group">
             <label>Título de la Alerta</label>
             <input type="text" [(ngModel)]="eventData.title" placeholder="Ej: ¡España Campeona!">
@@ -95,6 +106,10 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
           </div>
 
           <div class="action-buttons">
+            <button class="test-btn" (click)="testEvent()" [disabled]="isLoading">
+              <ion-icon name="eye-outline"></ion-icon>
+              PROBAR LOCALMENTE
+            </button>
             <button class="launch-btn" (click)="launchEvent()" [disabled]="isLoading">
               <ion-icon name="flash-outline"></ion-icon>
               {{ isLoading ? 'Lanzando...' : 'LANZAR EVENTO' }}
@@ -153,9 +168,14 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
     .color-input::-webkit-color-swatch { border: 2px solid #eee; border-radius: 10px; }
     
     .action-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+    .test-btn { background: linear-gradient(135deg, #4da6ff, #1a75ff); color: white; border: none; padding: 14px; border-radius: 16px; font-size: 1.05rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-shadow: 0 6px 20px rgba(77,166,255,0.3); cursor: pointer; transition: 0.2s; }
     .launch-btn { background: linear-gradient(135deg, #FF4D6D, #ff758f); color: white; border: none; padding: 14px; border-radius: 16px; font-size: 1.05rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-shadow: 0 6px 20px rgba(255,77,109,0.3); cursor: pointer; transition: 0.2s; }
     .stop-btn { background: #f1f3f5; color: #555; border: none; padding: 14px; border-radius: 16px; font-size: 0.95rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; cursor: pointer; transition: 0.2s; }
     button:active { transform: scale(0.96); }
+
+    .presets-box { background: rgba(255, 77, 109, 0.05); border: 1px dashed #FF4D6D; }
+    .event-preset-btn { white-space: nowrap; background: white; border: 1px solid #ddd; padding: 6px 12px; border-radius: 20px; font-weight: bold; color: #555; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
+    .event-preset-btn:active { transform: scale(0.95); }
     
     /* Night Mode Support */
     :host-context(.night-owl-mode) .modal-content { background: #1a1b1e; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
@@ -196,7 +216,7 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
   public confettiColorsStr = '';
 
   constructor() {
-    addIcons({ closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, starOutline });
+    addIcons({ closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, starOutline, eyeOutline, imageOutline });
   }
 
   ngOnInit() {
@@ -213,6 +233,66 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
 
   setEmojis(emojis: string) {
     this.eventData.emojis_list = emojis;
+  }
+
+  loadTheme(theme: string) {
+    if (theme === 'halloween') {
+      this.eventData.title = '¡Feliz Halloween!';
+      this.eventData.message = 'Truco o trato...';
+      this.eventData.confetti_enabled = true;
+      this.confettiColorsStr = '#ff6600,#000000,#800080';
+      this.eventData.emojis_enabled = true;
+      this.eventData.emojis_list = '🎃,👻,🦇,🕷️';
+      this.eventData.top_bar_color = 'linear-gradient(135deg, #1a0033, #ff6600)';
+    } else if (theme === 'cumple') {
+      this.eventData.title = '¡Feliz Cumpleaños!';
+      this.eventData.message = '¡Que lo pases genial!';
+      this.eventData.confetti_enabled = true;
+      this.confettiColorsStr = '#ff0000,#00ff00,#0000ff,#ffff00,#ff00ff';
+      this.eventData.emojis_enabled = true;
+      this.eventData.emojis_list = '🎂,🎉,🥳,🎁';
+      this.eventData.top_bar_color = 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)';
+    } else if (theme === 'amor') {
+      this.eventData.title = '¡Sorpresa de Amor!';
+      this.eventData.message = 'Te quiero muchísimo ❤️';
+      this.eventData.confetti_enabled = true;
+      this.confettiColorsStr = '#ff4d6d,#c9184a';
+      this.eventData.emojis_enabled = true;
+      this.eventData.emojis_list = '❤️,💖,💘,🥰';
+      this.eventData.top_bar_color = 'linear-gradient(135deg, #FF4D6D, #c9184a)';
+    } else if (theme === 'espana') {
+      this.eventData.title = '¡Viva España!';
+      this.eventData.message = '¡A por todas!';
+      this.eventData.confetti_enabled = true;
+      this.confettiColorsStr = '#aa151b,#f1bf00';
+      this.eventData.emojis_enabled = true;
+      this.eventData.emojis_list = '🇪🇸,🏆,🥇,⚽';
+      this.eventData.top_bar_color = 'linear-gradient(to bottom, #c60b1e 25%, #ffc400 25%, #ffc400 75%, #c60b1e 75%)';
+    } else if (theme === 'matrix') {
+      this.eventData.title = 'Wake up, Neo...';
+      this.eventData.message = 'The Matrix has you.';
+      this.eventData.confetti_enabled = false;
+      this.eventData.emojis_enabled = true;
+      this.eventData.emojis_list = '💻,📱,👽';
+      this.eventData.top_bar_color = 'url("https://media.giphy.com/media/A0667YgRCv0UU/giphy.gif") center/cover, #000';
+    }
+  }
+
+  testEvent() {
+    if (!this.eventData.title || !this.eventData.message) {
+      this.toastCtrl.create({ message: 'Título y Mensaje requeridos.', duration: 2000, color: 'danger' }).then(t => t.present());
+      return;
+    }
+    const payload: any = { ...this.eventData, id: Math.floor(Math.random() * 1000000) };
+    if (this.eventData.confetti_enabled && this.confettiColorsStr) {
+      payload.confetti_colors = this.confettiColorsStr.split(',').map(c => c.trim()).filter(c => c);
+    }
+    
+    localStorage.removeItem('dismissed_global_event_' + payload.id);
+    this.globalEventService.activeEvent$.next(payload);
+    
+    this.toastCtrl.create({ message: 'Modo Prueba: Solo lo ves tú', duration: 2500, color: 'tertiary' }).then(t => t.present());
+    this.close.emit();
   }
 
   async launchEvent() {

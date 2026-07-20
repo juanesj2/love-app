@@ -59,8 +59,13 @@ export class GlobalEventOverlayComponent implements OnInit, OnDestroy {
         // Handle top bar color
         if (evt.top_bar_color) {
           document.body.style.setProperty('--custom-header-bg', evt.top_bar_color);
-          document.body.style.setProperty('--ion-color-primary', evt.top_bar_color);
-          document.body.style.setProperty('--ion-background-color', evt.top_bar_color);
+          if (evt.top_bar_color.includes('gradient') || evt.top_bar_color.includes('url')) {
+            document.body.style.setProperty('--ion-color-primary', '#FF4D6D');
+            document.body.style.setProperty('--ion-background-color', '#fff5f8');
+          } else {
+            document.body.style.setProperty('--ion-color-primary', evt.top_bar_color);
+            document.body.style.setProperty('--ion-background-color', evt.top_bar_color + '10');
+          }
         } else {
           document.body.style.removeProperty('--custom-header-bg');
           document.body.style.removeProperty('--ion-color-primary');
