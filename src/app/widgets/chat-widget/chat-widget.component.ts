@@ -2124,11 +2124,15 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     this.scrollToBottom(true);
   }
 
+  private messageById = new Map<number, any>();
+
   private processMessages() {
     this.regularMessages = [];
     this.graffitisByAnchorId = {};
+    this.messageById.clear();
 
     this.messages.forEach(msg => {
+      this.messageById.set(msg.id, msg);
       if (this.deletedLocalMessages.includes(msg.id)) {
         msg.isDeletedLocally = true;
       }
@@ -2807,11 +2811,14 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   getDynamicReplyText(msg: any): string {
     if (!msg || !msg.reply_to) return '';
-    const originalMsg = this.regularMessages.find(m => m.id == msg.reply_to.id);
+    if (msg._dynamicReplyText !== undefined) return msg._dynamicReplyText;
+    const originalMsg = this.messageById.get(msg.reply_to.id);
     if (originalMsg) {
-      return this.getReplyPreviewText(originalMsg);
+      msg._dynamicReplyText = this.getReplyPreviewText(originalMsg);
+      return msg._dynamicReplyText;
     }
-    return msg.reply_to.text;
+    msg._dynamicReplyText = msg.reply_to.text;
+    return msg._dynamicReplyText;
   }
 
   // --- Audio Player Logic ---
@@ -3223,7 +3230,9 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   isMine(msg: any): boolean {
     if (!msg || !msg.user_id) return false;
-    return Number(msg.user_id) === Number(this.myUserId);
+    if (msg._isMine !== undefined) return msg._isMine;
+    msg._isMine = Number(msg.user_id) === Number(this.myUserId);
+    return msg._isMine;
   }
 
   trackByMsgId(index: number, msg: any) {
