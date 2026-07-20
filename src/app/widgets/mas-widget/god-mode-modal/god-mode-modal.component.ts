@@ -63,7 +63,7 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
               <label>Packs rápidos:</label>
               <div class="preset-row">
                 <button class="emoji-preset" (click)="setEmojis('🥳,🎉,🎈')" [class.active]="eventData.emojis_list === '🥳,🎉,🎈'">🎉</button>
-                <button class="emoji-preset" (click)="setEmojis('🇪🇸,🏆,🥇')" [class.active]="eventData.emojis_list === '🇪🇸,🏆,🥇'">🇪🇸</button>
+                <button class="emoji-preset" (click)="setEmojis('🇪🇸,🏆,🥇')" [class.active]="eventData.emojis_list === '🇪🇸,🏆,🥇'">🏆</button>
                 <button class="emoji-preset" (click)="setEmojis('❤️,💖,💘')" [class.active]="eventData.emojis_list === '❤️,💖,💘'">❤️</button>
                 <button class="emoji-preset" (click)="setEmojis('👻,🎃,🦇')" [class.active]="eventData.emojis_list === '👻,🎃,🦇'">👻</button>
               </div>
@@ -115,7 +115,7 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
     .form-group.mb-0 { margin-bottom: 0; }
     label { display: block; font-weight: 700; margin-bottom: 6px; color: #444; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
     
-    input[type="text"], input[type="number"], textarea { width: 100%; padding: 10px 12px; border: 2px solid #eee; border-radius: 12px; font-family: inherit; font-size: 0.95rem; background: #fdfdfd; box-sizing: border-box; transition: all 0.2s ease; }
+    input[type="text"], input[type="number"], textarea { width: 100%; padding: 10px 12px; border: 2px solid #eee; border-radius: 12px; font-family: inherit; font-size: 0.95rem; background: #fdfdfd; box-sizing: border-box; transition: all 0.2s ease; color: #333; }
     input[type="text"]:focus, input[type="number"]:focus, textarea:focus { border-color: #FF4D6D; outline: none; background: #fff; box-shadow: 0 4px 10px rgba(255,77,109,0.1); }
     .small-input { padding: 8px 12px !important; font-size: 0.85rem !important; margin-top: 10px; }
     
