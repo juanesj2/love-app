@@ -549,7 +549,8 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
     
     .photo-card:active img.main-photo { transform: scale(0.98); }
-    .grid-photo { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+    .grid-photo { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; background-color: #e0e0e0; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { opacity: 0.7; } 50% { opacity: 1; } 100% { opacity: 0.7; } }
     .grid-photo-container:active .grid-photo { transform: scale(0.95); }
     .grid-photo-container.selected { border: 3px solid #FF4D6D; transform: scale(0.95); }
     .grid-overlay { position: absolute; bottom: 3px; right: 3px; background: rgba(255,255,255,0.85); border-radius: 12px; padding: 1px 4px; font-size: 0.7rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
@@ -573,7 +574,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .delete-post-btn:hover { background: #FF4D6D; transform: scale(1.1); }
     
     .image-wrapper { width: 100%; aspect-ratio: 1/1; max-height: 48vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; position: relative; }
-    .main-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .main-photo { width: 100%; height: 100%; object-fit: cover; display: block; background-color: #e0e0e0; animation: pulse 1.5s infinite; min-height: 250px; }
     
     .photo-details { padding: 8px 14px; }
     .description { margin: 0 0 8px 0; color: #444; font-size: 0.95rem; line-height: 1.4; }
@@ -842,8 +843,6 @@ export class PhotoWidgetComponent implements OnInit {
   photos: any[] = [];
   groupedPhotos: any[] = [];
   galleryGroups: any[] = [];
-  fullTimeline: any[] = [];
-  currentTargetMonth: string | undefined = undefined;
 
   albums: any[] = [];
   isAlbumsModalOpen = false;
@@ -1162,10 +1161,9 @@ export class PhotoWidgetComponent implements OnInit {
 
   currentPage = 1;
   lastPage = 1;
-  async loadData(targetMonth?: string) {
+  async loadData() {
     try {
       this.currentPage = 1;
-      this.currentTargetMonth = targetMonth;
       
       const infiniteScrolls = document.querySelectorAll('ion-infinite-scroll');
       infiniteScrolls.forEach((is: any) => is.disabled = false);
@@ -1188,12 +1186,7 @@ export class PhotoWidgetComponent implements OnInit {
       // 2. Cargar en segundo plano
       this.coupleInfo = await this.api.getCoupleInfo();
       console.log('DEBUG STREAK:', this.coupleInfo?.debug_streak);
-      const [response, timelineResponse] = await Promise.all([
-        this.api.getPhotos(this.currentAlbum ? this.currentAlbum.id : undefined, this.currentPage, this.currentTargetMonth),
-        this.api.getTimeline(this.currentAlbum ? this.currentAlbum.id : undefined)
-      ]);
-      
-      this.fullTimeline = timelineResponse || [];
+      const response = await this.api.getPhotos(this.currentAlbum ? this.currentAlbum.id : undefined, this.currentPage);
       this.lastPage = response.last_page || 1;
       const newPhotos = response.data || response;
       
@@ -1234,7 +1227,7 @@ export class PhotoWidgetComponent implements OnInit {
     }
     this.currentPage++;
     try {
-      const response = await this.api.getPhotos(this.currentAlbum ? this.currentAlbum.id : undefined, this.currentPage, this.currentTargetMonth);
+      const response = await this.api.getPhotos(this.currentAlbum ? this.currentAlbum.id : undefined, this.currentPage);
       const newPhotos = response.data || [];
       this.photos = [...this.photos, ...newPhotos];
       this.groupPhotosByDate();
@@ -1486,17 +1479,7 @@ export class PhotoWidgetComponent implements OnInit {
         try {
           const scrollEl = await this.gridContent.getScrollElement();
           const scrollHeight = scrollEl.scrollHeight - scrollEl.clientHeight;
-          if (scrollHeight > 0 && this.fullTimeline && this.fullTimeline.length > 0) {
-            let matchIndex = 0;
-            if (this.currentTargetMonth) {
-              matchIndex = this.fullTimeline.findIndex(t => t.month_year === this.currentTargetMonth);
-              if (matchIndex < 0) matchIndex = 0;
-            }
-            const basePct = (matchIndex / this.fullTimeline.length) * 100;
-            const domPct = (scrollTop / scrollHeight) * (100 / this.fullTimeline.length);
-            this.timelineThumbY = basePct + domPct;
-            this.timelineThumbY = Math.max(0, Math.min(100, this.timelineThumbY));
-          } else if (scrollHeight > 0) {
+          if (scrollHeight > 0) {
             this.timelineThumbY = (scrollTop / scrollHeight) * 100;
             this.timelineThumbY = Math.max(0, Math.min(100, this.timelineThumbY));
           }
@@ -1529,24 +1512,6 @@ export class PhotoWidgetComponent implements OnInit {
     this.timelineHideTimeout = setTimeout(() => {
       this.isTimelineVisible = false;
     }, 1500);
-
-    if (this.fullTimeline && this.fullTimeline.length > 0) {
-      const track = (e.target as HTMLElement).closest('.timeline-track');
-      if (track) {
-        const rect = track.getBoundingClientRect();
-        let y = e.changedTouches[0].clientY - rect.top;
-        y = Math.max(0, Math.min(y, rect.height));
-        const index = Math.floor((y / rect.height) * this.fullTimeline.length);
-        const safeIndex = Math.max(0, Math.min(index, this.fullTimeline.length - 1));
-        const targetMonth = this.fullTimeline[safeIndex].month_year;
-        if (this.currentTargetMonth !== targetMonth) {
-          this.photos = [];
-          this.groupedPhotos = [];
-          this.galleryGroups = [];
-          this.loadData(targetMonth);
-        }
-      }
-    }
   }
 
   handleTimelineDrag(touch: Touch) {
@@ -1560,19 +1525,18 @@ export class PhotoWidgetComponent implements OnInit {
     // Calcular porcentaje (0 a 100)
     this.timelineThumbY = (y / rect.height) * 100;
     
-    // Mapear el porcentaje al índice de fullTimeline
-    if (!this.fullTimeline || this.fullTimeline.length === 0) return;
+    // Mapear el porcentaje al índice del grupo de fotos
+    if (this.galleryGroups.length === 0) return;
     
-    const index = Math.floor((y / rect.height) * this.fullTimeline.length);
-    const safeIndex = Math.max(0, Math.min(index, this.fullTimeline.length - 1));
+    const index = Math.floor((y / rect.height) * this.galleryGroups.length);
+    const safeIndex = Math.max(0, Math.min(index, this.galleryGroups.length - 1));
     
-    const targetGroup = this.fullTimeline[safeIndex];
-    if (targetGroup && targetGroup.month_year) {
-      const parts = targetGroup.month_year.split('-');
-      if (parts.length === 2) {
-        const dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, 1);
-        const monthStr = dateObj.toLocaleString('es-ES', { month: 'short' });
-        this.timelineActiveLabel = `${monthStr.charAt(0).toUpperCase() + monthStr.slice(1)} ${parts[0]}`;
+    const targetGroup = this.galleryGroups[safeIndex];
+    if (targetGroup) {
+      this.timelineActiveLabel = targetGroup.monthYear;
+      const el = document.getElementById('group-' + safeIndex);
+      if (el) {
+        this.gridContent.scrollToPoint(0, el.offsetTop, 10);
       }
     }
   }
