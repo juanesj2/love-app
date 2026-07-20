@@ -6,7 +6,7 @@ import { LoveApiService } from '../../../services/love-api.service';
 import { ToastController } from '@ionic/angular/standalone';
 import { IonIcon, IonToggle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, starOutline, eyeOutline, imageOutline, heart } from 'ionicons/icons';
+import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, starOutline, eyeOutline, imageOutline, heart, closeCircle } from 'ionicons/icons';
 
 @Component({
   selector: 'app-god-mode-modal',
@@ -60,16 +60,33 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
             </div>
           </div>
 
-          <div class="form-group recipient-box">
+          <div class="form-group recipient-box" style="position: relative;">
             <label class="feature-label">Destinatario (Opcional)</label>
-            <div class="search-container">
-              <ion-icon name="search-outline" class="search-icon"></ion-icon>
-              <input type="text" [(ngModel)]="searchTerm" (input)="filterUsers()" placeholder="Buscar por nombre o correo..." class="search-input">
+
+            <!-- Show selected user badge if one is selected -->
+            <div class="selected-user-badge" *ngIf="eventData.target_user_id" (click)="clearSelection()">
+              <span>{{ getSelectedUserName() }}</span>
+              <ion-icon name="close-circle"></ion-icon>
             </div>
-            <select [(ngModel)]="eventData.target_user_id" class="custom-select">
-              <option [ngValue]="null">🌍 Todos (Global)</option>
-              <option *ngFor="let user of filteredUsers" [ngValue]="user.id">{{ user.name }} ({{ user.email }})</option>
-            </select>
+
+            <!-- Search input, hidden when a user is selected (unless you want to change it) -->
+            <div class="search-container" *ngIf="!eventData.target_user_id">
+              <ion-icon name="search-outline" class="search-icon"></ion-icon>
+              <input type="text" [(ngModel)]="searchTerm" (input)="filterUsers(); showDropdown = true" (focus)="showDropdown = true" placeholder="Buscar por nombre o correo..." class="search-input">
+            </div>
+            
+            <div class="custom-dropdown" *ngIf="showDropdown && !eventData.target_user_id">
+              <div class="dropdown-item" (click)="selectUser(null)">
+                🌍 Todos (Global)
+              </div>
+              <div class="dropdown-item" *ngFor="let user of filteredUsers" (click)="selectUser(user.id)">
+                <div class="user-name">{{ user.name }}</div>
+                <div class="user-email">{{ user.email }}</div>
+              </div>
+              <div class="dropdown-empty" *ngIf="filteredUsers.length === 0">
+                No se encontraron usuarios
+              </div>
+            </div>
           </div>
 
           <div class="form-group">
@@ -218,12 +235,20 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
     .theme-pill .emoji { font-size: 1.1rem; }
     
     .recipient-box { background: #f8f9fa; padding: 15px; border-radius: 16px; border: 1px solid #eee; }
-    .search-container { position: relative; margin-bottom: 10px; margin-top: 8px; }
+    .search-container { position: relative; margin-top: 8px; }
     .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #888; font-size: 1.1rem; }
-    .search-input { width: 100%; padding: 10px 12px 10px 35px !important; border: 2px solid #eee !important; border-radius: 12px !important; font-size: 0.9rem !important; background: #fff !important; }
+    .search-input { width: 100%; padding: 10px 12px 10px 35px !important; border: 2px solid #eee !important; border-radius: 12px !important; font-size: 0.9rem !important; background: #fff !important; margin: 0; }
     .search-input:focus { border-color: #FF4D6D !important; }
-    .custom-select { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #eee; font-size: 0.95rem; background: #fff; color: #333; font-family: inherit; cursor: pointer; transition: 0.2s; appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23888%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 15px top 50%; background-size: 12px auto; }
-    .custom-select:focus { border-color: #FF4D6D; outline: none; }
+    
+    .custom-dropdown { position: absolute; top: calc(100% + 5px); left: 0; right: 0; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-height: 220px; overflow-y: auto; z-index: 1000; border: 1px solid #eee; }
+    .dropdown-item { padding: 12px 15px; border-bottom: 1px solid #f5f5f5; cursor: pointer; transition: 0.2s; }
+    .dropdown-item:active, .dropdown-item:hover { background: #fdf0f2; }
+    .dropdown-item:last-child { border-bottom: none; }
+    .user-name { font-weight: 700; color: #333; font-size: 0.95rem; }
+    .user-email { font-size: 0.8rem; color: #888; }
+    .dropdown-empty { padding: 15px; text-align: center; color: #888; font-size: 0.9rem; }
+    .selected-user-badge { display: inline-flex; align-items: center; gap: 8px; background: #FF4D6D; color: white; padding: 8px 14px; border-radius: 100px; font-size: 0.9rem; font-weight: 700; margin-top: 8px; cursor: pointer; transition: 0.2s; }
+    .selected-user-badge:active { transform: scale(0.95); }
     
     /* Night Mode Support */
     :host-context(.night-owl-mode) .modal-content { background: #1a1b1e; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
@@ -244,6 +269,13 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
     :host-context(.night-owl-mode) .stop-btn { background: #2c2d33; color: #ccc; }
     :host-context(.night-owl-mode) .section-title { color: #aaa; }
     :host-context(.night-owl-mode) .theme-pill { background: #25262b; color: #ddd; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    :host-context(.night-owl-mode) .recipient-box { background: #25262b; border-color: #333; }
+    :host-context(.night-owl-mode) .custom-dropdown { background: #1a1b1e; border-color: #444; }
+    :host-context(.night-owl-mode) .dropdown-item { border-color: #333; }
+    :host-context(.night-owl-mode) .dropdown-item:active, :host-context(.night-owl-mode) .dropdown-item:hover { background: #2c2d33; }
+    :host-context(.night-owl-mode) .user-name { color: #eee; }
+    :host-context(.night-owl-mode) .user-email { color: #aaa; }
+    :host-context(.night-owl-mode) .dropdown-empty { color: #aaa; }
   `]
 })
 export class GodModeModalComponent implements OnInit, OnDestroy {
@@ -256,6 +288,7 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
   public users: any[] = [];
   public filteredUsers: any[] = [];
   public searchTerm: string = '';
+  public showDropdown = false;
   
   public eventData = {
     title: '',
@@ -271,7 +304,7 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
   public confettiColorsStr = '';
 
   constructor() {
-    addIcons({ closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, starOutline, eyeOutline, imageOutline, heart });
+    addIcons({ closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, starOutline, eyeOutline, imageOutline, heart, closeCircle });
   }
 
   async ngOnInit() {
@@ -285,6 +318,7 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
   }
 
   filterUsers() {
+    this.showDropdown = true;
     if (!this.searchTerm) {
       this.filteredUsers = [...this.users];
     } else {
@@ -294,6 +328,23 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
         u.email.toLowerCase().includes(term)
       );
     }
+  }
+
+  selectUser(id: number | null) {
+    this.eventData.target_user_id = id as any;
+    this.showDropdown = false;
+    this.searchTerm = '';
+  }
+
+  getSelectedUserName() {
+    if (!this.eventData.target_user_id) return '🌍 Todos (Global)';
+    const u = this.users.find(u => u.id === this.eventData.target_user_id);
+    return u ? u.name : 'Desconocido';
+  }
+
+  clearSelection() {
+    this.eventData.target_user_id = null as any;
+    this.showDropdown = false;
   }
 
   ngOnDestroy() {
