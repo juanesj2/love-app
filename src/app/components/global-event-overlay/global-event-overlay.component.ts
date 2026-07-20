@@ -91,27 +91,27 @@ export class GlobalEventOverlayComponent implements OnInit, OnDestroy {
       const duration = 5000;
       const end = Date.now() + duration;
 
-      const frame = () => {
+      const interval = setInterval(() => {
+        if (Date.now() > end || this.isDismissed) {
+          return clearInterval(interval);
+        }
+
         confetti({
-          particleCount: 5,
+          particleCount: 15,
           angle: 60,
           spread: 55,
           origin: { x: 0 },
           colors: colors && colors.length ? colors : undefined
         });
+        
         confetti({
-          particleCount: 5,
+          particleCount: 15,
           angle: 120,
           spread: 55,
           origin: { x: 1 },
           colors: colors && colors.length ? colors : undefined
         });
-
-        if (Date.now() < end && !this.isDismissed) {
-          requestAnimationFrame(frame);
-        }
-      };
-      frame();
+      }, 250);
     });
   }
 
