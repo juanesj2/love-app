@@ -32,9 +32,6 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
               <span>Eventos Globales</span>
             </div>
             <div class="horizontal-scroll-container" style="margin-bottom: 15px;">
-              <button class="theme-pill" (click)="loadTheme('cumple')">
-                <span class="emoji">🎂</span> Cumple
-              </button>
               <button class="theme-pill" (click)="loadTheme('navidad')">
                 <span class="emoji">🎄</span> Navidad
               </button>
@@ -54,6 +51,9 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
               <span>Para mi chica</span>
             </div>
             <div class="horizontal-scroll-container">
+              <button class="theme-pill" (click)="loadTheme('cumple')">
+                <span class="emoji">🎂</span> Cumple
+              </button>
               <button class="theme-pill" (click)="loadTheme('buenos_dias')">
                 <span class="emoji">☀️</span> Buenos Días
               </button>
@@ -384,14 +384,6 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
       this.eventData.emojis_enabled = true;
       this.eventData.emojis_list = '🎃,👻,🦇,🕷️';
       this.eventData.top_bar_color = 'linear-gradient(135deg, #1a0033, #ff6600)';
-    } else if (theme === 'cumple') {
-      this.eventData.title = '¡Feliz Cumpleaños!';
-      this.eventData.message = '¡Que lo pases genial!';
-      this.eventData.confetti_enabled = true;
-      this.confettiColorsStr = '#ff0000,#00ff00,#0000ff,#ffff00,#ff00ff';
-      this.eventData.emojis_enabled = true;
-      this.eventData.emojis_list = '🎂,🎉,🥳,🎁';
-      this.eventData.top_bar_color = 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)';
     } else if (theme === 'navidad') {
       this.eventData.title = '¡Feliz Navidad!';
       this.eventData.message = 'Os deseamos unas fiestas mágicas 🎄';
@@ -418,7 +410,15 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
       this.eventData.top_bar_color = 'linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%)';
     } 
     // === EVENTOS PARA PAREJA ===
-    else if (theme === 'buenos_dias') {
+    else if (theme === 'cumple') {
+      this.eventData.title = '¡Feliz Cumpleaños!';
+      this.eventData.message = '¡Que lo pases genial hoy en tu día!';
+      this.eventData.confetti_enabled = true;
+      this.confettiColorsStr = '#ff0000,#00ff00,#0000ff,#ffff00,#ff00ff';
+      this.eventData.emojis_enabled = true;
+      this.eventData.emojis_list = '🎂,🎉,🥳,🎁';
+      this.eventData.top_bar_color = 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)';
+    } else if (theme === 'buenos_dias') {
       this.eventData.title = '¡Buenos días mi vida!';
       this.eventData.message = 'Espero que tengas un día maravilloso ☀️';
       this.eventData.confetti_enabled = false;
