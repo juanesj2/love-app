@@ -47,7 +47,7 @@ export class GlobalEventOverlayComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.sub = this.globalEventService.activeEvent$.subscribe(evt => {
       console.log('GlobalEvent Received:', evt);
-      if (evt && (!this.event || this.event.id !== evt.id)) {
+      if (evt && evt.id && (!this.event || this.event.id !== evt.id)) {
         if (localStorage.getItem('dismissed_global_event_' + evt.id) === 'true') {
           return;
         }
@@ -73,7 +73,7 @@ export class GlobalEventOverlayComponent implements OnInit, OnDestroy {
           document.body.style.removeProperty('--ion-background-color');
         }
 
-      } else if (!evt) {
+      } else if (!evt || !evt.id) {
         this.event = null;
         document.body.style.removeProperty('--ion-color-primary');
         document.body.style.removeProperty('--ion-background-color');
