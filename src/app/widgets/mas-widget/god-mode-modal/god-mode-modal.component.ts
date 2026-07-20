@@ -35,8 +35,14 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
               <button class="theme-pill" (click)="loadTheme('cumple')">
                 <span class="emoji">🎂</span> Cumple
               </button>
-              <button class="theme-pill" (click)="loadTheme('espana')">
-                <span class="emoji">🇪🇸</span> España
+              <button class="theme-pill" (click)="loadTheme('navidad')">
+                <span class="emoji">🎄</span> Navidad
+              </button>
+              <button class="theme-pill" (click)="loadTheme('ano_nuevo')">
+                <span class="emoji">🎆</span> Año Nuevo
+              </button>
+              <button class="theme-pill" (click)="loadTheme('san_valentin')">
+                <span class="emoji">💘</span> San Valentín
               </button>
               <button class="theme-pill" (click)="loadTheme('halloween')">
                 <span class="emoji">🎃</span> Halloween
@@ -48,11 +54,20 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
               <span>Para mi chica</span>
             </div>
             <div class="horizontal-scroll-container">
-              <button class="theme-pill" (click)="loadTheme('amor')">
-                <span class="emoji">❤️</span> Te Quiero
+              <button class="theme-pill" (click)="loadTheme('buenos_dias')">
+                <span class="emoji">☀️</span> Buenos Días
               </button>
               <button class="theme-pill" (click)="loadTheme('buenas_noches')">
                 <span class="emoji">🌙</span> Buenas Noches
+              </button>
+              <button class="theme-pill" (click)="loadTheme('amor')">
+                <span class="emoji">❤️</span> Te Quiero
+              </button>
+              <button class="theme-pill" (click)="loadTheme('te_extrano')">
+                <span class="emoji">🥺</span> Te Extraño
+              </button>
+              <button class="theme-pill" (click)="loadTheme('aniversario')">
+                <span class="emoji">🥂</span> Aniversario
               </button>
               <button class="theme-pill" (click)="loadTheme('sorpresa')">
                 <span class="emoji">🎁</span> Sorpresita
@@ -360,6 +375,7 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
   }
 
   loadTheme(theme: string) {
+    // === EVENTOS GLOBALES ===
     if (theme === 'halloween') {
       this.eventData.title = '¡Feliz Halloween!';
       this.eventData.message = 'Truco o trato...';
@@ -376,14 +392,40 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
       this.eventData.emojis_enabled = true;
       this.eventData.emojis_list = '🎂,🎉,🥳,🎁';
       this.eventData.top_bar_color = 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)';
-    } else if (theme === 'amor') {
-      this.eventData.title = '¡Sorpresa de Amor!';
-      this.eventData.message = 'Te quiero muchísimo ❤️';
+    } else if (theme === 'navidad') {
+      this.eventData.title = '¡Feliz Navidad!';
+      this.eventData.message = 'Os deseamos unas fiestas mágicas 🎄';
       this.eventData.confetti_enabled = true;
-      this.confettiColorsStr = '#ff4d6d,#c9184a';
+      this.confettiColorsStr = '#ffffff,#ff0000,#008000';
       this.eventData.emojis_enabled = true;
-      this.eventData.emojis_list = '❤️,💖,💘,🥰';
-      this.eventData.top_bar_color = 'linear-gradient(135deg, #FF4D6D, #c9184a)';
+      this.eventData.emojis_list = '🎄,🎅,❄️,⛄';
+      this.eventData.top_bar_color = 'linear-gradient(135deg, #0f9b0f, #d60000)';
+    } else if (theme === 'ano_nuevo') {
+      this.eventData.title = '¡Feliz Año Nuevo!';
+      this.eventData.message = 'Por un año lleno de cosas buenas ✨';
+      this.eventData.confetti_enabled = true;
+      this.confettiColorsStr = '#ffd700,#c0c0c0,#ffffff';
+      this.eventData.emojis_enabled = true;
+      this.eventData.emojis_list = '🎆,🥂,✨,🎉';
+      this.eventData.top_bar_color = 'linear-gradient(135deg, #111111, #d4af37)';
+    } else if (theme === 'san_valentin') {
+      this.eventData.title = '¡Feliz San Valentín!';
+      this.eventData.message = 'Día para celebrar el amor 💕';
+      this.eventData.confetti_enabled = true;
+      this.confettiColorsStr = '#ff0000,#ff69b4,#ff1493';
+      this.eventData.emojis_enabled = true;
+      this.eventData.emojis_list = '💘,🌹,💝,🥰';
+      this.eventData.top_bar_color = 'linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%)';
+    } 
+    // === EVENTOS PARA PAREJA ===
+    else if (theme === 'buenos_dias') {
+      this.eventData.title = '¡Buenos días mi vida!';
+      this.eventData.message = 'Espero que tengas un día maravilloso ☀️';
+      this.eventData.confetti_enabled = false;
+      this.confettiColorsStr = '';
+      this.eventData.emojis_enabled = true;
+      this.eventData.emojis_list = '☀️,☕,🌻,🥰';
+      this.eventData.top_bar_color = 'linear-gradient(120deg, #f6d365 0%, #fda085 100%)';
     } else if (theme === 'buenas_noches') {
       this.eventData.title = '¡Buenas noches mi amor!';
       this.eventData.message = 'Que sueñes con los angelitos ✨';
@@ -392,6 +434,30 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
       this.eventData.emojis_enabled = true;
       this.eventData.emojis_list = '🌙,✨,💫,😴';
       this.eventData.top_bar_color = 'linear-gradient(135deg, #1e3c72, #2a5298)';
+    } else if (theme === 'amor') {
+      this.eventData.title = 'Pensando en ti...';
+      this.eventData.message = 'Solo quería recordarte que te amo ❤️';
+      this.eventData.confetti_enabled = true;
+      this.confettiColorsStr = '#ff4d6d,#c9184a';
+      this.eventData.emojis_enabled = true;
+      this.eventData.emojis_list = '❤️,💖,💘,🥰';
+      this.eventData.top_bar_color = 'linear-gradient(135deg, #FF4D6D, #c9184a)';
+    } else if (theme === 'te_extrano') {
+      this.eventData.title = '¡Te echo mucho de menos!';
+      this.eventData.message = 'Tengo muchas ganas de verte 🥺';
+      this.eventData.confetti_enabled = false;
+      this.confettiColorsStr = '';
+      this.eventData.emojis_enabled = true;
+      this.eventData.emojis_list = '🥺,🫂,💔,😢';
+      this.eventData.top_bar_color = 'linear-gradient(to right, #4facfe 0%, #00f2fe 100%)';
+    } else if (theme === 'aniversario') {
+      this.eventData.title = '¡Feliz Aniversario mi amor!';
+      this.eventData.message = 'Gracias por hacerme tan feliz 🥂';
+      this.eventData.confetti_enabled = true;
+      this.confettiColorsStr = '#ff0000,#ff4d6d,#ffd700';
+      this.eventData.emojis_enabled = true;
+      this.eventData.emojis_list = '🥂,🎉,💍,❤️';
+      this.eventData.top_bar_color = 'linear-gradient(to top, #ff0844 0%, #ffb199 100%)';
     } else if (theme === 'sorpresa') {
       this.eventData.title = '¡Tengo una sorpresa para ti!';
       this.eventData.message = 'Abre el chat cuando puedas 👀';
@@ -400,14 +466,6 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
       this.eventData.emojis_enabled = true;
       this.eventData.emojis_list = '🎁,🤫,👀,✨';
       this.eventData.top_bar_color = 'linear-gradient(120deg, #f093fb 0%, #f5576c 100%)';
-    } else if (theme === 'espana') {
-      this.eventData.title = '¡Viva España!';
-      this.eventData.message = '¡A por todas!';
-      this.eventData.confetti_enabled = true;
-      this.confettiColorsStr = '#aa151b,#f1bf00';
-      this.eventData.emojis_enabled = true;
-      this.eventData.emojis_list = '🇪🇸,🏆,🥇,⚽';
-      this.eventData.top_bar_color = 'linear-gradient(to bottom, #c60b1e 25%, #ffc400 25%, #ffc400 75%, #c60b1e 75%)';
     }
   }
 
