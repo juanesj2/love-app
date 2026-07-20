@@ -226,7 +226,7 @@ import { GodModeModalComponent } from './god-mode-modal/god-mode-modal.component
         </div>
 
         <!-- God Mode (Solo SuperAdmin) -->
-        <button class="god-mode-btn" *ngIf="user?.rol === 'SuperAdmin'" (click)="isGodModeModalOpen = true">
+        <button class="god-mode-btn" *ngIf="myRole === 'SuperAdmin'" (click)="isGodModeModalOpen = true">
           <ion-icon name="flash-outline"></ion-icon> God Mode
         </button>
 
@@ -1171,6 +1171,8 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   isMovieListModalOpen = false;
   isGodModeModalOpen = false;
 
+  myRole: string = '';
+
   isAddingFoodPlace = false;
   newFoodPlace: any = { name: '', location: '', description: '', rating: 5, category: '', is_favorite: false, imageBase64: null };
 
@@ -1373,6 +1375,8 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     try {
       const info = await this.api.getCoupleInfo();
       
+      this.myRole = info.my_role || '';
+
       // Usar IDs reales
       this.myUserId = info.my_id as any;
 
