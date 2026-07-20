@@ -21,6 +21,7 @@ import { nativeHttpInterceptor } from './app/interceptors/native-http.intercepto
 import { LOCALE_ID } from '@angular/core';
 import localeEs from '@angular/common/locales/es';
 import { registerLocaleData } from '@angular/common';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 registerLocaleData(localeEs, 'es-ES');
 
@@ -29,6 +30,7 @@ bootstrapApplication(AppComponent, {
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     { provide: LOCALE_ID, useValue: 'es-ES' },
     provideIonicAngular(),
+    provideAnimationsAsync(),
     provideRouter(routes, withPreloading(PreloadAllModules)),
     provideHttpClient(withInterceptors([authInterceptor])),
     
