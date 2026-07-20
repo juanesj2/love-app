@@ -45,9 +45,9 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
               <label>Paleta de colores:</label>
               <div class="preset-row">
                 <div class="color-preset multicolor" (click)="setConfetti('#ff0000,#00ff00,#0000ff,#ffff00,#ff00ff')" [class.active]="confettiColorsStr === '#ff0000,#00ff00,#0000ff,#ffff00,#ff00ff'"></div>
-                <div class="color-preset" style="background: linear-gradient(135deg, #ff4d6d, #c9184a)" (click)="setConfetti('#ff4d6d,#c9184a')" [class.active]="confettiColorsStr === '#ff4d6d,#c9184a'"></div>
-                <div class="color-preset" style="background: linear-gradient(90deg, #aa151b 33%, #f1bf00 33%, #f1bf00 66%, #aa151b 66%)" (click)="setConfetti('#aa151b,#f1bf00')" [class.active]="confettiColorsStr === '#aa151b,#f1bf00'"></div>
-                <div class="color-preset" style="background: linear-gradient(135deg, #ffd700, #fb8500)" (click)="setConfetti('#ffd700,#fb8500')" [class.active]="confettiColorsStr === '#ffd700,#fb8500'"></div>
+                <div class="color-preset" [style.background]="'linear-gradient(135deg, #ff4d6d, #c9184a)'" (click)="setConfetti('#ff4d6d,#c9184a')" [class.active]="confettiColorsStr === '#ff4d6d,#c9184a'"></div>
+                <div class="color-preset" [style.background]="'linear-gradient(90deg, #aa151b 33%, #f1bf00 33%, #f1bf00 66%, #aa151b 66%)'" (click)="setConfetti('#aa151b,#f1bf00')" [class.active]="confettiColorsStr === '#aa151b,#f1bf00'"></div>
+                <div class="color-preset" [style.background]="'linear-gradient(135deg, #ffd700, #fb8500)'" (click)="setConfetti('#ffd700,#fb8500')" [class.active]="confettiColorsStr === '#ffd700,#fb8500'"></div>
               </div>
               <input type="text" class="small-input" [(ngModel)]="confettiColorsStr" placeholder="O personaliza: #HEX, #HEX">
             </div>
@@ -99,8 +99,9 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
     </div>
   `,
   styles: [`
-    .custom-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); padding: 15px; box-sizing: border-box; }
-    .modal-content { background: #fff; width: 100%; max-width: 380px; border-radius: 24px; padding: 25px 20px; position: relative; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+    .custom-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); padding: 25px 20px; box-sizing: border-box; }
+    .modal-content { background: #fff; width: 100%; max-width: 380px; border-radius: 24px; padding: 25px 20px; position: relative; max-height: 100%; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+
     .scrollable-form { overflow-y: auto; overflow-x: hidden; padding-right: 5px; flex-shrink: 1; }
     .scrollable-form::-webkit-scrollbar { width: 5px; }
     .scrollable-form::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
