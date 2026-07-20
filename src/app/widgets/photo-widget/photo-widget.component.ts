@@ -1492,7 +1492,7 @@ export class PhotoWidgetComponent implements OnInit {
   }
 
   onTimelineTouchStart(e: TouchEvent) {
-    e.preventDefault(); // Evita scroll nativo
+    if (e.cancelable) e.preventDefault(); // Evita scroll nativo
     this.isDraggingTimeline = true;
     this.isTimelineVisible = true;
     clearTimeout(this.timelineHideTimeout);
@@ -1500,7 +1500,7 @@ export class PhotoWidgetComponent implements OnInit {
   }
 
   onTimelineTouchMove(e: TouchEvent) {
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
     if (this.isDraggingTimeline) {
       this.handleTimelineDrag(e.touches[0]);
     }
