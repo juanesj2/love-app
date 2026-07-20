@@ -25,14 +25,24 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
         <p class="subtitle">Diseña y lanza un evento global</p>
 
         <div class="scrollable-form">
-          <div class="feature-box presets-box" style="margin-bottom: 20px;">
-            <label class="feature-label">Eventos Rápidos</label>
-            <div class="preset-row" style="margin-top: 10px; overflow-x: auto; padding-bottom: 5px;">
-              <button class="event-preset-btn" (click)="loadTheme('cumple')">🎂 Cumple</button>
-              <button class="event-preset-btn" (click)="loadTheme('amor')">❤️ Amor</button>
-              <button class="event-preset-btn" (click)="loadTheme('espana')">🇪🇸 España</button>
-              <button class="event-preset-btn" (click)="loadTheme('halloween')">🎃 Halloween</button>
-              <button class="event-preset-btn" (click)="loadTheme('matrix')">💻 Matrix</button>
+          <div class="presets-section">
+            <div class="section-title">
+              <ion-icon name="star-outline" style="color: #FF4D6D;"></ion-icon>
+              <span>Eventos Rápidos</span>
+            </div>
+            <div class="horizontal-scroll-container">
+              <button class="theme-pill" (click)="loadTheme('cumple')">
+                <span class="emoji">🎂</span> Cumple
+              </button>
+              <button class="theme-pill" (click)="loadTheme('amor')">
+                <span class="emoji">❤️</span> Amor
+              </button>
+              <button class="theme-pill" (click)="loadTheme('espana')">
+                <span class="emoji">🇪🇸</span> España
+              </button>
+              <button class="theme-pill" (click)="loadTheme('halloween')">
+                <span class="emoji">🎃</span> Halloween
+              </button>
             </div>
           </div>
 
@@ -173,9 +183,13 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
     .stop-btn { background: #f1f3f5; color: #555; border: none; padding: 14px; border-radius: 16px; font-size: 0.95rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; cursor: pointer; transition: 0.2s; }
     button:active { transform: scale(0.96); }
 
-    .presets-box { background: rgba(255, 77, 109, 0.05); border: 1px dashed #FF4D6D; }
-    .event-preset-btn { white-space: nowrap; background: white; border: 1px solid #ddd; padding: 6px 12px; border-radius: 20px; font-weight: bold; color: #555; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
-    .event-preset-btn:active { transform: scale(0.95); }
+    .presets-section { margin-bottom: 20px; }
+    .section-title { display: flex; align-items: center; gap: 6px; font-weight: 800; color: #444; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+    .horizontal-scroll-container { display: flex; gap: 12px; overflow-x: auto; padding: 4px 4px 10px 4px; margin: 0 -4px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+    .horizontal-scroll-container::-webkit-scrollbar { display: none; }
+    .theme-pill { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; background: white; border: none; padding: 10px 16px; border-radius: 100px; font-weight: 700; color: #555; font-size: 0.9rem; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .theme-pill:active { transform: scale(0.95); box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+    .theme-pill .emoji { font-size: 1.1rem; }
     
     /* Night Mode Support */
     :host-context(.night-owl-mode) .modal-content { background: #1a1b1e; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
@@ -194,6 +208,8 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
     :host-context(.night-owl-mode) .emoji-preset.active { border-color: #ff758f; background: rgba(255,117,143,0.1); }
     :host-context(.night-owl-mode) .color-input::-webkit-color-swatch { border-color: #444; }
     :host-context(.night-owl-mode) .stop-btn { background: #2c2d33; color: #ccc; }
+    :host-context(.night-owl-mode) .section-title { color: #aaa; }
+    :host-context(.night-owl-mode) .theme-pill { background: #25262b; color: #ddd; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
   `]
 })
 export class GodModeModalComponent implements OnInit, OnDestroy {
@@ -268,13 +284,6 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
       this.eventData.emojis_enabled = true;
       this.eventData.emojis_list = '🇪🇸,🏆,🥇,⚽';
       this.eventData.top_bar_color = 'linear-gradient(to bottom, #c60b1e 25%, #ffc400 25%, #ffc400 75%, #c60b1e 75%)';
-    } else if (theme === 'matrix') {
-      this.eventData.title = 'Wake up, Neo...';
-      this.eventData.message = 'The Matrix has you.';
-      this.eventData.confetti_enabled = false;
-      this.eventData.emojis_enabled = true;
-      this.eventData.emojis_list = '💻,📱,👽';
-      this.eventData.top_bar_color = 'url("https://media.giphy.com/media/A0667YgRCv0UU/giphy.gif") center/cover, #000';
     }
   }
 
