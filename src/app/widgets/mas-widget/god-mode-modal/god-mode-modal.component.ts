@@ -86,6 +86,8 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
               <input type="text" class="small-input" [(ngModel)]="eventData.top_bar_color" placeholder="Color o linear-gradient (ej: #FF0000)">
             </div>
           </div>
+
+          <div class="form-row" style="margin-top: 10px;">
             <div class="form-group flex-1 mb-0">
               <label>Minutos (0=inf)</label>
               <input type="number" [(ngModel)]="eventData.duration_minutes">
