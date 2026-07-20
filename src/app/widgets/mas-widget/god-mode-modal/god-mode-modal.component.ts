@@ -60,11 +60,15 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
             </div>
           </div>
 
-          <div class="form-group" style="background: #f0f4f8; padding: 12px; border-radius: 12px; border: 1px solid #dce4ec;">
-            <label style="color: #2c3e50; font-size: 0.9rem;">Destinatario (Opcional)</label>
-            <select [(ngModel)]="eventData.target_user_id" style="width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ccc; font-size: 0.95rem; background: white;">
+          <div class="form-group recipient-box">
+            <label class="feature-label">Destinatario (Opcional)</label>
+            <div class="search-container">
+              <ion-icon name="search-outline" class="search-icon"></ion-icon>
+              <input type="text" [(ngModel)]="searchTerm" (input)="filterUsers()" placeholder="Buscar por nombre o correo..." class="search-input">
+            </div>
+            <select [(ngModel)]="eventData.target_user_id" class="custom-select">
               <option [ngValue]="null">🌍 Todos (Global)</option>
-              <option *ngFor="let user of users" [ngValue]="user.id">{{ user.name }} ({{ user.email }})</option>
+              <option *ngFor="let user of filteredUsers" [ngValue]="user.id">{{ user.name }} ({{ user.email }})</option>
             </select>
           </div>
 
@@ -213,6 +217,14 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
     .theme-pill:active { transform: scale(0.95); box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
     .theme-pill .emoji { font-size: 1.1rem; }
     
+    .recipient-box { background: #f8f9fa; padding: 15px; border-radius: 16px; border: 1px solid #eee; }
+    .search-container { position: relative; margin-bottom: 10px; margin-top: 8px; }
+    .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #888; font-size: 1.1rem; }
+    .search-input { width: 100%; padding: 10px 12px 10px 35px !important; border: 2px solid #eee !important; border-radius: 12px !important; font-size: 0.9rem !important; background: #fff !important; }
+    .search-input:focus { border-color: #FF4D6D !important; }
+    .custom-select { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #eee; font-size: 0.95rem; background: #fff; color: #333; font-family: inherit; cursor: pointer; transition: 0.2s; appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23888%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 15px top 50%; background-size: 12px auto; }
+    .custom-select:focus { border-color: #FF4D6D; outline: none; }
+    
     /* Night Mode Support */
     :host-context(.night-owl-mode) .modal-content { background: #1a1b1e; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
     :host-context(.night-owl-mode) .god-title { color: #ff758f; }
@@ -242,6 +254,8 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
 
   public isLoading = false;
   public users: any[] = [];
+  public filteredUsers: any[] = [];
+  public searchTerm: string = '';
   
   public eventData = {
     title: '',
@@ -264,8 +278,21 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
     document.body.classList.add('hide-tabs');
     try {
       this.users = await this.loveApi.getAllUsers();
+      this.filteredUsers = [...this.users];
     } catch (e) {
       console.error('Error loading users', e);
+    }
+  }
+
+  filterUsers() {
+    if (!this.searchTerm) {
+      this.filteredUsers = [...this.users];
+    } else {
+      const term = this.searchTerm.toLowerCase();
+      this.filteredUsers = this.users.filter(u => 
+        u.name.toLowerCase().includes(term) || 
+        u.email.toLowerCase().includes(term)
+      );
     }
   }
 
