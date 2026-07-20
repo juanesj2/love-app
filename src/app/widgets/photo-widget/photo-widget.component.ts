@@ -1162,9 +1162,6 @@ export class PhotoWidgetComponent implements OnInit {
 
   currentPage = 1;
   lastPage = 1;
-  fullTimeline = [];
-  currentTargetMonth?: string;
-
   async loadData(targetMonth?: string) {
     try {
       this.currentPage = 1;
