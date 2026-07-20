@@ -549,8 +549,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
     
     .photo-card:active img.main-photo { transform: scale(0.98); }
-    .grid-photo { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; background-color: #e0e0e0; animation: pulse 1.5s infinite; }
-    @keyframes pulse { 0% { opacity: 0.7; } 50% { opacity: 1; } 100% { opacity: 0.7; } }
+    .grid-photo { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; background-color: #e0e0e0; }
     .grid-photo-container:active .grid-photo { transform: scale(0.95); }
     .grid-photo-container.selected { border: 3px solid #FF4D6D; transform: scale(0.95); }
     .grid-overlay { position: absolute; bottom: 3px; right: 3px; background: rgba(255,255,255,0.85); border-radius: 12px; padding: 1px 4px; font-size: 0.7rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
@@ -574,7 +573,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .delete-post-btn:hover { background: #FF4D6D; transform: scale(1.1); }
     
     .image-wrapper { width: 100%; aspect-ratio: 1/1; max-height: 48vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; position: relative; }
-    .main-photo { width: 100%; height: 100%; object-fit: cover; display: block; background-color: #e0e0e0; animation: pulse 1.5s infinite; min-height: 250px; }
+    .main-photo { width: 100%; height: 100%; object-fit: cover; display: block; background-color: #e0e0e0; min-height: 250px; }
     
     .photo-details { padding: 8px 14px; }
     .description { margin: 0 0 8px 0; color: #444; font-size: 0.95rem; line-height: 1.4; }
