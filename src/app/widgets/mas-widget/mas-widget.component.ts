@@ -23,12 +23,13 @@ import { ModalController } from '@ionic/angular';
 import { NotificationService } from '../../services/notification.service';
 import confetti from 'canvas-confetti';
 import { GodModeModalComponent } from './god-mode-modal/god-mode-modal.component';
+import { PremiumEventModalComponent } from './premium-event-modal/premium-event-modal.component';
 
 
 @Component({
   selector: 'app-mas-widget',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent, IonRefresher, IonRefresherContent, IonIcon, IonSelect, IonSelectOption, IonToggle, TimelineWidgetComponent, GodModeModalComponent],
+  imports: [CommonModule, FormsModule, IonContent, IonRefresher, IonRefresherContent, IonIcon, IonSelect, IonSelectOption, IonToggle, TimelineWidgetComponent, GodModeModalComponent, PremiumEventModalComponent],
   template: `
     <ion-content class="scroll-content">
       <ng-template #staticStars let-rating="rating">
@@ -159,6 +160,18 @@ import { GodModeModalComponent } from './god-mode-modal/god-mode-modal.component
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- Impulsa tu Relación Banner -->
+        <div class="boost-banner" (click)="showPremiumEventModal = true">
+          <div class="boost-left">
+            <div class="boost-icon">🚀</div>
+            <div class="boost-text">
+              <span class="boost-title">Dale un impulso a tu relación</span>
+              <span class="boost-sub">Envíale una notificación sorpresa · 24h · 0.99€</span>
+            </div>
+          </div>
+          <div class="boost-arrow">›</div>
         </div>
 
         <!-- Quick Actions Grid -->
@@ -694,6 +707,9 @@ import { GodModeModalComponent } from './god-mode-modal/god-mode-modal.component
         <!-- God Mode Modal -->
         <app-god-mode-modal *ngIf="isGodModeModalOpen" (close)="isGodModeModalOpen = false"></app-god-mode-modal>
 
+        <!-- Premium Event Modal (Impulsa tu Relación) -->
+        <app-premium-event-modal *ngIf="showPremiumEventModal" (close)="showPremiumEventModal = false"></app-premium-event-modal>
+
         <!-- Logout Confirmation Modal -->
         <div class="custom-overlay" *ngIf="isLogoutModalOpen" (click)="isLogoutModalOpen = false">
           <div class="modal-content glass-card" style="margin: 20px; padding: 30px; text-align: center; width: 85%; max-width: 350px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15);" (click)="$event.stopPropagation()">
@@ -880,6 +896,16 @@ import { GodModeModalComponent } from './god-mode-modal/god-mode-modal.component
     .delete-icon:active { color: #FF4D6D; }
     
     .add-glass { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+
+    /* Boost Banner */
+    .boost-banner { display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, #FF4D6D 0%, #c9184a 100%); border-radius: 22px; padding: 18px 20px; margin-bottom: 18px; cursor: pointer; box-shadow: 0 8px 24px rgba(255,77,109,0.35); transition: transform 0.2s, box-shadow 0.2s; }
+    .boost-banner:active { transform: scale(0.98); box-shadow: 0 4px 12px rgba(255,77,109,0.25); }
+    .boost-left { display: flex; align-items: center; gap: 14px; }
+    .boost-icon { font-size: 2rem; line-height: 1; }
+    .boost-text { display: flex; flex-direction: column; gap: 3px; }
+    .boost-title { font-size: 1rem; font-weight: 900; color: white; }
+    .boost-sub { font-size: 0.78rem; color: rgba(255,255,255,0.8); font-weight: 600; }
+    .boost-arrow { font-size: 1.8rem; color: rgba(255,255,255,0.7); font-weight: 300; line-height: 1; }
 
     /* Quick Actions Grid */
     .quick-actions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
@@ -1170,6 +1196,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   isFeedbackModalOpen = false;
   isMovieListModalOpen = false;
   isGodModeModalOpen = false;
+  showPremiumEventModal = false;
 
   myRole: string = '';
 
