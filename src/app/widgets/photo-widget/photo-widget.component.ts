@@ -837,6 +837,7 @@ export class PhotoWidgetComponent implements OnInit {
 
   viewMode: 'feed' | 'grid' = 'feed';
   @ViewChild(IonContent, { static: false }) content!: IonContent;
+  @ViewChild('gridContent', { static: false }) gridContent!: IonContent;
 
   photos: any[] = [];
   groupedPhotos: any[] = [];
@@ -1474,9 +1475,9 @@ export class PhotoWidgetComponent implements OnInit {
       this.isTimelineVisible = true;
       clearTimeout(this.timelineHideTimeout);
       
-      if (!this.isDraggingTimeline && this.content) {
+      if (!this.isDraggingTimeline && this.gridContent) {
         try {
-          const scrollEl = await this.content.getScrollElement();
+          const scrollEl = await this.gridContent.getScrollElement();
           const scrollHeight = scrollEl.scrollHeight - scrollEl.clientHeight;
           if (scrollHeight > 0) {
             this.timelineThumbY = (scrollTop / scrollHeight) * 100;
@@ -1535,7 +1536,7 @@ export class PhotoWidgetComponent implements OnInit {
       this.timelineActiveLabel = targetGroup.monthYear;
       const el = document.getElementById('group-' + safeIndex);
       if (el) {
-        this.content.scrollToPoint(0, el.offsetTop, 10);
+        this.gridContent.scrollToPoint(0, el.offsetTop, 10);
       }
     }
   }
