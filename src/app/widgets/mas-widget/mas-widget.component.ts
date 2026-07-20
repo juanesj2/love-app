@@ -240,8 +240,6 @@ import { PremiumEventModalComponent } from './premium-event-modal/premium-event-
           <p style="margin: 0; font-size: 0.85rem; color: #495057; font-weight: 500;">Modo Búho, Privacidad y Cuenta.</p>
         </div>
 
-        </div>
-
         <!-- God Mode (Solo SuperAdmin) -->
         <button class="god-mode-btn" *ngIf="myRole === 'SuperAdmin'" (click)="isGodModeModalOpen = true">
           <ion-icon name="flash-outline"></ion-icon> God Mode
