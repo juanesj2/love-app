@@ -219,23 +219,26 @@ import { PremiumEventModalComponent } from './premium-event-modal/premium-event-
             <span class="sub" *ngIf="uploadingAvatar">Actualizando...</span>
           </div>
 
-          <!-- Impulsa tu Relación Banner -->
-          <div class="boost-banner" (click)="showPremiumEventModal = true">
-            <div class="boost-left">
-              <div class="boost-icon">🚀</div>
-              <div class="boost-text">
-                <span class="boost-title">Dale un impulso a tu relación</span>
-                <span class="boost-sub">Envíale una sorpresa · Solo para tu pareja · 0.99€</span>
-              </div>
-            </div>
-            <div class="boost-arrow">›</div>
-          </div>
+        </div>
 
-          <!-- Settings -->
-          <div class="grid-card full-width interactive" id="mas-ajustes" (click)="openSettingsModal()">
-            <h4><ion-icon name="settings-sharp" style="color: #6c757d;"></ion-icon> Ajustes de Cuenta</h4>
-            <p style="margin: 0; font-size: 0.85rem; color: #495057; font-weight: 500;">Modo Búho, Privacidad y Cuenta.</p>
+        <!-- Impulsa tu Relación Banner (full width, fuera del grid) -->
+        <div class="boost-banner" (click)="showPremiumEventModal = true">
+          <div class="boost-left">
+            <div class="boost-icon">🚀</div>
+            <div class="boost-text">
+              <span class="boost-title">Dale un impulso a tu relación</span>
+              <span class="boost-sub">Envíale una notificación sorpresa · 24h · Solo para tu pareja</span>
+              <span class="boost-price">0.99 € →</span>
+            </div>
           </div>
+          <div class="boost-badge">NUEVO</div>
+        </div>
+
+        <!-- Settings -->
+        <div class="grid-card full-width interactive" id="mas-ajustes" (click)="openSettingsModal()">
+          <h4><ion-icon name="settings-sharp" style="color: #6c757d;"></ion-icon> Ajustes de Cuenta</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: #495057; font-weight: 500;">Modo Búho, Privacidad y Cuenta.</p>
+        </div>
 
         </div>
 
@@ -896,16 +899,18 @@ import { PremiumEventModalComponent } from './premium-event-modal/premium-event-
     .delete-icon { color: #ffccd5; font-size: 1.5rem; cursor: pointer; transition: color 0.2s; padding: 4px; }
     .delete-icon:active { color: #FF4D6D; }
     
-    .add-glass { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-
     /* Boost Banner */
-    .boost-banner { grid-column: span 2; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, #FF4D6D 0%, #c9184a 100%); border-radius: 22px; padding: 18px 20px; cursor: pointer; box-shadow: 0 8px 24px rgba(255,77,109,0.35); transition: transform 0.2s, box-shadow 0.2s; }
-    .boost-banner:active { transform: scale(0.98); box-shadow: 0 4px 12px rgba(255,77,109,0.25); }
-    .boost-left { display: flex; align-items: center; gap: 14px; }
-    .boost-icon { font-size: 2rem; line-height: 1; }
+    .boost-banner { display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, #FF4D6D 0%, #c9184a 100%); border-radius: 24px; padding: 22px 24px; margin-bottom: 16px; cursor: pointer; box-shadow: 0 10px 30px rgba(255,77,109,0.4); transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden; }
+    .boost-banner::before { content: ''; position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border-radius: 50%; }
+    .boost-banner::after { content: ''; position: absolute; bottom: -40px; right: 60px; width: 80px; height: 80px; background: rgba(255,255,255,0.06); border-radius: 50%; }
+    .boost-banner:active { transform: scale(0.98); box-shadow: 0 5px 15px rgba(255,77,109,0.3); }
+    .boost-left { display: flex; align-items: center; gap: 16px; z-index: 1; }
+    .boost-icon { font-size: 2.6rem; line-height: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
     .boost-text { display: flex; flex-direction: column; gap: 3px; }
-    .boost-title { font-size: 1rem; font-weight: 900; color: white; }
-    .boost-sub { font-size: 0.78rem; color: rgba(255,255,255,0.8); font-weight: 600; }
+    .boost-title { font-size: 1.05rem; font-weight: 900; color: white; letter-spacing: -0.2px; }
+    .boost-sub { font-size: 0.8rem; color: rgba(255,255,255,0.82); font-weight: 600; }
+    .boost-price { font-size: 1rem; font-weight: 900; color: white; margin-top: 4px; }
+    .boost-badge { background: rgba(255,255,255,0.2); color: white; font-size: 0.7rem; font-weight: 900; padding: 5px 10px; border-radius: 100px; letter-spacing: 1px; z-index: 1; border: 1.5px solid rgba(255,255,255,0.35); }
     .boost-arrow { font-size: 1.8rem; color: rgba(255,255,255,0.7); font-weight: 300; line-height: 1; }
 
     /* Quick Actions Grid */
