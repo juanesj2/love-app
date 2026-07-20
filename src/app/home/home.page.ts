@@ -564,10 +564,13 @@ export class HomePage implements OnInit, OnDestroy {
         const emojis = evt.emojis_list.split(',').map((e: string) => e.trim()).filter((e: string) => e);
         if (!emojis.length) return;
         this.emojisToAnimate = [];
-        for (let i = 0; i < 8; i++) {
+        const numEmojis = 12; // increased slightly to fill the space nicely
+        for (let i = 0; i < numEmojis; i++) {
+          const segmentWidth = 100 / numEmojis;
+          const leftPos = (i * segmentWidth) + (Math.random() * segmentWidth * 0.8); // distributed with slight randomness
           this.emojisToAnimate.push({
             emoji: emojis[Math.floor(Math.random() * emojis.length)],
-            left: Math.random() * 100,
+            left: leftPos,
             duration: 3 + Math.random() * 4,
             delay: Math.random() * 5
           });
