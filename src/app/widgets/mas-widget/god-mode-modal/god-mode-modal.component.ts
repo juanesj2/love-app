@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Output, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GlobalEventService } from '../../../services/global-event.service';
@@ -166,7 +166,7 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
     :host-context(.night-owl-mode) .stop-btn { background: #2c2d33; color: #ccc; }
   `]
 })
-export class GodModeModalComponent {
+export class GodModeModalComponent implements OnInit, OnDestroy {
   @Output() close = new EventEmitter<void>();
   private globalEventService = inject(GlobalEventService);
   private toastCtrl = inject(ToastController);
@@ -187,6 +187,14 @@ export class GodModeModalComponent {
 
   constructor() {
     addIcons({ closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, starOutline });
+  }
+
+  ngOnInit() {
+    document.body.classList.add('hide-tabs');
+  }
+
+  ngOnDestroy() {
+    document.body.classList.remove('hide-tabs');
   }
 
   setConfetti(colors: string) {
