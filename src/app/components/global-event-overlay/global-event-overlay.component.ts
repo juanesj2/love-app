@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GlobalEventService, GlobalEvent } from '../../services/global-event.service';
 import { Subscription } from 'rxjs';
@@ -28,6 +28,7 @@ import { closeCircleOutline, starOutline } from 'ionicons/icons';
 })
 export class GlobalEventOverlayComponent implements OnInit, OnDestroy {
   public globalEventService = inject(GlobalEventService);
+  private ngZone = inject(NgZone);
   public event: GlobalEvent | null = null;
   private sub?: Subscription;
   public isDismissed = false;
@@ -86,30 +87,32 @@ export class GlobalEventOverlayComponent implements OnInit, OnDestroy {
   }
 
   launchConfetti(colors: string[]) {
-    const duration = 5000;
-    const end = Date.now() + duration;
+    this.ngZone.runOutsideAngular(() => {
+      const duration = 5000;
+      const end = Date.now() + duration;
 
-    const frame = () => {
-      confetti({
-        particleCount: 5,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0 },
-        colors: colors && colors.length ? colors : undefined
-      });
-      confetti({
-        particleCount: 5,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1 },
-        colors: colors && colors.length ? colors : undefined
-      });
+      const frame = () => {
+        confetti({
+          particleCount: 5,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: colors && colors.length ? colors : undefined
+        });
+        confetti({
+          particleCount: 5,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: colors && colors.length ? colors : undefined
+        });
 
-      if (Date.now() < end && !this.isDismissed) {
-        requestAnimationFrame(frame);
-      }
-    };
-    frame();
+        if (Date.now() < end && !this.isDismissed) {
+          requestAnimationFrame(frame);
+        }
+      };
+      frame();
+    });
   }
 
   launchEmojis(emojisStr: string) {
