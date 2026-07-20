@@ -1,0 +1,135 @@
+.global-event-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+}
+
+.emojis-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.floating-emoji {
+  position: absolute;
+  bottom: -50px;
+  font-size: 2rem;
+  animation-name: floatUp;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  opacity: 0;
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) scale(0.8) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) scale(1.2) rotate(20deg);
+    opacity: 0;
+  }
+}
+
+.event-modal {
+  position: relative;
+  width: 90%;
+  max-width: 400px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  z-index: 2;
+  overflow: hidden;
+  text-align: center;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  color: #999;
+  font-size: 28px;
+  border: none;
+  z-index: 3;
+}
+
+.modal-content {
+  padding: 40px 20px 25px;
+  border-top: 6px solid #FF4D6D;
+  position: relative;
+}
+
+.icon-container {
+  width: 60px;
+  height: 60px;
+  background: #FF4D6D;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.event-title {
+  margin-top: 10px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #FF4D6D;
+  margin-bottom: 15px;
+}
+
+.event-message {
+  font-size: 1.1rem;
+  color: #555;
+  line-height: 1.4;
+  margin-bottom: 25px;
+}
+
+.action-btn {
+  --border-radius: 12px;
+  margin: 0 10px;
+  font-weight: bold;
+}
+
+/* Night Mode Support */
+:host-context(.night-owl-mode) .event-modal {
+  background: #1e1e1e;
+}
+:host-context(.night-owl-mode) .event-message {
+  color: #ccc;
+}

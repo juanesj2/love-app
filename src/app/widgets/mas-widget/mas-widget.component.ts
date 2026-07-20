@@ -22,12 +22,13 @@ import { PaywallComponent } from '../../components/paywall/paywall.component';
 import { ModalController } from '@ionic/angular';
 import { NotificationService } from '../../services/notification.service';
 import confetti from 'canvas-confetti';
+import { GodModeModalComponent } from './god-mode-modal/god-mode-modal.component';
 
 
 @Component({
   selector: 'app-mas-widget',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent, IonRefresher, IonRefresherContent, IonIcon, IonSelect, IonSelectOption, IonToggle, TimelineWidgetComponent],
+  imports: [CommonModule, FormsModule, IonContent, IonRefresher, IonRefresherContent, IonIcon, IonSelect, IonSelectOption, IonToggle, TimelineWidgetComponent, GodModeModalComponent],
   template: `
     <ion-content class="scroll-content">
       <ng-template #staticStars let-rating="rating">
@@ -223,6 +224,11 @@ import confetti from 'canvas-confetti';
           </div>
 
         </div>
+
+        <!-- God Mode (Solo SuperAdmin) -->
+        <button class="god-mode-btn" *ngIf="user?.rol === 'SuperAdmin'" (click)="isGodModeModalOpen = true">
+          <ion-icon name="flash-outline"></ion-icon> God Mode
+        </button>
 
         <!-- Logout -->
         <button class="logout-btn" (click)="isLogoutModalOpen = true">
@@ -685,6 +691,9 @@ import confetti from 'canvas-confetti';
           </div>
         </div>
 
+        <!-- God Mode Modal -->
+        <app-god-mode-modal *ngIf="isGodModeModalOpen" (close)="isGodModeModalOpen = false"></app-god-mode-modal>
+
         <!-- Logout Confirmation Modal -->
         <div class="custom-overlay" *ngIf="isLogoutModalOpen" (click)="isLogoutModalOpen = false">
           <div class="modal-content glass-card" style="margin: 20px; padding: 30px; text-align: center; width: 85%; max-width: 350px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15);" (click)="$event.stopPropagation()">
@@ -894,6 +903,11 @@ import confetti from 'canvas-confetti';
     .logout-btn { width: 100%; background: rgba(208, 0, 0, 0.1); color: #d00000; border: 2px solid rgba(208, 0, 0, 0.2); padding: 16px; border-radius: 20px; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(10px); }
     .logout-btn:active { background: rgba(208, 0, 0, 0.2); transform: scale(0.98); }
     .logout-btn ion-icon { font-size: 1.4rem; }
+
+    /* God Mode */
+    .god-mode-btn { width: 100%; margin-bottom: 15px; background: linear-gradient(45deg, #020024, #090979, #00d4ff); color: white; border: none; padding: 16px; border-radius: 20px; font-weight: 900; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4); }
+    .god-mode-btn:active { transform: scale(0.98); }
+    .god-mode-btn ion-icon { font-size: 1.5rem; color: #ffeb3b; }
 
     /* Developer Banner */
     .developer-banner { margin-top: 25px; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(255, 77, 109, 0.2); border-radius: 20px; padding: 20px; display: flex; gap: 15px; align-items: center; cursor: pointer; transition: transform 0.2s; }
@@ -1155,6 +1169,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   isLogoutModalOpen = false;
   isFeedbackModalOpen = false;
   isMovieListModalOpen = false;
+  isGodModeModalOpen = false;
 
   isAddingFoodPlace = false;
   newFoodPlace: any = { name: '', location: '', description: '', rating: 5, category: '', is_favorite: false, imageBase64: null };

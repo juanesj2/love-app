@@ -5,11 +5,13 @@ import { App } from '@capacitor/app';
 import { NotificationService } from './services/notification.service';
 import { environment } from '../environments/environment';
 import { PremiumService } from './services/premium.service';
+import { GlobalEventService } from './services/global-event.service';
+import { GlobalEventOverlayComponent } from './components/global-event-overlay/global-event-overlay.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  imports: [IonApp, IonRouterOutlet],
+  imports: [IonApp, IonRouterOutlet, GlobalEventOverlayComponent],
 })
 export class AppComponent {
   private notificationService = inject(NotificationService);
@@ -17,12 +19,14 @@ export class AppComponent {
   private toastCtrl = inject(ToastController);
   private router = inject(Router);
   private platform = inject(Platform);
+  private globalEventService = inject(GlobalEventService);
 
   private lastBackPress = 0;
 
   constructor() {
     this.notificationService.init();
     this.premiumService.initialize();
+    this.globalEventService.startPolling();
     this.setupBackButton();
   }
 

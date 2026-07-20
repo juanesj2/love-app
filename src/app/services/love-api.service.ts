@@ -598,4 +598,17 @@ export class LoveApiService {
   async getPartnerLocation(): Promise<any> {
     return firstValueFrom(this.http.get(`${API_BASE_URL}/location/partner`));
   }
+
+  // --- GLOBAL EVENTS (GOD MODE) ---
+  async getActiveGlobalEvent(): Promise<any> {
+    return firstValueFrom(this.http.get(`${API_BASE_URL}/love-album/global-events/active`));
+  }
+
+  async triggerGlobalEvent(data: any): Promise<any> {
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/global-events`, data));
+  }
+
+  async stopGlobalEvent(): Promise<any> {
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/global-events/stop`, {}));
+  }
 }

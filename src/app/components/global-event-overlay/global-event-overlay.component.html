@@ -1,0 +1,35 @@
+<div class="global-event-overlay" *ngIf="event && !isDismissed">
+  <!-- Backdrop -->
+  <div class="backdrop" (click)="dismiss()"></div>
+
+  <!-- Floating Emojis Container -->
+  <div class="emojis-container" *ngIf="event.emojis_enabled && emojisToAnimate.length > 0">
+    <div *ngFor="let anim of emojisToAnimate" 
+         class="floating-emoji" 
+         [style.left.%]="anim.left" 
+         [style.animation-duration.s]="anim.duration" 
+         [style.animation-delay.s]="anim.delay">
+      {{ anim.emoji }}
+    </div>
+  </div>
+
+  <!-- Main Alert Modal -->
+  <div class="event-modal" [@fadeInOut]>
+    <button class="close-btn" (click)="dismiss()">
+      <ion-icon name="close-circle-outline"></ion-icon>
+    </button>
+    
+    <div class="modal-content" [style.border-top-color]="event.top_bar_color || '#FF4D6D'">
+      <div class="icon-container" [style.background]="event.top_bar_color || '#FF4D6D'">
+        <ion-icon name="star-outline"></ion-icon>
+      </div>
+      
+      <h2 class="event-title" [style.color]="event.top_bar_color || '#FF4D6D'">{{ event.title }}</h2>
+      <p class="event-message" [innerHTML]="event.message.replace('\n', '<br>')"></p>
+      
+      <ion-button expand="block" shape="round" class="action-btn" (click)="dismiss()" [style.--background]="event.top_bar_color || '#FF4D6D'">
+        ¡Entendido!
+      </ion-button>
+    </div>
+  </div>
+</div>
