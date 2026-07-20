@@ -16,11 +16,14 @@ export interface UserLocation {
   is_sharing?: boolean;
 }
 
+import { PremiumService } from './premium.service';
+
 @Injectable({
   providedIn: 'root'
 })
 export class LocationService {
   private loveApi = inject(LoveApiService);
+  private premiumService = inject(PremiumService);
   public debugError = '';
 
   public myLocation$ = new BehaviorSubject<any>(null);
@@ -40,6 +43,10 @@ export class LocationService {
 
   async updateMyLocation(userId: string, name: string) {
     try {
+      if (this.premiumService.isFree$.value) {
+        return;
+      }
+
       const isGhost = await this.getPrivacyMode();
       
       if (isGhost) {
