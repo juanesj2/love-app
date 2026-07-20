@@ -34,6 +34,11 @@ export class GlobalEventOverlayComponent implements OnInit, OnDestroy {
   
   public emojisToAnimate: { id: number, emoji: string, left: number, duration: number, delay: number }[] = [];
 
+  get formattedMessage() {
+    if (!this.event || typeof this.event.message !== 'string') return '';
+    return this.event.message.replace(/\n/g, '<br>');
+  }
+
   constructor() {
     addIcons({ closeCircleOutline, starOutline });
   }
