@@ -2,17 +2,6 @@
   <!-- Backdrop -->
   <div class="backdrop" *ngIf="!isDismissed" (click)="dismiss()"></div>
 
-  <!-- Floating Emojis Container -->
-  <div class="emojis-container" *ngIf="event.emojis_enabled && emojisToAnimate.length > 0">
-    <div *ngFor="let anim of emojisToAnimate" 
-         class="floating-emoji" 
-         [style.left.%]="anim.left" 
-         [style.animation-duration.s]="anim.duration" 
-         [style.animation-delay.s]="anim.delay">
-      {{ anim.emoji }}
-    </div>
-  </div>
-
   <!-- Main Alert Modal -->
   <div class="event-modal" *ngIf="!isDismissed" [@fadeInOut]>
     <button class="close-btn" (click)="dismiss()">

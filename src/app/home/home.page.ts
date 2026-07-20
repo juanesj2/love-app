@@ -19,6 +19,7 @@ import { QuestionsWidgetComponent } from '../widgets/questions-widget/questions-
 import { LoveApiService } from '../services/love-api.service';
 import { LocationService } from '../services/location.service';
 import { TutorialService } from '../services/tutorial.service';
+import { GlobalEventService } from '../services/global-event.service';
 import { Camera, CameraResultType, CameraSource, CameraDirection } from '@capacitor/camera';
 import { Preferences } from '@capacitor/preferences';
 import { App } from '@capacitor/app';
@@ -36,6 +37,15 @@ import { PushNotifications } from '@capacitor/push-notifications';
     <!-- ... html was here ... -->
     <ion-header class="ion-no-border" style="position: absolute; top: 0; width: 100%; background: transparent; z-index: 20; pointer-events: none;">
       <div class="custom-header" [class.hide-header]="selectedWidget === 'location'" style="pointer-events: auto;">
+          <div class="bg-emojis-container" *ngIf="emojisToAnimate.length > 0">
+            <div *ngFor="let anim of emojisToAnimate" 
+                 class="bg-floating-emoji" 
+                 [style.left.%]="anim.left" 
+                 [style.animation-duration.s]="anim.duration" 
+                 [style.animation-delay.s]="anim.delay">
+              {{ anim.emoji }}
+            </div>
+          </div>
           
           <div class="avatar-container"
                (click)="onAvatarClick()"
@@ -239,6 +249,11 @@ import { PushNotifications } from '@capacitor/push-notifications';
 
       .custom-header { display: flex; justify-content: space-between; align-items: center; padding: calc(var(--ion-safe-area-top, 0px) + 15px) 25px 15px 25px; background: var(--custom-header-bg, rgba(255, 255, 255, 0.65)); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); border-radius: 0 0 25px 25px; margin-bottom: 10px; position: relative; z-index: 20; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
       .custom-header.hide-header { transform: translateY(-120px) scale(0.9); opacity: 0; pointer-events: none !important; }
+      
+      .bg-emojis-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 1; border-radius: 0 0 25px 25px; }
+      .bg-floating-emoji { position: absolute; top: -30px; font-size: 1.4rem; animation-name: fallDownHeader; animation-timing-function: linear; animation-iteration-count: infinite; opacity: 0; text-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+      @keyframes fallDownHeader { 0% { transform: translateY(0) scale(0.8) rotate(-15deg); opacity: 0; } 15% { opacity: 0.7; } 85% { opacity: 0.7; } 100% { transform: translateY(140px) scale(1.1) rotate(15deg); opacity: 0; } }
+
       .avatar-container { position: relative; cursor: pointer; z-index: 2; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
       .avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.15); object-fit: cover; border: 2px solid white; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; }
       .avatar-container:active .avatar { transform: scale(0.9); }
@@ -388,8 +403,12 @@ export class HomePage implements OnInit, OnDestroy {
   surpriseBody = '';
   sendingSurprise = false;
   hasSurpriseUnlocked = false;
+  
+  emojisToAnimate: any[] = [];
+  private globalEventSub?: Subscription;
 
   public premiumService = inject(PremiumService);
+  private globalEventService = inject(GlobalEventService);
   private api = inject(LoveApiService);
   private router = inject(Router);
   private modalController = inject(ModalController);
@@ -539,6 +558,24 @@ export class HomePage implements OnInit, OnDestroy {
     );
     
     this.checkDeliveredNotifications();
+
+    this.globalEventSub = this.globalEventService.activeEvent$.subscribe(evt => {
+      if (evt && evt.emojis_enabled && evt.emojis_list) {
+        const emojis = evt.emojis_list.split(',').map((e: string) => e.trim()).filter((e: string) => e);
+        if (!emojis.length) return;
+        this.emojisToAnimate = [];
+        for (let i = 0; i < 8; i++) {
+          this.emojisToAnimate.push({
+            emoji: emojis[Math.floor(Math.random() * emojis.length)],
+            left: Math.random() * 100,
+            duration: 3 + Math.random() * 4,
+            delay: Math.random() * 5
+          });
+        }
+      } else {
+        this.emojisToAnimate = [];
+      }
+    });
 
     const nightPref = await Preferences.get({ key: 'night_owl_enabled' });
     if (nightPref.value === 'true') {

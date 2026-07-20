@@ -26,46 +26,6 @@
   pointer-events: auto;
 }
 
-.emojis-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: calc(env(safe-area-inset-top, 0px) + 95px);
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 99999;
-  border-radius: 0 0 25px 25px;
-}
-
-.floating-emoji {
-  position: absolute;
-  top: -40px;
-  font-size: 1.5rem;
-  animation-name: fallDown;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  opacity: 0;
-  text-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-@keyframes fallDown {
-  0% {
-    transform: translateY(0) scale(0.8) rotate(-15deg);
-    opacity: 0;
-  }
-  15% {
-    opacity: 0.8;
-  }
-  85% {
-    opacity: 0.8;
-  }
-  100% {
-    transform: translateY(160px) scale(1.1) rotate(15deg);
-    opacity: 0;
-  }
-}
-
 .event-modal {
   position: relative;
   width: 90%;

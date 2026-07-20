@@ -55,10 +55,6 @@ export class GlobalEventOverlayComponent implements OnInit, OnDestroy {
         if (evt.confetti_enabled && !this.isDismissed) {
           this.launchConfetti(evt.confetti_colors);
         }
-        
-        if (evt.emojis_enabled && evt.emojis_list) {
-          this.launchEmojis(evt.emojis_list);
-        }
 
         // Handle top bar color
         if (evt.top_bar_color) {
@@ -121,22 +117,5 @@ export class GlobalEventOverlayComponent implements OnInit, OnDestroy {
         });
       }, 250);
     });
-  }
-
-  launchEmojis(emojisStr: string) {
-    const emojis = emojisStr.split(',').map(e => e.trim()).filter(e => e);
-    if (!emojis.length) return;
-
-    this.emojisToAnimate = [];
-    for (let i = 0; i < 30; i++) {
-      const emoji = emojis[Math.floor(Math.random() * emojis.length)];
-      this.emojisToAnimate.push({
-        id: i,
-        emoji,
-        left: Math.random() * 90 + 5, // 5% to 95%
-        duration: Math.random() * 2 + 3, // 3s to 5s
-        delay: Math.random() * 2 // 0s to 2s
-      });
-    }
   }
 }
