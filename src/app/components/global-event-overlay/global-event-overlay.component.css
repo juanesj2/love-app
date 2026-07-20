@@ -67,7 +67,6 @@
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   z-index: 2;
-  overflow: hidden;
   text-align: center;
 }
 
@@ -85,6 +84,8 @@
 .modal-content {
   padding: 40px 20px 25px;
   border-top: 6px solid #FF4D6D;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
   position: relative;
 }
 
