@@ -99,9 +99,8 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
     </div>
   `,
   styles: [`
-    .custom-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); padding: 25px 20px; box-sizing: border-box; }
-    .modal-content { background: #fff; width: 100%; max-width: 380px; border-radius: 24px; padding: 25px 20px; position: relative; max-height: 100%; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
-
+    .custom-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); padding: 90px 20px; box-sizing: border-box; }
+    .modal-content { background: #fff; width: 100%; max-width: 380px; border-radius: 24px; padding: 20px; position: relative; max-height: 100%; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.2); box-sizing: border-box; }
     .scrollable-form { overflow-y: auto; overflow-x: hidden; padding-right: 5px; flex-shrink: 1; }
     .scrollable-form::-webkit-scrollbar { width: 5px; }
     .scrollable-form::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
