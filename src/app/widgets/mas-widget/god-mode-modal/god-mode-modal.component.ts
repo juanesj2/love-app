@@ -71,13 +71,21 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
             </div>
           </div>
 
-          <div class="form-row" style="margin-top: 10px;">
-            <div class="form-group flex-1 mb-0">
-              <label>Color Barra Top</label>
-              <div class="color-picker-container">
-                <input type="color" [(ngModel)]="eventData.top_bar_color" class="color-input">
+          <div class="feature-box">
+            <label class="feature-label">Color Barra Superior</label>
+            <div class="presets-container" style="margin-top: 8px; border-top: none; padding-top: 0;">
+              <div class="preset-row">
+                <div class="color-preset" [style.background]="'linear-gradient(135deg, #FF4D6D, #c9184a)'" (click)="eventData.top_bar_color = 'linear-gradient(135deg, #FF4D6D, #c9184a)'" [class.active]="eventData.top_bar_color === 'linear-gradient(135deg, #FF4D6D, #c9184a)'"></div>
+                
+                <div class="color-preset" [style.background]="'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)'" (click)="eventData.top_bar_color = 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)'" [class.active]="eventData.top_bar_color === 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)'"></div>
+                
+                <div class="color-preset" [style.background]="'linear-gradient(120deg, #f093fb 0%, #f5576c 100%)'" (click)="eventData.top_bar_color = 'linear-gradient(120deg, #f093fb 0%, #f5576c 100%)'" [class.active]="eventData.top_bar_color === 'linear-gradient(120deg, #f093fb 0%, #f5576c 100%)'"></div>
+
+                <div class="color-preset" [style.background]="'linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%)'" (click)="eventData.top_bar_color = 'linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%)'" [class.active]="eventData.top_bar_color === 'linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%)'"></div>
               </div>
+              <input type="text" class="small-input" [(ngModel)]="eventData.top_bar_color" placeholder="Color o linear-gradient (ej: #FF0000)">
             </div>
+          </div>
             <div class="form-group flex-1 mb-0">
               <label>Minutos (0=inf)</label>
               <input type="number" [(ngModel)]="eventData.duration_minutes">

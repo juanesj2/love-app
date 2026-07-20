@@ -48,15 +48,11 @@ export class GlobalEventOverlayComponent implements OnInit, OnDestroy {
     this.sub = this.globalEventService.activeEvent$.subscribe(evt => {
       console.log('GlobalEvent Received:', evt);
       if (evt && evt.id && (!this.event || this.event.id !== evt.id)) {
-        if (localStorage.getItem('dismissed_global_event_' + evt.id) === 'true') {
-          return;
-        }
-
         this.event = evt;
-        this.isDismissed = false;
+        this.isDismissed = (localStorage.getItem('dismissed_global_event_' + evt.id) === 'true');
         
         // Launch effects
-        if (evt.confetti_enabled) {
+        if (evt.confetti_enabled && !this.isDismissed) {
           this.launchConfetti(evt.confetti_colors);
         }
         
@@ -66,9 +62,9 @@ export class GlobalEventOverlayComponent implements OnInit, OnDestroy {
 
         // Handle top bar color
         if (evt.top_bar_color) {
-          document.body.style.setProperty('--custom-header-bg', evt.top_bar_color + 'B3'); // 70% opacity
+          document.body.style.setProperty('--custom-header-bg', evt.top_bar_color);
           document.body.style.setProperty('--ion-color-primary', evt.top_bar_color);
-          document.body.style.setProperty('--ion-background-color', evt.top_bar_color + '10'); // light background
+          document.body.style.setProperty('--ion-background-color', evt.top_bar_color);
         } else {
           document.body.style.removeProperty('--custom-header-bg');
           document.body.style.removeProperty('--ion-color-primary');
