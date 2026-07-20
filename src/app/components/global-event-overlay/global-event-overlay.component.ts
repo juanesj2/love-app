@@ -66,15 +66,18 @@ export class GlobalEventOverlayComponent implements OnInit, OnDestroy {
 
         // Handle top bar color
         if (evt.top_bar_color) {
+          document.body.style.setProperty('--custom-header-bg', evt.top_bar_color + 'B3'); // 70% opacity
           document.body.style.setProperty('--ion-color-primary', evt.top_bar_color);
           document.body.style.setProperty('--ion-background-color', evt.top_bar_color + '10'); // light background
         } else {
+          document.body.style.removeProperty('--custom-header-bg');
           document.body.style.removeProperty('--ion-color-primary');
           document.body.style.removeProperty('--ion-background-color');
         }
 
       } else if (!evt || !evt.id) {
         this.event = null;
+        document.body.style.removeProperty('--custom-header-bg');
         document.body.style.removeProperty('--ion-color-primary');
         document.body.style.removeProperty('--ion-background-color');
       }
@@ -83,6 +86,7 @@ export class GlobalEventOverlayComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     if (this.sub) this.sub.unsubscribe();
+    document.body.style.removeProperty('--custom-header-bg');
     document.body.style.removeProperty('--ion-color-primary');
     document.body.style.removeProperty('--ion-background-color');
   }
