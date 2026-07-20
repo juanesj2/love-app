@@ -46,7 +46,12 @@ export class GlobalEventOverlayComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.sub = this.globalEventService.activeEvent$.subscribe(evt => {
+      console.log('GlobalEvent Received:', evt);
       if (evt && (!this.event || this.event.id !== evt.id)) {
+        if (localStorage.getItem('dismissed_global_event_' + evt.id) === 'true') {
+          return;
+        }
+
         this.event = evt;
         this.isDismissed = false;
         
@@ -84,6 +89,9 @@ export class GlobalEventOverlayComponent implements OnInit, OnDestroy {
 
   dismiss() {
     this.isDismissed = true;
+    if (this.event && this.event.id) {
+      localStorage.setItem('dismissed_global_event_' + this.event.id, 'true');
+    }
   }
 
   launchConfetti(colors: string[]) {
