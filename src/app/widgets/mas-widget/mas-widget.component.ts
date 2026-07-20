@@ -898,7 +898,7 @@ import { PremiumEventModalComponent } from './premium-event-modal/premium-event-
     .delete-icon:active { color: #FF4D6D; }
     
     /* Boost Banner */
-    .boost-banner { display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, #FF4D6D 0%, #c9184a 100%); border-radius: 24px; padding: 22px 24px; margin-bottom: 16px; cursor: pointer; box-shadow: 0 10px 30px rgba(255,77,109,0.4); transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden; }
+    .boost-banner { display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, #FF4D6D 0%, #c9184a 100%); border-radius: 24px; padding: 22px 24px; margin-bottom: 20px; cursor: pointer; box-shadow: 0 10px 30px rgba(255,77,109,0.4); transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden; }
     .boost-banner::before { content: ''; position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border-radius: 50%; }
     .boost-banner::after { content: ''; position: absolute; bottom: -40px; right: 60px; width: 80px; height: 80px; background: rgba(255,255,255,0.06); border-radius: 50%; }
     .boost-banner:active { transform: scale(0.98); box-shadow: 0 5px 15px rgba(255,77,109,0.3); }
