@@ -162,18 +162,6 @@ import { PremiumEventModalComponent } from './premium-event-modal/premium-event-
           </div>
         </div>
 
-        <!-- Impulsa tu Relación Banner -->
-        <div class="boost-banner" (click)="showPremiumEventModal = true">
-          <div class="boost-left">
-            <div class="boost-icon">🚀</div>
-            <div class="boost-text">
-              <span class="boost-title">Dale un impulso a tu relación</span>
-              <span class="boost-sub">Envíale una notificación sorpresa · 24h · 0.99€</span>
-            </div>
-          </div>
-          <div class="boost-arrow">›</div>
-        </div>
-
         <!-- Quick Actions Grid -->
         <div class="quick-actions-grid">
           <!-- Logros y Secretos (Spans full width) -->
@@ -230,7 +218,20 @@ import { PremiumEventModalComponent } from './premium-event-modal/premium-event-
             <span class="sub" *ngIf="!uploadingAvatar">Cambiar foto</span>
             <span class="sub" *ngIf="uploadingAvatar">Actualizando...</span>
           </div>
-        <!-- Settings -->
+
+          <!-- Impulsa tu Relación Banner -->
+          <div class="boost-banner" (click)="showPremiumEventModal = true">
+            <div class="boost-left">
+              <div class="boost-icon">🚀</div>
+              <div class="boost-text">
+                <span class="boost-title">Dale un impulso a tu relación</span>
+                <span class="boost-sub">Envíale una sorpresa · Solo para tu pareja · 0.99€</span>
+              </div>
+            </div>
+            <div class="boost-arrow">›</div>
+          </div>
+
+          <!-- Settings -->
           <div class="grid-card full-width interactive" id="mas-ajustes" (click)="openSettingsModal()">
             <h4><ion-icon name="settings-sharp" style="color: #6c757d;"></ion-icon> Ajustes de Cuenta</h4>
             <p style="margin: 0; font-size: 0.85rem; color: #495057; font-weight: 500;">Modo Búho, Privacidad y Cuenta.</p>
@@ -898,7 +899,7 @@ import { PremiumEventModalComponent } from './premium-event-modal/premium-event-
     .add-glass { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
 
     /* Boost Banner */
-    .boost-banner { display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, #FF4D6D 0%, #c9184a 100%); border-radius: 22px; padding: 18px 20px; margin-bottom: 18px; cursor: pointer; box-shadow: 0 8px 24px rgba(255,77,109,0.35); transition: transform 0.2s, box-shadow 0.2s; }
+    .boost-banner { grid-column: span 2; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, #FF4D6D 0%, #c9184a 100%); border-radius: 22px; padding: 18px 20px; cursor: pointer; box-shadow: 0 8px 24px rgba(255,77,109,0.35); transition: transform 0.2s, box-shadow 0.2s; }
     .boost-banner:active { transform: scale(0.98); box-shadow: 0 4px 12px rgba(255,77,109,0.25); }
     .boost-left { display: flex; align-items: center; gap: 14px; }
     .boost-icon { font-size: 2rem; line-height: 1; }
