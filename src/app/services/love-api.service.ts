@@ -197,6 +197,10 @@ export class LoveApiService {
     return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/poke`, { is_super: isSuper }));
   }
 
+  async getAllUsers(): Promise<any[]> {
+    return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/global-events/users`));
+  }
+
   // --- TIMELINE Y PLANES ---
   async getPlans(): Promise<any[]> {
     return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/plans`));

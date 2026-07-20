@@ -2,10 +2,11 @@ import { Component, EventEmitter, Output, inject, OnInit, OnDestroy } from '@ang
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GlobalEventService } from '../../../services/global-event.service';
+import { LoveApiService } from '../../../services/love-api.service';
 import { ToastController } from '@ionic/angular/standalone';
 import { IonIcon, IonToggle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, starOutline, eyeOutline, imageOutline } from 'ionicons/icons';
+import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, starOutline, eyeOutline, imageOutline, heart } from 'ionicons/icons';
 
 @Component({
   selector: 'app-god-mode-modal',
@@ -28,14 +29,11 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
           <div class="presets-section">
             <div class="section-title">
               <ion-icon name="star-outline" style="color: #FF4D6D;"></ion-icon>
-              <span>Eventos Rápidos</span>
+              <span>Eventos Globales</span>
             </div>
-            <div class="horizontal-scroll-container">
+            <div class="horizontal-scroll-container" style="margin-bottom: 15px;">
               <button class="theme-pill" (click)="loadTheme('cumple')">
                 <span class="emoji">🎂</span> Cumple
-              </button>
-              <button class="theme-pill" (click)="loadTheme('amor')">
-                <span class="emoji">❤️</span> Amor
               </button>
               <button class="theme-pill" (click)="loadTheme('espana')">
                 <span class="emoji">🇪🇸</span> España
@@ -44,6 +42,30 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
                 <span class="emoji">🎃</span> Halloween
               </button>
             </div>
+
+            <div class="section-title">
+              <ion-icon name="heart" style="color: #FF4D6D;"></ion-icon>
+              <span>Para mi chica</span>
+            </div>
+            <div class="horizontal-scroll-container">
+              <button class="theme-pill" (click)="loadTheme('amor')">
+                <span class="emoji">❤️</span> Te Quiero
+              </button>
+              <button class="theme-pill" (click)="loadTheme('buenas_noches')">
+                <span class="emoji">🌙</span> Buenas Noches
+              </button>
+              <button class="theme-pill" (click)="loadTheme('sorpresa')">
+                <span class="emoji">🎁</span> Sorpresita
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group" style="background: #f0f4f8; padding: 12px; border-radius: 12px; border: 1px solid #dce4ec;">
+            <label style="color: #2c3e50; font-size: 0.9rem;">Destinatario (Opcional)</label>
+            <select [(ngModel)]="eventData.target_user_id" style="width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ccc; font-size: 0.95rem; background: white;">
+              <option [ngValue]="null">🌍 Todos (Global)</option>
+              <option *ngFor="let user of users" [ngValue]="user.id">{{ user.name }} ({{ user.email }})</option>
+            </select>
           </div>
 
           <div class="form-group">
@@ -215,9 +237,11 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
 export class GodModeModalComponent implements OnInit, OnDestroy {
   @Output() close = new EventEmitter<void>();
   private globalEventService = inject(GlobalEventService);
+  private loveApi = inject(LoveApiService);
   private toastCtrl = inject(ToastController);
 
   public isLoading = false;
+  public users: any[] = [];
   
   public eventData = {
     title: '',
@@ -226,17 +250,23 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
     emojis_enabled: false,
     emojis_list: '',
     top_bar_color: '',
-    duration_minutes: 0
+    duration_minutes: 0,
+    target_user_id: null
   };
   
   public confettiColorsStr = '';
 
   constructor() {
-    addIcons({ closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, starOutline, eyeOutline, imageOutline });
+    addIcons({ closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, starOutline, eyeOutline, imageOutline, heart });
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     document.body.classList.add('hide-tabs');
+    try {
+      this.users = await this.loveApi.getAllUsers();
+    } catch (e) {
+      console.error('Error loading users', e);
+    }
   }
 
   ngOnDestroy() {
@@ -276,6 +306,22 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
       this.eventData.emojis_enabled = true;
       this.eventData.emojis_list = '❤️,💖,💘,🥰';
       this.eventData.top_bar_color = 'linear-gradient(135deg, #FF4D6D, #c9184a)';
+    } else if (theme === 'buenas_noches') {
+      this.eventData.title = '¡Buenas noches mi amor!';
+      this.eventData.message = 'Que sueñes con los angelitos ✨';
+      this.eventData.confetti_enabled = false;
+      this.confettiColorsStr = '';
+      this.eventData.emojis_enabled = true;
+      this.eventData.emojis_list = '🌙,✨,💫,😴';
+      this.eventData.top_bar_color = 'linear-gradient(135deg, #1e3c72, #2a5298)';
+    } else if (theme === 'sorpresa') {
+      this.eventData.title = '¡Tengo una sorpresa para ti!';
+      this.eventData.message = 'Abre el chat cuando puedas 👀';
+      this.eventData.confetti_enabled = true;
+      this.confettiColorsStr = '#ffd700,#fb8500';
+      this.eventData.emojis_enabled = true;
+      this.eventData.emojis_list = '🎁,🤫,👀,✨';
+      this.eventData.top_bar_color = 'linear-gradient(120deg, #f093fb 0%, #f5576c 100%)';
     } else if (theme === 'espana') {
       this.eventData.title = '¡Viva España!';
       this.eventData.message = '¡A por todas!';
