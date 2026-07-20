@@ -235,7 +235,7 @@ import { PremiumEventModalComponent } from './premium-event-modal/premium-event-
         </div>
 
         <!-- Settings -->
-        <div class="grid-card full-width interactive" id="mas-ajustes" (click)="openSettingsModal()">
+        <div class="grid-card full-width interactive" id="mas-ajustes" style="margin-top: 20px;" (click)="openSettingsModal()">
           <h4><ion-icon name="settings-sharp" style="color: #6c757d;"></ion-icon> Ajustes de Cuenta</h4>
           <p style="margin: 0; font-size: 0.85rem; color: #495057; font-weight: 500;">Modo Búho, Privacidad y Cuenta.</p>
         </div>
