@@ -128,7 +128,11 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
         </div>
 
         <ion-infinite-scroll (ionInfinite)="loadMore($event)">
-          <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Cargando más fotos..."></ion-infinite-scroll-content>
+          <ion-infinite-scroll-content loadingSpinner="null" loadingText="">
+             <div style="display: flex; justify-content: center; align-items: center; padding: 10px;">
+                <canvas #loadingLottieFeed width="80" height="80"></canvas>
+             </div>
+          </ion-infinite-scroll-content>
         </ion-infinite-scroll>
       </ion-content>
 
@@ -211,7 +215,11 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
           </div>
 
         <ion-infinite-scroll (ionInfinite)="loadMore($event)">
-          <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Cargando más fotos..."></ion-infinite-scroll-content>
+          <ion-infinite-scroll-content loadingSpinner="null" loadingText="">
+             <div style="display: flex; justify-content: center; align-items: center; padding: 10px;">
+                <canvas #loadingLottieGrid width="80" height="80"></canvas>
+             </div>
+          </ion-infinite-scroll-content>
         </ion-infinite-scroll>
       </ion-content>
 
@@ -1155,6 +1163,9 @@ export class PhotoWidgetComponent implements OnInit {
   async loadData() {
     try {
       this.currentPage = 1;
+      
+      const infiniteScrolls = document.querySelectorAll('ion-infinite-scroll');
+      infiniteScrolls.forEach((is: any) => is.disabled = false);
       
       // 1. Mostrar caché primero si no estamos en un álbum específico
       if (!this.currentAlbum) {
@@ -2426,6 +2437,44 @@ export class PhotoWidgetComponent implements OnInit {
 
   private dotLottieEmptyState: DotLottie | null = null;
   private dotLottieEmptyStateGrid: DotLottie | null = null;
+  private dotLottieLoadingFeed: DotLottie | null = null;
+  private dotLottieLoadingGrid: DotLottie | null = null;
+
+  @ViewChild('loadingLottieFeed') set loadingLottieFeed(el: ElementRef<HTMLCanvasElement>) {
+    if (el) {
+      if (!this.dotLottieLoadingFeed) {
+        this.dotLottieLoadingFeed = new DotLottie({
+          canvas: el.nativeElement,
+          src: 'assets/lottie/Loading with Heart.lottie',
+          loop: true,
+          autoplay: true
+        });
+      }
+    } else {
+      if (this.dotLottieLoadingFeed) {
+        this.dotLottieLoadingFeed.destroy();
+        this.dotLottieLoadingFeed = null;
+      }
+    }
+  }
+
+  @ViewChild('loadingLottieGrid') set loadingLottieGrid(el: ElementRef<HTMLCanvasElement>) {
+    if (el) {
+      if (!this.dotLottieLoadingGrid) {
+        this.dotLottieLoadingGrid = new DotLottie({
+          canvas: el.nativeElement,
+          src: 'assets/lottie/Loading with Heart.lottie',
+          loop: true,
+          autoplay: true
+        });
+      }
+    } else {
+      if (this.dotLottieLoadingGrid) {
+        this.dotLottieLoadingGrid.destroy();
+        this.dotLottieLoadingGrid = null;
+      }
+    }
+  }
   
   @ViewChild('sadLottie') set sadLottie(el: ElementRef<HTMLCanvasElement>) {
     if (el) {
