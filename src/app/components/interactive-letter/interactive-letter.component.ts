@@ -25,9 +25,8 @@ import { CommonModule } from '@angular/common';
             <div class="letter-content">
               {{ letterData?.content }}
             </div>
-            <div class="letter-signature">
-              Con mucho amor ❤️
-            </div>
+
+
           </div>
           <button class="close-btn" (click)="close.emit()">Guardar en el corazón</button>
         </div>
