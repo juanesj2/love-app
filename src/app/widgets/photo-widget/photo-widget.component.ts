@@ -479,12 +479,12 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
 
           <!-- Contador de revividores siempre visible (fuera de gracia) -->
           <div class="revival-info-row" *ngIf="!coupleInfo?.streak_in_grace && coupleInfo?.current_streak > 0">
-            <span class="revival-chip free clickable" (click)="showRevivalShop = true">
+            <span class="revival-chip free clickable" (click)="showStreakModal = false; showRevivalShop = true">
               🎁 {{ coupleInfo?.free_revivals }}/3 este mes
               <ion-icon name="add-circle-outline" style="font-size:0.9rem; vertical-align:middle; margin-left:3px;"></ion-icon>
             </span>
-            <span class="revival-chip paid clickable" *ngIf="coupleInfo?.paid_revivals > 0" (click)="showRevivalShop = true">💎 {{ coupleInfo?.paid_revivals }} guardados</span>
-            <span class="revival-chip buy-chip" *ngIf="!coupleInfo?.paid_revivals || coupleInfo?.paid_revivals === 0" (click)="showRevivalShop = true">🛒 Comprar más</span>
+            <span class="revival-chip paid clickable" *ngIf="coupleInfo?.paid_revivals > 0" (click)="showStreakModal = false; showRevivalShop = true">💎 {{ coupleInfo?.paid_revivals }} guardados</span>
+            <span class="revival-chip buy-chip" *ngIf="!coupleInfo?.paid_revivals || coupleInfo?.paid_revivals === 0" (click)="showStreakModal = false; showRevivalShop = true">🛒 Comprar más</span>
           </div>
 
         </div>
