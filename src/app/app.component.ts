@@ -9,6 +9,7 @@ import { GlobalEventService } from './services/global-event.service';
 import { GlobalEventOverlayComponent } from './components/global-event-overlay/global-event-overlay.component';
 import { PendingLetterOverlayComponent } from './components/pending-letter-overlay/pending-letter-overlay.component';
 import { PendingLetterService } from './services/pending-letter.service';
+import { filter, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -31,8 +32,9 @@ export class AppComponent {
     this.premiumService.initialize();
     this.globalEventService.startPolling();
     this.setupBackButton();
-    // Check for pending letters after a short delay to let auth settle
-    setTimeout(() => this.pendingLetterService.checkForPendingLetters(), 3000);
+    // Esperar a que el token esté disponible (login completado) antes de buscar cartas
+    // Así funciona aunque la conexión sea lenta — sin límite de tiempo
+    this.pendingLetterService.waitForTokenAndCheck();
   }
 
   setupBackButton() {
