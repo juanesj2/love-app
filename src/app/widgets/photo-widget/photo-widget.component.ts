@@ -19,6 +19,8 @@ import { Share } from '@capacitor/share';
 import { Keyboard } from '@capacitor/keyboard';
 import { Media } from '@capacitor-community/media';
 import { DotLottie } from '@lottiefiles/dotlottie-web';
+import confetti from 'canvas-confetti';
+
 
 @Component({
   selector: 'app-photo-widget',
@@ -527,8 +529,9 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
           </div>
 
           <!-- Pack de compra -->
-          <div class="shop-pack-card" (click)="onPurchaseRevivalPack(); showRevivalShop = false">
-            <div class="pack-badge">PACK</div>
+          <div class="shop-pack-card" (click)="onPurchaseRevivalPack()" [class.purchasing]="purchasingRevival">
+            <ion-spinner name="crescent" *ngIf="purchasingRevival" class="pack-spinner"></ion-spinner>
+            <div class="pack-badge" *ngIf="!purchasingRevival">PACK</div>
             <div class="pack-icon-wrap">
               <span class="pack-flame-emoji">🔥</span>
               <span class="pack-count">x3</span>
@@ -541,6 +544,15 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
           </div>
 
           <p class="shop-legal">⚠️ Este dinero no será reembolsable una vez realizada la compra.</p>
+        </div>
+      </div>
+
+      <!-- Lottie Overlay for Purchases -->
+      <div class="lottie-overlay" *ngIf="showLottie">
+        <div class="lottie-content">
+          <canvas #lottieCanvasRevival width="300" height="300"></canvas>
+          <h2 class="lottie-message">{{ lottieMessage }}</h2>
+          <ion-button *ngIf="showLottieButton" expand="block" class="lottie-btn" (click)="closeLottieOverlay()">{{ lottieButtonText }}</ion-button>
         </div>
       </div>
 
@@ -849,6 +861,14 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .pack-desc { display: block; font-size: 0.73rem; color: rgba(255,255,255,0.75); margin-top: 3px; }
     .pack-price-pill { background: rgba(255,255,255,0.2); color: white; font-size: 1.1rem; font-weight: 900; padding: 6px 12px; border-radius: 100px; white-space: nowrap; border: 1.5px solid rgba(255,255,255,0.35); }
     .shop-legal { text-align: center; font-size: 0.68rem; color: #bbb; margin: 4px 20px 0; }
+
+    /* Lottie Overlay */
+    .lottie-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.3s; }
+    .lottie-content { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .lottie-content canvas { width: 300px; height: 300px; max-width: 90vw; margin-bottom: 20px; }
+    .lottie-message { color: white; font-size: 1.5rem; font-weight: 800; text-shadow: 0 4px 10px rgba(0,0,0,0.5); max-width: 80%; line-height: 1.3; animation: slideUpPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); margin-bottom: 20px; }
+    .lottie-btn { --background: linear-gradient(135deg, #FF4D6D, #c9184a); --border-radius: 14px; font-weight: 700; width: 200px; animation: slideUpPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    @keyframes slideUpPop { 0% { transform: translateY(30px) scale(0.9); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
 
     @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
@@ -1173,8 +1193,6 @@ export class PhotoWidgetComponent implements OnInit {
     if (this.lastShownDate === date) return;
     this.lastShownDate = date;
 
-    this.globalDateText = date;
-    
     this.globalDateText = date;
     
     // Determinar la animación según la fecha
@@ -1561,6 +1579,72 @@ export class PhotoWidgetComponent implements OnInit {
   purchasingRevival = false;
   showRevivalShop   = false;
 
+  // Lottie Animation Vars
+  showLottie = false;
+  lottieMessage = '';
+  showLottieButton = false;
+  lottieButtonText = 'Aceptar';
+  private lottieResolve: ((value: void | PromiseLike<void>) => void) | null = null;
+  @ViewChild('lottieCanvasRevival') lottieCanvasRevival?: ElementRef<HTMLCanvasElement>;
+  private dotLottieInstance: DotLottie | null = null;
+
+  closeLottieOverlay() {
+    this.showLottie = false;
+    if (this.dotLottieInstance) {
+      this.dotLottieInstance.destroy();
+      this.dotLottieInstance = null;
+    }
+    if (this.lottieResolve) {
+      this.lottieResolve();
+      this.lottieResolve = null;
+    }
+  }
+
+  private fireConfetti() {
+    confetti({
+      particleCount: 150,
+      spread: 80,
+      origin: { y: 0.6 },
+      colors: ['#FF4D6D', '#ffb703', '#2ecc71', '#ffffff'],
+      zIndex: 5001
+    });
+  }
+
+  private async playLottieAnimation(src: string, message: string, buttonText: string): Promise<void> {
+    this.lottieMessage = message;
+    this.lottieButtonText = buttonText;
+    this.showLottie = true;
+    this.showLottieButton = false;
+    this.cdr.detectChanges(); // Force redraw
+
+    return new Promise((resolve) => {
+      this.lottieResolve = resolve;
+      
+      setTimeout(() => {
+        if (this.dotLottieInstance) {
+          this.dotLottieInstance.destroy();
+        }
+        
+        if (this.lottieCanvasRevival?.nativeElement) {
+          this.dotLottieInstance = new DotLottie({
+            autoplay: true,
+            loop: false,
+            canvas: this.lottieCanvasRevival.nativeElement,
+            src: src
+          });
+          
+          this.dotLottieInstance.addEventListener('complete', () => {
+            this.showLottieButton = true;
+            this.cdr.detectChanges();
+          });
+        } else {
+          this.showLottieButton = true;
+          this.cdr.detectChanges();
+        }
+      }, 50);
+    });
+  }
+
   async onReviveStreak(usePaid: boolean) {
     if (this.revivingStreak) return;
     this.revivingStreak = true;
@@ -1598,17 +1682,12 @@ export class PhotoWidgetComponent implements OnInit {
       if (this.coupleInfo) {
         this.coupleInfo.paid_revivals = res.paid_revivals;
       }
-      const toast = await this.toastController.create({
-        message: `💎 ¡Pack de 3 revividores añadido! (${res.paid_revivals} en total)`,
-        duration: 3000,
-        position: 'top',
-        color: 'success'
-      });
-      toast.present();
+      this.showRevivalShop = false; // Close shop bottom sheet on success
+      this.fireConfetti();
+      await this.playLottieAnimation('assets/lottie/Payment Success.lottie', '¡Pack Comprado!', 'Genial');
       this.cdr.detectChanges();
     } catch (e: any) {
-      const toast = await this.toastController.create({ message: 'Error al comprar el pack', duration: 2500, position: 'top', color: 'danger' });
-      toast.present();
+      await this.playLottieAnimation('assets/lottie/Payment Failed.lottie', 'Error en la compra. Revisa tu conexión.', 'Volver');
     } finally {
       this.purchasingRevival = false;
     }
