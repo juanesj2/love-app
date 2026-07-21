@@ -87,7 +87,7 @@ export class InteractiveLetterComponent implements OnInit, OnDestroy, AfterViewI
     if (!this.forceOpen && this.lottieCanvas) {
       this.lottieInstance = new (window as any).DotLottie({
         canvas: this.lottieCanvas.nativeElement,
-        src: 'assets/lottie/Love letter.lottie',
+        src: 'assets/lottie/Love-letter.lottie',
         loop: false,
         autoplay: false
       });
