@@ -34,16 +34,17 @@ import { LoveApiService } from '../../../services/love-api.service';
           </div>
 
           <!-- Cartas -->
-          <div class="inv-item">
+          <div class="inv-item" (click)="toggleLetters()" style="cursor: pointer; position: relative;">
             <div class="inv-icon"><ion-icon name="mail"></ion-icon></div>
             <div class="inv-details">
               <h4>Cartas de Amor</h4>
               <p *ngIf="!inv.letters || inv.letters.length === 0" class="locked">No tienes cartas guardadas.</p>
               <p *ngIf="inv.letters?.length > 0">{{inv.letters.length}} carta(s) lista(s)</p>
             </div>
+            <ion-icon *ngIf="inv.letters?.length > 0" [name]="showLetters ? 'chevron-up' : 'chevron-down'" style="position: absolute; right: 15px; font-size: 1.2rem; color: #888;"></ion-icon>
           </div>
           
-          <div class="letters-list" *ngIf="inv.letters && inv.letters.length > 0">
+          <div class="letters-list" *ngIf="inv.letters && inv.letters.length > 0 && showLetters">
             <div class="letter-card" *ngFor="let letter of inv.letters">
               <div class="l-title">{{letter.title}}</div>
               <div class="l-subj">{{letter.subject}}</div>
@@ -65,7 +66,7 @@ import { LoveApiService } from '../../../services/love-api.service';
   styles: [`
     .overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; animation: fadeIn 0.3s; }
     .modal-sheet { background: #fdf2f4; width: 100%; max-width: 400px; border-radius: 30px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); animation: slideUp 0.35s cubic-bezier(0.175, 0.885, 0.32, 1); position: relative; max-height: 80vh; overflow-y: auto; }
-    .close-btn { position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; border-radius: 50%; background: white; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #590D22; box-shadow: 0 4px 15px rgba(0,0,0,0.08); cursor: pointer; }
+    .close-btn { position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; border-radius: 50%; background: white; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #590D22; box-shadow: 0 4px 15px rgba(0,0,0,0.08); cursor: pointer; z-index: 100; }
     .modal-header { text-align: center; margin-bottom: 20px; }
     .header-icon { font-size: 3.5rem; margin-bottom: 10px; animation: bounce 2s infinite; }
     .header-title { color: #590D22; margin: 0 0 5px; font-size: 1.5rem; font-weight: 800; font-family: 'Outfit', sans-serif; }
@@ -91,8 +92,13 @@ import { LoveApiService } from '../../../services/love-api.service';
 export class InventoryModalComponent {
   @Output() close = new EventEmitter<void>();
   public api = inject(LoveApiService);
+  public showLetters = false;
 
   constructor() {
-    addIcons({ closeOutline, gift, mail, lockClosed });
+    addIcons({ closeOutline, gift, mail, lockClosed, chevronUp, chevronDown });
+  }
+
+  toggleLetters() {
+    this.showLetters = !this.showLetters;
   }
 }
