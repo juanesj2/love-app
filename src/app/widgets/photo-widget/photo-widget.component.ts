@@ -523,7 +523,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
           <!-- Info -->
           <div class="shop-free-info">
             <ion-icon name="information-circle-outline"></ion-icon>
-            Los 3 gratis se recargan cada mes. Los de pago <strong>nunca caducan</strong> y son compartidos.
+            <span>Los 3 gratis se recargan cada mes. Los de pago <strong>nunca caducan</strong> y son compartidos con tu pareja.</span>
           </div>
 
           <!-- Pack de compra -->
