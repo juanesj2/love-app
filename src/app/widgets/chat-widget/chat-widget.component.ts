@@ -14,13 +14,17 @@ import { PaywallComponent } from '../../components/paywall/paywall.component';
 import { environment } from '../../../environments/environment';
 import confetti from 'canvas-confetti';
 import { FingerprintGameModalComponent } from '../fingerprint-game-modal/fingerprint-game-modal.component';
+import { LetterSelectorModalComponent } from '../../components/letter-selector-modal/letter-selector-modal.component';
+import { InteractiveLetterComponent } from '../../components/interactive-letter/interactive-letter.component';
 import { addIcons } from 'ionicons';
-import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed, settingsOutline, imageOutline, partlySunnyOutline, waterOutline, moonOutline, planetOutline, heartOutline, colorPaletteOutline, chatbubbleEllipsesOutline, textOutline, musicalNotesOutline, personCircleOutline, timeOutline, checkmarkOutline, checkmarkDoneOutline, chevronDownOutline } from 'ionicons/icons';
+import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed, settingsOutline, imageOutline, partlySunnyOutline, waterOutline, moonOutline, planetOutline, heartOutline, colorPaletteOutline, chatbubbleEllipsesOutline, textOutline, musicalNotesOutline, personCircleOutline, timeOutline, checkmarkOutline, checkmarkDoneOutline, chevronDownOutline, gift, mail } from 'ionicons/icons';
 import { DotLottie } from '@lottiefiles/dotlottie-web';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Keyboard } from '@capacitor/keyboard';
 @Component({
   selector: 'app-chat-widget',
+  standalone: true,
+  imports: [CommonModule, FormsModule, IonicModule, LetterSelectorModalComponent, InteractiveLetterComponent],
   template: `
     <div class="chat-wrapper" [style.background]="chatBackground || null" [ngClass]="'font-' + chatFont">
       <ion-content class="messages-content" [style.--background]="chatBackground ? 'transparent' : null" #msgContainer [scrollEvents]="true" (ionScroll)="onScroll($event)">
@@ -230,8 +234,15 @@ import { Keyboard } from '@capacitor/keyboard';
 
             <div class="attach-menu" *ngIf="showAttachMenu">
               <ng-container *ngIf="api.inventory$ | async as inv">
-                <button *ngIf="inv.gifts" class="attach-menu-item" (click)="sendGift(); showAttachMenu = false"><ion-icon name="gift"></ion-icon></button>
-                <button *ngIf="inv.letters" class="attach-menu-item" (click)="sendLetter(); showAttachMenu = false"><ion-icon name="mail"></ion-icon></button>
+                <button class="attach-menu-item" (click)="inv.gifts ? sendGift() : promptStore('gifts'); showAttachMenu = false">
+                  <ion-icon name="gift"></ion-icon>
+                  <ion-icon name="lock-closed" class="premium-lock" *ngIf="!inv.gifts"></ion-icon>
+                </button>
+                <button class="attach-menu-item" (click)="inv.letters?.length > 0 ? openLetterSelector() : promptStore('letters'); showAttachMenu = false">
+                  <ion-icon name="mail"></ion-icon>
+                  <div class="letter-badge" *ngIf="inv.letters?.length > 0">{{inv.letters.length}}</div>
+                  <ion-icon name="lock-closed" class="premium-lock" *ngIf="!(inv.letters?.length > 0)"></ion-icon>
+                </button>
               </ng-container>
               <button class="attach-menu-item" (click)="toggleGifModal(); showAttachMenu = false"><ion-icon name="image"></ion-icon></button>
             <button class="attach-menu-item" (click)="startDoodle(); showAttachMenu = false">
@@ -398,6 +409,24 @@ import { Keyboard } from '@capacitor/keyboard';
         </div>
       </div>
     </div>
+
+    <!-- Modals -->
+    <app-letter-selector-modal
+      *ngIf="showLetterSelector"
+      [letters]="userLetters"
+      (close)="showLetterSelector = false"
+      (select)="onLetterSelect($event)">
+    </app-letter-selector-modal>
+
+    <!-- Interactive Letter -->
+    <app-interactive-letter
+      *ngIf="showInteractiveLetter"
+      [letterData]="interactiveLetterData"
+      [forceOpen]="interactiveLetterForceOpen"
+      (opened)="onLetterOpenedInChat()"
+      (close)="showInteractiveLetter = false">
+    </app-interactive-letter>
+
   `,
   styles: [`
     :host {
@@ -502,6 +531,7 @@ import { Keyboard } from '@capacitor/keyboard';
     .attach-menu { position: absolute; bottom: 65px; left: 10px; background: white; border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; padding: 5px; animation: scaleIn 0.2s; z-index: 2000; }
     .attach-menu-item { position: relative; background: transparent; border: none; font-size: 1.5rem; color: #a4133c; padding: 10px; cursor: pointer; transition: background 0.2s; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
     .attach-menu-item:hover { background: #fff0f3; }
+    .letter-badge { position: absolute; top: -2px; right: -2px; background: #FF4D6D; color: white; font-size: 0.6rem; font-weight: bold; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
     @keyframes scaleIn { from { transform: scale(0.8) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
 
     .recording-bar { display: flex; flex: 1; align-items: center; justify-content: space-between; padding: 0 10px; background: #fff0f3; border-radius: 20px; }
@@ -1637,9 +1667,7 @@ import { Keyboard } from '@capacitor/keyboard';
       padding: 0 4px;
       border: 2px solid white;
     }
-  `],
-  standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule]
+  `]
 })
 export class ChatWidgetComponent implements OnInit, AfterViewInit {
   pollingInterval: any;
@@ -1676,7 +1704,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   @ViewChild('chatInput', { static: false }) chatInput: any;
   
   constructor() {
-    addIcons({ paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed, 'time-outline': timeOutline, 'checkmark-outline': checkmarkOutline, 'checkmark-done-outline': checkmarkDoneOutline, 'image-outline': imageOutline, 'partly-sunny-outline': partlySunnyOutline, 'water-outline': waterOutline, 'moon-outline': moonOutline, 'planet-outline': planetOutline, 'heart-outline': heartOutline, 'color-palette-outline': colorPaletteOutline, 'chatbubble-ellipses-outline': chatbubbleEllipsesOutline, 'text-outline': textOutline, 'musical-notes-outline': musicalNotesOutline, 'person-circle-outline': personCircleOutline, 'chevron-down-outline': chevronDownOutline });
+    addIcons({ gift, mail, paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pencil, image, search, mic, stopCircle, colorPalette, checkmark, add, play, pause, colorWandOutline, eye, eyeOffOutline, banOutline, lockClosed, 'time-outline': timeOutline, 'checkmark-outline': checkmarkOutline, 'checkmark-done-outline': checkmarkDoneOutline, 'image-outline': imageOutline, 'partly-sunny-outline': partlySunnyOutline, 'water-outline': waterOutline, 'moon-outline': moonOutline, 'planet-outline': planetOutline, 'heart-outline': heartOutline, 'color-palette-outline': colorPaletteOutline, 'chatbubble-ellipses-outline': chatbubbleEllipsesOutline, 'text-outline': textOutline, 'musical-notes-outline': musicalNotesOutline, 'person-circle-outline': personCircleOutline, 'chevron-down-outline': chevronDownOutline });
   }
 
   // --- Background Feature ---
@@ -2253,6 +2281,15 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   // --- GIF Logic ---
+  showFingerprintModal = false;
+  showLetterSelector = false;
+  userLetters: any[] = [];
+  
+  showInteractiveLetter = false;
+  interactiveLetterData: any = null;
+  interactiveLetterForceOpen = false;
+  currentOpeningMsg: any = null;
+  
   showGifModal = false;
   giphyQuery = '';
   giphyResults: any[] = [];
@@ -2705,6 +2742,33 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     el.style.height = el.scrollHeight + 'px';
   }
 
+  openLetterSelector() {
+    const inv = this.api.inventory$.value;
+    if (inv && inv.letters && inv.letters.length > 0) {
+      this.userLetters = inv.letters;
+      this.showLetterSelector = true;
+    }
+  }
+
+  async onLetterSelect(letter: any) {
+    this.showLetterSelector = false;
+    try {
+      const meta = { type: 'letter', opened: false, title: letter.title, subject: letter.subject, content: letter.content };
+      await this.api.sendMessage('[LETTER]', undefined, undefined, meta);
+      await this.api.purchaseGlobalEvent({
+        title: '¡Carta de Amor! 💌',
+        message: 'Tienes una nueva carta romántica esperando por ti.',
+        confetti_enabled: true,
+        emojis_enabled: true,
+        emojis_list: '💌,💖,✨,🥰',
+        top_bar_color: '#590D22'
+      });
+      this.scrollToBottom();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   async openPaywall() {
     const modal = await this.modalCtrl.create({
       component: PaywallComponent
@@ -2826,26 +2890,28 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     this.safeTimeout(() => this.scrollToBottom(), 100);
   }
 
-  async sendLetter() {
-    this.showAttachMenu = false;
-    const meta = { opened: false, type: 'letter' };
-    await this.api.sendMessage('[LETTER]', undefined, undefined, meta);
-    await this.api.purchaseGlobalEvent({
-      title: '¡Carta de Amor! 💌',
-      message: 'Tienes una nueva carta romántica esperando por ti.',
-      confetti_enabled: true,
-      emojis_enabled: true,
-      emojis_list: '💌,💖,✨,🥰',
-      top_bar_color: '#590D22'
-    });
-    this.loadMessages();
-    this.safeTimeout(() => this.scrollToBottom(), 100);
-  }
-
   async openGiftOrLetter(msg: any) {
+    if (msg.meta?.type === 'letter') {
+      this.interactiveLetterData = {
+        title: msg.meta.title || 'Carta de Amor',
+        subject: msg.meta.subject || 'Para ti',
+        content: msg.meta.content || 'Mensaje de amor de tu pareja'
+      };
+      
+      if (msg.meta.opened) {
+        this.interactiveLetterForceOpen = true;
+        this.showInteractiveLetter = true;
+      } else {
+        this.interactiveLetterForceOpen = false;
+        this.currentOpeningMsg = msg;
+        this.showInteractiveLetter = true;
+      }
+      return;
+    }
+
     if (msg.meta?.opened) return; // Ya está abierto
     
-    // Aquí abriríamos un modal Lottie, pero como el evento global salta al entrar,
+    // Aquí abriríamos un modal Lottie para regalos, pero como el evento global salta al entrar,
     // si el usuario está en el chat y le da click, podemos disparar la animación global
     // manualmente y actualizar el mensaje.
     
@@ -2857,6 +2923,19 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       await this.api.editMessage(msg.id, msg.mensaje, msg.meta);
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  async onLetterOpenedInChat() {
+    if (this.currentOpeningMsg) {
+      if (!this.currentOpeningMsg.meta) this.currentOpeningMsg.meta = {};
+      this.currentOpeningMsg.meta.opened = true;
+      try {
+        await this.api.editMessage(this.currentOpeningMsg.id, this.currentOpeningMsg.mensaje, this.currentOpeningMsg.meta);
+      } catch (e) {
+        console.error(e);
+      }
+      this.currentOpeningMsg = null;
     }
   }
 
@@ -3345,6 +3424,16 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       }
     };
     frame();
+  }
+
+  async promptStore(item: string) {
+    const itemName = item === 'gifts' ? 'el Regalo Virtual' : 'la Carta de Amor';
+    const toast = await this.toastController.create({
+      message: `Necesitas comprar ${itemName} en la tienda (+ Más -> Tienda).`,
+      duration: 3000,
+      color: 'warning'
+    });
+    toast.present();
   }
 
   private async openFingerprintGame() {

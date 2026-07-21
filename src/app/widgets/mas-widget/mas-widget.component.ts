@@ -22,15 +22,17 @@ import { PaywallComponent } from '../../components/paywall/paywall.component';
 import { ModalController } from '@ionic/angular';
 import { NotificationService } from '../../services/notification.service';
 import confetti from 'canvas-confetti';
+
 import { GodModeModalComponent } from './god-mode-modal/god-mode-modal.component';
-import { PremiumEventModalComponent } from './premium-event-modal/premium-event-modal.component';
 import { StoreModalComponent } from './store-modal/store-modal.component';
+import { InventoryModalComponent } from './inventory-modal/inventory-modal.component';
+import { PremiumEventModalComponent } from './premium-event-modal/premium-event-modal.component';
 
 
 @Component({
   selector: 'app-mas-widget',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent, IonRefresher, IonRefresherContent, IonIcon, IonSelect, IonSelectOption, IonToggle, TimelineWidgetComponent, GodModeModalComponent, PremiumEventModalComponent, StoreModalComponent],
+  imports: [CommonModule, FormsModule, IonContent, IonRefresher, IonRefresherContent, IonIcon, IonSelect, IonSelectOption, IonToggle, TimelineWidgetComponent, GodModeModalComponent, PremiumEventModalComponent, StoreModalComponent, InventoryModalComponent],
   template: `
     <ion-content class="scroll-content">
       <ng-template #staticStars let-rating="rating">
@@ -232,6 +234,18 @@ import { StoreModalComponent } from './store-modal/store-modal.component';
             </div>
           </div>
           <div class="boost-price-pill">Abrir <ion-icon name="chevron-forward"></ion-icon></div>
+        </div>
+
+        <!-- Mis Cosas Banner -->
+        <div class="boost-banner" style="margin-top: 15px; background: linear-gradient(135deg, #FF4D6D, #590D22);" (click)="openInventoryModal()">
+          <div class="boost-left">
+            <div class="boost-icon">🎒</div>
+            <div class="boost-text">
+              <span class="boost-title" style="color: white;">Mis Cosas</span>
+              <span class="boost-sub" style="color: rgba(255,255,255,0.8);">Inventario de regalos y cartas</span>
+            </div>
+          </div>
+          <div class="boost-price-pill" style="color: #FF4D6D; background: white;">Ver <ion-icon name="chevron-forward"></ion-icon></div>
         </div>
 
         <!-- Settings -->
@@ -711,6 +725,9 @@ import { StoreModalComponent } from './store-modal/store-modal.component';
 
         <!-- Store Modal -->
         <app-store-modal *ngIf="isStoreModalOpen" (close)="closeStoreModal()" (openPaywall)="openPaywall()" (openPremiumEvent)="showPremiumEventModal = true"></app-store-modal>
+        
+        <!-- Inventory Modal -->
+        <app-inventory-modal *ngIf="isInventoryModalOpen" (close)="closeInventoryModal()"></app-inventory-modal>
 
         <!-- Premium Event Modal (Impulsa tu Relación) -->
         <app-premium-event-modal *ngIf="showPremiumEventModal" (close)="showPremiumEventModal = false"></app-premium-event-modal>
@@ -1308,8 +1325,19 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     document.body.classList.remove('hide-tabs');
   }
 
+  openInventoryModal() {
+    this.isInventoryModalOpen = true;
+    document.body.classList.add('hide-tabs');
+  }
+
+  closeInventoryModal() {
+    this.isInventoryModalOpen = false;
+    document.body.classList.remove('hide-tabs');
+  }
+
   isNightOwlEnabled = false;
   isStoreModalOpen = false;
+  isInventoryModalOpen = false;
 
   constructor() {
     addIcons({ fingerPrintOutline, bookOutline, imageOutline, logOutOutline, addCircleOutline, starOutline, star, closeOutline, checkmarkCircleOutline, restaurantOutline, locationOutline, pencilOutline, filmOutline, gameControllerOutline, personCircleOutline, informationCircleOutline, heartOutline, heart, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, timeOutline, settingsOutline, flagOutline, checkmarkCircle, ellipseOutline, moonOutline, closeCircle, calendar, add, cameraOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, lockClosed, chevronForward });

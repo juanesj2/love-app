@@ -47,8 +47,9 @@ export class LoveApiService {
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/purchase-revival-pack`, {}));
   }
 
-  async storePurchase(item: string): Promise<any> {
-    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/store/purchase`, { item }));
+  async storePurchase(data: any): Promise<any> {
+    const payload = typeof data === 'string' ? { item: data } : data;
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/store/purchase`, payload));
   }
 
   async sendCustomNotification(title: string, body: string): Promise<any> {

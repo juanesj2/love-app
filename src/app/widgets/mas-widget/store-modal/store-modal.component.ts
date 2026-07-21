@@ -7,11 +7,12 @@ import { LoveApiService } from "../../../services/love-api.service";
 import { PremiumService } from "../../../services/premium.service";
 import { DotLottie } from '@lottiefiles/dotlottie-web';
 import confetti from 'canvas-confetti';
+import { LetterFormModalComponent } from '../../../components/letter-form-modal/letter-form-modal.component';
 
 @Component({
   selector: "app-store-modal",
   standalone: true,
-  imports: [CommonModule, IonicModule],
+  imports: [CommonModule, IonicModule, LetterFormModalComponent],
   template: `
     <div class="overlay" (click)="onOverlayClick($event)">
       <div class="modal-sheet" (click)="$event.stopPropagation()">
@@ -78,15 +79,14 @@ import confetti from 'canvas-confetti';
             </div>
 
             <!-- Carta de Amor -->
-            <div class="store-card" (click)="!inv.letters && purchaseItem('letters')" [class.purchasing]="purchasingItem === 'letters'" [class.purchased]="inv.letters">
-              <ion-spinner name="crescent" *ngIf="purchasingItem === 'letters'" class="pack-spinner"></ion-spinner>
-              <div class="card-icon" *ngIf="purchasingItem !== 'letters'">💌</div>
-              <div class="card-info">
-                <span class="card-title">Carta de Amor</span>
-                <span class="card-desc">Mensaje romántico a pantalla completa</span>
-              </div>
-              <div class="card-action pack-price" *ngIf="!inv.letters">0.99 €</div>
-              <div class="card-action purchased-badge" *ngIf="inv.letters">Comprado</div>
+            <div class="store-card" (click)="purchaseItem('letters')" [class.purchasing]="purchasingItem === 'letters'">
+                <ion-spinner name="crescent" *ngIf="purchasingItem === 'letters'" class="pack-spinner"></ion-spinner>
+                <div class="card-icon" *ngIf="purchasingItem !== 'letters'">💌</div>
+                <div class="card-info">
+                  <span class="card-title">Carta de Amor</span>
+                  <span class="card-desc">Redacta una carta y guárdala para tu pareja</span>
+                </div>
+                <div class="card-action pack-price">0.99 €</div>
             </div>
 
             <!-- Pack Preguntas Picantes -->
@@ -105,6 +105,13 @@ import confetti from 'canvas-confetti';
           <p class="shop-legal">⚠️ Las compras directas no son reembolsables.</p>
         </div>
       </div>
+
+      <!-- Letter Form Modal -->
+      <app-letter-form-modal 
+        *ngIf="showLetterForm" 
+        (close)="showLetterForm = false" 
+        (save)="onLetterSave($event)">
+      </app-letter-form-modal>
 
       <!-- Lottie Overlay for Purchases -->
       <div class="lottie-overlay" *ngIf="showLottie">
@@ -193,6 +200,8 @@ export class StoreModalComponent implements OnDestroy {
   private lottieResolve: ((value: void | PromiseLike<void>) => void) | null = null;
   @ViewChild('lottieCanvasStore') lottieCanvasStore?: ElementRef<HTMLCanvasElement>;
   private dotLottieInstance?: DotLottie;
+
+  showLetterForm = false;
 
   constructor() {
     addIcons({ closeOutline, chevronForward });
@@ -300,9 +309,28 @@ export class StoreModalComponent implements OnDestroy {
 
   async purchaseItem(item: string) {
     if (this.purchasingItem) return;
+    
+    if (item === 'letters') {
+      this.showLetterForm = true;
+      return;
+    }
+
+    await this.processPurchase(item);
+  }
+
+  async onLetterSave(data: {title: string, subject: string, content: string}) {
+    this.showLetterForm = false;
+    await this.processPurchase('letters', data);
+  }
+
+  private async processPurchase(item: string, data?: any) {
     this.purchasingItem = item;
     try {
-      const res = await this.api.storePurchase(item);
+      let body: any = { item };
+      if (data) {
+        body = { ...body, ...data };
+      }
+      const res = await this.api.storePurchase(body);
       this.api.inventory$.next(res.inventory);
       this.fireConfetti();
       await this.playLottieAnimation('assets/lottie/Payment Success.lottie', '¡Desbloqueado!', 'Genial');
