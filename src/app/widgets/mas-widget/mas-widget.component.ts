@@ -13,7 +13,7 @@ import { LocationService } from '../../services/location.service';
 import { TutorialService } from '../../services/tutorial.service';
 import { OfflineSyncService } from '../../services/offline-sync.service';
 import { addIcons } from 'ionicons';
-import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, bookOutline, imageOutline, checkmarkCircleOutline, informationCircleOutline, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, lockClosed, fingerPrintOutline } from 'ionicons/icons';
+import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, bookOutline, imageOutline, checkmarkCircleOutline, informationCircleOutline, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, lockClosed, fingerPrintOutline, chevronForward } from 'ionicons/icons';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.component';
@@ -906,8 +906,8 @@ import { PremiumEventModalComponent } from './premium-event-modal/premium-event-
     .boost-text { display: flex; flex-direction: column; gap: 2px; }
     .boost-title { font-size: 1.05rem; font-weight: 900; color: white; letter-spacing: -0.2px; line-height: 1.1; }
     .boost-sub { font-size: 0.8rem; color: rgba(255,255,255,0.85); font-weight: 600; }
-    .boost-price-pill { display: flex; align-items: center; gap: 3px; background: rgba(255,255,255,0.2); color: white; font-size: 0.9rem; font-weight: 900; padding: 6px 12px; border-radius: 100px; border: 1.5px solid rgba(255,255,255,0.35); white-space: nowrap; z-index: 1; }
-    .boost-price-pill ion-icon { font-size: 1rem; }
+    .boost-price-pill { display: flex; align-items: center; justify-content: center; gap: 4px; background: rgba(255,255,255,0.2); color: white; font-size: 0.95rem; font-weight: 900; padding: 6px 14px; border-radius: 100px; border: 1.5px solid rgba(255,255,255,0.35); white-space: nowrap; z-index: 1; }
+    .boost-price-pill ion-icon { font-size: 1.1rem; margin-top: 1px; }
 
     /* Quick Actions Grid */
     .quick-actions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
@@ -1296,7 +1296,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   isNightOwlEnabled = false;
 
   constructor() {
-    addIcons({ fingerPrintOutline, bookOutline, imageOutline, logOutOutline, addCircleOutline, starOutline, star, closeOutline, checkmarkCircleOutline, restaurantOutline, locationOutline, pencilOutline, filmOutline, gameControllerOutline, personCircleOutline, informationCircleOutline, heartOutline, heart, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, timeOutline, settingsOutline, flagOutline, checkmarkCircle, ellipseOutline, moonOutline, closeCircle, calendar, add, cameraOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, lockClosed });
+    addIcons({ fingerPrintOutline, bookOutline, imageOutline, logOutOutline, addCircleOutline, starOutline, star, closeOutline, checkmarkCircleOutline, restaurantOutline, locationOutline, pencilOutline, filmOutline, gameControllerOutline, personCircleOutline, informationCircleOutline, heartOutline, heart, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, timeOutline, settingsOutline, flagOutline, checkmarkCircle, ellipseOutline, moonOutline, closeCircle, calendar, add, cameraOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, lockClosed, chevronForward });
   }
 
   async checkNightOwl() {
