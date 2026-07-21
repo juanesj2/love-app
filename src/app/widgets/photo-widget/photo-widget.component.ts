@@ -479,10 +479,57 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
 
           <!-- Contador de revividores siempre visible (fuera de gracia) -->
           <div class="revival-info-row" *ngIf="!coupleInfo?.streak_in_grace && coupleInfo?.current_streak > 0">
-            <span class="revival-chip free">🎁 {{ coupleInfo?.free_revivals }}/3 este mes</span>
-            <span class="revival-chip paid" *ngIf="coupleInfo?.paid_revivals > 0">💎 {{ coupleInfo?.paid_revivals }} guardados</span>
+            <span class="revival-chip free clickable" (click)="showRevivalShop = true">
+              🎁 {{ coupleInfo?.free_revivals }}/3 este mes
+              <ion-icon name="add-circle-outline" style="font-size:0.9rem; vertical-align:middle; margin-left:3px;"></ion-icon>
+            </span>
+            <span class="revival-chip paid clickable" *ngIf="coupleInfo?.paid_revivals > 0" (click)="showRevivalShop = true">💎 {{ coupleInfo?.paid_revivals }} guardados</span>
+            <span class="revival-chip buy-chip" *ngIf="!coupleInfo?.paid_revivals || coupleInfo?.paid_revivals === 0" (click)="showRevivalShop = true">🛒 Comprar más</span>
           </div>
 
+        </div>
+      </div>
+
+      <!-- Revival Shop Bottom Sheet -->
+      <div class="custom-overlay" *ngIf="showRevivalShop" (click)="showRevivalShop = false" style="align-items: flex-end;">
+        <div class="revival-shop-sheet" (click)="$event.stopPropagation()">
+          <div class="sheet-handle"></div>
+          <h3 class="shop-title">💎 Revividores de Racha</h3>
+          <p class="shop-sub">Salva vuestra racha cuando la vida se complica</p>
+
+          <!-- Estado actual -->
+          <div class="shop-status-row">
+            <div class="shop-status-card">
+              <span class="shop-status-emoji">🎁</span>
+              <span class="shop-status-val">{{ coupleInfo?.free_revivals }}/3</span>
+              <span class="shop-status-label">Gratis este mes</span>
+            </div>
+            <div class="shop-status-card">
+              <span class="shop-status-emoji">💎</span>
+              <span class="shop-status-val">{{ coupleInfo?.paid_revivals || 0 }}</span>
+              <span class="shop-status-label">De pago guardados</span>
+            </div>
+          </div>
+
+          <!-- Info gratis -->
+          <div class="shop-free-info">
+            <ion-icon name="information-circle-outline"></ion-icon>
+            Los 3 gratis se recargan el día 1 de cada mes. Los de pago nunca caducan.
+          </div>
+
+          <!-- Pack de compra -->
+          <div class="shop-pack-card" (click)="onPurchaseRevivalPack(); showRevivalShop = false">
+            <div class="pack-left">
+              <span class="pack-emoji">🔥🔥🔥</span>
+              <div class="pack-info">
+                <span class="pack-name">Pack de 3 Revividores</span>
+                <span class="pack-desc">No caducan nunca · Compartidos con tu pareja</span>
+              </div>
+            </div>
+            <div class="pack-price">1.50€</div>
+          </div>
+
+          <button class="shop-close-btn" (click)="showRevivalShop = false">Cerrar</button>
         </div>
       </div>
 
@@ -754,6 +801,32 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .free-btn { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; box-shadow: 0 4px 14px rgba(255,77,109,0.35); }
     .paid-btn { background: linear-gradient(135deg, #6c63ff, #4a43cc); color: white; box-shadow: 0 4px 14px rgba(108,99,255,0.35); }
     .buy-btn  { background: rgba(0,0,0,0.05); color: #555; border: 1.5px solid #ddd; box-shadow: none; }
+    .revival-chip.clickable { cursor: pointer; transition: transform 0.15s; }
+    .revival-chip.clickable:active { transform: scale(0.95); }
+    .revival-chip.buy-chip { background: linear-gradient(135deg,rgba(108,99,255,0.12),rgba(201,24,74,0.08)); color: #c9184a; border: 1.5px solid rgba(201,24,74,0.3); cursor: pointer; font-weight: 800; }
+
+    /* Revival Shop Bottom Sheet */
+    .revival-shop-sheet { background: white; border-radius: 28px 28px 0 0; padding: 20px 20px 36px; max-height: 85vh; overflow-y: auto; animation: slideUpSheet 0.3s ease; }
+    @keyframes slideUpSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .shop-title { font-size: 1.2rem; font-weight: 900; color: #590D22; text-align: center; margin: 8px 0 4px; }
+    .shop-sub { font-size: 0.82rem; color: #888; text-align: center; margin: 0 0 16px; }
+    .shop-status-row { display: flex; gap: 10px; margin-bottom: 14px; }
+    .shop-status-card { flex: 1; background: rgba(255,77,109,0.06); border-radius: 16px; padding: 14px 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; border: 1.5px solid rgba(255,77,109,0.1); }
+    .shop-status-emoji { font-size: 1.6rem; }
+    .shop-status-val { font-size: 1.4rem; font-weight: 900; color: #590D22; }
+    .shop-status-label { font-size: 0.7rem; color: #888; font-weight: 600; text-align: center; }
+    .shop-free-info { display: flex; align-items: flex-start; gap: 8px; font-size: 0.78rem; color: #666; background: #f8f9fa; border-radius: 12px; padding: 10px 12px; margin-bottom: 16px; }
+    .shop-free-info ion-icon { color: #6c63ff; font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+    .shop-pack-card { display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg,#fff0f3,#ffe4ec); border: 2px solid #FF4D6D; border-radius: 20px; padding: 18px 16px; margin-bottom: 14px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 6px 20px rgba(255,77,109,0.15); }
+    .shop-pack-card:active { transform: scale(0.98); }
+    .pack-left { display: flex; align-items: center; gap: 14px; }
+    .pack-emoji { font-size: 1.8rem; }
+    .pack-info { display: flex; flex-direction: column; gap: 3px; }
+    .pack-name { font-size: 0.95rem; font-weight: 900; color: #590D22; }
+    .pack-desc { font-size: 0.75rem; color: #a4133c; font-weight: 600; }
+    .pack-price { font-size: 1.5rem; font-weight: 900; color: #FF4D6D; white-space: nowrap; }
+    .shop-close-btn { width: 100%; background: #f1f3f5; color: #666; border: none; border-radius: 14px; padding: 13px; font-size: 0.95rem; font-weight: 700; cursor: pointer; }
+    .shop-close-btn:active { background: #e0e0e0; }
 
     @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
@@ -1464,6 +1537,7 @@ export class PhotoWidgetComponent implements OnInit {
 
   revivingStreak    = false;
   purchasingRevival = false;
+  showRevivalShop   = false;
 
   async onReviveStreak(usePaid: boolean) {
     if (this.revivingStreak) return;
