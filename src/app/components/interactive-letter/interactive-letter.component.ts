@@ -22,11 +22,10 @@ import { CommonModule } from '@angular/common';
         <div class="opened-letter" *ngIf="isOpened">
           <div class="paper">
             <h2 class="letter-title">{{ letterData?.title || 'Carta de Amor' }}</h2>
+            <p class="letter-subject" *ngIf="letterData?.subject">{{ letterData.subject }}</p>
             <div class="letter-content">
               {{ letterData?.content }}
             </div>
-
-
           </div>
           <button class="close-btn" (click)="close.emit()">Guardar en el corazón</button>
         </div>
@@ -50,7 +49,8 @@ import { CommonModule } from '@angular/common';
     
     .paper { width: 100%; min-height: 400px; max-height: 70vh; background: #fdfaf6; border-radius: 4px; padding: 40px 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); overflow-y: auto; position: relative; background-image: repeating-linear-gradient(transparent, transparent 29px, #e1d3c1 30px); background-attachment: local; }
     
-    .letter-title { font-family: 'Georgia', serif; color: #590D22; text-align: center; margin-top: 0; margin-bottom: 30px; font-size: 1.8rem; }
+    .letter-title { font-family: 'Georgia', serif; color: #590D22; text-align: center; margin-top: 0; margin-bottom: 8px; font-size: 1.8rem; }
+    .letter-subject { font-family: 'Georgia', serif; font-style: italic; color: #a4133c; text-align: center; margin: 0 0 24px; font-size: 1.1rem; opacity: 0.85; }
     
     .letter-content { font-family: 'Courier New', Courier, monospace; color: #333; font-size: 1.1rem; line-height: 30px; white-space: pre-wrap; margin-bottom: 40px; }
     
