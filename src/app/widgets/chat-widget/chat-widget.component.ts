@@ -430,7 +430,7 @@ import { Keyboard } from '@capacitor/keyboard';
     </app-interactive-letter>
 
     <!-- Gift Message Modal -->
-    <div class="custom-modal-overlay" *ngIf="showGiftMessageModal" (click)="showGiftMessageModal = false">
+    <div class="color-picker-overlay" *ngIf="showGiftMessageModal" (click)="showGiftMessageModal = false">
       <div class="color-picker-modal" (click)="$event.stopPropagation()" style="display: flex; flex-direction: column;">
         <h3>Adjuntar mensaje</h3>
         <p style="margin-bottom: 15px; color: #666; font-size: 0.95rem; text-align: center;">
