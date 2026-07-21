@@ -491,45 +491,56 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
       </div>
 
       <!-- Revival Shop Bottom Sheet -->
-      <div class="custom-overlay" *ngIf="showRevivalShop" (click)="showRevivalShop = false" style="align-items: flex-end;">
+      <div class="revival-shop-overlay" *ngIf="showRevivalShop" (click)="showRevivalShop = false">
         <div class="revival-shop-sheet" (click)="$event.stopPropagation()">
           <div class="sheet-handle"></div>
-          <h3 class="shop-title">💎 Revividores de Racha</h3>
-          <p class="shop-sub">Salva vuestra racha cuando la vida se complica</p>
+
+          <!-- Header -->
+          <div class="shop-header">
+            <div>
+              <h3 class="shop-title">Revividores de Racha</h3>
+              <p class="shop-sub">Salva vuestra racha cuando la vida se complica</p>
+            </div>
+            <button class="shop-x-btn" (click)="showRevivalShop = false">
+              <ion-icon name="close"></ion-icon>
+            </button>
+          </div>
 
           <!-- Estado actual -->
           <div class="shop-status-row">
-            <div class="shop-status-card">
+            <div class="shop-status-card free-card">
               <span class="shop-status-emoji">🎁</span>
-              <span class="shop-status-val">{{ coupleInfo?.free_revivals }}/3</span>
+              <span class="shop-status-val">{{ coupleInfo?.free_revivals }}<span class="shop-status-of">/3</span></span>
               <span class="shop-status-label">Gratis este mes</span>
             </div>
-            <div class="shop-status-card">
+            <div class="shop-status-card paid-card">
               <span class="shop-status-emoji">💎</span>
               <span class="shop-status-val">{{ coupleInfo?.paid_revivals || 0 }}</span>
               <span class="shop-status-label">De pago guardados</span>
             </div>
           </div>
 
-          <!-- Info gratis -->
+          <!-- Info -->
           <div class="shop-free-info">
             <ion-icon name="information-circle-outline"></ion-icon>
-            Los 3 gratis se recargan el día 1 de cada mes. Los de pago nunca caducan.
+            Los 3 gratis se recargan cada mes. Los de pago <strong>nunca caducan</strong> y son compartidos.
           </div>
 
           <!-- Pack de compra -->
           <div class="shop-pack-card" (click)="onPurchaseRevivalPack(); showRevivalShop = false">
-            <div class="pack-left">
-              <span class="pack-emoji">🔥🔥🔥</span>
-              <div class="pack-info">
-                <span class="pack-name">Pack de 3 Revividores</span>
-                <span class="pack-desc">No caducan nunca · Compartidos con tu pareja</span>
-              </div>
+            <div class="pack-badge">PACK</div>
+            <div class="pack-icon-wrap">
+              <ion-icon name="flame" class="pack-flame-icon"></ion-icon>
+              <span class="pack-count">x3</span>
             </div>
-            <div class="pack-price">1.50€</div>
+            <div class="pack-info">
+              <span class="pack-name">3 Revividores</span>
+              <span class="pack-desc">No caducan · Compartidos con tu pareja</span>
+            </div>
+            <div class="pack-price-pill">1.50€</div>
           </div>
 
-          <button class="shop-close-btn" (click)="showRevivalShop = false">Cerrar</button>
+          <p class="shop-legal">Compra simulada · En producción se usará RevenueCat</p>
         </div>
       </div>
 
@@ -805,28 +816,39 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .revival-chip.clickable:active { transform: scale(0.95); }
     .revival-chip.buy-chip { background: linear-gradient(135deg,rgba(108,99,255,0.12),rgba(201,24,74,0.08)); color: #c9184a; border: 1.5px solid rgba(201,24,74,0.3); cursor: pointer; font-weight: 800; }
 
-    /* Revival Shop Bottom Sheet */
-    .revival-shop-sheet { background: white; border-radius: 28px 28px 0 0; padding: 20px 20px 36px; max-height: 85vh; overflow-y: auto; animation: slideUpSheet 0.3s ease; }
-    @keyframes slideUpSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    .shop-title { font-size: 1.2rem; font-weight: 900; color: #590D22; text-align: center; margin: 8px 0 4px; }
-    .shop-sub { font-size: 0.82rem; color: #888; text-align: center; margin: 0 0 16px; }
-    .shop-status-row { display: flex; gap: 10px; margin-bottom: 14px; }
-    .shop-status-card { flex: 1; background: rgba(255,77,109,0.06); border-radius: 16px; padding: 14px 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; border: 1.5px solid rgba(255,77,109,0.1); }
-    .shop-status-emoji { font-size: 1.6rem; }
-    .shop-status-val { font-size: 1.4rem; font-weight: 900; color: #590D22; }
-    .shop-status-label { font-size: 0.7rem; color: #888; font-weight: 600; text-align: center; }
-    .shop-free-info { display: flex; align-items: flex-start; gap: 8px; font-size: 0.78rem; color: #666; background: #f8f9fa; border-radius: 12px; padding: 10px 12px; margin-bottom: 16px; }
+    /* Revival Shop Overlay — z-index alto para cubrir la tab bar */
+    .revival-shop-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 99999; display: flex; flex-direction: column; justify-content: flex-end; backdrop-filter: blur(3px); }
+    .revival-shop-sheet { background: white; border-radius: 28px 28px 0 0; padding: 0 0 36px; max-height: 88vh; overflow-y: auto; animation: slideUpSheet 0.28s cubic-bezier(.4,0,.2,1); }
+    @keyframes slideUpSheet { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .shop-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 20px 20px 0; }
+    .shop-x-btn { background: #f1f3f5; border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; color: #555; font-size: 1.1rem; }
+    .shop-x-btn:active { background: #e0e0e0; }
+    .sheet-handle { width: 40px; height: 4px; background: #e0e0e0; border-radius: 4px; margin: 12px auto 0; }
+    .shop-title { font-size: 1.15rem; font-weight: 900; color: #590D22; margin: 4px 0 2px; }
+    .shop-sub { font-size: 0.8rem; color: #999; margin: 0; }
+    .shop-status-row { display: flex; gap: 10px; margin: 16px 20px 14px; }
+    .shop-status-card { flex: 1; border-radius: 18px; padding: 16px 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .free-card { background: linear-gradient(135deg, #fff5f7, #ffe4ec); border: 1.5px solid rgba(255,77,109,0.2); }
+    .paid-card { background: linear-gradient(135deg, #f0eeff, #e4dfff); border: 1.5px solid rgba(108,99,255,0.2); }
+    .shop-status-emoji { font-size: 1.7rem; }
+    .shop-status-val { font-size: 1.6rem; font-weight: 900; color: #590D22; line-height: 1; }
+    .shop-status-of { font-size: 1rem; font-weight: 700; color: #aaa; }
+    .shop-status-label { font-size: 0.68rem; color: #888; font-weight: 700; text-align: center; text-transform: uppercase; letter-spacing: 0.03em; }
+    .shop-free-info { display: flex; align-items: flex-start; gap: 8px; font-size: 0.78rem; color: #666; background: #f8f9fa; border-radius: 14px; padding: 11px 14px; margin: 0 20px 16px; }
     .shop-free-info ion-icon { color: #6c63ff; font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
-    .shop-pack-card { display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg,#fff0f3,#ffe4ec); border: 2px solid #FF4D6D; border-radius: 20px; padding: 18px 16px; margin-bottom: 14px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 6px 20px rgba(255,77,109,0.15); }
-    .shop-pack-card:active { transform: scale(0.98); }
-    .pack-left { display: flex; align-items: center; gap: 14px; }
-    .pack-emoji { font-size: 1.8rem; }
-    .pack-info { display: flex; flex-direction: column; gap: 3px; }
-    .pack-name { font-size: 0.95rem; font-weight: 900; color: #590D22; }
-    .pack-desc { font-size: 0.75rem; color: #a4133c; font-weight: 600; }
-    .pack-price { font-size: 1.5rem; font-weight: 900; color: #FF4D6D; white-space: nowrap; }
-    .shop-close-btn { width: 100%; background: #f1f3f5; color: #666; border: none; border-radius: 14px; padding: 13px; font-size: 0.95rem; font-weight: 700; cursor: pointer; }
-    .shop-close-btn:active { background: #e0e0e0; }
+    /* Pack card rediseñado */
+    .shop-pack-card { display: flex; align-items: center; gap: 14px; background: linear-gradient(135deg, #590D22, #FF4D6D); border-radius: 22px; padding: 18px 20px; margin: 0 20px 12px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 8px 24px rgba(255,77,109,0.35); position: relative; overflow: hidden; }
+    .shop-pack-card::after { content: ''; position: absolute; top: -30px; right: -20px; width: 100px; height: 100px; background: rgba(255,255,255,0.08); border-radius: 50%; }
+    .shop-pack-card:active { transform: scale(0.97); box-shadow: 0 4px 12px rgba(255,77,109,0.25); }
+    .pack-badge { position: absolute; top: 10px; right: 14px; background: rgba(255,255,255,0.25); color: white; font-size: 0.6rem; font-weight: 900; letter-spacing: 0.1em; padding: 2px 7px; border-radius: 100px; }
+    .pack-icon-wrap { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+    .pack-flame-icon { font-size: 2.2rem; color: #FFD166; }
+    .pack-count { font-size: 0.75rem; font-weight: 900; color: rgba(255,255,255,0.8); margin-top: -4px; }
+    .pack-info { flex: 1; }
+    .pack-name { display: block; font-size: 1rem; font-weight: 900; color: white; }
+    .pack-desc { display: block; font-size: 0.73rem; color: rgba(255,255,255,0.75); margin-top: 3px; }
+    .pack-price-pill { background: rgba(255,255,255,0.2); color: white; font-size: 1.1rem; font-weight: 900; padding: 6px 12px; border-radius: 100px; white-space: nowrap; border: 1.5px solid rgba(255,255,255,0.35); }
+    .shop-legal { text-align: center; font-size: 0.68rem; color: #bbb; margin: 4px 20px 0; }
 
     @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
