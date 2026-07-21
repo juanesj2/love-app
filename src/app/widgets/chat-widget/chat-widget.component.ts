@@ -2755,14 +2755,15 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     try {
       const meta = { type: 'letter', opened: false, title: letter.title, subject: letter.subject, content: letter.content };
       await this.api.sendMessage('[LETTER]', undefined, undefined, meta);
-      await this.api.purchaseGlobalEvent({
+      // Notificación en segundo plano — no bloqueamos la UI
+      this.api.purchaseGlobalEvent({
         title: '¡Carta de Amor! 💌',
         message: 'Tienes una nueva carta romántica esperando por ti.',
         confetti_enabled: true,
         emojis_enabled: true,
         emojis_list: '💌,💖,✨,🥰',
         top_bar_color: '#590D22'
-      });
+      }).catch((e: any) => console.error('Error enviando notificación carta:', e));
       this.scrollToBottom();
     } catch (e) {
       console.error(e);
