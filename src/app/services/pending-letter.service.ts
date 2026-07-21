@@ -20,8 +20,8 @@ export class PendingLetterService {
     ).subscribe(async () => {
       console.log('[PendingLetter] Token disponible, cargando ID de usuario...');
       try {
-        const me = await this.api.getMe();
-        this.myId = me?.id ?? null;
+        const info = await this.api.getCoupleInfo();
+        this.myId = info?.my_id ?? null;
         console.log('[PendingLetter] Mi ID:', this.myId);
       } catch (e) {
         console.error('[PendingLetter] Error al obtener usuario:', e);
@@ -54,8 +54,8 @@ export class PendingLetterService {
 
       // Si myId no está cargado todavía, intentar de nuevo
       if (!this.myId) {
-        const me = await this.api.getMe();
-        this.myId = me?.id ?? null;
+        const info = await this.api.getCoupleInfo();
+        this.myId = info?.my_id ?? null;
         if (!this.myId) return null;
       }
 
