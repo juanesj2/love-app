@@ -935,7 +935,7 @@ import { PremiumEventModalComponent } from './premium-event-modal/premium-event-
     .logout-btn ion-icon { font-size: 1.4rem; }
 
     /* God Mode */
-    .god-mode-btn { width: 100%; margin-bottom: 15px; background: linear-gradient(45deg, #020024, #090979, #00d4ff); color: white; border: none; padding: 16px; border-radius: 20px; font-weight: 900; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4); }
+    .god-mode-btn { width: 100%; margin: 15px 0; background: linear-gradient(45deg, #020024, #090979, #00d4ff); color: white; border: none; padding: 16px; border-radius: 20px; font-weight: 900; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4); }
     .god-mode-btn:active { transform: scale(0.98); }
     .god-mode-btn ion-icon { font-size: 1.5rem; color: #ffeb3b; }
 
