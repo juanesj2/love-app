@@ -44,11 +44,13 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
              [ngClass]="{
                'active': coupleInfo.current_streak > 0 && coupleInfo.my_photo_today && coupleInfo.partner_photo_today,
                'pending': coupleInfo.current_streak > 0 && (!coupleInfo.my_photo_today || !coupleInfo.partner_photo_today),
-               'zero': coupleInfo.current_streak === 0
+               'zero': coupleInfo.current_streak === 0,
+               'grace': coupleInfo.streak_in_grace
              }">
-          <span class="streak-icon" *ngIf="coupleInfo.current_streak > 0 && coupleInfo.my_photo_today && coupleInfo.partner_photo_today">🔥</span>
-          <span class="streak-icon" *ngIf="coupleInfo.current_streak > 0 && (!coupleInfo.my_photo_today || !coupleInfo.partner_photo_today)">⏳</span>
-          <span class="streak-icon" *ngIf="coupleInfo.current_streak === 0">🤍</span>
+          <span class="streak-icon" *ngIf="coupleInfo.streak_in_grace">⚠️</span>
+          <span class="streak-icon" *ngIf="!coupleInfo.streak_in_grace && coupleInfo.current_streak > 0 && coupleInfo.my_photo_today && coupleInfo.partner_photo_today">🔥</span>
+          <span class="streak-icon" *ngIf="!coupleInfo.streak_in_grace && coupleInfo.current_streak > 0 && (!coupleInfo.my_photo_today || !coupleInfo.partner_photo_today)">⏳</span>
+          <span class="streak-icon" *ngIf="!coupleInfo.streak_in_grace && coupleInfo.current_streak === 0">🤍</span>
           <span class="streak-text">{{ coupleInfo.current_streak }} días</span>
         </div>
         <div class="streak-badge back-badge" *ngIf="currentAlbum" (click)="clearAlbum()" style="background: rgba(255,255,255,0.95); color: #590D22; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.08);">
@@ -435,6 +437,52 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
               ¡Sube tu foto primero antes de avisar a tu pareja!
             </p>
           </div>
+
+          <!-- PERÍODO DE GRACIA: Revividores -->
+          <div class="grace-period-box" *ngIf="coupleInfo?.streak_in_grace">
+            <div class="grace-header">
+              <span class="grace-icon">⚠️</span>
+              <div>
+                <p class="grace-title">¡Racha en peligro!</p>
+                <p class="grace-sub">Quedan <strong>{{ coupleInfo?.grace_hours_left }}h</strong> para revivirla</p>
+              </div>
+            </div>
+
+            <div class="revival-counters">
+              <div class="revival-chip free">🎁 Gratis: <strong>{{ coupleInfo?.free_revivals }}/3</strong></div>
+              <div class="revival-chip paid">💎 De pago: <strong>{{ coupleInfo?.paid_revivals }}</strong></div>
+            </div>
+
+            <button class="revival-btn free-btn"
+                    *ngIf="coupleInfo?.free_revivals > 0"
+                    (click)="onReviveStreak(false)"
+                    [disabled]="revivingStreak">
+              <ion-icon name="flame"></ion-icon>
+              {{ revivingStreak ? 'Reviviendo...' : 'Usar revival gratis' }}
+            </button>
+
+            <button class="revival-btn paid-btn"
+                    *ngIf="coupleInfo?.paid_revivals > 0"
+                    (click)="onReviveStreak(true)"
+                    [disabled]="revivingStreak">
+              <ion-icon name="diamond"></ion-icon>
+              {{ revivingStreak ? 'Reviviendo...' : 'Usar revival de pago 💎' }}
+            </button>
+
+            <button class="revival-btn buy-btn"
+                    (click)="onPurchaseRevivalPack()"
+                    [disabled]="purchasingRevival">
+              <ion-icon name="cart"></ion-icon>
+              {{ purchasingRevival ? 'Procesando...' : 'Comprar pack de 3 revividores · 1.50€' }}
+            </button>
+          </div>
+
+          <!-- Contador de revividores siempre visible (fuera de gracia) -->
+          <div class="revival-info-row" *ngIf="!coupleInfo?.streak_in_grace && coupleInfo?.current_streak > 0">
+            <span class="revival-chip free">🎁 {{ coupleInfo?.free_revivals }}/3 este mes</span>
+            <span class="revival-chip paid" *ngIf="coupleInfo?.paid_revivals > 0">💎 {{ coupleInfo?.paid_revivals }} guardados</span>
+          </div>
+
         </div>
       </div>
 
@@ -518,6 +566,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .streak-badge.active { background: linear-gradient(90deg, #FF4D6D, #ff758c); color: white; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4); animation: pulse 2s infinite; }
     .streak-badge.pending { background: linear-gradient(90deg, #FDB813, #F3A183); color: white; box-shadow: 0 4px 15px rgba(253, 184, 19, 0.4); }
     .streak-badge.zero { background: rgba(255,255,255,0.9); color: #888; }
+    .streak-badge.grace { background: linear-gradient(90deg, #f4a100, #e67e00); color: white; box-shadow: 0 4px 15px rgba(244,161,0,0.5); animation: pulse 1s infinite; }
     .streak-icon { font-size: 1.2rem; }
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     
@@ -686,6 +735,26 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .streak-timer-box.success { background: rgba(46, 204, 113, 0.1); color: #2ecc71; font-weight: bold; }
     .streak-remind-btn { background: #FF4D6D; color: white; border: none; padding: 12px 24px; border-radius: 25px; font-weight: 600; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3); transition: transform 0.2s; }
     .streak-remind-btn:active { transform: scale(0.95); }
+
+    /* Grace Period & Revival Styles */
+    .grace-period-box { background: linear-gradient(135deg, #fff3cd, #ffe8a0); border: 2px solid #f4a100; border-radius: 18px; padding: 16px; margin-top: 14px; }
+    .grace-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .grace-icon { font-size: 1.8rem; }
+    .grace-title { font-weight: 900; color: #7c4f00; font-size: 0.95rem; margin: 0; }
+    .grace-sub { color: #a06000; font-size: 0.82rem; margin: 2px 0 0; }
+    .grace-sub strong { color: #7c4f00; }
+    .revival-counters { display: flex; gap: 8px; margin-bottom: 12px; }
+    .revival-chip { font-size: 0.78rem; font-weight: 700; padding: 5px 10px; border-radius: 100px; }
+    .revival-chip.free { background: rgba(255,107,107,0.12); color: #c0392b; border: 1.5px solid rgba(255,107,107,0.3); }
+    .revival-chip.paid { background: rgba(108,99,255,0.12); color: #5147cc; border: 1.5px solid rgba(108,99,255,0.3); }
+    .revival-info-row { display: flex; gap: 8px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+    .revival-btn { width: 100%; border: none; border-radius: 14px; padding: 12px 16px; font-size: 0.9rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; transition: transform 0.15s, opacity 0.15s; }
+    .revival-btn:active { transform: scale(0.97); }
+    .revival-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .free-btn { background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; box-shadow: 0 4px 14px rgba(255,77,109,0.35); }
+    .paid-btn { background: linear-gradient(135deg, #6c63ff, #4a43cc); color: white; box-shadow: 0 4px 14px rgba(108,99,255,0.35); }
+    .buy-btn  { background: rgba(0,0,0,0.05); color: #555; border: 1.5px solid #ddd; box-shadow: none; }
+
     @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
     /* Timeline Fast Scroller */
@@ -1390,6 +1459,62 @@ export class PhotoWidgetComponent implements OnInit {
         color: 'danger'
       });
       toast.present();
+    }
+  }
+
+  revivingStreak    = false;
+  purchasingRevival = false;
+
+  async onReviveStreak(usePaid: boolean) {
+    if (this.revivingStreak) return;
+    this.revivingStreak = true;
+    try {
+      const res = await this.api.reviveStreak(usePaid);
+      if (this.coupleInfo) {
+        this.coupleInfo.streak_in_grace  = false;
+        this.coupleInfo.free_revivals    = res.free_revivals;
+        this.coupleInfo.paid_revivals    = res.paid_revivals;
+        this.coupleInfo.grace_hours_left = null;
+      }
+      this.showStreakModal = false;
+      const toast = await this.toastController.create({
+        message: `🔥 ¡Racha revivida! ${res.streak_saved} días salvados 💪`,
+        duration: 3000,
+        position: 'top',
+        color: 'success'
+      });
+      toast.present();
+      this.cdr.detectChanges();
+    } catch (e: any) {
+      const msg = e?.error?.error || 'Error al revivir la racha';
+      const toast = await this.toastController.create({ message: msg, duration: 3000, position: 'top', color: 'danger' });
+      toast.present();
+    } finally {
+      this.revivingStreak = false;
+    }
+  }
+
+  async onPurchaseRevivalPack() {
+    if (this.purchasingRevival) return;
+    this.purchasingRevival = true;
+    try {
+      const res = await this.api.purchaseRevivalPack();
+      if (this.coupleInfo) {
+        this.coupleInfo.paid_revivals = res.paid_revivals;
+      }
+      const toast = await this.toastController.create({
+        message: `💎 ¡Pack de 3 revividores añadido! (${res.paid_revivals} en total)`,
+        duration: 3000,
+        position: 'top',
+        color: 'success'
+      });
+      toast.present();
+      this.cdr.detectChanges();
+    } catch (e: any) {
+      const toast = await this.toastController.create({ message: 'Error al comprar el pack', duration: 2500, position: 'top', color: 'danger' });
+      toast.present();
+    } finally {
+      this.purchasingRevival = false;
     }
   }
 

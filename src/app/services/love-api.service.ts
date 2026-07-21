@@ -38,6 +38,14 @@ export class LoveApiService {
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/remind-streak`, {}));
   }
 
+  async reviveStreak(usePaid: boolean = false): Promise<any> {
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/revive-streak`, { use_paid: usePaid }));
+  }
+
+  async purchaseRevivalPack(): Promise<any> {
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/purchase-revival-pack`, {}));
+  }
+
   async sendCustomNotification(title: string, body: string): Promise<any> {
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/custom-notification`, { title, body }));
   }
