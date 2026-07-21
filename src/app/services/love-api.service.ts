@@ -19,6 +19,7 @@ export class LoveApiService {
   private router = inject(Router);
   public token$ = new BehaviorSubject<string | null>(null);
   public unlockedAchievements$ = new BehaviorSubject<string[]>([]);
+  public inventory$ = new BehaviorSubject<any>({ gifts: false, letters: false, spicy_pack: false });
   public avatarUpdated$ = new Subject<void>();
   
   constructor() {
@@ -44,6 +45,10 @@ export class LoveApiService {
 
   async purchaseRevivalPack(): Promise<any> {
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/purchase-revival-pack`, {}));
+  }
+
+  async storePurchase(item: string): Promise<any> {
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/store/purchase`, { item }));
   }
 
   async sendCustomNotification(title: string, body: string): Promise<any> {
@@ -177,6 +182,9 @@ export class LoveApiService {
     const res = await firstValueFrom(this.http.get<any>(`${API_BASE_URL}/love-album/info?local_date=${localDate}`));
     if (res && res.unlocked_achievements) {
       this.unlockedAchievements$.next(res.unlocked_achievements);
+    }
+    if (res && res.couple && res.couple.inventory) {
+      this.inventory$.next(res.couple.inventory);
     }
     return res;
   }
@@ -330,16 +338,19 @@ export class LoveApiService {
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/chat/delivered`, {}));
   }
 
-  async sendMessage(mensaje: string, photoId?: number, replyTo?: any): Promise<any> {
+  async sendMessage(mensaje: string, photoId?: number, replyTo?: any, meta?: any): Promise<any> {
     const payload: any = { mensaje };
     if (photoId) payload.love_photo_id = photoId;
     if (replyTo) payload.reply_to = replyTo;
+    if (meta) payload.meta = meta;
     
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/chat`, payload));
   }
 
-  async editMessage(id: number, mensaje: string): Promise<any> {
-    return firstValueFrom(this.http.put(`${API_BASE_URL}/love-album/chat/${id}`, { mensaje }));
+  async editMessage(id: number, mensaje: string, meta?: any): Promise<any> {
+    const payload: any = { mensaje };
+    if (meta) payload.meta = meta;
+    return firstValueFrom(this.http.put(`${API_BASE_URL}/love-album/chat/${id}`, payload));
   }
 
   async reactToMessage(msgId: number, emoji: string): Promise<any> {

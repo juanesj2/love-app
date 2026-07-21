@@ -98,10 +98,22 @@ import { Keyboard } from '@capacitor/keyboard';
                       </div>
                     </div>
 
-                    <p class="text" *ngIf="msg.mensaje && msg.mensaje !== 'null' && !msg.mensaje.startsWith('[GIF]') && !msg.mensaje.startsWith('[DOODLE]') && !msg.mensaje.startsWith('[AUDIO]')">
+                    <p class="text" *ngIf="msg.mensaje && msg.mensaje !== 'null' && !msg.mensaje.startsWith('[GIF]') && !msg.mensaje.startsWith('[DOODLE]') && !msg.mensaje.startsWith('[AUDIO]') && !msg.mensaje.startsWith('[GIFT]') && !msg.mensaje.startsWith('[LETTER]')">
                       {{msg.mensaje}}
                       <span class="edited-label" *ngIf="msg.is_edited">(editado)</span>
                     </p>
+                    <div class="gift-reply" *ngIf="msg.mensaje && msg.mensaje.startsWith('[GIFT]')" (click)="openGiftOrLetter(msg)">
+                      <div class="gift-box" [class.opened]="msg.meta?.opened">
+                        <span class="gift-icon">{{ msg.meta?.opened ? '🎀' : '🎁' }}</span>
+                        <span class="gift-text">{{ msg.meta?.opened ? 'Regalo Abierto' : 'Regalo Sorpresa (Toca para abrir)' }}</span>
+                      </div>
+                    </div>
+                    <div class="letter-reply" *ngIf="msg.mensaje && msg.mensaje.startsWith('[LETTER]')" (click)="openGiftOrLetter(msg)">
+                      <div class="letter-box" [class.opened]="msg.meta?.opened">
+                        <span class="letter-icon">{{ msg.meta?.opened ? '📜' : '💌' }}</span>
+                        <span class="letter-text">{{ msg.meta?.opened ? 'Carta Abierta' : 'Carta de Amor (Toca para abrir)' }}</span>
+                      </div>
+                    </div>
                     <div class="gif-reply" *ngIf="msg.mensaje && msg.mensaje.startsWith('[GIF]')">
                       <img [src]="msg.mensaje.replace('[GIF]', '')" loading="lazy" class="chat-gif" />
                     </div>
@@ -216,8 +228,12 @@ import { Keyboard } from '@capacitor/keyboard';
         <div class="input-container" *ngIf="!isDoodling">
           <button class="attach-btn" (click)="showAttachMenu = !showAttachMenu" *ngIf="!isRecording"><ion-icon [name]="showAttachMenu ? 'close' : 'add'"></ion-icon></button>
 
-          <div class="attach-menu" *ngIf="showAttachMenu">
-            <button class="attach-menu-item" (click)="toggleGifModal(); showAttachMenu = false"><ion-icon name="image"></ion-icon></button>
+            <div class="attach-menu" *ngIf="showAttachMenu">
+              <ng-container *ngIf="api.inventory$ | async as inv">
+                <button *ngIf="inv.gifts" class="attach-menu-item" (click)="sendGift(); showAttachMenu = false"><ion-icon name="gift"></ion-icon></button>
+                <button *ngIf="inv.letters" class="attach-menu-item" (click)="sendLetter(); showAttachMenu = false"><ion-icon name="mail"></ion-icon></button>
+              </ng-container>
+              <button class="attach-menu-item" (click)="toggleGifModal(); showAttachMenu = false"><ion-icon name="image"></ion-icon></button>
             <button class="attach-menu-item" (click)="startDoodle(); showAttachMenu = false">
               <ion-icon name="color-palette"></ion-icon>
               <ion-icon name="lock-closed" class="premium-lock" *ngIf="premiumService.isFree$ | async"></ion-icon>
@@ -644,7 +660,14 @@ import { Keyboard } from '@capacitor/keyboard';
     :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble { background: rgba(40,40,40,0.9); color: #fdfdfd; border-color: #333; }
     :host-context(.night-owl-mode) .sender { color: #a78bfa; }
     :host-context(.night-owl-mode) .attach-btn { color: #a78bfa; }
-    :host-context(.night-owl-mode) .empty-state { color: #ccc; }
+      /* Gift and Letter styles */
+      .gift-box, .letter-box { display: flex; align-items: center; gap: 10px; padding: 10px 15px; border-radius: 12px; cursor: pointer; transition: transform 0.2s; background: linear-gradient(135deg, rgba(255,77,109,0.1), rgba(255,179,193,0.1)); border: 1px dashed #FF4D6D; }
+      .gift-box:active, .letter-box:active { transform: scale(0.95); }
+      .gift-box.opened, .letter-box.opened { border-style: solid; background: rgba(255,255,255,0.8); }
+      .gift-icon, .letter-icon { font-size: 2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+      .gift-text, .letter-text { font-weight: bold; color: #590D22; font-size: 0.95rem; }
+
+      :host-context(.night-owl-mode) .empty-state { color: #ccc; }
     :host-context(.night-owl-mode) .empty-icon { color: #8b5cf6; }
     :host-context(.night-owl-mode) .reactions-container,
     :host-context(.night-owl-mode) .attach-menu,
@@ -2787,6 +2810,54 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       return msg.mensaje.replace('[AUDIO]', '');
     }
     return this.environment.storageUrl + msg.photo?.image_path;
+  }
+
+  async sendGift() {
+    this.showAttachMenu = false;
+    const meta = { opened: false, type: 'gift' };
+    await this.api.sendMessage('[GIFT]', undefined, undefined, meta);
+    await this.api.purchaseGlobalEvent({
+      title: '¡Tienes un Regalo! 🎁',
+      message: '¡Abre la app para descubrir tu regalo sorpresa!',
+      confetti_enabled: true,
+      top_bar_color: '#FF4D6D'
+    });
+    this.loadMessages();
+    this.safeTimeout(() => this.scrollToBottom(), 100);
+  }
+
+  async sendLetter() {
+    this.showAttachMenu = false;
+    const meta = { opened: false, type: 'letter' };
+    await this.api.sendMessage('[LETTER]', undefined, undefined, meta);
+    await this.api.purchaseGlobalEvent({
+      title: '¡Carta de Amor! 💌',
+      message: 'Tienes una nueva carta romántica esperando por ti.',
+      confetti_enabled: true,
+      emojis_enabled: true,
+      emojis_list: '💌,💖,✨,🥰',
+      top_bar_color: '#590D22'
+    });
+    this.loadMessages();
+    this.safeTimeout(() => this.scrollToBottom(), 100);
+  }
+
+  async openGiftOrLetter(msg: any) {
+    if (msg.meta?.opened) return; // Ya está abierto
+    
+    // Aquí abriríamos un modal Lottie, pero como el evento global salta al entrar,
+    // si el usuario está en el chat y le da click, podemos disparar la animación global
+    // manualmente y actualizar el mensaje.
+    
+    // Actualizamos en local primero
+    if (!msg.meta) msg.meta = {};
+    msg.meta.opened = true;
+    
+    try {
+      await this.api.updateChatMessage(msg.id, msg.mensaje, msg.meta);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   getReplyPreviewText(msg: any): string {

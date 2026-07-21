@@ -64,6 +64,44 @@ import confetti from 'canvas-confetti';
             </div>
           </div>
 
+          <ng-container *ngIf="api.inventory$ | async as inv">
+            <!-- Regalo Virtual -->
+            <div class="store-card" (click)="!inv.gifts && purchaseItem('gifts')" [class.purchasing]="purchasingItem === 'gifts'" [class.purchased]="inv.gifts">
+              <ion-spinner name="crescent" *ngIf="purchasingItem === 'gifts'" class="pack-spinner"></ion-spinner>
+              <div class="card-icon" *ngIf="purchasingItem !== 'gifts'">🎁</div>
+              <div class="card-info">
+                <span class="card-title">Regalo Virtual</span>
+                <span class="card-desc">Ábrelo para una sorpresa Lottie</span>
+              </div>
+              <div class="card-action pack-price" *ngIf="!inv.gifts">0.99 €</div>
+              <div class="card-action purchased-badge" *ngIf="inv.gifts">Comprado</div>
+            </div>
+
+            <!-- Carta de Amor -->
+            <div class="store-card" (click)="!inv.letters && purchaseItem('letters')" [class.purchasing]="purchasingItem === 'letters'" [class.purchased]="inv.letters">
+              <ion-spinner name="crescent" *ngIf="purchasingItem === 'letters'" class="pack-spinner"></ion-spinner>
+              <div class="card-icon" *ngIf="purchasingItem !== 'letters'">💌</div>
+              <div class="card-info">
+                <span class="card-title">Carta de Amor</span>
+                <span class="card-desc">Mensaje romántico a pantalla completa</span>
+              </div>
+              <div class="card-action pack-price" *ngIf="!inv.letters">0.99 €</div>
+              <div class="card-action purchased-badge" *ngIf="inv.letters">Comprado</div>
+            </div>
+
+            <!-- Pack Preguntas Picantes -->
+            <div class="store-card" (click)="!inv.spicy_pack && purchaseItem('spicy_pack')" [class.purchasing]="purchasingItem === 'spicy_pack'" [class.purchased]="inv.spicy_pack">
+              <ion-spinner name="crescent" *ngIf="purchasingItem === 'spicy_pack'" class="pack-spinner"></ion-spinner>
+              <div class="card-icon" *ngIf="purchasingItem !== 'spicy_pack'">🌶️</div>
+              <div class="card-info">
+                <span class="card-title">Pack Preguntas Picantes</span>
+                <span class="card-desc">Desbloquea una nueva categoría picante</span>
+              </div>
+              <div class="card-action pack-price" *ngIf="!inv.spicy_pack">0.99 €</div>
+              <div class="card-action purchased-badge" *ngIf="inv.spicy_pack">Comprado</div>
+            </div>
+          </ng-container>
+
           <p class="shop-legal">⚠️ Las compras directas no son reembolsables.</p>
         </div>
       </div>
@@ -117,6 +155,9 @@ import confetti from 'canvas-confetti';
     .event-card .card-title { color: white; }
     .event-card .card-desc { color: rgba(255, 255, 255, 0.85); }
 
+    .purchased-badge { background: #4caf50; color: white; border: none; box-shadow: none; opacity: 0.8; }
+    .store-card.purchased { opacity: 0.7; pointer-events: none; }
+
     .pack-spinner { position: absolute; top: 50%; left: 30px; transform: translateY(-50%); width: 28px; height: 28px; color: white; }
 
     .shop-legal { text-align: center; font-size: 0.75rem; color: #a4133c; margin: 10px 20px 0; font-weight: 600; opacity: 0.8; }
@@ -142,6 +183,7 @@ export class StoreModalComponent implements OnDestroy {
   private cdr = inject(ChangeDetectorRef);
 
   purchasingRevival = false;
+  purchasingItem: string | null = null;
 
   // Lottie logic
   showLottie = false;
@@ -245,17 +287,30 @@ export class StoreModalComponent implements OnDestroy {
     this.purchasingRevival = true;
     try {
       const res = await this.api.purchaseRevivalPack();
-      // Wait, we don't have coupleInfo directly here, but we could refetch it or let the app refresh it.
-      // Usually the API success means we just fire confetti and show success.
       this.fireConfetti();
       await this.playLottieAnimation('assets/lottie/Payment Success.lottie', '¡Pack Comprado!', 'Genial');
       this.cdr.detectChanges();
-      // Optionally close the modal
       this.close.emit();
     } catch (e: any) {
       await this.playLottieAnimation('assets/lottie/Payment Failed.lottie', 'Error en la compra.', 'Volver');
     } finally {
       this.purchasingRevival = false;
+    }
+  }
+
+  async purchaseItem(item: string) {
+    if (this.purchasingItem) return;
+    this.purchasingItem = item;
+    try {
+      const res = await this.api.storePurchase(item);
+      this.api.inventory$.next(res.inventory);
+      this.fireConfetti();
+      await this.playLottieAnimation('assets/lottie/Payment Success.lottie', '¡Desbloqueado!', 'Genial');
+      this.cdr.detectChanges();
+    } catch (e: any) {
+      await this.playLottieAnimation('assets/lottie/Payment Failed.lottie', 'Error en la compra.', 'Volver');
+    } finally {
+      this.purchasingItem = null;
     }
   }
 }

@@ -39,9 +39,18 @@ import { Location } from '@angular/common';
               <ion-icon name="infinite-outline"></ion-icon>
               <h3>Todas</h3>
             </div>
-            <div class="cat-card" *ngFor="let cat of categories" (click)="selectCategory(cat)">
-              <h3>{{ cat }}</h3>
-            </div>
+            <ng-container *ngIf="api.inventory$ | async as inv">
+              <div class="cat-card" *ngFor="let cat of categories" 
+                   [class.premium]="cat.toLowerCase() === 'picantes' && !inv?.spicy_pack"
+                   [class.spicy]="cat.toLowerCase() === 'picantes' && inv?.spicy_pack"
+                   (click)="handleCategoryClick(cat, inv)">
+                <h3>
+                  <ion-icon name="flame" *ngIf="cat.toLowerCase() === 'picantes' && inv?.spicy_pack" style="color: #ffbe0b; vertical-align: middle; margin-right: 5px;"></ion-icon>
+                  <ion-icon name="lock-closed" *ngIf="cat.toLowerCase() === 'picantes' && !inv?.spicy_pack" style="vertical-align: middle; margin-right: 5px;"></ion-icon>
+                  {{ cat }}
+                </h3>
+              </div>
+            </ng-container>
           </div>
         </div>
       </ng-container>
@@ -193,6 +202,10 @@ import { Location } from '@angular/common';
     .cat-card { background: white; border-radius: 15px; padding: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s; }
     .cat-card:active { transform: scale(0.95); }
     .cat-card h3 { margin: 0; color: #590D22; font-weight: bold; font-size: 1.1rem; }
+    .cat-card.premium { background: linear-gradient(135deg, #f8f9fa, #e9ecef); color: #888; border: 1px dashed #ccc; box-shadow: none; }
+    .cat-card.premium h3 { color: #888; }
+    .cat-card.spicy { background: linear-gradient(135deg, #FF4D6D, #590D22); color: white; border: 2px solid #ffbe0b; box-shadow: 0 4px 15px rgba(255,190,11,0.3); }
+    .cat-card.spicy h3 { color: white; }
     .all-card { grid-column: span 2; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; }
     .all-card h3 { color: white; margin-top: 5px; }
     .all-card ion-icon { font-size: 2rem; }
@@ -309,7 +322,7 @@ export class SwipeGameComponent implements OnInit {
   searchTerm: string = '';
   progress: any = null;
 
-  private api = inject(LoveApiService);
+  public api = inject(LoveApiService);
   private toastCtrl = inject(ToastController);
   private location = inject(Location);
   private tutorialService = inject(TutorialService);
@@ -382,6 +395,24 @@ export class SwipeGameComponent implements OnInit {
       console.error(e);
       this.categories = [];
     }
+  }
+
+  handleCategoryClick(cat: string, inv: any) {
+    if (cat.toLowerCase() === 'picantes' && (!inv || !inv.spicy_pack)) {
+      this.showToast('Debes desbloquear el pack Picante en la Tienda.');
+      return;
+    }
+    this.selectCategory(cat);
+  }
+
+  async showToast(msg: string) {
+    const toast = await this.toastCtrl.create({
+      message: msg,
+      duration: 3000,
+      position: 'top',
+      color: 'danger'
+    });
+    await toast.present();
   }
 
   async selectCategory(cat: string) {
