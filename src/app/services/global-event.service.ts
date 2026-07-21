@@ -36,7 +36,12 @@ export class GlobalEventService {
         return of(null);
       })
     ).subscribe(event => {
-      this.activeEvent$.next(event);
+      // Ignorar el evento global antiguo de prueba de regalos
+      if (event && event.title && event.title.includes('Regalo')) {
+        this.activeEvent$.next(null);
+      } else {
+        this.activeEvent$.next(event);
+      }
     });
   }
 
