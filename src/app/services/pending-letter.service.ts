@@ -68,13 +68,30 @@ export class PendingLetterService {
       const letters = messages.filter(msg => msg.mensaje?.startsWith('[LETTER]'));
       console.log('[PendingLetter] Cartas encontradas:', letters.length, letters.map(m => ({ id: m.id, user_id: m.user_id, opened: m.meta?.opened })));
 
-      const unread = letters.find(msg =>
+      const unreadPartnerLetters = letters.filter(msg =>
         msg.user_id !== this.myId &&
-        !msg.meta?.opened &&
-        !this.shownLetterIds.has(msg.id)
+        !msg.meta?.opened
       );
 
-      return unread ?? null;
+      if (unreadPartnerLetters.length === 0) return null;
+
+      // Ordenar por ID ascendente para garantizar que la última es la más reciente
+      unreadPartnerLetters.sort((a, b) => a.id - b.id);
+      
+      // Tomamos solo la más reciente
+      const latestUnread = unreadPartnerLetters[unreadPartnerLetters.length - 1];
+
+      // Añadimos las antiguas a 'shownLetterIds' para que nunca salten como popup
+      for (let i = 0; i < unreadPartnerLetters.length - 1; i++) {
+        this.shownLetterIds.add(unreadPartnerLetters[i].id);
+      }
+
+      // Si la más reciente ya la hemos mostrado, no hacemos nada
+      if (this.shownLetterIds.has(latestUnread.id)) {
+        return null;
+      }
+
+      return latestUnread;
     } catch (e) {
       console.error('[PendingLetter] Error al buscar cartas:', e);
       return null;

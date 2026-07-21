@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { closeOutline, paperPlaneOutline } from 'ionicons/icons';
+import { closeOutline, paperPlaneOutline, informationCircleOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-letter-form-modal',
@@ -36,6 +36,11 @@ import { closeOutline, paperPlaneOutline } from 'ionicons/icons';
             <textarea [(ngModel)]="content" rows="6" placeholder="Escribe aquí tu carta..."></textarea>
           </div>
           
+          <div class="warning-note" style="color: #ff4d4d; font-size: 0.8rem; margin-top: -10px; margin-bottom: 15px; text-align: center;">
+            <ion-icon name="information-circle-outline" style="vertical-align: middle;"></ion-icon> 
+            Si envías varias cartas seguidas, tu pareja solo verá la animación de la última. El resto quedarán en el chat.
+          </div>
+
           <button class="submit-btn" [disabled]="!title || !subject || !content" (click)="onSubmit()">
             Guardar Carta <ion-icon name="paper-plane-outline"></ion-icon>
           </button>
@@ -77,7 +82,7 @@ export class LetterFormModalComponent {
   content = '';
 
   constructor() {
-    addIcons({ closeOutline, paperPlaneOutline });
+    addIcons({ closeOutline, paperPlaneOutline, informationCircleOutline });
   }
 
   onSubmit() {
