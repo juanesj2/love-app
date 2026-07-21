@@ -69,7 +69,7 @@ export class PendingLetterService {
       console.log('[PendingLetter] Cartas encontradas:', letters.length, letters.map(m => ({ id: m.id, user_id: m.user_id, opened: m.meta?.opened })));
 
       const unreadPartnerLetters = letters.filter(msg =>
-        msg.user_id !== this.myId &&
+        Number(msg.user_id) !== Number(this.myId) &&
         !msg.meta?.opened
       );
 

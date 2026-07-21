@@ -2930,12 +2930,20 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   async onLetterOpenedInChat() {
     if (this.currentOpeningMsg) {
+      // Si la carta es mía (yo la envié), puedo abrirla sin marcarla como leída para la otra persona
+      if (this.isMine(this.currentOpeningMsg)) {
+        this.currentOpeningMsg = null;
+        return;
+      }
+      
       if (!this.currentOpeningMsg.meta) this.currentOpeningMsg.meta = {};
-      this.currentOpeningMsg.meta.opened = true;
-      try {
-        await this.api.editMessage(this.currentOpeningMsg.id, this.currentOpeningMsg.mensaje, this.currentOpeningMsg.meta);
-      } catch (e) {
-        console.error(e);
+      if (!this.currentOpeningMsg.meta.opened) {
+        this.currentOpeningMsg.meta.opened = true;
+        try {
+          await this.api.editMessage(this.currentOpeningMsg.id, this.currentOpeningMsg.mensaje, this.currentOpeningMsg.meta);
+        } catch (e) {
+          console.error(e);
+        }
       }
       this.currentOpeningMsg = null;
     }
