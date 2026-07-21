@@ -1296,6 +1296,8 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   closeSettingsModal() {
     this.isSettingsModalOpen = false;
     document.body.classList.remove('hide-tabs');
+  }
+
   openStoreModal() {
     this.isStoreModalOpen = true;
     document.body.classList.add('hide-tabs');
