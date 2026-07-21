@@ -67,15 +67,14 @@ import { LetterFormModalComponent } from '../../../components/letter-form-modal/
 
           <ng-container *ngIf="api.inventory$ | async as inv">
             <!-- Regalo Virtual -->
-            <div class="store-card" (click)="!inv.gifts && purchaseItem('gifts')" [class.purchasing]="purchasingItem === 'gifts'" [class.purchased]="inv.gifts">
+            <div class="store-card" (click)="purchaseItem('gifts')" [class.purchasing]="purchasingItem === 'gifts'">
               <ion-spinner name="crescent" *ngIf="purchasingItem === 'gifts'" class="pack-spinner"></ion-spinner>
               <div class="card-icon" *ngIf="purchasingItem !== 'gifts'">🎁</div>
               <div class="card-info">
-                <span class="card-title">Regalo Virtual</span>
-                <span class="card-desc">Ábrelo para una sorpresa Lottie</span>
+                <span class="card-title">Regalo Virtual <span *ngIf="inv.gifts > 0" class="qty-badge">(Tienes: {{ inv.gifts }})</span></span>
+                <span class="card-desc">Envía una caja sorpresa. Más tarde podrás añadir modelos 3D.</span>
               </div>
-              <div class="card-action pack-price" *ngIf="!inv.gifts">0.99 €</div>
-              <div class="card-action purchased-badge" *ngIf="inv.gifts">Comprado</div>
+              <div class="card-action pack-price">0.99 €</div>
             </div>
 
             <!-- Carta de Amor -->
@@ -164,6 +163,7 @@ import { LetterFormModalComponent } from '../../../components/letter-form-modal/
 
     .purchased-badge { background: #4caf50; color: white; border: none; box-shadow: none; opacity: 0.8; }
     .store-card.purchased { opacity: 0.7; pointer-events: none; }
+    .qty-badge { color: #FF4D6D; font-size: 0.85rem; font-weight: 800; margin-left: 5px; }
 
     .pack-spinner { position: absolute; top: 50%; left: 30px; transform: translateY(-50%); width: 28px; height: 28px; color: white; }
 

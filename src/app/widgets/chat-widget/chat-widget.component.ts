@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule, ToastController, ActionSheetController, AlertController, IonContent, ModalController } from '@ionic/angular';
 import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { LoveApiService } from '../../services/love-api.service';
+import { PendingLetterService } from '../../services/pending-letter.service';
 import { TutorialService } from '../../services/tutorial.service';
 import { PremiumService } from '../../services/premium.service';
 import { PaywallComponent } from '../../components/paywall/paywall.component';
@@ -234,9 +235,10 @@ import { Keyboard } from '@capacitor/keyboard';
 
             <div class="attach-menu" *ngIf="showAttachMenu">
               <ng-container *ngIf="api.inventory$ | async as inv">
-                <button class="attach-menu-item" (click)="inv.gifts ? sendGift() : promptStore('gifts'); showAttachMenu = false">
+                <button class="attach-menu-item" (click)="inv.gifts > 0 ? sendGift() : promptStore('gifts'); showAttachMenu = false">
                   <ion-icon name="gift"></ion-icon>
-                  <ion-icon name="lock-closed" class="premium-lock" *ngIf="!inv.gifts"></ion-icon>
+                  <div class="letter-badge" *ngIf="inv.gifts > 0">{{inv.gifts}}</div>
+                  <ion-icon name="lock-closed" class="premium-lock" *ngIf="!(inv.gifts > 0)"></ion-icon>
                 </button>
                 <button class="attach-menu-item" (click)="inv.letters?.length > 0 ? openLetterSelector() : promptStore('letters'); showAttachMenu = false">
                   <ion-icon name="mail"></ion-icon>
@@ -691,9 +693,23 @@ import { Keyboard } from '@capacitor/keyboard';
     :host-context(.night-owl-mode) .sender { color: #a78bfa; }
     :host-context(.night-owl-mode) .attach-btn { color: #a78bfa; }
       /* Gift styles */
-      .gift-box { display: flex; align-items: center; gap: 10px; padding: 10px 15px; border-radius: 12px; cursor: pointer; transition: transform 0.2s; background: linear-gradient(135deg, rgba(255,77,109,0.1), rgba(255,179,193,0.1)); border: 1px dashed #FF4D6D; }
-      .gift-box.opened { border-style: solid; background: rgba(255,255,255,0.8); }
+      .gift-box { 
+        display: flex; align-items: center; gap: 12px; padding: 12px 18px; border-radius: 16px; cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        background: linear-gradient(135deg, #f0e6ff, #e4c1f9); 
+        border: 2px solid #d0a5f5; 
+        box-shadow: 0 4px 15px rgba(208, 165, 245, 0.3), inset 0 0 10px rgba(255,255,255,0.8);
+        position: relative; overflow: hidden;
+      }
+      .gift-box::before {
+        content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+        background: linear-gradient(to right, transparent, rgba(255,255,255,0.8), transparent);
+        transform: skewX(-25deg); animation: letterShimmer 3s infinite;
+      }
+      .gift-box.opened { border: 2px dashed #d0a5f5; background: rgba(255,255,255,0.8); box-shadow: none; animation: none; }
+      .gift-box.opened::before { display: none; }
       .gift-box:active { transform: scale(0.95); }
+      .gift-icon { font-size: 1.8rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+      .gift-text { font-weight: 700; color: #590D22; font-size: 0.95rem; }
 
       /* Premium Letter Box styles */
       .letter-box { 
@@ -1694,6 +1710,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   pollingInterval: any;
   @ViewChild('msgContainer') msgContainer!: IonContent;
   public api = inject(LoveApiService);
+  public pendingLetterService = inject(PendingLetterService);
   private toastController = inject(ToastController);
   private firestore = inject(Firestore);
   private tutorialService = inject(TutorialService);
@@ -2898,16 +2915,45 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   async sendGift() {
     this.showAttachMenu = false;
-    const meta = { opened: false, type: 'gift' };
-    await this.api.sendMessage('[GIFT]', undefined, undefined, meta);
-    await this.api.purchaseGlobalEvent({
-      title: '¡Tienes un Regalo! 🎁',
-      message: '¡Abre la app para descubrir tu regalo sorpresa!',
-      confetti_enabled: true,
-      top_bar_color: '#FF4D6D'
+
+    const alert = await this.alertCtrl.create({
+      header: 'Adjuntar mensaje',
+      message: 'Escribe un mensaje cariñoso para acompañar tu regalo sorpresa:',
+      inputs: [
+        {
+          name: 'message',
+          type: 'textarea',
+          placeholder: 'Ej: Te amo muchísimo ❤️',
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary'
+        },
+        {
+          text: 'Enviar Regalo',
+          handler: async (data) => {
+            const giftMsg = data.message?.trim() || '';
+            try {
+              await this.api.consumeStoreItem('gifts');
+              const meta = { opened: false, type: 'gift', giftType: 'default', message: giftMsg };
+              await this.api.sendMessage('[GIFT]default', undefined, undefined, meta);
+              
+              this.api.getCoupleInfo();
+              this.loadMessages();
+              this.safeTimeout(() => this.scrollToBottom(), 100);
+            } catch (e) {
+              console.error('Error al consumir/enviar regalo:', e);
+              this.promptStore('gifts');
+            }
+          }
+        }
+      ]
     });
-    this.loadMessages();
-    this.safeTimeout(() => this.scrollToBottom(), 100);
+
+    await alert.present();
   }
 
   async openGiftOrLetter(msg: any) {
@@ -2929,6 +2975,9 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         this.showInteractiveLetter = true;
       }
       return;
+    } else if (msg.meta?.type === 'gift' || (msg.mensaje && msg.mensaje.startsWith('[GIFT]'))) {
+      if (!msg.meta) msg.meta = { type: 'gift' };
+      this.pendingLetterService.pendingGift$.next(msg);
     }
 
     if (msg.meta?.opened) return; // Ya está abierto

@@ -52,6 +52,11 @@ export class LoveApiService {
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/store/purchase`, payload));
   }
 
+  async consumeStoreItem(data: any): Promise<any> {
+    const payload = typeof data === 'string' ? { item: data } : data;
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/store/consume`, payload));
+  }
+
   async sendCustomNotification(title: string, body: string): Promise<any> {
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/custom-notification`, { title, body }));
   }

@@ -8,13 +8,14 @@ import { PremiumService } from './services/premium.service';
 import { GlobalEventService } from './services/global-event.service';
 import { GlobalEventOverlayComponent } from './components/global-event-overlay/global-event-overlay.component';
 import { PendingLetterOverlayComponent } from './components/pending-letter-overlay/pending-letter-overlay.component';
+import { PendingGiftOverlayComponent } from './components/pending-gift-overlay/pending-gift-overlay.component';
 import { PendingLetterService } from './services/pending-letter.service';
 import { filter, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  imports: [IonApp, IonRouterOutlet, GlobalEventOverlayComponent, PendingLetterOverlayComponent],
+  imports: [IonApp, IonRouterOutlet, GlobalEventOverlayComponent, PendingLetterOverlayComponent, PendingGiftOverlayComponent],
 })
 export class AppComponent {
   private notificationService = inject(NotificationService);
