@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="overlay" (click)="close.emit()">
+    <div class="overlay">
       <!-- Overlay blur para el fondo -->
       
       <div class="letter-container" (click)="$event.stopPropagation()">
@@ -88,7 +88,7 @@ import { CommonModule } from '@angular/common';
     @keyframes slideUpFade { from { opacity: 0; transform: translateY(40px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
   `]
 })
-export class InteractiveLetterComponent implements OnInit {
+export class InteractiveLetterComponent implements OnInit, OnDestroy {
   @Input() letterData: any;
   @Input() forceOpen: boolean = false;
   @Output() close = new EventEmitter<void>();
@@ -96,22 +96,30 @@ export class InteractiveLetterComponent implements OnInit {
 
   isOpened = false;
   isOpening = false;
+  
+  private animationTimeout1: any;
+  private animationTimeout2: any;
 
   ngOnInit() {
     if (this.forceOpen) {
       this.isOpened = true;
     } else {
-      setTimeout(() => {
+      this.animationTimeout1 = setTimeout(() => {
         this.playOpeningAnimation();
       }, 500);
     }
+  }
+
+  ngOnDestroy() {
+    if (this.animationTimeout1) clearTimeout(this.animationTimeout1);
+    if (this.animationTimeout2) clearTimeout(this.animationTimeout2);
   }
 
   private playOpeningAnimation() {
     this.isOpening = true;
     
     // Disparar la animación de abrir el sobre
-    setTimeout(() => {
+    this.animationTimeout2 = setTimeout(() => {
       this.isOpened = true;
       this.opened.emit();
     }, 1200);
