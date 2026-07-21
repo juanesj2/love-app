@@ -227,11 +227,10 @@ import { PremiumEventModalComponent } from './premium-event-modal/premium-event-
             <div class="boost-icon">🚀</div>
             <div class="boost-text">
               <span class="boost-title">Dale un impulso a tu relación</span>
-              <span class="boost-sub">Envíale una notificación sorpresa · 24h · Solo para tu pareja</span>
-              <span class="boost-price">0.99 € →</span>
+              <span class="boost-sub">Notificación sorpresa · 24h</span>
             </div>
           </div>
-          <div class="boost-badge">NUEVO</div>
+          <div class="boost-price-pill">0.99 € <ion-icon name="chevron-forward"></ion-icon></div>
         </div>
 
         <!-- Settings -->
@@ -904,12 +903,11 @@ import { PremiumEventModalComponent } from './premium-event-modal/premium-event-
     .boost-banner:active { transform: scale(0.98); box-shadow: 0 5px 15px rgba(255,77,109,0.3); }
     .boost-left { display: flex; align-items: center; gap: 16px; z-index: 1; }
     .boost-icon { font-size: 2.6rem; line-height: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
-    .boost-text { display: flex; flex-direction: column; gap: 3px; }
-    .boost-title { font-size: 1.05rem; font-weight: 900; color: white; letter-spacing: -0.2px; }
-    .boost-sub { font-size: 0.8rem; color: rgba(255,255,255,0.82); font-weight: 600; }
-    .boost-price { font-size: 1rem; font-weight: 900; color: white; margin-top: 4px; }
-    .boost-badge { background: rgba(255,255,255,0.2); color: white; font-size: 0.7rem; font-weight: 900; padding: 5px 10px; border-radius: 100px; letter-spacing: 1px; z-index: 1; border: 1.5px solid rgba(255,255,255,0.35); }
-    .boost-arrow { font-size: 1.8rem; color: rgba(255,255,255,0.7); font-weight: 300; line-height: 1; }
+    .boost-text { display: flex; flex-direction: column; gap: 2px; }
+    .boost-title { font-size: 1.05rem; font-weight: 900; color: white; letter-spacing: -0.2px; line-height: 1.1; }
+    .boost-sub { font-size: 0.8rem; color: rgba(255,255,255,0.85); font-weight: 600; }
+    .boost-price-pill { display: flex; align-items: center; gap: 3px; background: rgba(255,255,255,0.2); color: white; font-size: 0.9rem; font-weight: 900; padding: 6px 12px; border-radius: 100px; border: 1.5px solid rgba(255,255,255,0.35); white-space: nowrap; z-index: 1; }
+    .boost-price-pill ion-icon { font-size: 1rem; }
 
     /* Quick Actions Grid */
     .quick-actions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
