@@ -114,7 +114,7 @@ import { Keyboard } from '@capacitor/keyboard';
                     </div>
                     <div class="letter-reply" *ngIf="msg.mensaje && msg.mensaje.startsWith('[LETTER]')" (click)="openGiftOrLetter(msg)">
                       <div class="letter-box" [class.opened]="msg.meta?.opened">
-                        <span class="letter-icon">{{ msg.meta?.opened ? '📜' : '💌' }}</span>
+                        <img class="letter-icon-img" [src]="msg.meta?.opened ? 'assets/letter-open.png' : 'assets/letter-closed.png'" alt="carta" />
                         <span class="letter-text">{{ msg.meta?.opened ? 'Carta Abierta' : 'Carta de Amor (Toca para abrir)' }}</span>
                       </div>
                     </div>
@@ -695,6 +695,7 @@ import { Keyboard } from '@capacitor/keyboard';
       .gift-box:active, .letter-box:active { transform: scale(0.95); }
       .gift-box.opened, .letter-box.opened { border-style: solid; background: rgba(255,255,255,0.8); }
       .gift-icon, .letter-icon { font-size: 2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+      .letter-icon-img { width: 52px; height: 52px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15)); border-radius: 4px; }
       .gift-text, .letter-text { font-weight: bold; color: #590D22; font-size: 0.95rem; }
 
       :host-context(.night-owl-mode) .empty-state { color: #ccc; }
