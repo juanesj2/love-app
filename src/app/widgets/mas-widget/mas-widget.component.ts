@@ -223,7 +223,7 @@ import { StoreModalComponent } from './store-modal/store-modal.component';
         </div>
 
         <!-- Tienda Banner (full width, fuera del grid) -->
-        <div class="boost-banner" (click)="isStoreModalOpen = true">
+        <div class="boost-banner" (click)="openStoreModal()">
           <div class="boost-left">
             <div class="boost-icon">🛍️</div>
             <div class="boost-text">
@@ -710,7 +710,7 @@ import { StoreModalComponent } from './store-modal/store-modal.component';
         <app-god-mode-modal *ngIf="isGodModeModalOpen" (close)="isGodModeModalOpen = false"></app-god-mode-modal>
 
         <!-- Store Modal -->
-        <app-store-modal *ngIf="isStoreModalOpen" (close)="isStoreModalOpen = false" (openPaywall)="openPaywall()" (openPremiumEvent)="showPremiumEventModal = true"></app-store-modal>
+        <app-store-modal *ngIf="isStoreModalOpen" (close)="closeStoreModal()" (openPaywall)="openPaywall()" (openPremiumEvent)="showPremiumEventModal = true"></app-store-modal>
 
         <!-- Premium Event Modal (Impulsa tu Relación) -->
         <app-premium-event-modal *ngIf="showPremiumEventModal" (close)="showPremiumEventModal = false"></app-premium-event-modal>
@@ -1296,7 +1296,16 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   closeSettingsModal() {
     this.isSettingsModalOpen = false;
     document.body.classList.remove('hide-tabs');
+  openStoreModal() {
+    this.isStoreModalOpen = true;
+    document.body.classList.add('hide-tabs');
   }
+
+  closeStoreModal() {
+    this.isStoreModalOpen = false;
+    document.body.classList.remove('hide-tabs');
+  }
+
   isNightOwlEnabled = false;
   isStoreModalOpen = false;
 
