@@ -171,8 +171,8 @@ export class PendingGiftOverlayComponent implements OnInit, OnDestroy, AfterView
     this.cleanupLottie();
     if (this.lottieCanvas?.nativeElement) {
       this.dotLottieInstance = new DotLottie({
-        autoplay: true,
-        loop: true,
+        autoplay: false,
+        loop: false,
         canvas: this.lottieCanvas.nativeElement,
         src: 'assets/lottie/gift-box.lottie'
       });
@@ -191,8 +191,7 @@ export class PendingGiftOverlayComponent implements OnInit, OnDestroy, AfterView
     this.isPlaying = true;
 
     if (this.dotLottieInstance) {
-       // Opcional: si la animación tuviese un play() específico para abrirse
-       // Por ahora solo esperamos 1.5s antes de mostrar el contenido
+       this.dotLottieInstance.play();
     }
 
     setTimeout(() => {
