@@ -530,7 +530,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
           <div class="shop-pack-card" (click)="onPurchaseRevivalPack(); showRevivalShop = false">
             <div class="pack-badge">PACK</div>
             <div class="pack-icon-wrap">
-              <ion-icon name="flame" class="pack-flame-icon"></ion-icon>
+              <span class="pack-flame-emoji">🔥</span>
               <span class="pack-count">x3</span>
             </div>
             <div class="pack-info">
@@ -540,7 +540,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
             <div class="pack-price-pill">1.50€</div>
           </div>
 
-          <p class="shop-legal">Compra simulada · En producción se usará RevenueCat</p>
+          <p class="shop-legal">⚠️ Este dinero no será reembolsable una vez realizada la compra.</p>
         </div>
       </div>
 
@@ -842,7 +842,7 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
     .shop-pack-card:active { transform: scale(0.97); box-shadow: 0 4px 12px rgba(255,77,109,0.25); }
     .pack-badge { position: absolute; top: 10px; right: 14px; background: rgba(255,255,255,0.25); color: white; font-size: 0.6rem; font-weight: 900; letter-spacing: 0.1em; padding: 2px 7px; border-radius: 100px; }
     .pack-icon-wrap { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
-    .pack-flame-icon { font-size: 2.2rem; color: #FFD166; }
+    .pack-flame-emoji { font-size: 2rem; line-height: 1; }
     .pack-count { font-size: 0.75rem; font-weight: 900; color: rgba(255,255,255,0.8); margin-top: -4px; }
     .pack-info { flex: 1; }
     .pack-name { display: block; font-size: 1rem; font-weight: 900; color: white; }
