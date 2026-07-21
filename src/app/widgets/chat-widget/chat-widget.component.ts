@@ -2752,6 +2752,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   async onLetterSelect(letter: any) {
     this.showLetterSelector = false;
+    this.sending = true;
     try {
       const meta = { type: 'letter', opened: false, title: letter.title, subject: letter.subject, content: letter.content };
       await this.api.sendMessage('[LETTER]', undefined, undefined, meta);
@@ -2767,8 +2768,12 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         emojis_list: '💌,💖,✨,🥰',
         top_bar_color: '#590D22'
       }).catch((e: any) => console.error('Error enviando notificación carta:', e));
-    } catch (e) {
-      console.error(e);
+    } catch (e: any) {
+      console.error('Error al enviar carta:', e);
+      this.showError('Error al enviar la carta: ' + (e?.error?.message || e?.message || 'Error desconocido'));
+    } finally {
+      this.sending = false;
+      this.cdr.detectChanges();
     }
   }
 
