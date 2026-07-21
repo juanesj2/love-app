@@ -230,7 +230,7 @@ import { PremiumEventModalComponent } from './premium-event-modal/premium-event-
               <span class="boost-sub">Notificación sorpresa · 24h</span>
             </div>
           </div>
-          <div class="boost-price-pill">0.99 € <ion-icon name="chevron-forward"></ion-icon></div>
+          <div class="boost-price-pill">Probar <ion-icon name="chevron-forward"></ion-icon></div>
         </div>
 
         <!-- Settings -->
