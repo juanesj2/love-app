@@ -23,13 +23,34 @@ import { LoveApiService } from '../../../services/love-api.service';
         </div>
 
         <div class="inventory-content" *ngIf="api.inventory$ | async as inv">
-          <!-- Regalo -->
+          <!-- Regalo para enviar -->
           <div class="inv-item">
             <div class="inv-icon"><ion-icon name="gift"></ion-icon></div>
             <div class="inv-details">
               <h4>Regalo Virtual</h4>
               <p *ngIf="inv.gifts">Disponible para enviar</p>
               <p *ngIf="!inv.gifts" class="locked">No tienes regalos.</p>
+            </div>
+          </div>
+
+          <!-- Regalos Recibidos -->
+          <div class="inv-item" (click)="toggleReceivedGifts()" style="cursor: pointer; position: relative;">
+            <div class="inv-icon"><ion-icon name="gift" style="color: #FFB703;"></ion-icon></div>
+            <div class="inv-details">
+              <h4>Mis Regalos Recibidos</h4>
+              <p *ngIf="!inv.received_gifts || inv.received_gifts.length === 0" class="locked">Aún no has recibido regalos.</p>
+              <p *ngIf="inv.received_gifts?.length > 0">{{inv.received_gifts.length}} regalo(s) en tu estantería</p>
+            </div>
+            <ion-icon *ngIf="inv.received_gifts?.length > 0" [name]="showReceivedGifts ? 'chevron-up' : 'chevron-down'" style="position: absolute; right: 15px; font-size: 1.2rem; color: #888;"></ion-icon>
+          </div>
+
+          <!-- Estantería de Regalos Recibidos -->
+          <div class="gifts-grid" *ngIf="inv.received_gifts && inv.received_gifts.length > 0 && showReceivedGifts">
+            <div class="gift-card" *ngFor="let gift of inv.received_gifts">
+              <div class="g-icon">🎁</div>
+              <div class="g-msg" *ngIf="gift.meta?.message">"{{ gift.meta.message }}"</div>
+              <div class="g-msg" *ngIf="!gift.meta?.message">Un regalo especial</div>
+              <div class="g-date">{{ gift.created_at | date:'shortDate' }}</div>
             </div>
           </div>
 
@@ -51,14 +72,6 @@ import { LoveApiService } from '../../../services/love-api.service';
               <div class="l-date">{{letter.created_at | date:'shortDate'}}</div>
             </div>
           </div>
-          
-          <!-- RAW JSON PARA DEPURAR -->
-          <div style="margin-top: 30px; background: #eee; padding: 10px; border-radius: 10px; font-size: 10px; overflow-wrap: break-word;">
-            <details>
-              <summary style="cursor: pointer; color: #888;">Ver datos crudos</summary>
-              <pre>{{ inv | json }}</pre>
-            </details>
-          </div>
         </div>
       </div>
     </div>
@@ -78,6 +91,12 @@ import { LoveApiService } from '../../../services/love-api.service';
     .inv-details p { margin: 0; color: #A4133C; font-size: 0.85rem; font-weight: 500; }
     .inv-details p.locked { color: #888; font-weight: 400; }
     
+    .gifts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+    .gift-card { background: white; padding: 15px 10px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .g-icon { font-size: 2.5rem; margin-bottom: 5px; }
+    .g-msg { font-size: 0.8rem; color: #590D22; font-style: italic; margin-bottom: 5px; font-weight: 500; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .g-date { font-size: 0.65rem; color: #999; }
+
     .letters-list { display: flex; flex-direction: column; gap: 10px; padding-left: 10px; border-left: 2px solid #FF4D6D; margin-left: 20px; margin-bottom: 20px; }
     .letter-card { background: white; padding: 10px 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     .l-title { font-weight: bold; color: #590D22; font-size: 0.95rem; }
@@ -93,6 +112,7 @@ export class InventoryModalComponent {
   @Output() close = new EventEmitter<void>();
   public api = inject(LoveApiService);
   public showLetters = false;
+  public showReceivedGifts = true;
 
   constructor() {
     addIcons({ closeOutline, gift, mail, lockClosed, chevronUp, chevronDown });
@@ -100,5 +120,9 @@ export class InventoryModalComponent {
 
   toggleLetters() {
     this.showLetters = !this.showLetters;
+  }
+
+  toggleReceivedGifts() {
+    this.showReceivedGifts = !this.showReceivedGifts;
   }
 }
