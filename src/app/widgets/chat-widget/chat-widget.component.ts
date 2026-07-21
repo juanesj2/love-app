@@ -1644,7 +1644,7 @@ import { Keyboard } from '@capacitor/keyboard';
 export class ChatWidgetComponent implements OnInit, AfterViewInit {
   pollingInterval: any;
   @ViewChild('msgContainer') msgContainer!: IonContent;
-  private api = inject(LoveApiService);
+  public api = inject(LoveApiService);
   private toastController = inject(ToastController);
   private firestore = inject(Firestore);
   private tutorialService = inject(TutorialService);
@@ -2854,7 +2854,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     msg.meta.opened = true;
     
     try {
-      await this.api.updateChatMessage(msg.id, msg.mensaje, msg.meta);
+      await this.api.editMessage(msg.id, msg.mensaje, msg.meta);
     } catch (e) {
       console.error(e);
     }
