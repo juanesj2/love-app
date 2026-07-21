@@ -2891,7 +2891,9 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   async openGiftOrLetter(msg: any) {
-    if (msg.meta?.type === 'letter') {
+    if (msg.meta?.type === 'letter' || (msg.mensaje && msg.mensaje.startsWith('[LETTER]'))) {
+      if (!msg.meta) msg.meta = { type: 'letter' };
+      
       this.interactiveLetterData = {
         title: msg.meta.title || 'Carta de Amor',
         subject: msg.meta.subject || 'Para ti',
