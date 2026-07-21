@@ -7,11 +7,13 @@ import { environment } from '../environments/environment';
 import { PremiumService } from './services/premium.service';
 import { GlobalEventService } from './services/global-event.service';
 import { GlobalEventOverlayComponent } from './components/global-event-overlay/global-event-overlay.component';
+import { PendingLetterOverlayComponent } from './components/pending-letter-overlay/pending-letter-overlay.component';
+import { PendingLetterService } from './services/pending-letter.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  imports: [IonApp, IonRouterOutlet, GlobalEventOverlayComponent],
+  imports: [IonApp, IonRouterOutlet, GlobalEventOverlayComponent, PendingLetterOverlayComponent],
 })
 export class AppComponent {
   private notificationService = inject(NotificationService);
@@ -20,6 +22,7 @@ export class AppComponent {
   private router = inject(Router);
   private platform = inject(Platform);
   private globalEventService = inject(GlobalEventService);
+  private pendingLetterService = inject(PendingLetterService);
 
   private lastBackPress = 0;
 
@@ -28,6 +31,8 @@ export class AppComponent {
     this.premiumService.initialize();
     this.globalEventService.startPolling();
     this.setupBackButton();
+    // Check for pending letters after a short delay to let auth settle
+    setTimeout(() => this.pendingLetterService.checkForPendingLetters(), 3000);
   }
 
   setupBackButton() {
