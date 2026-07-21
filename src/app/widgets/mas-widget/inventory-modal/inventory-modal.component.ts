@@ -2,7 +2,7 @@ import { Component, EventEmitter, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { closeOutline, gift, mail, lockClosed } from 'ionicons/icons';
+import { closeOutline, gift, mail, lockClosed, chevronUp, chevronDown } from 'ionicons/icons';
 import { LoveApiService } from '../../../services/love-api.service';
 
 @Component({
