@@ -1,3 +1,4 @@
+import { DotLottie } from '@lottiefiles/dotlottie-web';
 import { Component, EventEmitter, Output, Input, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -85,7 +86,7 @@ export class InteractiveLetterComponent implements OnInit, OnDestroy, AfterViewI
 
   ngAfterViewInit() {
     if (!this.forceOpen && this.lottieCanvas) {
-      this.lottieInstance = new (window as any).DotLottie({
+      this.lottieInstance = new DotLottie({
         canvas: this.lottieCanvas.nativeElement,
         src: 'assets/lottie/Love-letter.lottie',
         loop: false,
