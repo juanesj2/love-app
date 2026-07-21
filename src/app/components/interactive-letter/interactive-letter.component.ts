@@ -12,13 +12,7 @@ import { CommonModule } from '@angular/common';
       <div class="letter-container" (click)="$event.stopPropagation()">
         
         <!-- Estado 1: Cerrada (Sobre con sello de cera) -->
-        <div class="envelope" *ngIf="!isOpened" 
-             (mousedown)="startPress()" 
-             (mouseup)="endPress()" 
-             (mouseleave)="endPress()"
-             (touchstart)="startPress()"
-             (touchend)="endPress()"
-             (touchcancel)="endPress()">
+        <div class="envelope" *ngIf="!isOpened">
              
           <div class="envelope-flap" [class.opening]="isOpening"></div>
           <div class="envelope-body">
@@ -29,13 +23,6 @@ import { CommonModule } from '@angular/common';
             <span>❤️</span>
           </div>
           
-          <div class="instruction-text" [class.fade]="isOpening">Mantén pulsado para abrir</div>
-          
-          <!-- Progress ring around seal -->
-          <svg class="progress-ring" width="80" height="80" *ngIf="isPressing">
-            <circle class="progress-ring-circle" stroke="white" stroke-width="4" fill="transparent" r="34" cx="40" cy="40"
-                    [style.strokeDashoffset]="circumference - (pressProgress / 100) * circumference" />
-          </svg>
         </div>
 
         <!-- Estado 2: Abierta (Contenido de la carta) -->
@@ -109,53 +96,24 @@ export class InteractiveLetterComponent implements OnInit {
 
   isOpened = false;
   isOpening = false;
-  isPressing = false;
-  pressProgress = 0;
-  circumference = 34 * 2 * Math.PI;
-  
-  private pressInterval: any;
 
   ngOnInit() {
     if (this.forceOpen) {
       this.isOpened = true;
+    } else {
+      setTimeout(() => {
+        this.playOpeningAnimation();
+      }, 500);
     }
   }
 
-  startPress() {
-    if (this.isOpened || this.isOpening) return;
-    this.isPressing = true;
-    this.pressProgress = 0;
-    
-    const duration = 1500; // 1.5 seconds to open
-    const interval = 20;
-    const step = (100 / (duration / interval));
-
-    this.pressInterval = setInterval(() => {
-      this.pressProgress += step;
-      if (this.pressProgress >= 100) {
-        this.completeOpening();
-      }
-    }, interval);
-  }
-
-  endPress() {
-    if (this.isOpened || this.isOpening) return;
-    this.isPressing = false;
-    this.pressProgress = 0;
-    if (this.pressInterval) {
-      clearInterval(this.pressInterval);
-    }
-  }
-
-  private completeOpening() {
-    clearInterval(this.pressInterval);
-    this.isPressing = false;
+  private playOpeningAnimation() {
     this.isOpening = true;
     
     // Disparar la animación de abrir el sobre
     setTimeout(() => {
       this.isOpened = true;
       this.opened.emit();
-    }, 800);
+    }, 1200);
   }
 }
