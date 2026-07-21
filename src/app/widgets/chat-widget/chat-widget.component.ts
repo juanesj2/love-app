@@ -690,10 +690,30 @@ import { Keyboard } from '@capacitor/keyboard';
     :host-context(.night-owl-mode) .message-wrapper:not(.mine) .bubble { background: rgba(40,40,40,0.9); color: #fdfdfd; border-color: #333; }
     :host-context(.night-owl-mode) .sender { color: #a78bfa; }
     :host-context(.night-owl-mode) .attach-btn { color: #a78bfa; }
-      /* Gift and Letter styles */
-      .gift-box, .letter-box { display: flex; align-items: center; gap: 10px; padding: 10px 15px; border-radius: 12px; cursor: pointer; transition: transform 0.2s; background: linear-gradient(135deg, rgba(255,77,109,0.1), rgba(255,179,193,0.1)); border: 1px dashed #FF4D6D; }
-      .gift-box:active, .letter-box:active { transform: scale(0.95); }
-      .gift-box.opened, .letter-box.opened { border-style: solid; background: rgba(255,255,255,0.8); }
+      /* Gift styles */
+      .gift-box { display: flex; align-items: center; gap: 10px; padding: 10px 15px; border-radius: 12px; cursor: pointer; transition: transform 0.2s; background: linear-gradient(135deg, rgba(255,77,109,0.1), rgba(255,179,193,0.1)); border: 1px dashed #FF4D6D; }
+      .gift-box.opened { border-style: solid; background: rgba(255,255,255,0.8); }
+      .gift-box:active { transform: scale(0.95); }
+
+      /* Premium Letter Box styles */
+      .letter-box { 
+        display: flex; align-items: center; gap: 12px; padding: 12px 18px; border-radius: 16px; cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        background: linear-gradient(135deg, #fff0f5, #ffe4eb); 
+        border: 2px solid #ffb3c6; 
+        box-shadow: 0 4px 15px rgba(255, 77, 109, 0.25), inset 0 0 10px rgba(255,255,255,0.8);
+        position: relative; overflow: hidden;
+      }
+      .letter-box::before {
+        content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+        background: linear-gradient(to right, transparent, rgba(255,255,255,0.8), transparent);
+        transform: skewX(-25deg); animation: letterShimmer 3s infinite;
+      }
+      .letter-box:active { transform: scale(0.95); }
+      .letter-box.opened { 
+        background: rgba(255,255,255,0.7); border: 2px solid #e2e8f0; box-shadow: none; 
+      }
+      .letter-box.opened::before { display: none; }
+      @keyframes letterShimmer { 0% { left: -100%; } 100% { left: 200%; } }
       .gift-icon, .letter-icon { font-size: 2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
       .letter-icon-img { width: 52px; height: 52px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15)); border-radius: 4px; }
       .gift-text, .letter-text { font-weight: bold; color: #590D22; font-size: 0.95rem; }

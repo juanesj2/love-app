@@ -25,15 +25,15 @@ import { closeOutline, paperPlaneOutline, informationCircleOutline } from 'ionic
         <div class="form-content">
           <div class="form-group">
             <label>Título (para ti)</label>
-            <input type="text" [(ngModel)]="title" placeholder="Ej: Aniversario">
+            <input type="text" [(ngModel)]="title" placeholder="Ej: Aniversario" maxlength="30">
           </div>
           <div class="form-group">
             <label>Asunto (para el sobre)</label>
-            <input type="text" [(ngModel)]="subject" placeholder="Ej: Para el amor de mi vida">
+            <input type="text" [(ngModel)]="subject" placeholder="Ej: Para el amor de mi vida" maxlength="50">
           </div>
           <div class="form-group">
             <label>Mensaje</label>
-            <textarea [(ngModel)]="content" rows="6" placeholder="Escribe aquí tu carta..."></textarea>
+            <textarea [(ngModel)]="content" rows="6" placeholder="Escribe aquí tu carta..." maxlength="2500"></textarea>
           </div>
           
           <div class="warning-note" style="color: #ff4d4d; font-size: 0.8rem; margin-top: -10px; margin-bottom: 15px; text-align: center;">
@@ -41,8 +41,8 @@ import { closeOutline, paperPlaneOutline, informationCircleOutline } from 'ionic
             Si envías varias cartas seguidas, tu pareja solo verá la animación de la última. El resto quedarán en el chat.
           </div>
 
-          <button class="submit-btn" [disabled]="!title || !subject || !content" (click)="onSubmit()">
-            Guardar Carta <ion-icon name="paper-plane-outline"></ion-icon>
+          <button class="submit-btn" [disabled]="!title || !subject || !content || isSubmitting" (click)="onSubmit()">
+            {{ isSubmitting ? 'Guardando...' : 'Guardar Carta' }} <ion-icon *ngIf="!isSubmitting" name="paper-plane-outline"></ion-icon>
           </button>
         </div>
       </div>
@@ -80,6 +80,7 @@ export class LetterFormModalComponent {
   title = '';
   subject = '';
   content = '';
+  isSubmitting = false;
 
   constructor() {
     addIcons({ closeOutline, paperPlaneOutline, informationCircleOutline });
@@ -87,6 +88,7 @@ export class LetterFormModalComponent {
 
   onSubmit() {
     if (this.title && this.subject && this.content) {
+      this.isSubmitting = true;
       this.save.emit({ title: this.title, subject: this.subject, content: this.content });
     }
   }

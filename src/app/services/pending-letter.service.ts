@@ -3,6 +3,7 @@ import { BehaviorSubject, Subscription, timer } from 'rxjs';
 import { filter, take, switchMap, catchError } from 'rxjs/operators';
 import { of, from } from 'rxjs';
 import { LoveApiService } from './love-api.service';
+import { Preferences } from '@capacitor/preferences';
 
 @Injectable({ providedIn: 'root' })
 export class PendingLetterService {
@@ -12,6 +13,22 @@ export class PendingLetterService {
   private shownLetterIds = new Set<number>();
   private pollSub?: Subscription;
   private myId: number | null = null;
+
+  constructor() {
+    this.loadShownLetters();
+  }
+
+  private async loadShownLetters() {
+    const cached = await Preferences.get({ key: 'shown_letters_ids' });
+    if (cached.value) {
+      try {
+        const ids = JSON.parse(cached.value);
+        if (Array.isArray(ids)) {
+          ids.forEach(id => this.shownLetterIds.add(id));
+        }
+      } catch (e) {}
+    }
+  }
 
   waitForTokenAndCheck() {
     this.api.token$.pipe(
@@ -100,7 +117,10 @@ export class PendingLetterService {
 
   dismiss() {
     const current = this.pendingLetter$.value;
-    if (current?.id) this.shownLetterIds.add(current.id);
+    if (current?.id) {
+      this.shownLetterIds.add(current.id);
+      Preferences.set({ key: 'shown_letters_ids', value: JSON.stringify(Array.from(this.shownLetterIds)) }).catch(e => console.error(e));
+    }
     this.pendingLetter$.next(null);
   }
 

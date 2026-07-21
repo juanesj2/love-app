@@ -35,6 +35,8 @@ import { Subscription } from 'rxjs';
     </div>
   `,
   styles: [`
+    @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap');
+    
     .letter-global-overlay {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
@@ -50,7 +52,7 @@ import { Subscription } from 'rxjs';
       position: relative; display: flex; flex-direction: column;
       align-items: center; cursor: pointer;
     }
-    .lottie-wrapper canvas { width: 300px; height: 300px; max-width: 90vw; }
+    .lottie-wrapper canvas { width: 300px; height: 300px; max-width: 90vw; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3)); }
 
     .tap-hint {
       color: white; font-size: 1.2rem; font-weight: 700;
@@ -61,28 +63,28 @@ import { Subscription } from 'rxjs';
 
     /* Paper */
     .letter-paper-container {
-      width: 90%; max-width: 420px; display: flex; flex-direction: column;
-      align-items: center; gap: 20px; animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      width: 92%; max-width: 420px; display: flex; flex-direction: column;
+      align-items: center; gap: 24px; animation: slideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .paper {
-      width: 100%; min-height: 380px; max-height: 65vh; background: #fdfaf6;
-      border-radius: 4px; padding: 40px 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      width: 100%; min-height: 400px; max-height: 70vh; background: #fdfaf6;
+      border-radius: 6px; padding: 45px 35px; box-shadow: 0 25px 60px rgba(0,0,0,0.6);
       overflow-y: auto; background-image: repeating-linear-gradient(transparent, transparent 29px, #e1d3c1 30px);
       background-attachment: local;
     }
-    .letter-title { font-family: 'Georgia', serif; color: #590D22; text-align: center; margin-top: 0; margin-bottom: 8px; font-size: 1.8rem; }
-    .letter-subject { font-family: 'Georgia', serif; font-style: italic; color: #a4133c; text-align: center; margin: 0 0 24px; font-size: 1.1rem; opacity: 0.85; }
-    .letter-content { font-family: 'Courier New', monospace; color: #333; font-size: 1.1rem; line-height: 30px; white-space: pre-wrap; }
+    .letter-title { font-family: 'Dancing Script', cursive; color: #590D22; text-align: center; margin-top: 0; margin-bottom: 8px; font-size: 2.8rem; font-weight: 700; line-height: 1.1; }
+    .letter-subject { font-family: 'Dancing Script', cursive; color: #a4133c; text-align: center; margin: 0 0 24px; font-size: 1.8rem; opacity: 0.9; }
+    .letter-content { font-family: 'Dancing Script', cursive; color: #2a0800; font-size: 1.6rem; line-height: 30px; white-space: pre-wrap; font-weight: 500; }
 
     .close-btn {
       background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border: none;
-      padding: 15px 35px; border-radius: 30px; font-weight: 800; font-size: 1.1rem;
-      box-shadow: 0 8px 25px rgba(255,77,109,0.4); cursor: pointer; transition: transform 0.2s;
+      padding: 16px 35px; border-radius: 30px; font-weight: 800; font-size: 1.1rem;
+      box-shadow: 0 8px 25px rgba(255,77,109,0.4); cursor: pointer; transition: transform 0.2s; letter-spacing: 0.5px;
     }
     .close-btn:active { transform: scale(0.95); }
 
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(50px) scale(0.92); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(50px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
   `]
 })
 export class PendingLetterOverlayComponent implements OnInit, OnDestroy, AfterViewInit {
