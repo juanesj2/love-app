@@ -429,6 +429,22 @@ import { Keyboard } from '@capacitor/keyboard';
       (close)="showInteractiveLetter = false">
     </app-interactive-letter>
 
+    <!-- Gift Message Modal -->
+    <div class="custom-modal-overlay" *ngIf="showGiftMessageModal" (click)="showGiftMessageModal = false">
+      <div class="color-picker-modal" (click)="$event.stopPropagation()" style="display: flex; flex-direction: column;">
+        <h3>Adjuntar mensaje</h3>
+        <p style="margin-bottom: 15px; color: #666; font-size: 0.95rem; text-align: center;">
+          Escribe un mensaje cariñoso para acompañar tu regalo sorpresa:
+        </p>
+        <textarea [(ngModel)]="giftMessageText" placeholder="Ej: Te amo muchísimo ❤️" rows="3"
+                  class="hex-input" style="width: 100%; margin-bottom: 20px; resize: none;"></textarea>
+        <div class="color-picker-actions">
+          <button class="cp-btn cancel" (click)="showGiftMessageModal = false">Cancelar</button>
+          <button class="cp-btn accept" (click)="confirmSendGift()">Enviar Regalo</button>
+        </div>
+      </div>
+    </div>
+
   `,
   styles: [`
     :host {
@@ -750,6 +766,8 @@ import { Keyboard } from '@capacitor/keyboard';
     :host-context(.night-owl-mode) .gif-search-btn { background: linear-gradient(135deg, #a78bfa, #8b5cf6); }
     :host-context(.night-owl-mode) .color-picker-modal { background: rgba(30,30,30,0.95); border-color: #333; }
     :host-context(.night-owl-mode) .color-picker-modal h3 { color: #fdfdfd; }
+    :host-context(.night-owl-mode) .color-picker-modal p { color: #aaa !important; }
+    :host-context(.night-owl-mode) .color-picker-modal textarea.hex-input { background: rgba(0,0,0,0.4); border-color: #333; color: #fdfdfd; }
     :host-context(.night-owl-mode) .cp-btn.cancel { background: rgba(255,255,255,0.1); color: #ccc; }
     :host-context(.night-owl-mode) .cp-btn.accept { background: linear-gradient(135deg, #a78bfa, #8b5cf6); }
     :host-context(.night-owl-mode) .menu-username { color: #fdfdfd; }
@@ -2328,6 +2346,9 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   interactiveLetterForceOpen = false;
   currentOpeningMsg: any = null;
   
+  showGiftMessageModal = false;
+  giftMessageText = '';
+  
   showGifModal = false;
   giphyQuery = '';
   giphyResults: any[] = [];
@@ -2915,45 +2936,25 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   async sendGift() {
     this.showAttachMenu = false;
+    this.giftMessageText = '';
+    this.showGiftMessageModal = true;
+  }
 
-    const alert = await this.alertCtrl.create({
-      header: 'Adjuntar mensaje',
-      message: 'Escribe un mensaje cariñoso para acompañar tu regalo sorpresa:',
-      inputs: [
-        {
-          name: 'message',
-          type: 'textarea',
-          placeholder: 'Ej: Te amo muchísimo ❤️',
-        }
-      ],
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          cssClass: 'secondary'
-        },
-        {
-          text: 'Enviar Regalo',
-          handler: async (data) => {
-            const giftMsg = data.message?.trim() || '';
-            try {
-              await this.api.consumeStoreItem('gifts');
-              const meta = { opened: false, type: 'gift', giftType: 'default', message: giftMsg };
-              await this.api.sendMessage('[GIFT]default', undefined, undefined, meta);
-              
-              this.api.getCoupleInfo();
-              this.loadMessages();
-              this.safeTimeout(() => this.scrollToBottom(), 100);
-            } catch (e) {
-              console.error('Error al consumir/enviar regalo:', e);
-              this.promptStore('gifts');
-            }
-          }
-        }
-      ]
-    });
-
-    await alert.present();
+  async confirmSendGift() {
+    this.showGiftMessageModal = false;
+    const giftMsg = this.giftMessageText?.trim() || '';
+    try {
+      await this.api.consumeStoreItem('gifts');
+      const meta = { opened: false, type: 'gift', giftType: 'default', message: giftMsg };
+      await this.api.sendMessage('[GIFT]default', undefined, undefined, meta);
+      
+      this.api.getCoupleInfo();
+      this.loadMessages();
+      this.safeTimeout(() => this.scrollToBottom(), 100);
+    } catch (e) {
+      console.error('Error al consumir/enviar regalo:', e);
+      this.promptStore('gifts');
+    }
   }
 
   async openGiftOrLetter(msg: any) {
