@@ -2760,15 +2760,6 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       // Recargar mensajes para mostrar la carta enviada
       await this.loadMessages();
       this.safeTimeout(() => this.scrollToBottom(), 100);
-      // Notificación en segundo plano — no bloqueamos la UI
-      this.api.purchaseGlobalEvent({
-        title: '¡Carta de Amor! 💌',
-        message: 'Tienes una nueva carta romántica esperando por ti.',
-        confetti_enabled: true,
-        emojis_enabled: true,
-        emojis_list: '💌,💖,✨,🥰',
-        top_bar_color: '#590D22'
-      }).catch((e: any) => console.error('Error enviando notificación carta:', e));
     } catch (e: any) {
       console.error('Error al enviar carta:', e);
       this.showError('Error al enviar la carta: ' + (e?.error?.message || e?.message || 'Error desconocido'));
