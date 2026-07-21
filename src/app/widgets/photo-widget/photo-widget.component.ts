@@ -1586,13 +1586,12 @@ export class PhotoWidgetComponent implements OnInit {
   lottieButtonText = 'Aceptar';
   private lottieResolve: ((value: void | PromiseLike<void>) => void) | null = null;
   @ViewChild('lottieCanvasRevival') lottieCanvasRevival?: ElementRef<HTMLCanvasElement>;
-  private dotLottieInstance: DotLottie | null = null;
 
   closeLottieOverlay() {
     this.showLottie = false;
     if (this.dotLottieInstance) {
       this.dotLottieInstance.destroy();
-      this.dotLottieInstance = null;
+      this.dotLottieInstance = undefined;
     }
     if (this.lottieResolve) {
       this.lottieResolve();
