@@ -432,8 +432,23 @@ import { Keyboard } from '@capacitor/keyboard';
     <!-- Gift Message Modal -->
     <div class="color-picker-overlay" *ngIf="showGiftMessageModal" (click)="showGiftMessageModal = false">
       <div class="color-picker-modal" (click)="$event.stopPropagation()" style="display: flex; flex-direction: column;">
-        <h3>Adjuntar mensaje</h3>
-        <p style="margin-bottom: 15px; color: #666; font-size: 0.95rem; text-align: center;">
+        <h3>Adjuntar Regalo y Mensaje</h3>
+        
+        <div class="gift-selector" *ngIf="availableGiftsForSending.length > 0">
+          <p style="margin-bottom: 10px; color: #666; font-size: 0.85rem; text-align: center;">Selecciona el regalo a enviar:</p>
+          <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; justify-content: center;">
+            <div *ngFor="let g of availableGiftsForSending" 
+                 (click)="selectedGiftTypeToSend = g.data"
+                 style="display: flex; flex-direction: column; align-items: center; padding: 10px; border-radius: 12px; cursor: pointer; min-width: 70px; border: 2px solid transparent; transition: all 0.2s;"
+                 [style.background]="selectedGiftTypeToSend === g.data ? '#ffe4eb' : '#f5f5f5'"
+                 [style.border-color]="selectedGiftTypeToSend === g.data ? '#ffb3c6' : 'transparent'">
+              <span style="font-size: 2rem;">{{g.icon}}</span>
+              <span style="font-size: 0.7rem; font-weight: bold; margin-top: 5px; color: #590D22;">{{g.text}}</span>
+            </div>
+          </div>
+        </div>
+
+        <p style="margin-bottom: 15px; color: #666; font-size: 0.95rem; text-align: center; margin-top: 10px;">
           Escribe un mensaje cariñoso para acompañar tu regalo sorpresa:
         </p>
         <textarea [(ngModel)]="giftMessageText" placeholder="Ej: Te amo muchísimo ❤️" rows="3"
@@ -2940,33 +2955,20 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   selectedGiftTypeToSend: string = 'teddy';
 
+  availableGiftsForSending: any[] = [];
+
   async sendGift(inv: any) {
     this.showAttachMenu = false;
     this.giftMessageText = '';
 
-    const availableGifts = [];
-    if ((inv.gift_teddy || 0) + (inv.gifts || 0) > 0) availableGifts.push({ text: 'Oso de Peluche (Tienes ' + ((inv.gift_teddy || 0) + (inv.gifts || 0)) + ')', data: 'teddy' });
-    if (inv.gift_rose > 0) availableGifts.push({ text: 'Rosa 3D (Tienes ' + inv.gift_rose + ')', data: 'rose' });
-    if (inv.gift_ring > 0) availableGifts.push({ text: 'Anillo Doji (Tienes ' + inv.gift_ring + ')', data: 'ring' });
+    this.availableGiftsForSending = [];
+    if ((inv.gift_teddy || 0) + (inv.gifts || 0) > 0) this.availableGiftsForSending.push({ icon: '🧸', text: 'Oso (' + ((inv.gift_teddy || 0) + (inv.gifts || 0)) + ')', data: 'teddy' });
+    if (inv.gift_rose > 0) this.availableGiftsForSending.push({ icon: '🌹', text: 'Rosa (' + inv.gift_rose + ')', data: 'rose' });
+    if (inv.gift_ring > 0) this.availableGiftsForSending.push({ icon: '💍', text: 'Anillo (' + inv.gift_ring + ')', data: 'ring' });
 
-    if (availableGifts.length === 1) {
-      this.selectedGiftTypeToSend = availableGifts[0].data;
+    if (this.availableGiftsForSending.length > 0) {
+      this.selectedGiftTypeToSend = this.availableGiftsForSending[0].data;
       this.showGiftMessageModal = true;
-    } else if (availableGifts.length > 1) {
-      const buttons: any[] = availableGifts.map(g => ({
-        text: g.text,
-        handler: () => {
-          this.selectedGiftTypeToSend = g.data;
-          this.showGiftMessageModal = true;
-        }
-      }));
-      buttons.push({ text: 'Cancelar', role: 'cancel', handler: () => {} });
-
-      const actionSheet = await this.actionSheetCtrl.create({
-        header: '¿Qué regalo quieres enviar?',
-        buttons: buttons
-      });
-      await actionSheet.present();
     }
   }
 
