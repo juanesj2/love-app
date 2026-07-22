@@ -128,38 +128,44 @@ import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer
 
           <div style="display: flex; gap: 10px; justify-content: center; padding-bottom: 15px;">
             <div (click)="selectedGiftType = 'teddy'" 
-                 style="font-size: 2rem; cursor: pointer; padding: 10px 12px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s;" 
+                 style="font-size: 2rem; cursor: pointer; padding: 10px 12px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s; position: relative;" 
                  [style.background]="selectedGiftType === 'teddy' ? '#ffe4eb' : '#f8f9fa'" 
                  [style.borderColor]="selectedGiftType === 'teddy' ? '#ffb3c6' : 'transparent'">
               🧸
+              <div *ngIf="cart['teddy'] > 0" style="position: absolute; top: -5px; right: -5px; background: #FF4D6D; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; font-weight: bold;">{{ cart['teddy'] }}</div>
             </div>
             <div (click)="selectedGiftType = 'rose'" 
-                 style="font-size: 2rem; cursor: pointer; padding: 10px 12px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s;" 
+                 style="font-size: 2rem; cursor: pointer; padding: 10px 12px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s; position: relative;" 
                  [style.background]="selectedGiftType === 'rose' ? '#ffe4eb' : '#f8f9fa'" 
                  [style.borderColor]="selectedGiftType === 'rose' ? '#ffb3c6' : 'transparent'">
               🌹
+              <div *ngIf="cart['rose'] > 0" style="position: absolute; top: -5px; right: -5px; background: #FF4D6D; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; font-weight: bold;">{{ cart['rose'] }}</div>
             </div>
             <div (click)="selectedGiftType = 'ring'" 
-                 style="font-size: 2rem; cursor: pointer; padding: 10px 12px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s;" 
+                 style="font-size: 2rem; cursor: pointer; padding: 10px 12px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s; position: relative;" 
                  [style.background]="selectedGiftType === 'ring' ? '#ffe4eb' : '#f8f9fa'" 
                  [style.borderColor]="selectedGiftType === 'ring' ? '#ffb3c6' : 'transparent'">
               💍
+              <div *ngIf="cart['ring'] > 0" style="position: absolute; top: -5px; right: -5px; background: #FF4D6D; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; font-weight: bold;">{{ cart['ring'] }}</div>
             </div>
             <div (click)="selectedGiftType = 'bundle'" 
-                 style="font-size: 2rem; cursor: pointer; padding: 10px 12px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s;" 
+                 style="font-size: 2rem; cursor: pointer; padding: 10px 12px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s; position: relative;" 
                  [style.background]="selectedGiftType === 'bundle' ? '#ffe4eb' : '#f8f9fa'" 
                  [style.borderColor]="selectedGiftType === 'bundle' ? '#ffb3c6' : 'transparent'">
               🎁
+              <div *ngIf="cart['bundle'] > 0" style="position: absolute; top: -5px; right: -5px; background: #FF4D6D; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; font-weight: bold;">{{ cart['bundle'] }}</div>
             </div>
           </div>
           
           <div style="display: flex; align-items: center; justify-content: center; gap: 25px; margin-bottom: 15px;">
-            <button style="background: #f8f9fa; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-radius: 50%; width: 45px; height: 45px; font-size: 1.8rem; color: #590D22; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="giftQuantity = giftQuantity > 1 ? giftQuantity - 1 : 1">-</button>
-            <span style="font-size: 1.8rem; font-weight: 900; color: #FF4D6D; min-width: 40px; text-align: center;">{{ giftQuantity }}</span>
-            <button style="background: #f8f9fa; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-radius: 50%; width: 45px; height: 45px; font-size: 1.8rem; color: #590D22; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="giftQuantity = giftQuantity + 1">+</button>
+            <button style="background: #f8f9fa; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-radius: 50%; width: 45px; height: 45px; font-size: 1.8rem; color: #590D22; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="decrementCart()">-</button>
+            <span style="font-size: 1.8rem; font-weight: 900; color: #FF4D6D; min-width: 40px; text-align: center;">{{ cart[selectedGiftType] || 0 }}</span>
+            <button style="background: #f8f9fa; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-radius: 50%; width: 45px; height: 45px; font-size: 1.8rem; color: #590D22; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="incrementCart()">+</button>
           </div>
 
-          <button class="confirm-gift-btn" (click)="purchaseGift()">Comprar por {{ ( (selectedGiftType === 'bundle' ? 2.00 : 0.99) * giftQuantity ) | number:'1.2-2' }} €</button>
+          <button class="confirm-gift-btn" [disabled]="getCartTotal() === 0" (click)="purchaseGift()">
+            {{ getCartTotal() > 0 ? ('Comprar por ' + (getCartTotal() | number:'1.2-2') + ' €') : 'Selecciona cantidad' }}
+          </button>
         </div>
       </div>
 
@@ -262,7 +268,12 @@ export class StoreModalComponent implements OnInit, OnDestroy {
   // Gift selection logic
   showGiftSelector = false;
   selectedGiftType = 'teddy';
-  giftQuantity = 1;
+  cart: { [key: string]: number } = {
+    teddy: 0,
+    rose: 0,
+    ring: 0,
+    bundle: 0
+  };
 
   // Lottie logic
   showLottie = false;
@@ -303,16 +314,40 @@ export class StoreModalComponent implements OnInit, OnDestroy {
 
   openGiftSelector() {
     this.selectedGiftType = 'teddy';
-    this.giftQuantity = 1;
+    this.cart = { teddy: 0, rose: 0, ring: 0, bundle: 0 };
     this.showGiftSelector = true;
+  }
+
+  incrementCart() {
+    this.cart[this.selectedGiftType]++;
+  }
+
+  decrementCart() {
+    if (this.cart[this.selectedGiftType] > 0) {
+      this.cart[this.selectedGiftType]--;
+    }
+  }
+
+  getCartTotal() {
+    return (this.cart['teddy'] * 0.99) + (this.cart['rose'] * 0.99) + (this.cart['ring'] * 0.99) + (this.cart['bundle'] * 2.00);
   }
 
   purchaseGift() {
     this.showGiftSelector = false;
-    if (this.selectedGiftType === 'bundle') {
-      this.purchaseItem('bundle', { quantity: this.giftQuantity });
-    } else {
-      this.purchaseItem('gifts', { gift_type: this.selectedGiftType, quantity: this.giftQuantity });
+    
+    // Construct cart payload for the backend
+    const cartItems = [];
+    if (this.cart['bundle'] > 0) {
+      cartItems.push({ item: 'bundle', quantity: this.cart['bundle'] });
+    }
+    ['teddy', 'rose', 'ring'].forEach(type => {
+      if (this.cart[type] > 0) {
+        cartItems.push({ item: 'gifts', gift_type: type, quantity: this.cart[type] });
+      }
+    });
+
+    if (cartItems.length > 0) {
+      this.purchaseItem('cart', { cart: cartItems });
     }
   }
 
