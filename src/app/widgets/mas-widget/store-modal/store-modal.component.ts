@@ -29,6 +29,31 @@ import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer
         </div>
 
         <div class="store-content">
+          <!-- Carrusel de Ofertas Especiales -->
+          <div class="offers-carousel">
+            
+            <div class="offer-card" style="background: linear-gradient(135deg, #FF4D6D 0%, #c9184a 100%);">
+              <div class="offer-content">
+                <div class="offer-badge">OFERTA ESPECIAL</div>
+                <h3 class="offer-title">Pack x3 Regalos 3D</h3>
+                <p class="offer-desc">Llévate el oso, la rosa y el anillo por solo 2.00€</p>
+                <button class="offer-btn" (click)="openGiftSelectorForBundle()">Ver Oferta</button>
+              </div>
+              <div class="offer-icon">🎁</div>
+            </div>
+
+            <div class="offer-card" style="background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);" (click)="openPaywall.emit(); close.emit()">
+              <div class="offer-content">
+                <div class="offer-badge" style="background: #590D22; color: white;">PREMIUM</div>
+                <h3 class="offer-title" style="color: #590D22;">Amor Ilimitado</h3>
+                <p class="offer-desc" style="color: rgba(89, 13, 34, 0.8);">Desbloquea regalos y revividores ilimitados</p>
+                <button class="offer-btn" style="background: #590D22; color: white;">Mejorar ahora</button>
+              </div>
+              <div class="offer-icon">👑</div>
+            </div>
+
+          </div>
+
           <!-- Premium -->
           <div class="store-card premium-card" (click)="openPaywall.emit(); close.emit()">
             <div class="card-icon">👑</div>
@@ -233,6 +258,18 @@ import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer
 
     .shop-legal { text-align: center; font-size: 0.75rem; color: #a4133c; margin: 10px 20px 0; font-weight: 600; opacity: 0.8; }
 
+    /* Offers Carousel */
+    .offers-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px; padding-bottom: 5px; margin-bottom: 5px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .offers-carousel::-webkit-scrollbar { display: none; }
+    .offer-card { flex: 0 0 85%; scroll-snap-align: center; border-radius: 24px; padding: 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 8px 24px rgba(0,0,0,0.12); position: relative; overflow: hidden; cursor: pointer; transition: transform 0.2s; }
+    .offer-card:active { transform: scale(0.97); }
+    .offer-content { flex: 1; display: flex; flex-direction: column; align-items: flex-start; z-index: 2; }
+    .offer-badge { font-size: 0.65rem; font-weight: 900; background: white; color: #FF4D6D; padding: 4px 8px; border-radius: 8px; letter-spacing: 0.5px; margin-bottom: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .offer-title { font-size: 1.3rem; font-weight: 900; color: white; margin: 0 0 4px; line-height: 1.1; text-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .offer-desc { font-size: 0.85rem; color: rgba(255,255,255,0.9); margin: 0 0 12px; font-weight: 500; line-height: 1.2; text-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .offer-btn { background: white; color: #FF4D6D; border: none; padding: 8px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 800; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; }
+    .offer-icon { font-size: 4.5rem; position: absolute; right: -5px; bottom: -10px; line-height: 1; opacity: 0.9; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.2)); transform: rotate(-5deg); z-index: 1; }
+
     /* Gift Selector */
     .gift-selector-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 2000; display: flex; flex-direction: column; justify-content: flex-end; animation: fadeIn 0.2s; }
     .gift-selector-sheet { background: white; width: 100%; border-radius: 30px 30px 0 0; padding: 25px 25px 40px; box-shadow: 0 -10px 40px rgba(0,0,0,0.2); animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1); }
@@ -315,6 +352,12 @@ export class StoreModalComponent implements OnInit, OnDestroy {
   openGiftSelector() {
     this.selectedGiftType = 'teddy';
     this.cart = { teddy: 0, rose: 0, ring: 0, bundle: 0 };
+    this.showGiftSelector = true;
+  }
+
+  openGiftSelectorForBundle() {
+    this.selectedGiftType = 'bundle';
+    this.cart = { teddy: 0, rose: 0, ring: 0, bundle: 1 };
     this.showGiftSelector = true;
   }
 
