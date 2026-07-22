@@ -22,7 +22,7 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
 import { DotLottie } from '@lottiefiles/dotlottie-web';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Keyboard } from '@capacitor/keyboard';
-import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer.component';
+import { GiftViewerComponent } from '../../components/gift-viewer/gift-viewer.component';
 
 @Component({
   selector: 'app-chat-widget',
