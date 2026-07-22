@@ -153,7 +153,13 @@ import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer
             </div>
           </div>
           
-          <button class="confirm-gift-btn" (click)="purchaseGift()">Comprar por {{ selectedGiftType === 'bundle' ? '2.00' : '0.99' }} €</button>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 25px; margin-bottom: 15px;">
+            <button style="background: #f8f9fa; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-radius: 50%; width: 45px; height: 45px; font-size: 1.8rem; color: #590D22; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="giftQuantity = giftQuantity > 1 ? giftQuantity - 1 : 1">-</button>
+            <span style="font-size: 1.8rem; font-weight: 900; color: #FF4D6D; min-width: 40px; text-align: center;">{{ giftQuantity }}</span>
+            <button style="background: #f8f9fa; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-radius: 50%; width: 45px; height: 45px; font-size: 1.8rem; color: #590D22; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="giftQuantity = giftQuantity + 1">+</button>
+          </div>
+
+          <button class="confirm-gift-btn" (click)="purchaseGift()">Comprar por {{ ( (selectedGiftType === 'bundle' ? 2.00 : 0.99) * giftQuantity ) | number:'1.2-2' }} €</button>
         </div>
       </div>
 
@@ -256,6 +262,7 @@ export class StoreModalComponent implements OnInit, OnDestroy {
   // Gift selection logic
   showGiftSelector = false;
   selectedGiftType = 'teddy';
+  giftQuantity = 1;
 
   // Lottie logic
   showLottie = false;
@@ -296,15 +303,16 @@ export class StoreModalComponent implements OnInit, OnDestroy {
 
   openGiftSelector() {
     this.selectedGiftType = 'teddy';
+    this.giftQuantity = 1;
     this.showGiftSelector = true;
   }
 
   purchaseGift() {
     this.showGiftSelector = false;
     if (this.selectedGiftType === 'bundle') {
-      this.purchaseItem('gift_bundle');
+      this.purchaseItem('bundle', { quantity: this.giftQuantity });
     } else {
-      this.purchaseItem('gifts', { gift_type: this.selectedGiftType });
+      this.purchaseItem('gifts', { gift_type: this.selectedGiftType, quantity: this.giftQuantity });
     }
   }
 
