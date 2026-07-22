@@ -273,34 +273,6 @@ import { PremiumEventModalComponent } from './premium-event-modal/premium-event-
             <span class="feedback-link">Enviar feedback →</span>
           </div>
         </div>
-        
-        <div style="text-align: center; margin-top: 15px; margin-bottom: 20px;">
-          <span style="font-size: 0.75rem; color: #aaa; text-decoration: underline; cursor: pointer;" (click)="isCreditsModalOpen = true">
-            Créditos y Licencias
-          </span>
-        </div>
-      </div>
-
-      <!-- Modal for Credits -->
-      <div class="custom-overlay" *ngIf="isCreditsModalOpen" (click)="isCreditsModalOpen = false">
-        <div class="modal-content glass-card" style="margin: 20px; padding: 25px; text-align: left; width: 85%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(0,0,0, 0.15);" (click)="$event.stopPropagation()">
-          <h3 style="color: #590D22; font-family: 'Outfit', sans-serif; margin-top: 0;">Créditos de Modelos 3D</h3>
-          <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">Agradecimiento especial a los artistas de Sketchfab que hacen posibles los regalos virtuales mediante licencias Creative Commons:</p>
-          
-          <ul style="font-size: 0.75rem; color: #555; padding-left: 15px; line-height: 1.4;">
-            <li style="margin-bottom: 10px;">
-              <strong>"Teddy Bear"</strong> (<a href="https://skfb.ly/oJGNy" target="_blank" style="color: #FF4D6D;">https://skfb.ly/oJGNy</a>) by <i>sergeilihandristov</i> is licensed under Creative Commons Attribution.
-            </li>
-            <li style="margin-bottom: 10px;">
-              <strong>"Rose"</strong> (<a href="https://skfb.ly/ouCso" target="_blank" style="color: #FF4D6D;">https://skfb.ly/ouCso</a>) by <i>Heliona</i> is licensed under Creative Commons Attribution.
-            </li>
-            <li style="margin-bottom: 10px;">
-              <strong>"Doji Diamond Ring"</strong> (<a href="https://skfb.ly/onyBx" target="_blank" style="color: #FF4D6D;">https://skfb.ly/onyBx</a>) by <i>M. Visual</i> is licensed under Creative Commons Attribution.
-            </li>
-          </ul>
-          
-          <button (click)="isCreditsModalOpen = false" class="btn-primary" style="margin-top: 20px; width: 100%; border-radius: 12px; font-weight: bold; background: #FF4D6D; color: white; padding: 12px; border: none;">Cerrar</button>
-        </div>
       </div>
 
       <!-- Modal for Event Details -->
@@ -399,9 +371,17 @@ import { PremiumEventModalComponent } from './premium-event-modal/premium-event-
             
             <div style="background: rgba(0,0,0,0.03); padding: 15px; border-radius: 12px; margin-bottom: 15px; font-size: 0.9rem; color: #495057;">
               <p style="margin-top: 0; font-weight: bold; color: #590D22; margin-bottom: 5px;">Modelos 3D</p>
-              <p style="margin: 0; line-height: 1.4;">
-                <a href="https://skfb.ly/oJGNy" target="_blank" style="color: #FF4D6D; text-decoration: none;">"Teddy Bear"</a> by sergeilihandristov is licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" style="color: #FF4D6D; text-decoration: none;">Creative Commons Attribution</a>.
-              </p>
+              <ul style="margin: 0; padding-left: 15px; line-height: 1.4;">
+                <li style="margin-bottom: 5px;">
+                  <a href="https://skfb.ly/oJGNy" target="_blank" style="color: #FF4D6D; text-decoration: none;">"Teddy Bear"</a> by sergeilihandristov is licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" style="color: #FF4D6D; text-decoration: none;">Creative Commons Attribution</a>.
+                </li>
+                <li style="margin-bottom: 5px;">
+                  <a href="https://skfb.ly/ouCso" target="_blank" style="color: #FF4D6D; text-decoration: none;">"Rose"</a> by Heliona is licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" style="color: #FF4D6D; text-decoration: none;">Creative Commons Attribution</a>.
+                </li>
+                <li>
+                  <a href="https://skfb.ly/onyBx" target="_blank" style="color: #FF4D6D; text-decoration: none;">"Doji Diamond Ring"</a> by M. Visual is licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" style="color: #FF4D6D; text-decoration: none;">Creative Commons Attribution</a>.
+                </li>
+              </ul>
             </div>
             
             <div style="background: rgba(0,0,0,0.03); padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 0.9rem; color: #495057;">
@@ -1277,7 +1257,6 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   isFoodListModalOpen = false;
   isLogoutModalOpen = false;
   isFeedbackModalOpen = false;
-  isCreditsModalOpen = false;
   isMovieListModalOpen = false;
   isGodModeModalOpen = false;
   showPremiumEventModal = false;
