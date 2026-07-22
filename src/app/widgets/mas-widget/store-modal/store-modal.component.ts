@@ -30,26 +30,46 @@ import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer
 
         <div class="store-content">
           <!-- Carrusel de Ofertas Especiales -->
-          <div class="offers-carousel">
+          <div class="offers-carousel" #carousel (touchstart)="stopAutoScroll()" (touchend)="startAutoScroll()" (mouseenter)="stopAutoScroll()" (mouseleave)="startAutoScroll()">
             
-            <div class="offer-card" style="background: linear-gradient(135deg, #FF4D6D 0%, #c9184a 100%);">
+            <div class="offer-card" style="background-image: url('assets/images/offers/gifts.png'); background-size: cover; background-position: center;" (click)="openGiftSelectorForBundle()">
+              <div class="offer-overlay"></div>
               <div class="offer-content">
-                <div class="offer-badge">OFERTA ESPECIAL</div>
-                <h3 class="offer-title">Pack x3 Regalos 3D</h3>
-                <p class="offer-desc">Llévate el oso, la rosa y el anillo por solo 2.00€</p>
-                <button class="offer-btn" (click)="openGiftSelectorForBundle()">Ver Oferta</button>
+                <div class="offer-badge">PACK DESCUENTO</div>
+                <h3 class="offer-title">El Trío Perfecto</h3>
+                <p class="offer-desc">Llévate el oso, la rosa y el anillo con un precio especial</p>
+                <button class="offer-btn">Ver Oferta 2.00€</button>
               </div>
-              <div class="offer-icon">🎁</div>
             </div>
 
-            <div class="offer-card" style="background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);" (click)="openPaywall.emit(); close.emit()">
+            <div class="offer-card" style="background-image: url('assets/images/offers/streak.png'); background-size: cover; background-position: center;" (click)="purchaseRevivalPack()" [class.purchasing]="purchasingRevival">
+              <div class="offer-overlay"></div>
               <div class="offer-content">
-                <div class="offer-badge" style="background: #590D22; color: white;">PREMIUM</div>
-                <h3 class="offer-title" style="color: #590D22;">Amor Ilimitado</h3>
-                <p class="offer-desc" style="color: rgba(89, 13, 34, 0.8);">Desbloquea regalos y revividores ilimitados</p>
-                <button class="offer-btn" style="background: #590D22; color: white;">Mejorar ahora</button>
+                <div class="offer-badge">SUPERVIVENCIA</div>
+                <h3 class="offer-title">Pack Salva-Rachas</h3>
+                <p class="offer-desc">3 Revividores mágicos para que el fuego nunca se apague</p>
+                <button class="offer-btn">{{ purchasingRevival ? 'Comprando...' : 'Comprar 1.50€' }}</button>
               </div>
-              <div class="offer-icon">👑</div>
+            </div>
+
+            <div class="offer-card" style="background-image: url('assets/images/offers/spicy.png'); background-size: cover; background-position: center;" (click)="purchaseItem('spicy_pack')">
+              <div class="offer-overlay"></div>
+              <div class="offer-content">
+                <div class="offer-badge" style="background: #240046; color: #ff0054;">18+ HOT</div>
+                <h3 class="offer-title">Pack Picante</h3>
+                <p class="offer-desc">Desbloquea 50 retos y juegos íntimos para subir la temperatura</p>
+                <button class="offer-btn" style="color: #ff0054;">Desbloquear 2.99€</button>
+              </div>
+            </div>
+
+            <div class="offer-card" style="background-image: url('assets/images/offers/premium.png'); background-size: cover; background-position: center;" (click)="openPaywall.emit(); close.emit()">
+              <div class="offer-overlay"></div>
+              <div class="offer-content">
+                <div class="offer-badge" style="background: #ffaa00; color: #590D22;">VIP</div>
+                <h3 class="offer-title">Amor Ilimitado</h3>
+                <p class="offer-desc">Desbloquea regalos, cartas y revividores ilimitados. Sin barreras.</p>
+                <button class="offer-btn" style="background: #ffaa00; color: #590D22;">Mejorar a Premium</button>
+              </div>
             </div>
 
           </div>
@@ -91,45 +111,37 @@ import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer
             </div>
           </div>
 
-          <ng-container *ngIf="api.inventory$ | async as inv">
-            <!-- Regalo Virtual 3D -->
-            <div class="store-card" (click)="openGiftSelector()" [class.purchasing]="purchasingItem === 'gifts'">
-              <ion-spinner name="crescent" *ngIf="purchasingItem === 'gifts'" class="pack-spinner"></ion-spinner>
-              <div class="card-icon" *ngIf="purchasingItem !== 'gifts'">🎁</div>
-              <div class="card-info">
-                <span class="card-title">Regalo 3D / Pack
-                  <span *ngIf="getTotalGifts(inv) > 0" class="qty-badge">(Tienes: {{ getTotalGifts(inv) }})</span>
-                </span>
-                <span class="card-desc">Elige y envía un modelo 3D sorpresa o un pack con descuento.</span>
-              </div>
-              <div class="card-action pack-price">Desde 0.99 €</div>
+          <!-- Regalos 3D -->
+          <div class="store-card pack-card" style="background: white; border: 1px solid #ffe4eb;" (click)="openGiftSelector()">
+            <div class="card-icon">🎁</div>
+            <div class="card-info">
+              <span class="card-title" style="color: #590D22;">Regalo 3D / Pack</span>
+              <span class="card-desc" style="color: #FF4D6D; font-weight: 800; font-size: 0.75rem;">(Tienes: {{ getTotalGifts(api.couple()?.inventory || {}) }})</span>
+              <span class="card-desc" style="color: #a4133c;">Elige y envía un modelo 3D sorpresa o un pack con descuento.</span>
             </div>
-
-            <!-- Carta de Amor -->
-            <div class="store-card" (click)="purchaseItem('letters')" [class.purchasing]="purchasingItem === 'letters'">
-                <ion-spinner name="crescent" *ngIf="purchasingItem === 'letters'" class="pack-spinner"></ion-spinner>
-                <div class="card-icon" *ngIf="purchasingItem !== 'letters'">💌</div>
-                <div class="card-info">
-                  <span class="card-title">Carta de Amor</span>
-                  <span class="card-desc">Redacta una carta y guárdala para tu pareja</span>
-                </div>
-                <div class="card-action pack-price">0.99 €</div>
+            <div class="card-action pack-price">
+              Desde 0.99 €
             </div>
+          </div>
 
-            <!-- Pack Preguntas Picantes -->
-            <div class="store-card" (click)="!inv.spicy_pack && purchaseItem('spicy_pack')" [class.purchasing]="purchasingItem === 'spicy_pack'" [class.purchased]="inv.spicy_pack">
-              <ion-spinner name="crescent" *ngIf="purchasingItem === 'spicy_pack'" class="pack-spinner"></ion-spinner>
-              <div class="card-icon" *ngIf="purchasingItem !== 'spicy_pack'">🌶️</div>
-              <div class="card-info">
-                <span class="card-title">Pack Preguntas Picantes</span>
-                <span class="card-desc">Desbloquea una nueva categoría picante</span>
-              </div>
-              <div class="card-action pack-price" *ngIf="!inv.spicy_pack">0.99 €</div>
-              <div class="card-action purchased-badge" *ngIf="inv.spicy_pack">Comprado</div>
+          <!-- Cartas -->
+          <div class="store-card pack-card" style="background: white; border: 1px solid #ffe4eb;" (click)="purchaseItem('letters')">
+            <div class="card-icon">💌</div>
+            <div class="card-info">
+              <span class="card-title" style="color: #590D22;">Carta de Amor</span>
+              <span class="card-desc" style="color: #a4133c;">Redacta una carta y guárdala para tu pareja</span>
             </div>
-          </ng-container>
+            <div class="card-action pack-price">
+              0.99 €
+            </div>
+          </div>
+          
+          <p class="shop-legal">Las compras en la tienda no son reembolsables. Asegúrate de tener el consentimiento de tu pareja para enviar regalos.</p>
+        </div>
 
-          <p class="shop-legal">⚠️ Las compras directas no son reembolsables.</p>
+        <div class="shop-legal" style="color: white; margin-bottom: 20px;">
+          <span style="display: block; font-weight: 800; margin-bottom: 5px;">LoveApp Store Secure Checkout</span>
+          Pagos seguros. Cancela cuando quieras.
         </div>
       </div>
 
@@ -195,11 +207,7 @@ import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer
       </div>
 
       <!-- Letter Form Modal -->
-      <app-letter-form-modal 
-        *ngIf="showLetterForm" 
-        (close)="showLetterForm = false" 
-        (save)="onLetterSave($event)">
-      </app-letter-form-modal>
+      <app-letter-form-modal [isOpen]="showLetterForm" (close)="showLetterForm = false" (letterSent)="processPurchase('letters', $event)"></app-letter-form-modal>
 
       <!-- Lottie Overlay for Purchases -->
       <div class="lottie-overlay" *ngIf="showLottie">
@@ -259,14 +267,15 @@ import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer
     .shop-legal { text-align: center; font-size: 0.75rem; color: #a4133c; margin: 10px 20px 0; font-weight: 600; opacity: 0.8; }
 
     /* Offers Carousel */
-    .offers-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px; padding-bottom: 5px; margin-bottom: 5px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .offers-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px; padding-bottom: 5px; margin-bottom: 5px; -webkit-overflow-scrolling: touch; scrollbar-width: none; scroll-behavior: smooth; }
     .offers-carousel::-webkit-scrollbar { display: none; }
-    .offer-card { flex: 0 0 85%; scroll-snap-align: center; border-radius: 24px; padding: 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 8px 24px rgba(0,0,0,0.12); position: relative; overflow: hidden; cursor: pointer; transition: transform 0.2s; }
+    .offer-card { flex: 0 0 85%; scroll-snap-align: center; border-radius: 24px; padding: 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 8px 24px rgba(0,0,0,0.12); position: relative; overflow: hidden; cursor: pointer; transition: transform 0.2s; min-height: 180px; }
     .offer-card:active { transform: scale(0.97); }
-    .offer-content { flex: 1; display: flex; flex-direction: column; align-items: flex-start; z-index: 2; }
+    .offer-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%); z-index: 1; }
+    .offer-content { flex: 1; display: flex; flex-direction: column; align-items: flex-start; z-index: 2; position: relative; }
     .offer-badge { font-size: 0.65rem; font-weight: 900; background: white; color: #FF4D6D; padding: 4px 8px; border-radius: 8px; letter-spacing: 0.5px; margin-bottom: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    .offer-title { font-size: 1.3rem; font-weight: 900; color: white; margin: 0 0 4px; line-height: 1.1; text-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .offer-desc { font-size: 0.85rem; color: rgba(255,255,255,0.9); margin: 0 0 12px; font-weight: 500; line-height: 1.2; text-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .offer-title { font-size: 1.3rem; font-weight: 900; color: white; margin: 0 0 4px; line-height: 1.1; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+    .offer-desc { font-size: 0.85rem; color: rgba(255,255,255,0.9); margin: 0 0 12px; font-weight: 500; line-height: 1.2; text-shadow: 0 1px 3px rgba(0,0,0,0.8); max-width: 85%; }
     .offer-btn { background: white; color: #FF4D6D; border: none; padding: 8px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 800; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; }
     .offer-icon { font-size: 4.5rem; position: absolute; right: -5px; bottom: -10px; line-height: 1; opacity: 0.9; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.2)); transform: rotate(-5deg); z-index: 1; }
 
@@ -312,6 +321,10 @@ export class StoreModalComponent implements OnInit, OnDestroy {
     bundle: 0
   };
 
+  // Carousel logic
+  @ViewChild('carousel') carouselRef?: ElementRef<HTMLDivElement>;
+  autoScrollInterval: any;
+
   // Lottie logic
   showLottie = false;
   lottieTitle = '';
@@ -329,13 +342,33 @@ export class StoreModalComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     document.body.classList.add('hide-footer');
+    this.startAutoScroll();
   }
 
   ngOnDestroy() {
     document.body.classList.remove('hide-footer');
+    this.stopAutoScroll();
     if (this.dotLottieInstance) {
       this.dotLottieInstance.destroy();
       this.dotLottieInstance = undefined;
+    }
+  }
+
+  startAutoScroll() {
+    this.autoScrollInterval = setInterval(() => {
+      if (!this.carouselRef?.nativeElement) return;
+      const el = this.carouselRef.nativeElement;
+      if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 10) {
+        el.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        el.scrollBy({ left: el.clientWidth * 0.85 + 15, behavior: 'smooth' });
+      }
+    }, 4000);
+  }
+
+  stopAutoScroll() {
+    if (this.autoScrollInterval) {
+      clearInterval(this.autoScrollInterval);
     }
   }
 
