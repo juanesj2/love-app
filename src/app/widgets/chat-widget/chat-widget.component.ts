@@ -2953,7 +2953,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       this.selectedGiftTypeToSend = availableGifts[0].data;
       this.showGiftMessageModal = true;
     } else if (availableGifts.length > 1) {
-      const buttons = availableGifts.map(g => ({
+      const buttons: any[] = availableGifts.map(g => ({
         text: g.text,
         handler: () => {
           this.selectedGiftTypeToSend = g.data;
@@ -2974,7 +2974,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     this.showGiftMessageModal = false;
     const giftMsg = this.giftMessageText?.trim() || '';
     try {
-      await this.api.consumeStoreItem('gifts', { gift_type: this.selectedGiftTypeToSend });
+      await this.api.consumeStoreItem({ item: 'gifts', gift_type: this.selectedGiftTypeToSend });
       const meta = { opened: false, type: 'gift', giftType: this.selectedGiftTypeToSend, message: giftMsg };
       await this.api.sendMessage('[GIFT]', undefined, undefined, meta);
       
