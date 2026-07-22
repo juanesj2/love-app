@@ -214,7 +214,7 @@ public class LoveWidgetWorker extends Worker {
                     // Draw Line
                     if (distance >= 50) {
                         Paint linePaint = new Paint();
-                        linePaint.setColor(Color.WHITE);
+                        linePaint.setColor(android.graphics.Color.parseColor("#FFCCD5")); // Pastel pink
                         linePaint.setStrokeWidth(6f);
                         linePaint.setStyle(Paint.Style.STROKE);
                         linePaint.setPathEffect(new DashPathEffect(new float[]{15f, 15f}, 0));

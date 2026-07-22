@@ -94,11 +94,20 @@ public class CounterWidgetWorker extends Worker {
             
             prefs.edit().putString("lastCounterText", counterText).apply();
 
-            // Fetch latest photo from Laravel API
             String photoUrl = fetchLatestPhotoUrl(albumId);
             Bitmap photoBitmap = null;
-            if (photoUrl != null && !photoUrl.isEmpty()) {
+            boolean isNetworkError = false;
+            boolean isEmpty = false;
+
+            if ("ERROR".equals(photoUrl) || photoUrl == null) {
+                isNetworkError = true;
+            } else if ("EMPTY".equals(photoUrl)) {
+                isEmpty = true;
+            } else if (!photoUrl.isEmpty()) {
                 photoBitmap = fetchBitmap("https://j2api.alwaysdata.net/storage/" + photoUrl);
+                if (photoBitmap == null) {
+                    isNetworkError = true;
+                }
             }
             
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
@@ -129,13 +138,17 @@ public class CounterWidgetWorker extends Worker {
                 RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_counter_photo);
                 views.setTextViewText(R.id.widget_counter_text_large, counterText);
                 views.setTextViewText(R.id.widget_album_name, albumName);
+                
                 if (photoBitmap != null) {
                     views.setImageViewBitmap(R.id.widget_photo_large, photoBitmap);
                     views.setViewVisibility(R.id.widget_photo_title, android.view.View.GONE);
-                } else {
+                } else if (isEmpty) {
                     views.setImageViewResource(R.id.widget_photo_large, R.drawable.ic_launcher_background);
                     views.setViewVisibility(R.id.widget_photo_title, android.view.View.VISIBLE);
                     views.setTextViewText(R.id.widget_photo_title, "No hay fotos");
+                } else {
+                    // It's a network error. We do nothing to the image view, 
+                    // which means it will keep displaying the last loaded image instead of "No hay fotos".
                 }
                 
                 android.content.Intent intent = new android.content.Intent(context, MainActivity.class);
@@ -227,11 +240,13 @@ public class CounterWidgetWorker extends Worker {
                 prefs.edit().putInt("counterWidgetPhotoIndex", currentIndex + 1).apply();
                 
                 return photo.getString("image_path");
+            } else {
+                return "EMPTY";
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return "ERROR";
     }
     
     private Bitmap fetchBitmap(String urlString) {
