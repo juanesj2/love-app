@@ -22,10 +22,12 @@ import { paperPlane, hourglassOutline, close, arrowUndoOutline, trashOutline, pe
 import { DotLottie } from '@lottiefiles/dotlottie-web';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Keyboard } from '@capacitor/keyboard';
+import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer.component';
+
 @Component({
   selector: 'app-chat-widget',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, LetterSelectorModalComponent, InteractiveLetterComponent],
+  imports: [CommonModule, FormsModule, IonicModule, LetterSelectorModalComponent, InteractiveLetterComponent, GiftViewerComponent],
   template: `
     <div class="chat-wrapper" [style.background]="chatBackground || null" [ngClass]="'font-' + chatFont">
       <ion-content class="messages-content" [style.--background]="chatBackground ? 'transparent' : null" #msgContainer [scrollEvents]="true" (ionScroll)="onScroll($event)">
@@ -435,6 +437,9 @@ import { Keyboard } from '@capacitor/keyboard';
         <h3>Adjuntar Regalo y Mensaje</h3>
         
         <div class="gift-selector" *ngIf="availableGiftsForSending.length > 0">
+          <div class="gift-preview-container" style="background: #fff0f3; border-radius: 20px; margin-bottom: 15px; padding: 10px; box-shadow: inset 0 4px 10px rgba(255,77,109,0.05);">
+            <app-gift-viewer [giftType]="selectedGiftTypeToSend" [height]="'200px'"></app-gift-viewer>
+          </div>
           <p style="margin-bottom: 10px; color: #666; font-size: 0.85rem; text-align: center;">Selecciona el regalo a enviar:</p>
           <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; justify-content: center;">
             <div *ngFor="let g of availableGiftsForSending" 
