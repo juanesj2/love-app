@@ -24,12 +24,17 @@ import { LoveApiService } from '../../../services/love-api.service';
 
         <div class="inventory-content" *ngIf="api.inventory$ | async as inv">
           <!-- Regalo para enviar -->
-          <div class="inv-item">
+          <div class="inv-item" style="align-items: flex-start;">
             <div class="inv-icon"><ion-icon name="gift"></ion-icon></div>
-            <div class="inv-details">
-              <h4>Regalo Virtual</h4>
-              <p *ngIf="inv.gifts">Disponible para enviar</p>
-              <p *ngIf="!inv.gifts" class="locked">No tienes regalos.</p>
+            <div class="inv-details" style="flex: 1;">
+              <h4>Regalo Virtual 3D</h4>
+              <div *ngIf="getTotalGifts(inv) > 0" class="gift-counters" style="margin-top: 5px;">
+                <p *ngIf="(inv.gift_teddy || 0) + (inv.gifts || 0) > 0">🧸 Oso de Peluche: <strong>{{ (inv.gift_teddy || 0) + (inv.gifts || 0) }}</strong></p>
+                <p *ngIf="inv.gift_rose > 0">🌹 Rosa 3D: <strong>{{ inv.gift_rose }}</strong></p>
+                <p *ngIf="inv.gift_ring > 0">💍 Anillo Doji: <strong>{{ inv.gift_ring }}</strong></p>
+                <p style="margin-top: 5px; font-size: 0.8rem;"><i>Disponibles para enviar desde el chat</i></p>
+              </div>
+              <p *ngIf="getTotalGifts(inv) === 0" class="locked">No tienes regalos.</p>
             </div>
           </div>
 
@@ -156,5 +161,9 @@ export class InventoryModalComponent {
 
   toggleSentGifts() {
     this.showSentGifts = !this.showSentGifts;
+  }
+
+  getTotalGifts(inv: any): number {
+    return (inv?.gift_teddy || 0) + (inv?.gift_rose || 0) + (inv?.gift_ring || 0) + (inv?.gifts || 0);
   }
 }

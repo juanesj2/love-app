@@ -235,10 +235,10 @@ import { Keyboard } from '@capacitor/keyboard';
 
             <div class="attach-menu" *ngIf="showAttachMenu">
               <ng-container *ngIf="api.inventory$ | async as inv">
-                <button class="attach-menu-item" (click)="inv.gifts > 0 ? sendGift() : promptStore('gifts'); showAttachMenu = false">
+                <button class="attach-menu-item" (click)="getTotalGifts(inv) > 0 ? sendGift(inv) : promptStore('gifts'); showAttachMenu = false">
                   <ion-icon name="gift"></ion-icon>
-                  <div class="letter-badge" *ngIf="inv.gifts > 0">{{inv.gifts}}</div>
-                  <ion-icon name="lock-closed" class="premium-lock" *ngIf="!(inv.gifts > 0)"></ion-icon>
+                  <div class="letter-badge" *ngIf="getTotalGifts(inv) > 0">{{getTotalGifts(inv)}}</div>
+                  <ion-icon name="lock-closed" class="premium-lock" *ngIf="!(getTotalGifts(inv) > 0)"></ion-icon>
                 </button>
                 <button class="attach-menu-item" (click)="inv.letters?.length > 0 ? openLetterSelector() : promptStore('letters'); showAttachMenu = false">
                   <ion-icon name="mail"></ion-icon>
@@ -2934,19 +2934,49 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     return this.environment.storageUrl + msg.photo?.image_path;
   }
 
-  async sendGift() {
+  getTotalGifts(inv: any): number {
+    return (inv?.gift_teddy || 0) + (inv?.gift_rose || 0) + (inv?.gift_ring || 0) + (inv?.gifts || 0);
+  }
+
+  selectedGiftTypeToSend: string = 'teddy';
+
+  async sendGift(inv: any) {
     this.showAttachMenu = false;
     this.giftMessageText = '';
-    this.showGiftMessageModal = true;
+
+    const availableGifts = [];
+    if ((inv.gift_teddy || 0) + (inv.gifts || 0) > 0) availableGifts.push({ text: 'Oso de Peluche (Tienes ' + ((inv.gift_teddy || 0) + (inv.gifts || 0)) + ')', data: 'teddy' });
+    if (inv.gift_rose > 0) availableGifts.push({ text: 'Rosa 3D (Tienes ' + inv.gift_rose + ')', data: 'rose' });
+    if (inv.gift_ring > 0) availableGifts.push({ text: 'Anillo Doji (Tienes ' + inv.gift_ring + ')', data: 'ring' });
+
+    if (availableGifts.length === 1) {
+      this.selectedGiftTypeToSend = availableGifts[0].data;
+      this.showGiftMessageModal = true;
+    } else if (availableGifts.length > 1) {
+      const buttons = availableGifts.map(g => ({
+        text: g.text,
+        handler: () => {
+          this.selectedGiftTypeToSend = g.data;
+          this.showGiftMessageModal = true;
+        }
+      }));
+      buttons.push({ text: 'Cancelar', role: 'cancel', handler: () => {} });
+
+      const actionSheet = await this.actionSheetCtrl.create({
+        header: '¿Qué regalo quieres enviar?',
+        buttons: buttons
+      });
+      await actionSheet.present();
+    }
   }
 
   async confirmSendGift() {
     this.showGiftMessageModal = false;
     const giftMsg = this.giftMessageText?.trim() || '';
     try {
-      await this.api.consumeStoreItem('gifts');
-      const meta = { opened: false, type: 'gift', giftType: 'default', message: giftMsg };
-      await this.api.sendMessage('[GIFT]default', undefined, undefined, meta);
+      await this.api.consumeStoreItem('gifts', { gift_type: this.selectedGiftTypeToSend });
+      const meta = { opened: false, type: 'gift', giftType: this.selectedGiftTypeToSend, message: giftMsg };
+      await this.api.sendMessage('[GIFT]', undefined, undefined, meta);
       
       this.api.getCoupleInfo();
       this.loadMessages();

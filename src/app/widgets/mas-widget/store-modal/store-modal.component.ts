@@ -2,17 +2,18 @@ import { Component, Output, EventEmitter, inject, ChangeDetectorRef, ViewChild, 
 import { CommonModule } from "@angular/common";
 import { IonicModule } from "@ionic/angular";
 import { addIcons } from "ionicons";
-import { closeOutline, chevronForward } from "ionicons/icons";
+import { closeOutline, chevronForward, giftOutline } from "ionicons/icons";
 import { LoveApiService } from "../../../services/love-api.service";
 import { PremiumService } from "../../../services/premium.service";
 import { DotLottie } from '@lottiefiles/dotlottie-web';
 import confetti from 'canvas-confetti';
 import { LetterFormModalComponent } from '../../../components/letter-form-modal/letter-form-modal.component';
+import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer.component';
 
 @Component({
   selector: "app-store-modal",
   standalone: true,
-  imports: [CommonModule, IonicModule, LetterFormModalComponent],
+  imports: [CommonModule, IonicModule, LetterFormModalComponent, GiftViewerComponent],
   template: `
     <div class="overlay" (click)="onOverlayClick($event)">
       <div class="modal-sheet" (click)="$event.stopPropagation()">
@@ -66,13 +67,15 @@ import { LetterFormModalComponent } from '../../../components/letter-form-modal/
           </div>
 
           <ng-container *ngIf="api.inventory$ | async as inv">
-            <!-- Regalo Virtual -->
-            <div class="store-card" (click)="purchaseItem('gifts')" [class.purchasing]="purchasingItem === 'gifts'">
+            <!-- Regalo Virtual 3D -->
+            <div class="store-card" (click)="openGiftSelector()" [class.purchasing]="purchasingItem === 'gifts'">
               <ion-spinner name="crescent" *ngIf="purchasingItem === 'gifts'" class="pack-spinner"></ion-spinner>
               <div class="card-icon" *ngIf="purchasingItem !== 'gifts'">🎁</div>
               <div class="card-info">
-                <span class="card-title">Regalo Virtual <span *ngIf="inv.gifts > 0" class="qty-badge">(Tienes: {{ inv.gifts }})</span></span>
-                <span class="card-desc">Envía una caja sorpresa. Más tarde podrás añadir modelos 3D.</span>
+                <span class="card-title">Regalo 3D 
+                  <span *ngIf="getTotalGifts(inv) > 0" class="qty-badge">(Tienes: {{ getTotalGifts(inv) }})</span>
+                </span>
+                <span class="card-desc">Elige y envía un modelo 3D sorpresa.</span>
               </div>
               <div class="card-action pack-price">0.99 €</div>
             </div>
@@ -102,6 +105,31 @@ import { LetterFormModalComponent } from '../../../components/letter-form-modal/
           </ng-container>
 
           <p class="shop-legal">⚠️ Las compras directas no son reembolsables.</p>
+        </div>
+      </div>
+
+      <!-- Gift Selector Modal -->
+      <div class="gift-selector-overlay" *ngIf="showGiftSelector" (click)="showGiftSelector = false">
+        <div class="gift-selector-sheet" (click)="$event.stopPropagation()">
+          <div class="handle-bar"></div>
+          <h2 class="header-title" style="text-align: center; margin-bottom: 20px;">Elige un Regalo 3D</h2>
+          
+          <div class="gift-options">
+            <div class="gift-option" [class.selected]="selectedGiftType === 'teddy'" (click)="selectedGiftType = 'teddy'">
+              <app-gift-viewer [giftType]="'teddy'" [height]="'120px'"></app-gift-viewer>
+              <span class="gift-name">Oso de Peluche</span>
+            </div>
+            <div class="gift-option" [class.selected]="selectedGiftType === 'rose'" (click)="selectedGiftType = 'rose'">
+              <app-gift-viewer [giftType]="'rose'" [height]="'120px'"></app-gift-viewer>
+              <span class="gift-name">Rosa 3D</span>
+            </div>
+            <div class="gift-option" [class.selected]="selectedGiftType === 'ring'" (click)="selectedGiftType = 'ring'">
+              <app-gift-viewer [giftType]="'ring'" [height]="'120px'"></app-gift-viewer>
+              <span class="gift-name">Anillo Doji</span>
+            </div>
+          </div>
+          
+          <button class="confirm-gift-btn" (click)="purchaseGift()">Comprar por 0.99 €</button>
         </div>
       </div>
 
@@ -169,6 +197,15 @@ import { LetterFormModalComponent } from '../../../components/letter-form-modal/
 
     .shop-legal { text-align: center; font-size: 0.75rem; color: #a4133c; margin: 10px 20px 0; font-weight: 600; opacity: 0.8; }
 
+    /* Gift Selector */
+    .gift-selector-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 2000; display: flex; flex-direction: column; justify-content: flex-end; animation: fadeIn 0.2s; }
+    .gift-selector-sheet { background: white; width: 100%; border-radius: 30px 30px 0 0; padding: 25px 25px 40px; box-shadow: 0 -10px 40px rgba(0,0,0,0.2); animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1); }
+    .gift-options { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; }
+    .gift-option { flex: 0 0 120px; background: #fff5f7; border: 2px solid transparent; border-radius: 18px; padding: 10px; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .gift-option.selected { border-color: #FF4D6D; background: #ffe3e8; transform: scale(1.05); }
+    .gift-name { display: block; font-size: 0.85rem; font-weight: 700; color: #590D22; margin-top: 5px; }
+    .confirm-gift-btn { width: 100%; padding: 16px; background: #FF4D6D; color: white; border: none; border-radius: 20px; font-size: 1.1rem; font-weight: 800; margin-top: 10px; box-shadow: 0 8px 20px rgba(255,77,109,0.3); }
+
     /* Lottie Overlay */
     .lottie-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.3s; }
     .lottie-content { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -192,6 +229,10 @@ export class StoreModalComponent implements OnDestroy {
   purchasingRevival = false;
   purchasingItem: string | null = null;
 
+  // Gift selection logic
+  showGiftSelector = false;
+  selectedGiftType = 'teddy';
+
   // Lottie logic
   showLottie = false;
   lottieTitle = '';
@@ -204,7 +245,7 @@ export class StoreModalComponent implements OnDestroy {
   showLetterForm = false;
 
   constructor() {
-    addIcons({ closeOutline, chevronForward });
+    addIcons({ closeOutline, chevronForward, giftOutline });
   }
 
   ngOnDestroy() {
@@ -218,6 +259,20 @@ export class StoreModalComponent implements OnDestroy {
     if ((e.target as HTMLElement).classList.contains('overlay') && !this.showLottie) {
       this.close.emit();
     }
+  }
+
+  getTotalGifts(inv: any): number {
+    return (inv.gift_teddy || 0) + (inv.gift_rose || 0) + (inv.gift_ring || 0) + (inv.gifts || 0);
+  }
+
+  openGiftSelector() {
+    this.showGiftSelector = true;
+    this.selectedGiftType = 'teddy'; // Default
+  }
+
+  purchaseGift() {
+    this.showGiftSelector = false;
+    this.purchaseItem('gifts', { gift_type: this.selectedGiftType });
   }
 
   closeLottieOverlay() {
@@ -307,7 +362,7 @@ export class StoreModalComponent implements OnDestroy {
     }
   }
 
-  async purchaseItem(item: string) {
+  async purchaseItem(item: string, data?: any) {
     if (this.purchasingItem) return;
     
     if (item === 'letters') {
@@ -315,7 +370,7 @@ export class StoreModalComponent implements OnDestroy {
       return;
     }
 
-    await this.processPurchase(item);
+    await this.processPurchase(item, data);
   }
 
   async onLetterSave(data: {title: string, subject: string, content: string}) {

@@ -4,11 +4,12 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
 import { PendingLetterService } from '../../services/pending-letter.service';
 import { LoveApiService } from '../../services/love-api.service';
 import { Subscription } from 'rxjs';
+import { GiftViewerComponent } from '../gift-viewer/gift-viewer.component';
 
 @Component({
   selector: 'app-pending-gift-overlay',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, GiftViewerComponent],
   template: `
     <div class="gift-global-overlay" *ngIf="pendingMsg && !isOpened">
       <div class="gift-global-container" (click)="$event.stopPropagation()">
@@ -27,10 +28,7 @@ import { Subscription } from 'rxjs';
       <div class="gift-content-container" (click)="$event.stopPropagation()">
         <div class="gift-box-opened">
           <h2>¡Has recibido un regalo virtual!</h2>
-          <div class="gift-placeholder">
-            <span class="placeholder-icon">🧸</span>
-            <p>Modelo 3D próximamente...</p>
-          </div>
+          <app-gift-viewer [giftType]="pendingMsg?.meta?.giftType || 'teddy'" [height]="'250px'"></app-gift-viewer>
           <div class="gift-message" *ngIf="pendingMsg?.meta?.message">
             <p class="gift-message-text">"{{ pendingMsg.meta.message }}"</p>
           </div>
