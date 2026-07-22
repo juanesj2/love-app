@@ -373,7 +373,7 @@ import { PremiumEventModalComponent } from './premium-event-modal/premium-event-
               <p style="margin-top: 0; font-weight: bold; color: #590D22; margin-bottom: 5px;">Modelos 3D</p>
               <ul style="margin: 0; padding-left: 15px; line-height: 1.4;">
                 <li style="margin-bottom: 5px;">
-                  <a href="https://skfb.ly/oJGNy" target="_blank" style="color: #FF4D6D; text-decoration: none;">"Teddy Bear"</a> by sergeilihandristov is licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" style="color: #FF4D6D; text-decoration: none;">Creative Commons Attribution</a>.
+                  <a href="https://skfb.ly/6AYxB" target="_blank" style="color: #FF4D6D; text-decoration: none;">"Sitting Teddy Bear"</a> by Mathias is licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" style="color: #FF4D6D; text-decoration: none;">Creative Commons Attribution</a>.
                 </li>
                 <li style="margin-bottom: 5px;">
                   <a href="https://skfb.ly/ouCso" target="_blank" style="color: #FF4D6D; text-decoration: none;">"Rose"</a> by Heliona is licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" style="color: #FF4D6D; text-decoration: none;">Creative Commons Attribution</a>.
