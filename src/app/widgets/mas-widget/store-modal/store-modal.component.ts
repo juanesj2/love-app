@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, inject, ChangeDetectorRef, ViewChild, ElementRef, OnDestroy } from "@angular/core";
+import { Component, Output, EventEmitter, inject, ChangeDetectorRef, ViewChild, ElementRef, OnInit, OnDestroy } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { IonicModule } from "@ionic/angular";
 import { addIcons } from "ionicons";
@@ -72,12 +72,12 @@ import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer
               <ion-spinner name="crescent" *ngIf="purchasingItem === 'gifts'" class="pack-spinner"></ion-spinner>
               <div class="card-icon" *ngIf="purchasingItem !== 'gifts'">🎁</div>
               <div class="card-info">
-                <span class="card-title">Regalo 3D 
+                <span class="card-title">Regalo 3D / Pack
                   <span *ngIf="getTotalGifts(inv) > 0" class="qty-badge">(Tienes: {{ getTotalGifts(inv) }})</span>
                 </span>
-                <span class="card-desc">Elige y envía un modelo 3D sorpresa.</span>
+                <span class="card-desc">Elige y envía un modelo 3D sorpresa o un pack con descuento.</span>
               </div>
-              <div class="card-action pack-price">0.99 €</div>
+              <div class="card-action pack-price">Desde 0.99 €</div>
             </div>
 
             <!-- Carta de Amor -->
@@ -114,36 +114,46 @@ import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer
           <div class="handle-bar"></div>
           <h2 class="header-title" style="text-align: center; margin-bottom: 20px;">Elige un Regalo 3D</h2>
           
-          <div class="gift-preview-container" style="background: #fff0f3; border-radius: 20px; margin-bottom: 15px; padding: 10px; box-shadow: inset 0 4px 10px rgba(255,77,109,0.05);">
-            <app-gift-viewer [giftType]="selectedGiftType" [height]="'220px'"></app-gift-viewer>
+          <div class="gift-preview-container" style="background: #fff0f3; border-radius: 20px; margin-bottom: 15px; padding: 10px; box-shadow: inset 0 4px 10px rgba(255,77,109,0.05); min-height: 220px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <app-gift-viewer *ngIf="selectedGiftType !== 'bundle'" [giftType]="selectedGiftType" [height]="'220px'" style="width: 100%;"></app-gift-viewer>
+            <div *ngIf="selectedGiftType === 'bundle'" style="text-align: center;">
+              <div style="font-size: 5rem; line-height: 1.2;">🎁</div>
+              <div style="font-size: 1.8rem; margin-top: 10px; font-weight: 900; color: #FF4D6D; text-shadow: 0 2px 10px rgba(255, 77, 109, 0.2);">🧸 + 🌹 + 💍</div>
+            </div>
           </div>
           
           <div style="text-align: center; font-size: 1.1rem; color: #590D22; margin-bottom: 15px; font-weight: 800;">
-            {{ selectedGiftType === 'teddy' ? 'Oso de Peluche' : selectedGiftType === 'rose' ? 'Rosa 3D' : 'Anillo Doji' }}
+            {{ selectedGiftType === 'teddy' ? 'Oso de Peluche' : selectedGiftType === 'rose' ? 'Rosa 3D' : selectedGiftType === 'ring' ? 'Anillo Doji' : 'Pack x3 (Los Tres Regalos)' }}
           </div>
 
-          <div style="display: flex; gap: 15px; justify-content: center; padding-bottom: 15px;">
+          <div style="display: flex; gap: 10px; justify-content: center; padding-bottom: 15px;">
             <div (click)="selectedGiftType = 'teddy'" 
-                 style="font-size: 2.5rem; cursor: pointer; padding: 10px 15px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s;" 
+                 style="font-size: 2rem; cursor: pointer; padding: 10px 12px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s;" 
                  [style.background]="selectedGiftType === 'teddy' ? '#ffe4eb' : '#f8f9fa'" 
                  [style.borderColor]="selectedGiftType === 'teddy' ? '#ffb3c6' : 'transparent'">
               🧸
             </div>
             <div (click)="selectedGiftType = 'rose'" 
-                 style="font-size: 2.5rem; cursor: pointer; padding: 10px 15px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s;" 
+                 style="font-size: 2rem; cursor: pointer; padding: 10px 12px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s;" 
                  [style.background]="selectedGiftType === 'rose' ? '#ffe4eb' : '#f8f9fa'" 
                  [style.borderColor]="selectedGiftType === 'rose' ? '#ffb3c6' : 'transparent'">
               🌹
             </div>
             <div (click)="selectedGiftType = 'ring'" 
-                 style="font-size: 2.5rem; cursor: pointer; padding: 10px 15px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s;" 
+                 style="font-size: 2rem; cursor: pointer; padding: 10px 12px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s;" 
                  [style.background]="selectedGiftType === 'ring' ? '#ffe4eb' : '#f8f9fa'" 
                  [style.borderColor]="selectedGiftType === 'ring' ? '#ffb3c6' : 'transparent'">
               💍
             </div>
+            <div (click)="selectedGiftType = 'bundle'" 
+                 style="font-size: 2rem; cursor: pointer; padding: 10px 12px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s;" 
+                 [style.background]="selectedGiftType === 'bundle' ? '#ffe4eb' : '#f8f9fa'" 
+                 [style.borderColor]="selectedGiftType === 'bundle' ? '#ffb3c6' : 'transparent'">
+              🎁
+            </div>
           </div>
           
-          <button class="confirm-gift-btn" (click)="purchaseGift()">Comprar por 0.99 €</button>
+          <button class="confirm-gift-btn" (click)="purchaseGift()">Comprar por {{ selectedGiftType === 'bundle' ? '2.00' : '0.99' }} €</button>
         </div>
       </div>
 
@@ -231,7 +241,7 @@ import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer
     @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
   `]
 })
-export class StoreModalComponent implements OnDestroy {
+export class StoreModalComponent implements OnInit, OnDestroy {
   @Output() close = new EventEmitter<void>();
   @Output() openPaywall = new EventEmitter<void>();
   @Output() openPremiumEvent = new EventEmitter<void>();
@@ -262,14 +272,19 @@ export class StoreModalComponent implements OnDestroy {
     addIcons({ closeOutline, chevronForward, giftOutline });
   }
 
+  ngOnInit() {
+    document.body.classList.add('hide-footer');
+  }
+
   ngOnDestroy() {
+    document.body.classList.remove('hide-footer');
     if (this.dotLottieInstance) {
       this.dotLottieInstance.destroy();
       this.dotLottieInstance = undefined;
     }
   }
 
-  onOverlayClick(e: Event) {
+  onOverlayClick(e: MouseEvent) {
     if ((e.target as HTMLElement).classList.contains('overlay') && !this.showLottie) {
       this.close.emit();
     }
@@ -280,13 +295,17 @@ export class StoreModalComponent implements OnDestroy {
   }
 
   openGiftSelector() {
+    this.selectedGiftType = 'teddy';
     this.showGiftSelector = true;
-    this.selectedGiftType = 'teddy'; // Default
   }
 
   purchaseGift() {
     this.showGiftSelector = false;
-    this.purchaseItem('gifts', { gift_type: this.selectedGiftType });
+    if (this.selectedGiftType === 'bundle') {
+      this.purchaseItem('gift_bundle');
+    } else {
+      this.purchaseItem('gifts', { gift_type: this.selectedGiftType });
+    }
   }
 
   closeLottieOverlay() {
