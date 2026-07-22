@@ -23,11 +23,12 @@ import { DotLottie } from '@lottiefiles/dotlottie-web';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Keyboard } from '@capacitor/keyboard';
 import { GiftViewerComponent } from '../../components/gift-viewer/gift-viewer.component';
+import { StoreModalComponent } from '../mas-widget/store-modal/store-modal.component';
 
 @Component({
   selector: 'app-chat-widget',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, LetterSelectorModalComponent, InteractiveLetterComponent, GiftViewerComponent],
+  imports: [CommonModule, FormsModule, IonicModule, LetterSelectorModalComponent, InteractiveLetterComponent, GiftViewerComponent, StoreModalComponent],
   template: `
     <div class="chat-wrapper" [style.background]="chatBackground || null" [ngClass]="'font-' + chatFont">
       <ion-content class="messages-content" [style.--background]="chatBackground ? 'transparent' : null" #msgContainer [scrollEvents]="true" (ionScroll)="onScroll($event)">
@@ -465,6 +466,20 @@ import { GiftViewerComponent } from '../../components/gift-viewer/gift-viewer.co
       </div>
     </div>
 
+    <!-- Store Modal -->
+    <app-store-modal *ngIf="isStoreModalOpen" (close)="isStoreModalOpen = false" (openPaywall)="showPremiumEventModal = true"></app-store-modal>
+
+    <!-- Premium Event Modal -->
+    <div class="custom-overlay" *ngIf="showPremiumEventModal" (click)="showPremiumEventModal = false" style="z-index: 100000;">
+      <div class="modal-content glass-card" style="margin: 20px; padding: 30px; text-align: center; width: 85%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15);" (click)="$event.stopPropagation()">
+        <ion-icon name="heart" style="font-size: 3rem; color: #FF4D6D; margin-bottom: 15px;"></ion-icon>
+        <h2 style="color: #590D22; margin-bottom: 15px; font-weight: 900; font-size: 1.5rem;">LoveApp Premium</h2>
+        <p style="color: #666; font-size: 0.95rem; margin-bottom: 25px; line-height: 1.5;">Desbloquea funciones exclusivas y sorprende a tu pareja todos los días.</p>
+        
+        <button class="btn-primary" style="width: 100%; border-radius: 12px; font-weight: bold; margin-bottom: 15px;" (click)="showPremiumEventModal = false">Continuar</button>
+        <button class="glass-btn" style="width: 100%;" (click)="showPremiumEventModal = false">Más tarde</button>
+      </div>
+    </div>
   `,
   styles: [`
     :host {
@@ -2959,8 +2974,10 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   selectedGiftTypeToSend: string = 'teddy';
-
   availableGiftsForSending: any[] = [];
+  
+  isStoreModalOpen = false;
+  showPremiumEventModal = false;
 
   async sendGift(inv: any) {
     this.showAttachMenu = false;
@@ -3544,13 +3561,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   async promptStore(item: string) {
-    const itemName = item === 'gifts' ? 'el Regalo Virtual' : 'la Carta de Amor';
-    const toast = await this.toastController.create({
-      message: `Necesitas comprar ${itemName} en la tienda (+ Más -> Tienda).`,
-      duration: 3000,
-      color: 'warning'
-    });
-    toast.present();
+    this.isStoreModalOpen = true;
   }
 
   private async openFingerprintGame() {
