@@ -336,6 +336,14 @@ import { PremiumEventModalComponent } from './premium-event-modal/premium-event-
                 <ion-toggle [(ngModel)]="isNightOwlEnabled" (ionChange)="toggleNightOwl()"></ion-toggle>
               </div>
 
+              <div class="settings-item interactive" (click)="isCreditsModalOpen = true" style="display: flex; align-items: center; padding: 15px; background: rgba(255,255,255,0.8); border-radius: 14px; margin-bottom: 10px;">
+                <div>
+                  <h4 style="margin: 0; color: #590D22; font-weight: 700;"><ion-icon name="information-circle-outline"></ion-icon> Créditos de Recursos</h4>
+                  <p style="margin: 0; font-size: 0.8rem; color: #6c757d;">Licencias y autores de recursos 3D.</p>
+                </div>
+                <ion-icon name="chevron-forward" style="margin-left: auto; color: #888;"></ion-icon>
+              </div>
+
               <div class="settings-item interactive" (click)="confirmUnpair()" style="display: flex; align-items: center; padding: 15px; background: rgba(255, 77, 109, 0.1); border-radius: 14px; margin-bottom: 10px;">
                 <ion-icon name="heart-dislike-outline" style="color: #FF4D6D; font-size: 1.5rem; margin-right: 15px;"></ion-icon>
                 <div>
@@ -355,6 +363,29 @@ import { PremiumEventModalComponent } from './premium-event-modal/premium-event-
           </div>
         </div>
       </div>
+
+        <!-- Credits Modal -->
+        <div class="custom-overlay" *ngIf="isCreditsModalOpen" (click)="isCreditsModalOpen = false" style="z-index: 100000;">
+          <div class="modal-content glass-card" style="margin: 20px; padding: 30px; text-align: left; width: 85%; max-width: 400px; box-sizing: border-box; border: none; background: rgba(255, 255, 255, 0.95); box-shadow: 0 10px 40px rgba(255, 77, 109, 0.15); max-height: 80vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+            <h2 style="color: #590D22; margin-bottom: 15px; font-weight: 900; font-size: 1.5rem; text-align: center;"><ion-icon name="information-circle-outline"></ion-icon> Créditos</h2>
+            
+            <div style="background: rgba(0,0,0,0.03); padding: 15px; border-radius: 12px; margin-bottom: 15px; font-size: 0.9rem; color: #495057;">
+              <p style="margin-top: 0; font-weight: bold; color: #590D22; margin-bottom: 5px;">Modelos 3D</p>
+              <p style="margin: 0; line-height: 1.4;">
+                <a href="https://skfb.ly/oJGNy" target="_blank" style="color: #FF4D6D; text-decoration: none;">"Teddy Bear"</a> by sergeilihandristov is licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" style="color: #FF4D6D; text-decoration: none;">Creative Commons Attribution</a>.
+              </p>
+            </div>
+            
+            <div style="background: rgba(0,0,0,0.03); padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 0.9rem; color: #495057;">
+              <p style="margin-top: 0; font-weight: bold; color: #590D22; margin-bottom: 5px;">Animaciones (Lottie)</p>
+              <p style="margin: 0; line-height: 1.4;">
+                Las animaciones Lottie utilizadas en esta app han sido obtenidas de bibliotecas gratuitas (LottieFiles) bajo licencia libre de atribución estricta o de dominio público.
+              </p>
+            </div>
+
+            <button class="glass-btn" style="width: 100%; background: rgba(255,77,109,0.1); color: #FF4D6D;" (click)="isCreditsModalOpen = false">Cerrar</button>
+          </div>
+        </div>
 
         <!-- Food List Modal -->
         <div class="custom-overlay" *ngIf="isFoodListModalOpen" (click)="closeGastroModal()" style="align-items: flex-end;">
@@ -1095,6 +1126,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
   @Output() viewChange = new EventEmitter<string>();
 
+  isCreditsModalOpen = false;
   isMapModalOpen = false;
   safeMapUrl: SafeResourceUrl | null = null;
   
