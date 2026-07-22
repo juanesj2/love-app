@@ -114,18 +114,32 @@ import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer
           <div class="handle-bar"></div>
           <h2 class="header-title" style="text-align: center; margin-bottom: 20px;">Elige un Regalo 3D</h2>
           
-          <div class="gift-options">
-            <div class="gift-option" [class.selected]="selectedGiftType === 'teddy'" (click)="selectedGiftType = 'teddy'">
-              <app-gift-viewer [giftType]="'teddy'" [height]="'120px'"></app-gift-viewer>
-              <span class="gift-name">Oso de Peluche</span>
+          <div class="gift-preview-container" style="background: #fff0f3; border-radius: 20px; margin-bottom: 15px; padding: 10px; box-shadow: inset 0 4px 10px rgba(255,77,109,0.05);">
+            <app-gift-viewer [giftType]="selectedGiftType" [height]="'220px'"></app-gift-viewer>
+          </div>
+          
+          <div style="text-align: center; font-size: 1.1rem; color: #590D22; margin-bottom: 15px; font-weight: 800;">
+            {{ selectedGiftType === 'teddy' ? 'Oso de Peluche' : selectedGiftType === 'rose' ? 'Rosa 3D' : 'Anillo Doji' }}
+          </div>
+
+          <div style="display: flex; gap: 15px; justify-content: center; padding-bottom: 15px;">
+            <div (click)="selectedGiftType = 'teddy'" 
+                 style="font-size: 2.5rem; cursor: pointer; padding: 10px 15px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s;" 
+                 [style.background]="selectedGiftType === 'teddy' ? '#ffe4eb' : '#f8f9fa'" 
+                 [style.borderColor]="selectedGiftType === 'teddy' ? '#ffb3c6' : 'transparent'">
+              🧸
             </div>
-            <div class="gift-option" [class.selected]="selectedGiftType === 'rose'" (click)="selectedGiftType = 'rose'">
-              <app-gift-viewer [giftType]="'rose'" [height]="'120px'"></app-gift-viewer>
-              <span class="gift-name">Rosa 3D</span>
+            <div (click)="selectedGiftType = 'rose'" 
+                 style="font-size: 2.5rem; cursor: pointer; padding: 10px 15px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s;" 
+                 [style.background]="selectedGiftType === 'rose' ? '#ffe4eb' : '#f8f9fa'" 
+                 [style.borderColor]="selectedGiftType === 'rose' ? '#ffb3c6' : 'transparent'">
+              🌹
             </div>
-            <div class="gift-option" [class.selected]="selectedGiftType === 'ring'" (click)="selectedGiftType = 'ring'">
-              <app-gift-viewer [giftType]="'ring'" [height]="'120px'"></app-gift-viewer>
-              <span class="gift-name">Anillo Doji</span>
+            <div (click)="selectedGiftType = 'ring'" 
+                 style="font-size: 2.5rem; cursor: pointer; padding: 10px 15px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s;" 
+                 [style.background]="selectedGiftType === 'ring' ? '#ffe4eb' : '#f8f9fa'" 
+                 [style.borderColor]="selectedGiftType === 'ring' ? '#ffb3c6' : 'transparent'">
+              💍
             </div>
           </div>
           
