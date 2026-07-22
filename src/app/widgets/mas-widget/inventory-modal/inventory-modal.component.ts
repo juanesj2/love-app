@@ -54,6 +54,33 @@ import { LoveApiService } from '../../../services/love-api.service';
             </div>
           </div>
 
+          <!-- Regalos Enviados -->
+          <div class="inv-item" (click)="toggleSentGifts()" style="cursor: pointer; position: relative;">
+            <div class="inv-icon"><ion-icon name="gift" style="color: #4CC9F0; background: rgba(76, 201, 240, 0.1); border-radius: 12px; padding: 10px;"></ion-icon></div>
+            <div class="inv-details">
+              <h4>Mis Regalos Enviados</h4>
+              <p *ngIf="!inv.sent_gifts || inv.sent_gifts.length === 0" class="locked">Aún no has enviado regalos.</p>
+              <p *ngIf="inv.sent_gifts?.length > 0">{{inv.sent_gifts.length}} regalo(s) enviados</p>
+            </div>
+            <ion-icon *ngIf="inv.sent_gifts?.length > 0" [name]="showSentGifts ? 'chevron-up' : 'chevron-down'" style="position: absolute; right: 15px; font-size: 1.2rem; color: #888;"></ion-icon>
+          </div>
+
+          <!-- Lista de Regalos Enviados -->
+          <div class="gifts-grid" *ngIf="inv.sent_gifts && inv.sent_gifts.length > 0 && showSentGifts">
+            <div class="gift-card" *ngFor="let gift of inv.sent_gifts">
+              <div class="g-icon" [style.opacity]="gift.meta?.opened ? '1' : '0.5'">🎁</div>
+              <div class="g-msg" *ngIf="gift.meta?.message">"{{ gift.meta.message }}"</div>
+              <div class="g-msg" *ngIf="!gift.meta?.message">Un regalo especial</div>
+              <div class="g-date" style="margin-top: 5px;">
+                {{ gift.created_at | date:'shortDate' }}
+                <br>
+                <span [style.color]="gift.meta?.opened ? '#4CAF50' : '#FF9800'" style="font-weight: bold; font-size: 0.6rem;">
+                  {{ gift.meta?.opened ? 'Abierto ✓' : 'Aún cerrado 🔒' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
           <!-- Cartas -->
           <div class="inv-item" (click)="toggleLetters()" style="cursor: pointer; position: relative;">
             <div class="inv-icon"><ion-icon name="mail"></ion-icon></div>
@@ -113,6 +140,7 @@ export class InventoryModalComponent {
   public api = inject(LoveApiService);
   public showLetters = false;
   public showReceivedGifts = true;
+  public showSentGifts = false;
 
   constructor() {
     addIcons({ closeOutline, gift, mail, lockClosed, chevronUp, chevronDown });
@@ -124,5 +152,9 @@ export class InventoryModalComponent {
 
   toggleReceivedGifts() {
     this.showReceivedGifts = !this.showReceivedGifts;
+  }
+
+  toggleSentGifts() {
+    this.showSentGifts = !this.showSentGifts;
   }
 }
