@@ -11,16 +11,18 @@ import { CommonModule } from '@angular/common';
       <!-- Loading state could go here if needed -->
       <model-viewer
         *ngIf="modelSrc"
-        [attr.src]="modelSrc"
+        [src]="modelSrc"
         auto-rotate
         camera-controls
         shadow-intensity="1"
         environment-image="neutral"
         exposure="1"
-        [style.width]="'100%'"
-        [style.height]="'100%'"
+        style="width: 100%; height: 100%; display: block;"
         interaction-prompt="none"
-        alt="A 3D model of a gift">
+        alt="Regalo 3D">
+        <div slot="poster" style="display: flex; align-items: center; justify-content: center; height: 100%; color: #FF4D6D; font-weight: bold;">
+          Cargando modelo 3D...
+        </div>
       </model-viewer>
       
       <div class="error-msg" *ngIf="!modelSrc">
@@ -29,6 +31,10 @@ import { CommonModule } from '@angular/common';
     </div>
   `,
   styles: [`
+    :host {
+      display: block;
+      width: 100%;
+    }
     .viewer-container {
       width: 100%;
       position: relative;
@@ -69,16 +75,16 @@ export class GiftViewerComponent implements OnInit, OnChanges {
   private updateModelSrc() {
     switch (this.giftType) {
       case 'teddy':
-        this.modelSrc = 'assets/models/oso.glb';
+        this.modelSrc = '/assets/models/oso.glb';
         break;
       case 'rose':
-        this.modelSrc = 'assets/models/rosa.glb'; // Assuming the user names it rosa.glb
+        this.modelSrc = '/assets/models/rosa.glb';
         break;
       case 'ring':
-        this.modelSrc = 'assets/models/anillo.glb'; // Assuming the user names it anillo.glb
+        this.modelSrc = '/assets/models/anillo.glb';
         break;
       default:
-        this.modelSrc = `assets/models/${this.giftType}.glb`;
+        this.modelSrc = `/assets/models/${this.giftType}.glb`;
         break;
     }
   }
