@@ -247,7 +247,8 @@ import { PushNotifications } from '@capacitor/push-notifications';
       
       :host-context(.night-owl-mode) .c-box { background: linear-gradient(135deg, #FF9F1C, #E85D04); }
 
-      :host-context(body.hide-footer) .custom-footer { transform: translateY(150%); opacity: 0; pointer-events: none; }
+      :host-context(body.hide-footer) .custom-footer { transform: translateY(150%); opacity: 0; pointer-events: none !important; }
+      :host-context(body.hide-footer) .custom-tab-bar { pointer-events: none !important; }
       .custom-footer { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); background: transparent; border: none; padding: 0 15px calc(var(--safe-bottom) + 15px) 15px; position: absolute; bottom: 0; width: 100%; pointer-events: none; z-index: 1000; }
       
       .custom-header { display: flex; justify-content: space-between; align-items: center; padding: calc(var(--ion-safe-area-top, 0px) + 15px) 25px 15px 25px; background: var(--custom-header-bg, rgba(255, 255, 255, 0.65)); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); border-radius: 0 0 25px 25px; margin-bottom: 10px; position: relative; z-index: 20; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
