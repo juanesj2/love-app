@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Output, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -156,8 +156,8 @@ import { InteractiveLetterComponent } from '../../../components/interactive-lett
     </app-interactive-letter>
   `,
   styles: [`
-    .overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; animation: fadeIn 0.3s; }
-    .modal-sheet { background: #fdf2f4; width: 100%; max-width: 400px; border-radius: 30px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); animation: slideUp 0.35s cubic-bezier(0.175, 0.885, 0.32, 1); position: relative; max-height: 80vh; overflow-y: auto; }
+      .overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 10000; display: flex; flex-direction: column; padding: calc(env(safe-area-inset-top, 20px) + 20px) 20px 20px; align-items: center; overflow-y: auto; animation: fadeIn 0.3s; }
+      .modal-sheet { margin: auto 0; background: #fdf2f4; width: 100%; max-width: 400px; border-radius: 30px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); animation: slideUp 0.35s cubic-bezier(0.175, 0.885, 0.32, 1); position: relative; max-height: 85vh; overflow-y: auto; }
     .close-btn { position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; border-radius: 50%; background: white; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #590D22; box-shadow: 0 4px 15px rgba(0,0,0,0.08); cursor: pointer; z-index: 100; }
     .modal-header { text-align: center; margin-bottom: 20px; }
     .header-icon { font-size: 3.5rem; margin-bottom: 10px; animation: bounce 2s infinite; }
@@ -192,11 +192,28 @@ export class InventoryModalComponent {
   @Output() close = new EventEmitter<void>();
   public api = inject(LoveApiService);
   public showLetters = false;
-  public showReceivedGifts = true;
   public showSentGifts = false;
-
-  public viewingGift: any = null;
+  public showReceivedGifts = true;
+  public viewingGift = false;
+  public viewingLetter = false;
   public selectedGift: any = null;
+  public selectedLetter: any = null;
+  
+  @HostListener('document:ionBackButton', ['$event'])
+  overrideHardwareBackAction(event: any) {
+    if (this.viewingGift) {
+      this.closeGiftView();
+    } else if (this.viewingLetter) {
+      this.closeLetterView();
+    } else {
+      this.close.emit();
+    }
+    
+    // Detener propagación para que no cierre la app si estamos en root
+    if (event && event.detail && event.detail.register) {
+      event.detail.register(100, () => {});
+    }
+  }
 
   showInteractiveLetter = false;
   interactiveLetterData: any = null;
