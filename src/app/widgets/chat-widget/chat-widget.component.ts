@@ -24,11 +24,12 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Keyboard } from '@capacitor/keyboard';
 import { GiftViewerComponent } from '../../components/gift-viewer/gift-viewer.component';
 import { StoreModalComponent } from '../mas-widget/store-modal/store-modal.component';
+import { SecureImageComponent } from '../../components/secure-image/secure-image.component';
 
 @Component({
   selector: 'app-chat-widget',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, LetterSelectorModalComponent, InteractiveLetterComponent, GiftViewerComponent, StoreModalComponent],
+  imports: [CommonModule, FormsModule, IonicModule, LetterSelectorModalComponent, InteractiveLetterComponent, GiftViewerComponent, StoreModalComponent, SecureImageComponent],
   template: `
     <div class="chat-wrapper" [style.background]="chatBackground || null" [ngClass]="'font-' + chatFont">
       <ion-content class="messages-content" [style.--background]="chatBackground ? 'transparent' : null" #msgContainer [scrollEvents]="true" (ionScroll)="onScroll($event)">
@@ -41,8 +42,8 @@ import { StoreModalComponent } from '../mas-widget/store-modal/store-modal.compo
           <!-- Graffitis anclados a este mensaje -->
           <ng-container *ngIf="graffitisByAnchorId[msg.id]">
             <ng-container *ngFor="let graf of graffitisByAnchorId[msg.id]">
-              <img *ngIf="!hiddenGraffitis[graf.id]"
-                   [src]="environment.storageUrl + (graf.custom_image_path || graf.photo?.image_path)" 
+              <app-secure-image *ngIf="!hiddenGraffitis[graf.id]"
+                   [url]="environment.secureStorageUrl + (graf.custom_image_path || graf.photo?.image_path)" 
                    class="graffiti-overlay" 
                    (touchstart)="startGraffitiPress(graf, $event)"
                    (touchmove)="moveGraffitiPress($event)"
@@ -100,7 +101,9 @@ import { StoreModalComponent } from '../mas-widget/store-modal/store-modal.compo
                     </div>
                     
                     <div class="photo-reply" *ngIf="msg.photo && !msg.mensaje?.startsWith('[DOODLE]') && !msg.mensaje?.startsWith('[AUDIO]')">
-                      <img [src]="environment.storageUrl + msg.photo.image_path" loading="lazy" />
+                      <div class="photo-container" style="display: block; width: 100%; height: 100%; position: relative; min-height: 200px;">
+                        <app-secure-image [url]="environment.secureStorageUrl + msg.photo.image_path"></app-secure-image>
+                      </div>
                       <div class="photo-description" *ngIf="msg.photo.description">
                         {{msg.photo.description}}
                       </div>
@@ -126,7 +129,9 @@ import { StoreModalComponent } from '../mas-widget/store-modal/store-modal.compo
                       <img [src]="msg.mensaje.replace('[GIF]', '')" loading="lazy" class="chat-gif" />
                     </div>
                     <div class="doodle-reply" *ngIf="msg.mensaje && msg.mensaje.startsWith('[DOODLE]')">
-                      <img [src]="environment.storageUrl + msg.photo?.image_path" loading="lazy" class="chat-doodle" />
+                      <div class="photo-container" style="display: block; width: 100%; height: 100%; position: relative; min-height: 200px;">
+                        <app-secure-image [url]="environment.secureStorageUrl + msg.photo?.image_path" class="chat-doodle"></app-secure-image>
+                      </div>
                     </div>
                     <div class="audio-reply" *ngIf="msg.mensaje && msg.mensaje.startsWith('[AUDIO]')">
                       <div class="custom-audio-player">
@@ -380,7 +385,7 @@ import { StoreModalComponent } from '../mas-widget/store-modal/store-modal.compo
     <!-- Graffiti Context Menu Overlay -->
     <div class="graffiti-context-overlay" *ngIf="selectedGraffiti" (click)="closeGraffitiOptions()">
       <!-- Resaltar el graffiti seleccionado -->
-      <img [src]="environment.storageUrl + (selectedGraffiti.custom_image_path || selectedGraffiti.photo?.image_path)" 
+      <app-secure-image [url]="environment.secureStorageUrl + (selectedGraffiti.custom_image_path || selectedGraffiti.photo?.image_path)" 
            class="highlighted-graffiti"
            [style.left.px]="graffitiRect.left"
            [style.top.px]="graffitiRect.top"
@@ -2967,7 +2972,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     if (msg.mensaje && msg.mensaje.length > 20 && msg.mensaje.includes('data:audio')) {
       return msg.mensaje.replace('[AUDIO]', '');
     }
-    return this.environment.storageUrl + msg.photo?.image_path;
+    return this.environment.secureStorageUrl + msg.photo?.image_path;
   }
 
   getTotalGifts(inv: any): number {

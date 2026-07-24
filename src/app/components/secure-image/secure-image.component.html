@@ -1,0 +1,15 @@
+<div class="secure-image-container" [ngClass]="class">
+  <div *ngIf="loading" class="image-placeholder loading">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+  
+  <div *ngIf="error" class="image-placeholder error">
+    <ion-icon name="image-outline"></ion-icon>
+  </div>
+
+  <img *ngIf="!loading && !error && secureUrl" 
+       [src]="secureUrl" 
+       [alt]="alt" 
+       [class]="class"
+       style="opacity: 0; animation: fadeIn 0.3s ease forwards;" />
+</div>

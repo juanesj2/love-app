@@ -20,7 +20,7 @@ import { Keyboard } from '@capacitor/keyboard';
 import { Media } from '@capacitor-community/media';
 import { DotLottie } from '@lottiefiles/dotlottie-web';
 import confetti from 'canvas-confetti';
-
+import { SecureImageComponent } from '../../components/secure-image/secure-image.component';
 
 @Component({
   selector: 'app-photo-widget',
@@ -93,7 +93,7 @@ import confetti from 'canvas-confetti';
           <div class="photo-card" *ngFor="let photo of group.photos; let i = index" [attr.data-date]="group.date" #photoCards>
             
             <div class="image-wrapper">
-              <img [src]="environment.storageUrl + photo.image_path" class="main-photo" loading="lazy" (click)="openLightbox(photo)" style="cursor: pointer;" />
+              <app-secure-image [url]="environment.secureStorageUrl + photo.image_path" class="main-photo" (click)="openLightbox(photo)" style="cursor: pointer; display: block; height: 100%; width: 100%;"></app-secure-image>
               
               <div class="photo-overlay-bottom">
                 <div class="card-user-info">
@@ -170,7 +170,7 @@ import confetti from 'canvas-confetti';
           <!-- Recuerdo Destacado -->
           <div class="memory-highlight-container" *ngIf="highlightedMemory && !selectionMode && currentGalleryFilter === 'todas' && !currentAlbum" (click)="openLightbox(highlightedMemory)">
             <div class="memory-highlight">
-              <img [src]="environment.storageUrl + highlightedMemory.image_path" class="memory-bg" />
+              <app-secure-image [url]="environment.secureStorageUrl + highlightedMemory.image_path" class="memory-bg"></app-secure-image>
               <div class="memory-overlay">
                 <span class="memory-title">Recuerdo destacado</span>
                 <span class="memory-subtitle">{{ highlightedMemory.created_at | date:'longDate':'':'es-ES' }}</span>
@@ -193,7 +193,7 @@ import confetti from 'canvas-confetti';
                    (click)="openLightbox(photo)"
                    [class.selected]="selectedPhotos.has(photo.id)"
                    [class.large]="photo.isLarge">
-                <img [src]="environment.storageUrl + photo.image_path" class="grid-photo" loading="lazy" />
+                <app-secure-image [url]="environment.secureStorageUrl + photo.image_path" class="grid-photo"></app-secure-image>
                 <div class="selection-overlay" *ngIf="selectionMode">
                   <ion-icon name="checkmark-circle" *ngIf="selectedPhotos.has(photo.id)"></ion-icon>
                   <ion-icon name="ellipse-outline" *ngIf="!selectedPhotos.has(photo.id)"></ion-icon>
@@ -267,7 +267,7 @@ import confetti from 'canvas-confetti';
                  style="margin: auto; width: 100%; max-height: 90vh;">
               
               <div class="image-wrapper">
-                <img [src]="environment.storageUrl + photo.image_path" class="main-photo" loading="lazy" />
+                <app-secure-image [url]="environment.secureStorageUrl + photo.image_path" class="main-photo"></app-secure-image>
                 
                 <div class="photo-overlay-bottom">
                   <div class="card-user-info">
@@ -360,7 +360,8 @@ import confetti from 'canvas-confetti';
             </div>
             
             <div class="album-item" *ngFor="let album of albums" (click)="openAlbum(album)">
-              <div class="album-cover" [style.backgroundImage]="album.cover_image ? 'url(' + environment.storageUrl + album.cover_image + ')' : ''">
+              <div class="album-cover" style="position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; z-index: 1;">
+                <app-secure-image *ngIf="album.cover_image" [url]="environment.secureStorageUrl + album.cover_image" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;"></app-secure-image>
                 <ion-icon name="heart" *ngIf="!album.cover_image" style="color: white; font-size: 2rem;"></ion-icon>
                 <div class="change-cover-btn" (click)="changeAlbumCover(album.id, $event)">
                   <ion-icon name="camera"></ion-icon>
@@ -986,7 +987,7 @@ import confetti from 'canvas-confetti';
     :host-context(.night-owl-mode) .sheet-send-btn { background: linear-gradient(135deg, #a78bfa, #8b5cf6); }
   `],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule]
+  imports: [CommonModule, FormsModule, IonicModule, SecureImageComponent]
 })
 export class PhotoWidgetComponent implements OnInit {
   private api = inject(LoveApiService);
