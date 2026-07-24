@@ -195,16 +195,14 @@ export class InventoryModalComponent {
   public showSentGifts = false;
   public showReceivedGifts = true;
   public viewingGift = false;
-  public viewingLetter = false;
   public selectedGift: any = null;
-  public selectedLetter: any = null;
   
   @HostListener('document:ionBackButton', ['$event'])
   overrideHardwareBackAction(event: any) {
     if (this.viewingGift) {
       this.closeGiftView();
-    } else if (this.viewingLetter) {
-      this.closeLetterView();
+    } else if (this.showInteractiveLetter) {
+      this.showInteractiveLetter = false;
     } else {
       this.close.emit();
     }
