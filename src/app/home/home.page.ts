@@ -817,6 +817,12 @@ export class HomePage implements OnInit, OnDestroy {
       
       const data = await this.api.getCoupleInfo();
       
+      if (data.global_theme && data.global_theme !== 'default') {
+        document.body.setAttribute('data-global-theme', data.global_theme);
+      } else {
+        document.body.removeAttribute('data-global-theme');
+      }
+      
       if (data.my_mood) this.myMood = data.my_mood;
       if (data.partner_mood) this.partnerMood = data.partner_mood;
       if (data.my_avatar_frame || data.avatar_frame) this.myAvatarFrame = data.my_avatar_frame || data.avatar_frame || 'default';
@@ -837,8 +843,6 @@ export class HomePage implements OnInit, OnDestroy {
         // Clear previous subscriptions to avoid duplicate listeners
         this.subscriptions.forEach(s => s.unsubscribe());
         this.subscriptions = [];
-
-        // No need to listen to locations here just for the avatars anymore
       }
 
       // Leer logros siempre despues de getCoupleInfo (por si la suscripcion fue antes)

@@ -6,7 +6,7 @@ import { LoveApiService } from '../../../services/love-api.service';
 import { ToastController } from '@ionic/angular/standalone';
 import { IonIcon, IonToggle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, starOutline, eyeOutline, imageOutline, heart, closeCircle } from 'ionicons/icons';
+import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, starOutline, eyeOutline, imageOutline, heart, closeCircle, statsChartOutline, diamondOutline, giftOutline, timeOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-god-mode-modal',
@@ -23,9 +23,45 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
           <ion-icon name="flash-outline"></ion-icon>
           God Mode
         </h2>
-        <p class="subtitle">Diseña y lanza un evento global</p>
+        <p class="subtitle">Panel de Control Global</p>
+
+        <div class="god-tabs">
+          <button [class.active]="currentTab === 'events'" (click)="currentTab = 'events'">Eventos</button>
+          <button [class.active]="currentTab === 'powers'" (click)="currentTab = 'powers'">Poderes</button>
+          <button [class.active]="currentTab === 'stats'" (click)="loadGodStats(); currentTab = 'stats'">Stats</button>
+        </div>
 
         <div class="scrollable-form">
+          <div class="form-group recipient-box" style="position: relative;" *ngIf="currentTab === 'events' || currentTab === 'powers'">
+            <label class="feature-label">Destinatario</label>
+
+            <!-- Show selected user badge if one is selected -->
+            <div class="selected-user-badge" *ngIf="eventData.target_user_id" (click)="clearSelection()">
+              <span>{{ getSelectedUserName() }}</span>
+              <ion-icon name="close-circle"></ion-icon>
+            </div>
+
+            <!-- Search input, hidden when a user is selected (unless you want to change it) -->
+            <div class="search-container" *ngIf="!eventData.target_user_id">
+              <ion-icon name="search-outline" class="search-icon"></ion-icon>
+              <input type="text" [(ngModel)]="searchTerm" (input)="filterUsers(); showDropdown = true" (focus)="showDropdown = true" placeholder="Buscar por nombre o correo..." class="search-input">
+            </div>
+            
+            <div class="custom-dropdown" *ngIf="showDropdown && !eventData.target_user_id">
+              <div class="dropdown-item" *ngIf="currentTab === 'events'" (click)="selectUser(null)">
+                🌍 Todos (Global)
+              </div>
+              <div class="dropdown-item" *ngFor="let user of filteredUsers" (click)="selectUser(user.id)">
+                <div class="user-name">{{ user.name }}</div>
+                <div class="user-email">{{ user.email }}</div>
+              </div>
+              <div class="dropdown-empty" *ngIf="filteredUsers.length === 0">
+                No se encontraron usuarios
+              </div>
+            </div>
+          </div>
+
+          <ng-container *ngIf="currentTab === 'events'">
           <div class="presets-section">
             <div class="section-title">
               <ion-icon name="star-outline" style="color: #FF4D6D;"></ion-icon>
@@ -72,35 +108,6 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
               <button class="theme-pill" (click)="loadTheme('sorpresa')">
                 <span class="emoji">🎁</span> Sorpresita
               </button>
-            </div>
-          </div>
-
-          <div class="form-group recipient-box" style="position: relative;">
-            <label class="feature-label">Destinatario (Opcional)</label>
-
-            <!-- Show selected user badge if one is selected -->
-            <div class="selected-user-badge" *ngIf="eventData.target_user_id" (click)="clearSelection()">
-              <span>{{ getSelectedUserName() }}</span>
-              <ion-icon name="close-circle"></ion-icon>
-            </div>
-
-            <!-- Search input, hidden when a user is selected (unless you want to change it) -->
-            <div class="search-container" *ngIf="!eventData.target_user_id">
-              <ion-icon name="search-outline" class="search-icon"></ion-icon>
-              <input type="text" [(ngModel)]="searchTerm" (input)="filterUsers(); showDropdown = true" (focus)="showDropdown = true" placeholder="Buscar por nombre o correo..." class="search-input">
-            </div>
-            
-            <div class="custom-dropdown" *ngIf="showDropdown && !eventData.target_user_id">
-              <div class="dropdown-item" (click)="selectUser(null)">
-                🌍 Todos (Global)
-              </div>
-              <div class="dropdown-item" *ngFor="let user of filteredUsers" (click)="selectUser(user.id)">
-                <div class="user-name">{{ user.name }}</div>
-                <div class="user-email">{{ user.email }}</div>
-              </div>
-              <div class="dropdown-empty" *ngIf="filteredUsers.length === 0">
-                No se encontraron usuarios
-              </div>
             </div>
           </div>
 
@@ -187,6 +194,69 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
               DETENER ACTUAL
             </button>
           </div>
+          </ng-container>
+
+          <ng-container *ngIf="currentTab === 'powers'">
+             <div class="feature-box">
+                <div class="section-title"><ion-icon name="diamond-outline"></ion-icon> VIP Gratis</div>
+                <p class="subtitle" style="text-align: left; margin: 0 0 10px 0; font-size: 0.8rem;">Requiere seleccionar un destinatario arriba.</p>
+                <button class="action-btn btn-vip" (click)="grantPremium()"><ion-icon name="diamond-outline"></ion-icon> Dar Premium Eterno</button>
+             </div>
+             
+             <div class="feature-box">
+                <div class="section-title"><ion-icon name="gift-outline"></ion-icon> Lluvia de Regalos</div>
+                <select class="custom-select mb-2" [(ngModel)]="powerGiftType">
+                  <option value="all">Todo</option>
+                  <option value="teddy">Solo Ositos</option>
+                  <option value="rose">Solo Rosas</option>
+                  <option value="ring">Solo Anillos</option>
+                  <option value="letters">Solo Cartas</option>
+                </select>
+                <input type="number" [(ngModel)]="powerGiftAmount" placeholder="Cantidad (ej: 5)" class="small-input mb-2">
+                <button class="action-btn btn-gifts" (click)="grantGifts()"><ion-icon name="gift-outline"></ion-icon> Dar Regalos</button>
+             </div>
+             
+             <div class="feature-box">
+                <div class="section-title"><ion-icon name="time-outline"></ion-icon> Dios del Tiempo</div>
+                <input type="number" [(ngModel)]="powerStreak" placeholder="Días de racha (ej: 365)" class="small-input mb-2">
+                <button class="action-btn btn-time" (click)="setStreak()"><ion-icon name="time-outline"></ion-icon> Modificar Racha</button>
+             </div>
+             
+             <div class="feature-box">
+                <div class="section-title"><ion-icon name="color-palette-outline"></ion-icon> Forzar Tema</div>
+                <input type="text" [(ngModel)]="powerGlobalTheme" placeholder="ej: navidad, default..." class="small-input mb-2">
+                <button class="action-btn btn-theme" (click)="setGlobalTheme()"><ion-icon name="color-palette-outline"></ion-icon> Aplicar Tema Global</button>
+             </div>
+          </ng-container>
+
+          <ng-container *ngIf="currentTab === 'stats'">
+             <div class="stats-grid" *ngIf="godStats">
+               <div class="stat-card">
+                 <div class="stat-value">{{godStats.total_users}}</div>
+                 <div class="stat-label">Usuarios</div>
+               </div>
+               <div class="stat-card">
+                 <div class="stat-value">{{godStats.total_couples}}</div>
+                 <div class="stat-label">Parejas</div>
+               </div>
+               <div class="stat-card">
+                 <div class="stat-value">{{godStats.active_couples_today}}</div>
+                 <div class="stat-label">Activos Hoy</div>
+               </div>
+               <div class="stat-card">
+                 <div class="stat-value">{{godStats.total_messages}}</div>
+                 <div class="stat-label">Mensajes</div>
+               </div>
+               <div class="stat-card">
+                 <div class="stat-value">{{godStats.total_gifts}}</div>
+                 <div class="stat-label">Regalos dados</div>
+               </div>
+               <div class="stat-card" style="grid-column: span 2;">
+                 <div class="stat-label">Tema Global Actual: {{godStats.global_theme}}</div>
+               </div>
+             </div>
+             <div *ngIf="!godStats" style="text-align:center; padding: 20px;">Cargando estadísticas...</div>
+          </ng-container>
         </div>
       </div>
     </div>
@@ -264,6 +334,30 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
     .dropdown-empty { padding: 15px; text-align: center; color: #888; font-size: 0.9rem; }
     .selected-user-badge { display: inline-flex; align-items: center; gap: 8px; background: #FF4D6D; color: white; padding: 8px 14px; border-radius: 100px; font-size: 0.9rem; font-weight: 700; margin-top: 8px; cursor: pointer; transition: 0.2s; }
     .selected-user-badge:active { transform: scale(0.95); }
+
+    .god-tabs { display: flex; gap: 5px; margin-bottom: 15px; background: rgba(0,0,0,0.05); padding: 5px; border-radius: 12px; }
+    .god-tabs button { flex: 1; padding: 8px; border-radius: 8px; background: transparent; border: none; font-weight: bold; color: #666; transition: 0.2s; cursor: pointer; }
+    .god-tabs button.active { background: white; color: #FF4D6D; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    :host-context(.night-owl-mode) .god-tabs { background: rgba(255,255,255,0.05); }
+    :host-context(.night-owl-mode) .god-tabs button { color: #aaa; }
+    :host-context(.night-owl-mode) .god-tabs button.active { background: #333; color: #ff758f; }
+
+    .action-btn { color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .action-btn:active { transform: scale(0.95); }
+    .btn-vip { background: linear-gradient(135deg, #FFD700, #DAA520); text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+    .btn-gifts { background: linear-gradient(135deg, #FF4D6D, #c9184a); }
+    .btn-time { background: linear-gradient(135deg, #4da6ff, #1a75ff); }
+    .btn-theme { background: linear-gradient(135deg, #84fab0, #8fd3f4); color: #111; }
+    .mb-2 { margin-bottom: 10px; }
+    .custom-select { width: 100%; padding: 10px 12px; border: 2px solid #eee; border-radius: 12px; font-family: inherit; font-size: 0.95rem; background: #fdfdfd; box-sizing: border-box; color: #333; }
+
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat-card { background: #f8f9fa; border-radius: 16px; padding: 15px; text-align: center; border: 1px solid #eee; }
+    .stat-value { font-size: 1.8rem; font-weight: 900; color: #FF4D6D; margin-bottom: 5px; }
+    .stat-label { font-size: 0.8rem; color: #666; font-weight: 700; text-transform: uppercase; }
+    :host-context(.night-owl-mode) .stat-card { background: #25262b; border-color: #333; }
+    :host-context(.night-owl-mode) .custom-select { background: #25262b; border-color: #333; color: #fff; }
+    
     
     /* Night Mode Support */
     :host-context(.night-owl-mode) .modal-content { background: #1a1b1e; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
@@ -313,13 +407,20 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
     emojis_list: '',
     top_bar_color: '',
     duration_minutes: 0,
-    target_user_id: null
+    target_user_id: null as number | null
   };
   
+  public currentTab: 'events' | 'powers' | 'stats' = 'events';
+  public godStats: any = null;
+  public powerTargetEmail = '';
+  public powerGiftType = 'all';
+  public powerGiftAmount = 999;
+  public powerStreak = 365;
+  public powerGlobalTheme = 'default';
   public confettiColorsStr = '';
 
   constructor() {
-    addIcons({ closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, starOutline, eyeOutline, imageOutline, heart, closeCircle });
+    addIcons({ closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, starOutline, eyeOutline, imageOutline, heart, closeCircle, statsChartOutline, diamondOutline, giftOutline, timeOutline });
   }
 
   async ngOnInit() {
@@ -327,6 +428,12 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
     try {
       this.users = await this.loveApi.getAllUsers();
       this.filteredUsers = [...this.users];
+      
+      // Set default to myself
+      const info = await this.loveApi.getCoupleInfo();
+      if (info && info.my_id) {
+        this.eventData.target_user_id = Number(info.my_id);
+      }
     } catch (e) {
       console.error('Error loading users', e);
     }
@@ -353,8 +460,16 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
 
   getSelectedUserName() {
     if (!this.eventData.target_user_id) return '🌍 Todos (Global)';
-    const u = this.users.find(u => u.id === this.eventData.target_user_id);
+    const targetId = Number(this.eventData.target_user_id);
+    const u = this.users.find(u => Number(u.id) === targetId);
     return u ? u.name : 'Desconocido';
+  }
+
+  getSelectedUserEmail() {
+    if (!this.eventData.target_user_id) return undefined;
+    const targetId = Number(this.eventData.target_user_id);
+    const u = this.users.find(u => Number(u.id) === targetId);
+    return u ? u.email : undefined;
   }
 
   clearSelection() {
@@ -476,7 +591,7 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
     }
     const payload: any = { ...this.eventData, id: Math.floor(Math.random() * 1000000) };
     if (this.eventData.confetti_enabled && this.confettiColorsStr) {
-      payload.confetti_colors = this.confettiColorsStr.split(',').map(c => c.trim()).filter(c => c);
+      payload.confetti_colors = this.confettiColorsStr.split(',').map((c: string) => c.trim()).filter((c: string) => c);
     }
     
     localStorage.removeItem('dismissed_global_event_' + payload.id);
@@ -497,7 +612,7 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
     try {
       const payload: any = { ...this.eventData };
       if (this.eventData.confetti_enabled && this.confettiColorsStr) {
-        payload.confetti_colors = this.confettiColorsStr.split(',').map(c => c.trim()).filter(c => c);
+        payload.confetti_colors = this.confettiColorsStr.split(',').map((c: string) => c.trim()).filter((c: string) => c);
       }
       
       await this.globalEventService.triggerEvent(payload);
@@ -518,14 +633,68 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     try {
       await this.globalEventService.stopEvent();
-      const t = await this.toastCtrl.create({ message: 'Evento Detenido', duration: 3000, color: 'medium' });
+      const t = await this.toastCtrl.create({ message: 'Evento Global Detenido.', duration: 3000, color: 'medium' });
       t.present();
       this.close.emit();
-    } catch (e) {
-      const t = await this.toastCtrl.create({ message: 'Error al detener', duration: 3000, color: 'danger' });
+    } catch (e: any) {
+      const msg = e?.error?.error || 'Error al detener';
+      const t = await this.toastCtrl.create({ message: msg, duration: 3000, color: 'danger' });
       t.present();
     } finally {
       this.isLoading = false;
     }
+  }
+
+  // --- GOD MODE POWERS ---
+  async loadGodStats() {
+    try {
+      this.godStats = await this.loveApi.getGodStats();
+    } catch(e) { console.error(e); }
+  }
+
+  async grantPremium() {
+    try {
+      this.isLoading = true;
+      const targetEmail = this.getSelectedUserEmail();
+      if (!targetEmail) {
+        this.toastCtrl.create({ message: 'Por favor, selecciona un destinatario arriba.', duration: 3000, color: 'warning' }).then(t => t.present());
+        return;
+      }
+      const res = await this.loveApi.grantGodPremium(targetEmail);
+      this.toastCtrl.create({ message: res.message, duration: 3000, color: 'success' }).then(t => t.present());
+    } catch(e: any) {
+      this.toastCtrl.create({ message: 'Error: ' + (e.error?.error || e.message), duration: 3000, color: 'danger' }).then(t => t.present());
+    } finally { this.isLoading = false; }
+  }
+  
+  async grantGifts() {
+    try {
+      this.isLoading = true;
+      const emailParam = this.getSelectedUserEmail();
+      const res = await this.loveApi.grantGodGifts(this.powerGiftType, this.powerGiftAmount, emailParam);
+      this.toastCtrl.create({ message: res.message, duration: 3000, color: 'success' }).then(t => t.present());
+    } catch(e: any) {
+      this.toastCtrl.create({ message: 'Error: ' + (e.error?.error || e.message), duration: 3000, color: 'danger' }).then(t => t.present());
+    } finally { this.isLoading = false; }
+  }
+
+  async setStreak() {
+    try {
+      this.isLoading = true;
+      const res = await this.loveApi.setGodStreak(this.powerStreak);
+      this.toastCtrl.create({ message: res.message, duration: 3000, color: 'success' }).then(t => t.present());
+    } catch(e: any) {
+      this.toastCtrl.create({ message: 'Error: ' + (e.error?.error || e.message), duration: 3000, color: 'danger' }).then(t => t.present());
+    } finally { this.isLoading = false; }
+  }
+
+  async setGlobalTheme() {
+    try {
+      this.isLoading = true;
+      const res = await this.loveApi.setGodTheme(this.powerGlobalTheme);
+      this.toastCtrl.create({ message: res.message, duration: 3000, color: 'success' }).then(t => t.present());
+    } catch(e: any) {
+      this.toastCtrl.create({ message: 'Error: ' + (e.error?.error || e.message), duration: 3000, color: 'danger' }).then(t => t.present());
+    } finally { this.isLoading = false; }
   }
 }

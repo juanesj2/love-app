@@ -666,4 +666,27 @@ export class LoveApiService {
   async purchaseGlobalEvent(data: any): Promise<any> {
     return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/global-events/purchase`, data));
   }
+
+  // --- GOD MODE ENDPOINTS ---
+  async getGodStats(): Promise<any> {
+    return firstValueFrom(this.http.get<any>(`${API_BASE_URL}/love-album/god-mode/stats`));
+  }
+
+  async grantGodPremium(email: string): Promise<any> {
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/god-mode/grant-premium`, { email }));
+  }
+
+  async grantGodGifts(type: string, amount: number, email?: string): Promise<any> {
+    const body: any = { type, amount };
+    if (email) body.email = email;
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/god-mode/grant-gifts`, body));
+  }
+
+  async setGodStreak(streak: number): Promise<any> {
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/god-mode/set-streak`, { streak }));
+  }
+
+  async setGodTheme(theme: string): Promise<any> {
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/god-mode/set-theme`, { theme }));
+  }
 }
