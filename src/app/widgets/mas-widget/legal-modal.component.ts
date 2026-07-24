@@ -54,44 +54,47 @@ import { closeOutline } from 'ionicons/icons';
           
           <!-- CONTENIDO POLÍTICA DE PRIVACIDAD -->
           <div *ngIf="documentType === 'privacy'">
-            <p><strong>Juan Stiven Alcañiz Aullon</strong> opera esta aplicación. El uso de la Aplicación implica la aceptación de la recopilación y el uso de información de acuerdo con esta política (RGPD y Google Play).</p>
+            <p><strong>Juan Stiven Alcañiz Aullon</strong> (en adelante "el Desarrollador") opera la aplicación "Love Widget". Al usar nuestra app, usted acepta la recopilación y uso de información de acuerdo con esta política. Esta política está diseñada para cumplir con el RGPD (Europa), CCPA (California) y las estrictas normativas de privacidad de Google Play y Apple App Store.</p>
             
-            <h4 style="color: #590D22; margin-top: 15px;">1. Información Recopilada</h4>
+            <h4 style="color: #590D22; margin-top: 15px;">1. Datos Recopilados y Finalidad</h4>
             <ul>
-              <li><strong>Cuenta:</strong> Email, nombre y foto de perfil.</li>
-              <li><strong>Contenido generado:</strong> Fotos, audios y textos compartidos.</li>
-              <li><strong>Ubicación:</strong> Precisa y en segundo plano, estrictamente para compartirla en tiempo real con su pareja.</li>
-              <li><strong>Permisos:</strong> Cámara, micrófono, notificaciones push (Firebase) y almacenamiento.</li>
+              <li><strong>Cuenta:</strong> Email, nombre y foto de perfil (para identificarle ante su pareja).</li>
+              <li><strong>Contenido Generado:</strong> Textos, fotos, garabatos y audios enviados en el chat. Estos datos se procesan únicamente para entregarlos a su pareja vinculada.</li>
+              <li><strong>Ubicación en Segundo Plano (IMPORTANTE):</strong> La aplicación solicita acceso a su ubicación precisa y en segundo plano (incluso cuando la app está cerrada o no se está usando) <strong>estrictamente</strong> para actualizar su posición en el mapa en tiempo real y compartirla exclusivamente con su pareja vinculada. <strong>Nunca</strong> vendemos, alquilamos ni compartimos su historial de ubicaciones con terceros, anunciantes o agencias. Usted puede revocar este permiso en cualquier momento desde los ajustes de su dispositivo o activando el "Modo Fantasma" en la app.</li>
+              <li><strong>Información del Dispositivo:</strong> Tokens de notificaciones push (para enviarle avisos) y datos de diagnóstico anónimos en caso de errores técnicos.</li>
             </ul>
 
-            <h4 style="color: #590D22; margin-top: 15px;">2. Terceros</h4>
-            <p>Usamos Firebase para notificaciones y autenticación, y RevenueCat para gestionar suscripciones de Google Play Billing. No vendemos sus datos.</p>
+            <h4 style="color: #590D22; margin-top: 15px;">2. Proveedores de Terceros</h4>
+            <p>Utilizamos servicios de terceros que cumplen con normativas de privacidad internacionales: <strong>Firebase (Google)</strong> para autenticación y notificaciones push, <strong>RevenueCat</strong> para la gestión de suscripciones, y servidores propios seguros (AlwaysData) para alojar el contenido multimedia temporalmente. Ninguno de estos terceros tiene derecho a usar sus datos para fines publicitarios.</p>
 
-            <h4 style="color: #590D22; margin-top: 15px;">3. Eliminación de Datos</h4>
-            <p>Puede eliminar su cuenta y todos sus datos en Ajustes > "Eliminar mi Cuenta", enviando un correo a <strong>lovewidgetsupport@gmail.com</strong> o desde la web (enlace próximamente).</p>
+            <h4 style="color: #590D22; margin-top: 15px;">3. Retención y Eliminación de Datos</h4>
+            <p>Sus datos se retienen únicamente mientras su cuenta esté activa. Usted tiene el derecho absoluto de eliminar sus datos. Puede borrar su cuenta y todo su historial de ubicaciones y mensajes instantáneamente yendo a <strong>Ajustes > Eliminar mi Cuenta</strong>. Alternativamente, puede solicitar la eliminación escribiendo a <strong>lovewidgetsupport@gmail.com</strong>.</p>
             
-            <h4 style="color: #590D22; margin-top: 15px;">4. Contacto</h4>
-            <p>Para privacidad: lovewidgetsupport@gmail.com</p>
+            <h4 style="color: #590D22; margin-top: 15px;">4. Restricción de Edad</h4>
+            <p>La Aplicación no está dirigida a menores de 13 años (o la edad mínima legal en su país). No recopilamos conscientemente datos de menores. Si descubrimos que un menor nos ha proporcionado información, la eliminaremos inmediatamente.</p>
+
+            <h4 style="color: #590D22; margin-top: 15px;">5. Cambios en la Política y Contacto</h4>
+            <p>Nos reservamos el derecho a actualizar esta política. En caso de cambios sustanciales sobre el tratamiento de su ubicación, se le solicitará consentimiento nuevamente. Para cualquier consulta legal o de privacidad, contacte a: <strong>lovewidgetsupport@gmail.com</strong>.</p>
           </div>
 
           <!-- CONTENIDO TÉRMINOS Y CONDICIONES -->
           <div *ngIf="documentType === 'terms'">
-            <p>Al acceder o utilizar la Aplicación, usted acepta regirse por estos Términos.</p>
+            <p>Al acceder, descargar o utilizar "Love Widget", usted acepta estar legalmente vinculado por estos Términos y Condiciones. Si no está de acuerdo, no utilice la Aplicación.</p>
 
-            <h4 style="color: #590D22; margin-top: 15px;">1. Uso de la Aplicación</h4>
-            <p>Concedemos una licencia personal para vincularse con su pareja. Queda prohibido el acoso o contenido ilegal.</p>
+            <h4 style="color: #590D22; margin-top: 15px;">1. Uso Consentido y Prohibición de Acoso</h4>
+            <p>Esta aplicación está diseñada exclusivamente para su uso entre parejas u otras relaciones de <strong>mutuo consentimiento</strong>. Al vincular su cuenta con otro usuario, usted otorga permiso explícito para compartir su ubicación, estado del teléfono y mensajes.<br><br><strong>Queda estrictamente prohibido:</strong> Instalar la aplicación en el dispositivo de otra persona sin su conocimiento (Spyware/Stalking), acosar, amenazar o usar los datos de ubicación para fines maliciosos. El Desarrollador se reserva el derecho de bloquear inmediatamente cuentas que violen esta norma y reportarlas a las autoridades competentes si fuese necesario.</p>
 
-            <h4 style="color: #590D22; margin-top: 15px;">2. Compras In-App y Reembolsos</h4>
-            <p>Todas las compras (paquetes premium, créditos, etc.) se procesan de forma segura mediante Google Play o Apple App Store. Debido a la naturaleza digital inmediata de los artículos (bienes digitales), <strong>todas las ventas son definitivas y no se emitirán reembolsos</strong>, salvo que la ley local exija lo contrario o a discreción de la tienda de aplicaciones. Las suscripciones se renuevan automáticamente salvo cancelación 24h antes del fin del ciclo en su respectiva tienda.</p>
+            <h4 style="color: #590D22; margin-top: 15px;">2. Renuncia de Responsabilidad ("AS IS")</h4>
+            <p><strong>Limitación de Responsabilidad Legal:</strong> La aplicación se proporciona "TAL CUAL" y "SEGÚN DISPONIBILIDAD". El Desarrollador <strong>no se hace responsable</strong> de problemas personales, disputas de pareja, o consecuencias derivadas del uso o mala interpretación de la información mostrada en la app (como errores de GPS, retrasos en la ubicación, o mensajes no entregados). Usted utiliza la información de la aplicación bajo su propio riesgo.</p>
 
-            <h4 style="color: #590D22; margin-top: 15px;">3. Contenido</h4>
-            <p>Usted conserva los derechos sobre el contenido subido, y es el único responsable del mismo.</p>
+            <h4 style="color: #590D22; margin-top: 15px;">3. Compras, Suscripciones y Política de Reembolsos</h4>
+            <p>Las compras y suscripciones premium se gestionan a través de Apple App Store o Google Play Store. Debido a que el contenido digital premium se entrega inmediatamente tras la compra, <strong>todas las ventas son definitivas y no se emitirán reembolsos</strong> bajo ninguna circunstancia, excepto cuando sea requerido imperativamente por la ley local (ej. derecho de desistimiento de la UE, si aplica) o a discreción exclusiva de la tienda de aplicaciones. Es su responsabilidad cancelar suscripciones recurrentes al menos 24 horas antes de la renovación desde los ajustes de su teléfono.</p>
 
-            <h4 style="color: #590D22; margin-top: 15px;">4. Limitación de Responsabilidad</h4>
-            <p>La app se provee "TAL CUAL". No garantizamos precisión absoluta del GPS ni funcionamiento libre de errores.</p>
+            <h4 style="color: #590D22; margin-top: 15px;">4. Contenido del Usuario</h4>
+            <p>Usted conserva los derechos de propiedad intelectual sobre las fotos y textos que envíe. Sin embargo, usted es el único responsable legal de que dicho contenido no viole leyes de derechos de autor, no contenga material ilegal, extremista o no consensuado.</p>
 
-            <h4 style="color: #590D22; margin-top: 15px;">5. Contacto</h4>
-            <p>lovewidgetsupport@gmail.com</p>
+            <h4 style="color: #590D22; margin-top: 15px;">5. Jurisdicción y Contacto</h4>
+            <p>Estos Términos se regirán e interpretarán de acuerdo con las leyes aplicables al domicilio del Desarrollador (España). Para cualquier disputa o consulta, puede contactar a: <strong>lovewidgetsupport@gmail.com</strong>.</p>
           </div>
 
           <div style="margin-top: 20px;">
