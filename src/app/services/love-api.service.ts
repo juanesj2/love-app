@@ -7,6 +7,7 @@ import { firstValueFrom, BehaviorSubject, Subject, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
+import { clearAuthCache, setAuthCache } from '../interceptors/auth.interceptor';
 
 export const API_BASE_URL = environment.apiUrl;
 
@@ -115,6 +116,7 @@ export class LoveApiService {
     const res: any = await firstValueFrom(this.http.post(`${API_BASE_URL}/login`, { email, password }, { headers: { 'Accept': 'application/json' } }));
     const token = res?.access_token || res?.token;
     if (token) {
+      setAuthCache(token);
       await Preferences.set({ key: 'auth_token', value: token });
       SecureStoragePlugin.set({ key: 'auth_token', value: token }).catch(() => {}); // Don't await to prevent Android keystore hang
       this.token$.next(token);
@@ -139,6 +141,7 @@ export class LoveApiService {
     const res = response.data;
     const token = res?.access_token || res?.token;
     if (token) {
+      setAuthCache(token);
       await Preferences.set({ key: 'auth_token', value: token });
       SecureStoragePlugin.set({ key: 'auth_token', value: token }).catch(() => {}); // Don't await
       this.token$.next(token);
@@ -181,6 +184,7 @@ export class LoveApiService {
       await CapacitorCookies.clearAllCookies();
     } catch (e) {}
 
+    clearAuthCache();
     await Preferences.remove({ key: 'auth_token' });
     await Preferences.remove({ key: 'myUserId' });
     localStorage.removeItem('love_widget_user');

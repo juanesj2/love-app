@@ -7,6 +7,9 @@ import { switchMap, catchError } from 'rxjs/operators';
 let cachedToken: string | null | undefined = undefined;
 let tokenPromise: Promise<string | null> | null = null;
 
+export const clearAuthCache = () => { cachedToken = undefined; };
+export const setAuthCache = (token: string | null) => { cachedToken = token; };
+
 const getToken = async (): Promise<string | null> => {
   if (cachedToken !== undefined) {
     return cachedToken;
