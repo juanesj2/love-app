@@ -32,7 +32,7 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
   imports: [CommonModule, FormsModule, IonicModule, LetterSelectorModalComponent, InteractiveLetterComponent, GiftViewerComponent, StoreModalComponent, SecureImageComponent],
   template: `
     <div class="chat-wrapper" [style.background]="chatBackground || null" [ngClass]="'font-' + chatFont">
-      <ion-content class="messages-content" [style.--background]="chatBackground ? 'transparent' : null" #msgContainer [scrollEvents]="true" (ionScroll)="onScroll($event)">
+      <ion-content class="messages-content" [style.--background]="chatBackground ? 'transparent' : null" #msgContainer [scrollEvents]="true" (ionScroll)="onScroll($event)" (ionScrollStart)="onScrollStart()">
         <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)" [disabled]="isDoodling">
           <ion-refresher-content></ion-refresher-content>
         </ion-refresher>
@@ -221,9 +221,9 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
         </div>
 
         <!-- Unread Bubble -->
-        <div class="unread-bubble" *ngIf="unreadCount > 0" (click)="scrollToBottomAndClear()">
+        <div class="unread-bubble" *ngIf="isUserScrolledUp || unreadCount > 0" (click)="scrollToBottomAndClear()">
           <ion-icon name="chevron-down-outline"></ion-icon>
-          <span class="badge">{{unreadCount}}</span>
+          <span class="badge" *ngIf="unreadCount > 0">{{unreadCount}}</span>
         </div>
 
         <div class="reply-preview-container" *ngIf="replyingTo || isEditing">
@@ -1800,6 +1800,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   unreadCount = 0;
   isUserScrolledUp = false;
   private timeouts: any[] = [];
+  private forceScrollInterval: any = null;
 
   @ViewChild('doodleCanvas', { static: false }) doodleCanvas: any;
   @ViewChild('chatInput', { static: false }) chatInput: any;
@@ -2158,9 +2159,27 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.viewInitialized = true;
-    this.safeTimeout(() => this.scrollToBottom(false), 50);
-    this.safeTimeout(() => this.scrollToBottom(false), 300);
-    this.safeTimeout(() => this.scrollToBottom(false), 600);
+    this.enforceScrollToBottom();
+  }
+
+  enforceScrollToBottom() {
+    if (this.forceScrollInterval) clearInterval(this.forceScrollInterval);
+    let attempts = 0;
+    this.forceScrollInterval = setInterval(() => {
+      if (!this.isUserScrolledUp) {
+        this.scrollToBottom(false);
+      }
+      attempts++;
+      if (attempts >= 15) { // 3 seconds total
+        clearInterval(this.forceScrollInterval);
+      }
+    }, 200);
+  }
+
+  onScrollStart() {
+    if (this.forceScrollInterval) {
+      clearInterval(this.forceScrollInterval);
+    }
   }
 
   scrollToBottom(animated: boolean = true): void {
