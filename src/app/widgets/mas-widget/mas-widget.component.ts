@@ -1497,8 +1497,8 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
   async confirmDeleteAccount() {
     this.showConfirm(
-      '¿ELIMINAR CUENTA?',
-      'Esta acción es IRREVERSIBLE. Se borrarán todos tus datos y PERDERÁS PARA SIEMPRE tus paquetes premium o compras in-app (no son reembolsables ni transferibles). ¿Estás absolutamente seguro?',
+      '¿ELIMINAR CUENTA DE FORMA DEFINITIVA?',
+      'Esta acción es IRREVERSIBLE. Se borrarán físicamente TODOS tus datos, PERDERÁS para siempre tus compras in-app, y ADEMÁS, se borrará todo el historial de chat y todas las fotos para tu pareja (dado que la relación dejará de existir). ¿Estás absolutamente seguro de querer borrarlo todo?',
       async () => {
         await this.api.deleteAccount();
         await this.api.logout();
