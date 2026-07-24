@@ -2157,6 +2157,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     }
   }
 
+  isEnforcingScroll = false;
+
   ngAfterViewInit() {
     this.viewInitialized = true;
     this.enforceScrollToBottom();
@@ -2165,21 +2167,22 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   enforceScrollToBottom() {
     if (this.forceScrollInterval) clearInterval(this.forceScrollInterval);
     let attempts = 0;
+    this.isEnforcingScroll = true;
     this.forceScrollInterval = setInterval(() => {
-      if (!this.isUserScrolledUp) {
-        this.scrollToBottom(false);
-      }
+      this.scrollToBottom(false);
       attempts++;
       if (attempts >= 15) { // 3 seconds total
         clearInterval(this.forceScrollInterval);
+        this.isEnforcingScroll = false;
+        // Check real position after enforcing
+        if (this.msgContainer) {
+          this.msgContainer.getScrollElement().then((el: any) => {
+             const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+             this.isUserScrolledUp = distanceFromBottom > 100;
+          });
+        }
       }
     }, 200);
-  }
-
-  onScrollStart() {
-    if (this.forceScrollInterval) {
-      clearInterval(this.forceScrollInterval);
-    }
   }
 
   scrollToBottom(animated: boolean = true): void {
@@ -2277,6 +2280,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   async onScroll(event: any) {
+    if (this.isEnforcingScroll) return;
+    
     if (!this.msgContainer) return;
     const scrollElement = await this.msgContainer.getScrollElement();
     if (!scrollElement) return;
