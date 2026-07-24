@@ -17,7 +17,9 @@ import { GiftViewerComponent } from '../gift-viewer/gift-viewer.component';
         <!-- Lottie gift box -->
         <div class="lottie-wrapper" (click)="playAndOpen()">
           <canvas #lottieCanvas width="300" height="300"></canvas>
-          <div class="tap-hint" [class.fade]="isPlaying">🎁 Toca para abrir tu sorpresa</div>
+          <div class="tap-hint" [class.fade]="isPlaying">
+            {{ isAdminGift ? '🎁 Te has portado muy bien, un admin te ha hecho un regalo' : '🎁 Toca para abrir tu sorpresa' }}
+          </div>
         </div>
 
       </div>
@@ -27,11 +29,22 @@ import { GiftViewerComponent } from '../gift-viewer/gift-viewer.component';
     <div class="gift-global-overlay" *ngIf="isOpened">
       <div class="gift-content-container" (click)="$event.stopPropagation()">
         <div class="gift-box-opened">
-          <h2>¡Has recibido un regalo virtual!</h2>
-          <img [src]="getGiftImageUrl(pendingMsg)" alt="gift" style="width: 200px; height: 200px; object-fit: contain;" />
-          <div class="gift-message" *ngIf="pendingMsg?.meta?.message">
-            <p class="gift-message-text">"{{ pendingMsg.meta.message }}"</p>
-          </div>
+          <h2 *ngIf="!isAdminGift">¡Has recibido un regalo virtual!</h2>
+          <h2 *ngIf="isAdminGift">¡Regalo del Administrador!</h2>
+          
+          <ng-container *ngIf="!isAdminGift">
+            <img [src]="getGiftImageUrl(pendingMsg)" alt="gift" style="width: 200px; height: 200px; object-fit: contain;" />
+            <div class="gift-message" *ngIf="pendingMsg?.meta?.message">
+              <p class="gift-message-text">"{{ pendingMsg.meta.message }}"</p>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="isAdminGift">
+            <img src="assets/gifts/box.png" alt="admin-gift" style="width: 150px; height: 150px; object-fit: contain;" />
+            <div class="gift-message">
+              <p class="gift-message-text" style="font-weight: 700; color: #d00000;">Has recibido:<br/> {{ adminGiftText }}</p>
+            </div>
+          </ng-container>
         </div>
         <button class="close-btn" (click)="closeOverlay()">Guardar en el inventario 🎁</button>
       </div>
@@ -139,6 +152,22 @@ export class PendingGiftOverlayComponent implements OnInit, OnDestroy, AfterView
   isPlaying = false;
   private sub?: Subscription;
 
+  get isAdminGift(): boolean {
+    return this.pendingMsg?.mensaje === '[ADMIN_GIFT]';
+  }
+
+  get adminGiftText(): string {
+    if (!this.isAdminGift || !this.pendingMsg?.meta?.gifts) return '';
+    const gifts = this.pendingMsg.meta.gifts;
+    const amount = gifts.amount || 1;
+    if (gifts.type === 'all') {
+      return `${amount} rosa(s), ${amount} anillo(s) y ${amount} oso(s)`;
+    } else {
+      const typeName = gifts.type === 'rose' ? 'rosa(s)' : gifts.type === 'ring' ? 'anillo(s)' : 'oso(s)';
+      return `${amount} ${typeName}`;
+    }
+  }
+
   getGiftImageUrl(msg: any): string {
     if (!msg?.meta?.opened) {
       return 'assets/gifts/box.png';
@@ -183,7 +212,7 @@ export class PendingGiftOverlayComponent implements OnInit, OnDestroy, AfterView
         autoplay: false,
         loop: false,
         canvas: this.lottieCanvas.nativeElement,
-        src: 'assets/lottie/gift-box.lottie'
+        src: this.isAdminGift ? 'assets/lottie/Admin_giftt.lottie' : 'assets/lottie/gift-box.lottie'
       });
     }
   }

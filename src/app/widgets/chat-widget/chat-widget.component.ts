@@ -111,7 +111,7 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
                       </div>
                     </div>
 
-                    <p class="text" *ngIf="msg.mensaje && msg.mensaje !== 'null' && !msg.mensaje.startsWith('[GIF]') && !msg.mensaje.startsWith('[DOODLE]') && !msg.mensaje.startsWith('[AUDIO]') && !msg.mensaje.startsWith('[GIFT]') && !msg.mensaje.startsWith('[LETTER]')">
+                    <p class="text" *ngIf="msg.mensaje && msg.mensaje !== 'null' && !msg.mensaje.startsWith('[GIF]') && !msg.mensaje.startsWith('[DOODLE]') && !msg.mensaje.startsWith('[AUDIO]') && !msg.mensaje.startsWith('[GIFT]') && !msg.mensaje.startsWith('[LETTER]') && !msg.mensaje.startsWith('[ADMIN_GIFT]')">
                       {{msg.mensaje}}
                       <span class="edited-label" *ngIf="msg.is_edited">(editado)</span>
                     </p>
@@ -119,6 +119,12 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
                       <div class="gift-box" [class.opened]="msg.meta?.opened">
                         <img class="gift-icon-img" [src]="getGiftImageUrl(msg)" alt="gift" />
                         <span class="gift-text">{{ msg.meta?.opened ? 'Regalo Abierto' : 'Regalo Sorpresa (Toca para abrir)' }}</span>
+                      </div>
+                    </div>
+                    <div class="gift-reply" *ngIf="msg.mensaje && msg.mensaje.startsWith('[ADMIN_GIFT]')" (click)="openGiftOrLetter(msg)">
+                      <div class="gift-box" [class.opened]="msg.meta?.opened" style="border: 2px dashed #d00000; background: #fff0f0;">
+                        <img class="gift-icon-img" src="assets/gifts/box.png" alt="admin-gift" />
+                        <span class="gift-text" style="color: #d00000; font-weight: bold;">{{ msg.meta?.opened ? 'Regalo del Administrador' : '🎁 Regalo del Administrador 🎁' }}</span>
                       </div>
                     </div>
                     <div class="letter-reply" *ngIf="msg.mensaje && msg.mensaje.startsWith('[LETTER]')" (click)="openGiftOrLetter(msg)">

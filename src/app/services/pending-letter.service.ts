@@ -57,7 +57,7 @@ export class PendingLetterService {
       if (unread) {
         if (unread.mensaje.startsWith('[LETTER]')) {
            this.pendingLetter$.next(unread);
-        } else if (unread.mensaje.startsWith('[GIFT]')) {
+        } else if (unread.mensaje.startsWith('[GIFT]') || unread.mensaje.startsWith('[ADMIN_GIFT]')) {
            this.pendingGift$.next(unread);
         }
       }
@@ -79,11 +79,11 @@ export class PendingLetterService {
       const messages: any[] = await this.api.getChatMessages();
       
       const surprises = messages.filter(msg => 
-         msg.mensaje?.startsWith('[LETTER]') || msg.mensaje?.startsWith('[GIFT]')
+         msg.mensaje?.startsWith('[LETTER]') || msg.mensaje?.startsWith('[GIFT]') || msg.mensaje?.startsWith('[ADMIN_GIFT]')
       );
 
       const unreadPartnerSurprises = surprises.filter(msg =>
-        Number(msg.user_id) !== Number(this.myId) &&
+        (Number(msg.user_id) !== Number(this.myId) || msg.mensaje?.startsWith('[ADMIN_GIFT]')) &&
         !msg.meta?.opened
       );
 
