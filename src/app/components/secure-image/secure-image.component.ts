@@ -16,6 +16,7 @@ import { IonicModule } from '@ionic/angular';
 export class SecureImageComponent implements OnInit, OnChanges, OnDestroy {
   @Input() url!: string;
   @Input() alt: string = '';
+  @Input() objectFit: 'cover' | 'contain' | 'inherit' = 'cover';
   
   public secureUrl: SafeUrl | null = null;
   public loading: boolean = true;

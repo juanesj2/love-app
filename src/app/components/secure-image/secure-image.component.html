@@ -9,5 +9,6 @@
 
   <img *ngIf="!loading && !error && secureUrl" 
        [src]="secureUrl" 
-       [alt]="alt" />
+       [alt]="alt"
+       [style.object-fit]="objectFit" />
 </div>
