@@ -41,7 +41,7 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
         <div class="message-row" *ngFor="let msg of regularMessages; trackBy: trackByMsgId" [id]="'msg-' + msg.id">
           <!-- Graffitis anclados a este mensaje -->
           <ng-container *ngIf="graffitisByAnchorId[msg.id]">
-            <ng-container *ngFor="let graf of graffitisByAnchorId[msg.id]">
+            <ng-container *ngFor="let graf of graffitisByAnchorId[msg.id]; trackBy: trackByMsgId">
               <app-secure-image *ngIf="!hiddenGraffitis[graf.id]"
                    [url]="environment.secureStorageUrl + (graf.custom_image_path || graf.photo?.image_path)" 
                    [objectFit]="'contain'"
