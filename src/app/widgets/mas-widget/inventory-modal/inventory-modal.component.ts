@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Output, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonIcon } from '@ionic/angular/standalone';
+import { IonIcon, IonModal } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { closeOutline, gift, mail, lockClosed, chevronUp, chevronDown } from 'ionicons/icons';
 import { LoveApiService } from '../../../services/love-api.service';
@@ -10,9 +10,11 @@ import { InteractiveLetterComponent } from '../../../components/interactive-lett
 @Component({
   selector: 'app-inventory-modal',
   standalone: true,
-  imports: [CommonModule, IonIcon, GiftViewerComponent, InteractiveLetterComponent],
+  imports: [CommonModule, IonIcon, IonModal, GiftViewerComponent, InteractiveLetterComponent],
   template: `
-    <div class="overlay" (click)="close.emit()">
+    <ion-modal [isOpen]="true" (didDismiss)="close.emit()" class="transparent-modal">
+      <ng-template>
+        <div class="overlay" (click)="close.emit()">
       <div class="modal-sheet" (click)="$event.stopPropagation()">
         <button class="close-btn" (click)="close.emit()">
           <ion-icon name="close-outline"></ion-icon>
@@ -147,15 +149,18 @@ import { InteractiveLetterComponent } from '../../../components/interactive-lett
     </div>
     
     <!-- Componente para visualizar la carta de manera independiente -->
-    <app-interactive-letter
-      *ngIf="showInteractiveLetter"
-      [letterData]="interactiveLetterData"
-      [forceOpen]="true"
-      (close)="showInteractiveLetter = false"
-      style="z-index: 10005; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;">
-    </app-interactive-letter>
+      <app-interactive-letter
+        *ngIf="showInteractiveLetter"
+        [letterData]="interactiveLetterData"
+        [forceOpen]="true"
+        (close)="showInteractiveLetter = false"
+        style="z-index: 10005; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;">
+      </app-interactive-letter>
+      </ng-template>
+    </ion-modal>
   `,
   styles: [`
+      ::ng-deep .transparent-modal { --background: transparent; --box-shadow: none; --backdrop-opacity: 0; }
       .overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 10000; display: flex; flex-direction: column; padding: calc(env(safe-area-inset-top, 20px) + 20px) 20px 20px; align-items: center; overflow-y: auto; animation: fadeIn 0.3s; }
       .modal-sheet { margin: auto 0; background: #fdf2f4; width: 100%; max-width: 400px; border-radius: 30px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); animation: slideUp 0.35s cubic-bezier(0.175, 0.885, 0.32, 1); position: relative; max-height: 85vh; overflow-y: auto; }
     .close-btn { position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; border-radius: 50%; background: white; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #590D22; box-shadow: 0 4px 15px rgba(0,0,0,0.08); cursor: pointer; z-index: 100; }
