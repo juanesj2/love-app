@@ -12,7 +12,7 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
 @Component({
   selector: 'app-god-mode-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonIcon, IonToggle],
+  imports: [CommonModule, FormsModule, IonIcon, IonToggle, LetterFormModalComponent],
   template: `
     <div class="custom-overlay" (click)="close.emit()">
       <div class="modal-content glass-card" (click)="$event.stopPropagation()">
@@ -260,6 +260,13 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
           </ng-container>
         </div>
       </div>
+      
+      <!-- Letter Form Modal -->
+      <app-letter-form-modal 
+        *ngIf="showLetterForm" 
+        (close)="showLetterForm = false" 
+        (save)="onGodLetterSave($event)">
+      </app-letter-form-modal>
     </div>
   `,
   styles: [`
@@ -669,27 +676,46 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
     } finally { this.isLoading = false; }
   }
   
+  public showLetterForm = false;
+
   onGiftTypeChange() {
     if (this.powerGiftType === 'letters') {
       this.powerGiftAmount = 1;
     }
   }
 
-  async grantGifts() {
+  grantGifts() {
+    if (this.powerGiftType === 'letters') {
+      this.showLetterForm = true;
+    } else {
+      this.processGrantGifts();
+    }
+  }
+
+  async onGodLetterSave(data: {title: string, subject: string, content: string}) {
+    this.showLetterForm = false;
+    await this.processGrantGifts(data);
+  }
+
+  async processGrantGifts(letterData?: {title: string, subject: string, content: string}) {
     try {
       this.isLoading = true;
       const emailParam = this.getSelectedUserEmail();
       const amount = this.powerGiftType === 'letters' ? 1 : this.powerGiftAmount;
-      const res = await this.loveApi.grantGodGifts(this.powerGiftType, amount, emailParam);
-      this.toastCtrl.create({ message: res.message, duration: 3000, color: 'success' }).then(t => t.present());
       
-      if (this.powerGiftType === 'letters') {
-        const modal = await this.modalCtrl.create({
-          component: LetterFormModalComponent,
-          cssClass: 'glass-modal'
-        });
-        await modal.present();
+      const payload: any = { type: this.powerGiftType, amount };
+      if (emailParam) payload.email = emailParam;
+      if (letterData) {
+        payload.title = letterData.title;
+        payload.subject = letterData.subject;
+        payload.content = letterData.content;
       }
+
+      // We need to bypass loveApi.grantGodGifts parameters if we want to pass letter data easily.
+      // Wait, let's just use loveApi.post directly for this special case, or modify grantGodGifts.
+      // The fastest is calling the API directly here since it's God Mode.
+      const res = await import('rxjs').then(m => m.firstValueFrom(this.loveApi['http'].post<any>(`https://j2api.alwaysdata.net/api/love-album/god-mode/grant-gifts`, payload)));
+      this.toastCtrl.create({ message: res.message, duration: 3000, color: 'success' }).then(t => t.present());
     } catch(e: any) {
       this.toastCtrl.create({ message: 'Error: ' + (e.error?.error || e.message), duration: 3000, color: 'danger' }).then(t => t.present());
     } finally { this.isLoading = false; }
