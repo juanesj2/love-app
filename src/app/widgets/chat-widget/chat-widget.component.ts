@@ -765,6 +765,7 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
         content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
         background: linear-gradient(to right, transparent, rgba(255,255,255,0.8), transparent);
         transform: skewX(-25deg); animation: letterShimmer 3s infinite;
+        pointer-events: none;
       }
       .gift-box.opened { border: 2px dashed #d0a5f5; background: rgba(255,255,255,0.8); box-shadow: none; animation: none; }
       .gift-box.opened::before { display: none; }
@@ -784,6 +785,7 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
         content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
         background: linear-gradient(to right, transparent, rgba(255,255,255,0.8), transparent);
         transform: skewX(-25deg); animation: letterShimmer 3s infinite;
+        pointer-events: none;
       }
       .letter-box:active { transform: scale(0.95); }
       .letter-box.opened { 
