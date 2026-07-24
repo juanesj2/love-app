@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GlobalEventService } from '../../../services/global-event.service';
 import { LoveApiService } from '../../../services/love-api.service';
-import { ToastController } from '@ionic/angular/standalone';
+import { ToastController, ModalController } from '@ionic/angular/standalone';
 import { IonIcon, IonToggle } from '@ionic/angular/standalone';
+import { LetterFormModalComponent } from '../../../components/letter-form-modal/letter-form-modal.component';
 import { addIcons } from 'ionicons';
 import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, starOutline, eyeOutline, imageOutline, heart, closeCircle, statsChartOutline, diamondOutline, giftOutline, timeOutline } from 'ionicons/icons';
 
@@ -205,14 +206,14 @@ import { closeOutline, flashOutline, stopCircleOutline, colorPaletteOutline, sta
              
              <div class="feature-box">
                 <div class="section-title"><ion-icon name="gift-outline"></ion-icon> Lluvia de Regalos</div>
-                <select class="custom-select mb-2" [(ngModel)]="powerGiftType">
+                <select class="custom-select mb-2" [(ngModel)]="powerGiftType" (ngModelChange)="onGiftTypeChange()">
                   <option value="all">Todo</option>
                   <option value="teddy">Solo Ositos</option>
                   <option value="rose">Solo Rosas</option>
                   <option value="ring">Solo Anillos</option>
                   <option value="letters">Solo Cartas</option>
                 </select>
-                <input type="number" [(ngModel)]="powerGiftAmount" placeholder="Cantidad (ej: 5)" class="small-input mb-2">
+                <input type="number" [(ngModel)]="powerGiftAmount" placeholder="Cantidad (ej: 5)" class="small-input mb-2" [disabled]="powerGiftType === 'letters'">
                 <button class="action-btn btn-gifts" (click)="grantGifts()"><ion-icon name="gift-outline"></ion-icon> Dar Regalos</button>
              </div>
              
@@ -392,6 +393,7 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
   private globalEventService = inject(GlobalEventService);
   private loveApi = inject(LoveApiService);
   private toastCtrl = inject(ToastController);
+  private modalCtrl = inject(ModalController);
 
   public isLoading = false;
   public users: any[] = [];
@@ -667,12 +669,27 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
     } finally { this.isLoading = false; }
   }
   
+  onGiftTypeChange() {
+    if (this.powerGiftType === 'letters') {
+      this.powerGiftAmount = 1;
+    }
+  }
+
   async grantGifts() {
     try {
       this.isLoading = true;
       const emailParam = this.getSelectedUserEmail();
-      const res = await this.loveApi.grantGodGifts(this.powerGiftType, this.powerGiftAmount, emailParam);
+      const amount = this.powerGiftType === 'letters' ? 1 : this.powerGiftAmount;
+      const res = await this.loveApi.grantGodGifts(this.powerGiftType, amount, emailParam);
       this.toastCtrl.create({ message: res.message, duration: 3000, color: 'success' }).then(t => t.present());
+      
+      if (this.powerGiftType === 'letters') {
+        const modal = await this.modalCtrl.create({
+          component: LetterFormModalComponent,
+          cssClass: 'glass-modal'
+        });
+        await modal.present();
+      }
     } catch(e: any) {
       this.toastCtrl.create({ message: 'Error: ' + (e.error?.error || e.message), duration: 3000, color: 'danger' }).then(t => t.present());
     } finally { this.isLoading = false; }
