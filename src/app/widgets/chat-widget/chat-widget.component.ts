@@ -45,6 +45,7 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
               <app-secure-image *ngIf="!hiddenGraffitis[graf.id]"
                    [url]="environment.secureStorageUrl + (graf.custom_image_path || graf.photo?.image_path)" 
                    [objectFit]="'contain'"
+                   [showPlaceholder]="false"
                    class="graffiti-overlay" 
                    (touchstart)="startGraffitiPress(graf, $event)"
                    (touchmove)="moveGraffitiPress($event)"
@@ -131,7 +132,7 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
                     </div>
                     <div class="doodle-reply" *ngIf="msg.mensaje && msg.mensaje.startsWith('[DOODLE]')">
                       <div class="photo-container" style="display: block; width: 100%; height: 100%; position: relative; min-height: 200px;">
-                        <app-secure-image [url]="environment.secureStorageUrl + msg.photo?.image_path" [objectFit]="'contain'" class="chat-doodle"></app-secure-image>
+                        <app-secure-image [url]="environment.secureStorageUrl + msg.photo?.image_path" [objectFit]="'contain'" [showPlaceholder]="false" class="chat-doodle"></app-secure-image>
                       </div>
                     </div>
                     <div class="audio-reply" *ngIf="msg.mensaje && msg.mensaje.startsWith('[AUDIO]')">
@@ -388,6 +389,7 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
       <!-- Resaltar el graffiti seleccionado -->
       <app-secure-image [url]="environment.secureStorageUrl + (selectedGraffiti.custom_image_path || selectedGraffiti.photo?.image_path)" 
            [objectFit]="'contain'"
+           [showPlaceholder]="false"
            class="highlighted-graffiti"
            [style.left.px]="graffitiRect.left"
            [style.top.px]="graffitiRect.top"

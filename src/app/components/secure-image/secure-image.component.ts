@@ -17,6 +17,7 @@ export class SecureImageComponent implements OnInit, OnChanges, OnDestroy {
   @Input() url!: string;
   @Input() alt: string = '';
   @Input() objectFit: 'cover' | 'contain' | 'inherit' = 'cover';
+  @Input() showPlaceholder: boolean = true;
   
   public secureUrl: SafeUrl | null = null;
   public loading: boolean = true;

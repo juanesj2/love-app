@@ -1,9 +1,9 @@
 <div class="secure-image-container">
-  <div *ngIf="loading" class="image-placeholder loading">
+  <div *ngIf="loading && showPlaceholder" class="image-placeholder loading">
     <ion-spinner name="crescent"></ion-spinner>
   </div>
   
-  <div *ngIf="error" class="image-placeholder error">
+  <div *ngIf="error && showPlaceholder" class="image-placeholder error">
     <ion-icon name="image-outline"></ion-icon>
   </div>
 
