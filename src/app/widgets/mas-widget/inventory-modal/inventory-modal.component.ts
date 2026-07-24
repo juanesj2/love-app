@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, inject, HostListener } from '@angular/core';
+import { Component, EventEmitter, Output, inject, HostListener, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonIcon, IonModal } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -12,11 +12,11 @@ import { InteractiveLetterComponent } from '../../../components/interactive-lett
   standalone: true,
   imports: [CommonModule, IonIcon, IonModal, GiftViewerComponent, InteractiveLetterComponent],
   template: `
-    <ion-modal [isOpen]="true" (didDismiss)="close.emit()" class="transparent-modal">
+    <ion-modal #modal [isOpen]="true" (didDismiss)="close.emit()" class="transparent-modal">
       <ng-template>
-        <div class="overlay" (click)="close.emit()">
+        <div class="overlay" (click)="modal.dismiss()">
       <div class="modal-sheet" (click)="$event.stopPropagation()">
-        <button class="close-btn" (click)="close.emit()">
+        <button class="close-btn" (click)="modal.dismiss()">
           <ion-icon name="close-outline"></ion-icon>
         </button>
         
@@ -195,7 +195,9 @@ import { InteractiveLetterComponent } from '../../../components/interactive-lett
 })
 export class InventoryModalComponent {
   @Output() close = new EventEmitter<void>();
-  public api = inject(LoveApiService);
+  api = inject(LoveApiService);
+  
+  @ViewChild('modal') modal!: IonModal;
   public showLetters = false;
   public showSentGifts = false;
   public showReceivedGifts = true;
@@ -209,7 +211,11 @@ export class InventoryModalComponent {
     } else if (this.showInteractiveLetter) {
       this.showInteractiveLetter = false;
     } else {
-      this.close.emit();
+      if (this.modal) {
+        this.modal.dismiss();
+      } else {
+        this.close.emit();
+      }
     }
     
     // Detener propagación para que no cierre la app si estamos en root
