@@ -10,6 +10,7 @@ drawable logo
 drawable splash
 drawable widget_album
 drawable widget_background
+drawable widget_bg_counter
 drawable widget_foto_diaria
 drawable widget_mapa
 drawable widget_tiempo_juntos
@@ -24,9 +25,6 @@ id widget_ghost_title
 id widget_map_bg
 id widget_photo_large
 id widget_photo_title
-id widget_poke_icon
-id widget_poke_root
-id widget_poke_text
 id widget_root
 id widget_time
 id widget_title
@@ -35,7 +33,6 @@ layout widget_counter_1x1
 layout widget_counter_photo
 layout widget_daily_photo
 layout widget_layout
-layout widget_poke
 mipmap ic_launcher
 mipmap ic_launcher_background
 mipmap ic_launcher_foreground
@@ -57,7 +54,6 @@ string widget_counter_1x1_label
 string widget_counter_photo_label
 string widget_daily_photo_label
 string widget_love_label
-string widget_poke_label
 style AppTheme
 style AppTheme.NoActionBar
 style AppTheme.NoActionBarLaunch
@@ -67,4 +63,3 @@ xml widget_counter_1x1_info
 xml widget_counter_photo_info
 xml widget_daily_photo_info
 xml widget_info
-xml widget_poke_info

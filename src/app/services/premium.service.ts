@@ -176,6 +176,31 @@ export class PremiumService {
     }
   }
 
+  async purchaseConsumable(productId: string): Promise<{success: boolean, error?: any}> {
+    if (!this.platform.is('hybrid')) {
+      const confirmPurchase = confirm(`Estás en la web (modo simulado). ¿Seguro que quieres "comprar" el producto ${productId}?`);
+      if (!confirmPurchase) return { success: false, error: { userCancelled: true } };
+      return { success: true };
+    }
+
+    try {
+      // 1. Obtener el producto de las tiendas
+      const productsInfo = await (Purchases as any).getProducts({ productIdentifiers: [productId] });
+      if (!productsInfo || productsInfo.length === 0) {
+        return { success: false, error: { message: `Producto ${productId} no encontrado en RevenueCat/Google Play` } };
+      }
+
+      // 2. Realizar la compra usando purchaseStoreProduct (método para consumibles)
+      const purchaseResult = await (Purchases as any).purchaseStoreProduct({ product: productsInfo[0] });
+      
+      // Si no ha lanzado excepción, la compra nativa fue exitosa.
+      return { success: true };
+    } catch (e: any) {
+      console.error('Error comprando consumible:', e);
+      return { success: false, error: e };
+    }
+  }
+
   async restorePurchases(): Promise<boolean> {
     if (!this.platform.is('hybrid')) return false;
 

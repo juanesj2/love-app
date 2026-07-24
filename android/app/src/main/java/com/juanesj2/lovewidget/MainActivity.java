@@ -8,6 +8,31 @@ import androidx.work.WorkManager;
 public class MainActivity extends BridgeActivity {
     
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        
+        // Unlock high refresh rate (90Hz / 120Hz etc) if supported
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            android.view.Window window = getWindow();
+            android.view.WindowManager.LayoutParams layoutParams = window.getAttributes();
+            
+            android.view.Display.Mode[] modes = getWindowManager().getDefaultDisplay().getSupportedModes();
+            int bestModeId = 0;
+            float maxRefreshRate = 0;
+            for (android.view.Display.Mode mode : modes) {
+                if (mode.getRefreshRate() > maxRefreshRate) {
+                    maxRefreshRate = mode.getRefreshRate();
+                    bestModeId = mode.getModeId();
+                }
+            }
+            if (bestModeId != 0) {
+                layoutParams.preferredDisplayModeId = bestModeId;
+                window.setAttributes(layoutParams);
+            }
+        }
+    }
+    
+    @Override
     public void onResume() {
         super.onResume();
         handleWidgetIntent();

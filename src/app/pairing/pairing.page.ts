@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonIcon, ToastController } from '@ionic/angular/standalone';
@@ -14,7 +14,7 @@ import { LoveApiService } from '../services/love-api.service';
   standalone: true,
   imports: [IonContent, IonIcon, CommonModule, FormsModule]
 })
-export class PairingPage implements OnInit {
+export class PairingPage implements OnInit, OnDestroy {
   private loveApi = inject(LoveApiService);
   private toastCtrl = inject(ToastController);
   private router = inject(Router);
@@ -22,6 +22,7 @@ export class PairingPage implements OnInit {
   public myCode: string | null = null;
   public partnerCode: string = '';
   public isLoading = false;
+  private pollInterval: any;
 
   constructor() {
     addIcons({ linkOutline, copyOutline, keyOutline });
@@ -29,6 +30,16 @@ export class PairingPage implements OnInit {
 
   async ngOnInit() {
     await this.loadMyCode();
+    // Start polling every 3 seconds to check if we got paired
+    this.pollInterval = setInterval(async () => {
+      await this.checkIfPaired();
+    }, 3000);
+  }
+
+  ngOnDestroy() {
+    if (this.pollInterval) {
+      clearInterval(this.pollInterval);
+    }
   }
 
   async loadMyCode() {
@@ -40,6 +51,20 @@ export class PairingPage implements OnInit {
       }
     } catch (e) {
       console.error('Error loading user profile:', e);
+    }
+  }
+
+  async checkIfPaired() {
+    try {
+      const res = await this.loveApi.getMe();
+      const user = res.data ? res.data : res;
+      // If user now has a partner_id, they are paired!
+      if (user && user.partner_id) {
+        if (this.pollInterval) clearInterval(this.pollInterval);
+        this.router.navigate(['/home'], { replaceUrl: true });
+      }
+    } catch (e) {
+      // ignore
     }
   }
 

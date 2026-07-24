@@ -6,6 +6,7 @@ import { catchError, map, startWith } from 'rxjs/operators';
 import { Preferences } from '@capacitor/preferences';
 import type { BackgroundGeolocationPlugin } from '@capacitor-community/background-geolocation';
 import { LoveApiService } from './love-api.service';
+import { AlertController } from '@ionic/angular/standalone';
 
 const BackgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>('BackgroundGeolocation');
 
@@ -24,6 +25,7 @@ import { PremiumService } from './premium.service';
 export class LocationService {
   private loveApi = inject(LoveApiService);
   private premiumService = inject(PremiumService);
+  private alertController = inject(AlertController);
   public debugError = '';
 
   public myLocation$ = new BehaviorSubject<any>(null);
@@ -102,43 +104,62 @@ export class LocationService {
           if (existingWatcher) {
             return;
           }
-
-          BackgroundGeolocation.addWatcher(
-            {
-              backgroundMessage: "La aplicación está usando tu ubicación.",
-              backgroundTitle: "Ubicación en segundo plano",
-              requestPermissions: true,
-              stale: false,
-              distanceFilter: 10,
-              icon: "ic_notification"
-            } as any,
-            async (location, error) => {
-              if (error) {
-                if (error.code === 'NOT_AUTHORIZED') {
-                  if (window.confirm("La aplicación necesita acceso a la ubicación en segundo plano. ¿Ir a ajustes?")) {
-                    BackgroundGeolocation.openSettings();
-                  }
-                }
-                return console.error(error);
-              }
-              if (location) {
-                const currentGhost = await this.getPrivacyMode();
-                if (currentGhost) return;
-                await this.loveApi.updateLocation(location.latitude, location.longitude, true).catch(()=>console.error('bg fail'));
-                this.myLocation$.next({
-                    name: name,
-                    is_sharing: true,
-                    position: {
-                        latitude: location.latitude,
-                        longitude: location.longitude
+          
+          // Google Play Prominent Disclosure
+          const alert = await this.alertController.create({
+            header: 'Ubicación en Segundo Plano',
+            message: 'Love Widget recopila datos de ubicación para permitir que tu pareja vea dónde estás en tiempo real en el mapa, incluso cuando la aplicación está cerrada o no se está utilizando.',
+            buttons: [
+              {
+                text: 'Cancelar',
+                role: 'cancel'
+              },
+              {
+                text: 'Entendido',
+                handler: () => {
+                  BackgroundGeolocation.addWatcher(
+                    {
+                      backgroundMessage: "La aplicación está usando tu ubicación.",
+                      backgroundTitle: "Ubicación en segundo plano",
+                      requestPermissions: true,
+                      stale: false,
+                      distanceFilter: 10,
+                      icon: "ic_notification"
+                    } as any,
+                    async (location, error) => {
+                      if (error) {
+                        if (error.code === 'NOT_AUTHORIZED') {
+                          if (window.confirm("La aplicación necesita acceso a la ubicación en segundo plano. ¿Ir a ajustes?")) {
+                            BackgroundGeolocation.openSettings();
+                          }
+                        }
+                        return console.error(error);
+                      }
+                      if (location) {
+                        const currentGhost = await this.getPrivacyMode();
+                        if (currentGhost) return;
+                        await this.loveApi.updateLocation(location.latitude, location.longitude, true).catch(()=>console.error('bg fail'));
+                        this.myLocation$.next({
+                            name: name,
+                            is_sharing: true,
+                            position: {
+                                latitude: location.latitude,
+                                longitude: location.longitude
+                            }
+                        });
+                        console.log('Fondo actualizado APIREST:', location);
+                      }
                     }
-                });
-                console.log('Fondo actualizado APIREST:', location);
+                  ).then(watcherId => {
+                    localStorage.setItem('bg_watcher_id', watcherId);
+                  });
+                }
               }
-            }
-          ).then(watcherId => {
-            localStorage.setItem('bg_watcher_id', watcherId);
+            ],
+            backdropDismiss: false
           });
+          
+          await alert.present();
         } catch (e) {
           console.error('Error al inicializar BackgroundGeolocation', e);
         }

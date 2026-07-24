@@ -4,7 +4,7 @@ import { LoveApiService, API_BASE_URL } from '../../services/love-api.service';
 import { TutorialService } from '../../services/tutorial.service';
 import { IonIcon, ToastController, IonContent, IonRefresher, IonRefresherContent } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { arrowBack, trashOutline, checkmarkCircleOutline, arrowUndoOutline } from 'ionicons/icons';
+import { arrowBack, trashOutline, checkmarkCircleOutline, arrowUndoOutline, chevronBackOutline, chevronForwardOutline } from 'ionicons/icons';
 import { Location } from '@angular/common';
 import iro from '@jaames/iro';
 
@@ -45,9 +45,18 @@ import iro from '@jaames/iro';
               <ion-icon name="infinite-outline"></ion-icon>
               <h3>Todas</h3>
             </div>
-            <div class="cat-card" *ngFor="let cat of categories" (click)="selectCategory(cat)">
-              <h3>{{ cat }}</h3>
-            </div>
+            <ng-container *ngIf="api.inventory$ | async as inv">
+              <div class="cat-card" *ngFor="let cat of categories" 
+                   [class.spicy]="cat === 'Picante' && inv?.spicy_pack"
+                   [class.premium]="cat === 'Picante' && !inv?.spicy_pack"
+                   (click)="handleCategoryClick(cat, inv)">
+                <h3>
+                  <ion-icon name="lock-closed" *ngIf="cat === 'Picante' && !inv?.spicy_pack" style="vertical-align: middle; margin-right: 5px;"></ion-icon>
+                  <ion-icon name="flame" *ngIf="cat === 'Picante' && inv?.spicy_pack" style="vertical-align: middle; margin-right: 5px; color: #ffbe0b;"></ion-icon>
+                  {{ cat }}
+                </h3>
+              </div>
+            </ng-container>
           </div>
         </div>
 
@@ -64,16 +73,16 @@ import iro from '@jaames/iro';
 
           <div *ngIf="(galleryFilter === 'all' || galleryFilter === 'new') && waitingMePrompts.length > 0" class="mb-20">
             <h3 class="section-title">¡Es tu turno! Nuevos dibujos ({{waitingMePrompts.length}})</h3>
-            <div class="drawing-item unread-item" *ngFor="let p of waitingMePrompts" (click)="startSpecificPrompt(p)">
-              <h4 class="d-title">{{ p.prompt_text }} <span class="new-badge">NUEVO</span></h4>
+            <div class="drawing-item unread-item" *ngFor="let p of waitingMePrompts" (click)="startSpecificPrompt(p)" [class.spicy-q]="p.category === 'Picante'">
+              <h4 class="d-title">{{ p.prompt_text }} <span class="new-badge">NUEVO</span> <span *ngIf="p.category === 'Picante'">🌶️</span></h4>
               <p class="action-text"><ion-icon name="brush-outline"></ion-icon> Tu pareja ha dibujado. ¡Dibuja tú para verlo!</p>
             </div>
           </div>
 
           <div *ngIf="(galleryFilter === 'all' || galleryFilter === 'seen') && waitingPrompts.length > 0" class="mb-20">
             <h3 class="section-title">Esperando a tu pareja ({{waitingPrompts.length}})</h3>
-            <div class="drawing-item" *ngFor="let p of waitingPrompts">
-              <h4 class="d-title">{{ p.prompt_text }}</h4>
+            <div class="drawing-item" *ngFor="let p of waitingPrompts" [class.spicy-q]="p.category === 'Picante'">
+              <h4 class="d-title">{{ p.prompt_text }} <span *ngIf="p.category === 'Picante'">🌶️</span></h4>
               <div class="d-grid">
                 <div class="d-col">
                   <img [src]="getImageUrl(p.my_drawing)" class="d-img-thumb" />
@@ -89,8 +98,8 @@ import iro from '@jaames/iro';
 
           <div *ngIf="(galleryFilter === 'all' || galleryFilter === 'seen') && completedPrompts.length > 0">
             <h3 class="section-title">Completadas ({{completedPrompts.length}})</h3>
-            <div class="drawing-item" *ngFor="let p of completedPrompts">
-              <h4 class="d-title">{{ p.prompt_text }}</h4>
+            <div class="drawing-item" *ngFor="let p of completedPrompts" [class.spicy-q]="p.category === 'Picante'">
+              <h4 class="d-title">{{ p.prompt_text }} <span *ngIf="p.category === 'Picante'">🌶️</span></h4>
               <div class="d-grid">
                 <div class="d-col">
                   <img [src]="getImageUrl(p.my_drawing)" class="d-img-thumb" />
@@ -107,10 +116,18 @@ import iro from '@jaames/iro';
       </ng-container>
 
       <div class="content" *ngIf="prompt && gameState !== 'categories' && gameState !== 'completed_list'">
-        <div class="prompt-card">
+        <div class="prompt-card" [class.spicy-q]="selectedCategory === 'Picante'">
           <p>Dibuja:</p>
           <h3 *ngIf="selectedCategory" class="cat-badge">{{ selectedCategory }}</h3>
-          <h3>{{ prompt.prompt_text }}</h3>
+          <h3>{{ prompt.prompt_text }} <span *ngIf="selectedCategory === 'Picante'">🌶️</span></h3>
+          <div class="prompt-nav" *ngIf="gameState === 'drawing'">
+            <button class="nav-btn" (click)="loadPrompt('prev')" [disabled]="currentPromptIndex <= 0">
+              <ion-icon name="chevron-back-outline"></ion-icon> Anterior
+            </button>
+            <button class="nav-btn" (click)="loadPrompt('next')">
+              Siguiente <ion-icon name="chevron-forward-outline"></ion-icon>
+            </button>
+          </div>
         </div>
 
         <ng-container *ngIf="gameState === 'drawing'">
@@ -192,15 +209,24 @@ import iro from '@jaames/iro';
     .cat-card { background: white; border-radius: 15px; padding: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s; }
     .cat-card:active { transform: scale(0.95); }
     .cat-card h3 { margin: 0; color: #590D22; font-weight: bold; font-size: 1.1rem; }
+    .cat-card.premium { background: linear-gradient(135deg, #f8f9fa, #e9ecef); color: #888; border: 1px dashed #ccc; box-shadow: none; }
+    .cat-card.premium h3 { color: #888; }
+    .cat-card.spicy { background: linear-gradient(135deg, #FF4D6D, #590D22); color: white; border: 2px solid #ffbe0b; box-shadow: 0 4px 15px rgba(255,190,11,0.3); }
+    .cat-card.spicy h3 { color: white; }
     .all-card { grid-column: span 2; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; }
     .all-card h3 { color: white; margin-top: 5px; }
     .all-card ion-icon { font-size: 2rem; }
 
     .content { flex: 1; display: flex; flex-direction: column; }
-    .prompt-card { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(255,77,109,0.1); margin-bottom: 20px; }
-    .prompt-card p { margin: 0; color: #a4133c; font-size: 0.9rem; text-transform: uppercase; font-weight: bold; }
-    .cat-badge { display: inline-block; background: #ffb3c1; color: #590d22; font-size: 0.8rem; padding: 3px 8px; border-radius: 10px; margin-top: 5px; }
-    .prompt-card h3 { margin: 5px 0 0; color: #590D22; font-size: 1.3rem; font-weight: 800; }
+    .prompt-card { background: white; border-radius: 15px; padding: 25px; text-align: center; box-shadow: 0 4px 15px rgba(255,77,109,0.1); margin-bottom: 20px; }
+    .prompt-card.spicy-q { border: 2px solid #ff0055; box-shadow: 0 0 15px rgba(255,0,85,0.3); }
+    .prompt-card p { color: #a4133c; margin: 0 0 10px; font-weight: bold; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+    .prompt-card h3 { color: #590D22; margin: 0; font-weight: 800; font-size: 1.3rem; line-height: 1.4; }
+    .cat-badge { display: inline-block; background: #ffb3c1; color: #590D22 !important; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem !important; margin-bottom: 10px !important; text-transform: uppercase; }
+    .prompt-nav { display: flex; justify-content: center; gap: 20px; margin-top: 15px; }
+    .nav-btn { background: rgba(255,77,109,0.1); color: #590D22; border: none; padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; cursor: pointer; transition: all 0.2s; }
+    .nav-btn:active { transform: scale(0.95); }
+    .nav-btn:disabled { opacity: 0.5; pointer-events: none; }
 
     /* TOGGLE TABS */
     .custom-toggle-container { display: flex; background: rgba(255,255,255,0.6); padding: 5px; border-radius: 30px; margin: 0 0 15px 0; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
@@ -214,6 +240,7 @@ import iro from '@jaames/iro';
     .section-title { color: #590D22; font-size: 1.1rem; border-bottom: 2px solid #ffb3c1; padding-bottom: 5px; margin-bottom: 15px; text-align: left; }
     .mb-20 { margin-bottom: 20px; }
     .drawing-item { background: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; }
+    .drawing-item.spicy-q { border: 2px solid #ff0055; box-shadow: 0 0 15px rgba(255, 0, 85, 0.3); }
     .d-title { margin: 0 0 15px; color: #590D22; font-weight: bold; font-size: 1.1rem; }
     .d-grid { display: flex; gap: 15px; }
     .d-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 0.8rem; font-weight: bold; color: #FF4D6D; text-transform: uppercase; }
@@ -309,6 +336,8 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
   categories: string[] = [];
   selectedCategory: string = '';
   prompt: any = null;
+  promptHistory: any[] = [];
+  currentPromptIndex: number = -1;
   gameState: 'categories' | 'completed_list' | 'init' | 'drawing' | 'waiting' | 'completed' = 'categories';
   galleryFilter: 'all' | 'new' | 'seen' = 'all';
   result: any = null;
@@ -328,13 +357,13 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
     '#000000', '#ffffff', '#8b4513', '#a0522d', '#cd853f', '#f5deb3', 
     '#ffb6c1', '#ff69b4', '#9370db', '#e6e6fa', '#add8e6', '#98fb98'
   ];
-  private api = inject(LoveApiService);
+  public api = inject(LoveApiService);
   private toastCtrl = inject(ToastController);
   private location = inject(Location);
   private tutorialService = inject(TutorialService);
 
   constructor() {
-    addIcons({ arrowBack, trashOutline, checkmarkCircleOutline, arrowUndoOutline, 'play-circle-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M112 111v290c0 17.44 17 28.52 31 20.16l247.9-148.37c12.12-7.25 12.12-26.33 0-33.58L143 90.84c-14-8.36-31 2.72-31 20.16z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/></svg>', 'lock-closed-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M336 208v-95a80 80 0 00-160 0v95" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="96" y="208" width="320" height="272" rx="48" ry="48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>', 'infinite-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M256 256s-48-96-126-96c-54.12 0-98 43-98 96s43.88 96 98 96c37.51 0 71-22.41 94-48M256 256s48 96 126 96c54.12 0 98-43 98-96s-43.88-96-98-96c-37.51 0-71 22.41-94 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="48"/></svg>', 'images-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M432 112V96a48.14 48.14 0 00-48-48H64a48.14 48.14 0 00-48 48v256a48.14 48.14 0 0048 48h16" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32"/><rect x="96" y="128" width="400" height="336" rx="45.99" ry="45.99" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32"/><ellipse cx="372.92" cy="219.64" rx="30.77" ry="30.55" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/><path d="M342.15 372.17L255 285.78a30.93 30.93 0 00-42.18-1.21L96 387.64M265.23 464l118.59-117.73a31 31 0 0141.46-1.87L496 402.91" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>', 'brush-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M452.37 59.63h0a40.49 40.49 0 00-57.26 0L184.54 270.17a64.12 64.12 0 00-17.72 31.78L160 336l34.05-6.81a64.12 64.12 0 0031.78-17.72L436.37 101.9a40.49 40.49 0 000-57.26z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path d="M160 336l-34.05 6.81A32 32 0 00104 368.53v0a32 32 0 0032 32h0a32 32 0 0025.72-12.78L192 352" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path d="M224 400h128" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>' });
+    addIcons({ arrowBack, trashOutline, checkmarkCircleOutline, arrowUndoOutline, chevronBackOutline, chevronForwardOutline, 'play-circle-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M112 111v290c0 17.44 17 28.52 31 20.16l247.9-148.37c12.12-7.25 12.12-26.33 0-33.58L143 90.84c-14-8.36-31 2.72-31 20.16z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/></svg>', 'lock-closed-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M336 208v-95a80 80 0 00-160 0v95" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="96" y="208" width="320" height="272" rx="48" ry="48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>', 'lock-closed': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M336 208v-95a80 80 0 00-160 0v95" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="96" y="208" width="320" height="272" rx="48" ry="48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>', 'flame': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M112 320c0-93 124-165 96-272 66 0 192 96 192 272a144 144 0 01-288 0z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path d="M320 368c0 57.71-32 80-64 80s-64-22.29-64-80 40-86 32-128c42 0 96 70.29 96 128z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>', 'infinite-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M256 256s-48-96-126-96c-54.12 0-98 43-98 96s43.88 96 98 96c37.51 0 71-22.41 94-48M256 256s48 96 126 96c54.12 0 98-43 98-96s-43.88-96-98-96c-37.51 0-71 22.41-94 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="48"/></svg>', 'images-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M432 112V96a48.14 48.14 0 00-48-48H64a48.14 48.14 0 00-48 48v256a48.14 48.14 0 0048 48h16" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32"/><rect x="96" y="128" width="400" height="336" rx="45.99" ry="45.99" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32"/><ellipse cx="372.92" cy="219.64" rx="30.77" ry="30.55" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/><path d="M342.15 372.17L255 285.78a30.93 30.93 0 00-42.18-1.21L96 387.64M265.23 464l118.59-117.73a31 31 0 0141.46-1.87L496 402.91" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>', 'brush-outline': 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M452.37 59.63h0a40.49 40.49 0 00-57.26 0L184.54 270.17a64.12 64.12 0 00-17.72 31.78L160 336l34.05-6.81a64.12 64.12 0 0031.78-17.72L436.37 101.9a40.49 40.49 0 000-57.26z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path d="M160 336l-34.05 6.81A32 32 0 00104 368.53v0a32 32 0 0032 32h0a32 32 0 0025.72-12.78L192 352" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path d="M224 400h128" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>' });
   }
 
   async ngOnInit() {}
@@ -371,7 +400,13 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
 
   async loadCategories() {
     try {
-      this.categories = await this.api.getDrawingCategories();
+      let cats = await this.api.getDrawingCategories();
+      const spicyIdx = cats.findIndex((c: string) => c === 'Picante' || c === 'Picantes');
+      if (spicyIdx > -1) {
+        const spicy = cats.splice(spicyIdx, 1)[0];
+        cats.unshift(spicy);
+      }
+      this.categories = cats;
     } catch (e: any) {
       console.error(e);
       const toast = await this.toastCtrl.create({
@@ -389,7 +424,23 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
     this.selectedCategory = cat;
     this.gameState = 'init';
     this.prompt = null;
-    await this.loadPrompt();
+    this.promptHistory = [];
+    this.currentPromptIndex = -1;
+    await this.loadPrompt('new');
+  }
+
+  async handleCategoryClick(cat: string, inv: any) {
+    if (cat === 'Picante' && (!inv || !inv.spicy_pack)) {
+      const toast = await this.toastCtrl.create({
+        message: 'Debes desbloquear el pack Picante en la Tienda.',
+        duration: 3000,
+        position: 'top',
+        color: 'danger'
+      });
+      toast.present();
+      return;
+    }
+    this.selectCategory(cat);
   }
 
   async loadCompletedList() {
@@ -431,16 +482,35 @@ export class DrawingGameComponent implements OnInit, AfterViewInit {
     }
   }
 
-  async loadPrompt() {
+  async loadPrompt(direction: 'next' | 'prev' | 'new' = 'new') {
+    if (direction === 'prev' && this.currentPromptIndex > 0) {
+      this.currentPromptIndex--;
+      this.prompt = this.promptHistory[this.currentPromptIndex];
+      this.checkResult();
+      return;
+    }
+    
+    if (direction === 'next' && this.currentPromptIndex < this.promptHistory.length - 1) {
+      this.currentPromptIndex++;
+      this.prompt = this.promptHistory[this.currentPromptIndex];
+      this.checkResult();
+      return;
+    }
+
     try {
-      this.prompt = await this.api.getDrawingPrompt(this.selectedCategory);
+      const excludeIds = this.promptHistory.map(p => p.id);
+      this.prompt = await this.api.getDrawingPrompt(this.selectedCategory, excludeIds);
+      
+      this.promptHistory.push(this.prompt);
+      this.currentPromptIndex = this.promptHistory.length - 1;
+      
       this.checkResult(); 
     } catch (e: any) {
       console.error(e);
       this.gameState = 'init';
       
       const toast = await this.toastCtrl.create({
-        message: e?.status === 404 ? 'No hay retos disponibles.' : 'Error al cargar el reto.',
+        message: e?.status === 404 ? 'No hay más retos disponibles.' : 'Error al cargar el reto.',
         duration: 3000,
         color: e?.status === 404 ? 'warning' : 'danger',
         position: 'bottom',

@@ -123,7 +123,20 @@ export class LoveApiService {
   }
 
   async googleLogin(email: string, name: string, uid: string): Promise<any> {
-    const res: any = await firstValueFrom(this.http.post(`${API_BASE_URL}/google-login`, { email, name, uid }, { headers: { 'Accept': 'application/json' } }));
+    const { CapacitorHttp } = await import('@capacitor/core');
+    const options = {
+      url: `${API_BASE_URL}/google-login`,
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      data: { email, name, uid }
+    };
+    
+    const response = await CapacitorHttp.post(options);
+    
+    if (response.status >= 400) {
+      throw { status: response.status, error: response.data, message: 'Http failure' };
+    }
+    
+    const res = response.data;
     const token = res?.access_token || res?.token;
     if (token) {
       await Preferences.set({ key: 'auth_token', value: token });
@@ -169,8 +182,11 @@ export class LoveApiService {
     } catch (e) {}
 
     await Preferences.remove({ key: 'auth_token' });
+    await Preferences.remove({ key: 'myUserId' });
+    localStorage.removeItem('love_widget_user');
     await SecureStoragePlugin.remove({ key: 'auth_token' }).catch(() => {});
     this.token$.next(null);
+    this.router.navigate(['/login'], { replaceUrl: true });
   }
 
   async unpair(): Promise<any> {
@@ -402,13 +418,19 @@ export class LoveApiService {
     const url = category ? `${API_BASE_URL}/love-album/games/swipe/stats?category=${encodeURIComponent(category)}` : `${API_BASE_URL}/love-album/games/swipe/stats`;
     return firstValueFrom(this.http.get(url));
   }
-
   async getDrawingCategories(): Promise<string[]> {
     return firstValueFrom(this.http.get<string[]>(`${API_BASE_URL}/love-album/games/drawing/categories`));
   }
 
-  async getDrawingPrompt(category?: string): Promise<any> {
-    const url = category ? `${API_BASE_URL}/love-album/games/drawing/prompt?category=${encodeURIComponent(category)}` : `${API_BASE_URL}/love-album/games/drawing/prompt`;
+  async getDrawingPrompt(category?: string, excludeIds: number[] = []): Promise<any> {
+    let url = category ? 
+      `${API_BASE_URL}/love-album/games/drawing/prompt?category=${encodeURIComponent(category)}` : 
+      `${API_BASE_URL}/love-album/games/drawing/prompt`;
+      
+    if (excludeIds && excludeIds.length > 0) {
+      const sep = url.includes('?') ? '&' : '?';
+      url += `${sep}exclude=${excludeIds.join(',')}`;
+    }
     return firstValueFrom(this.http.get(url));
   }
 

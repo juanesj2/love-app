@@ -561,6 +561,28 @@ export class HomePage implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       })
     );
+
+    this.subscriptions.push(
+      this.notificationService.tappedNotification$.subscribe((action: any) => {
+        const notif = action.notification;
+        const title = notif.title ? notif.title.toLowerCase() : '';
+        const body = notif.body ? notif.body.toLowerCase() : '';
+        const text = title + ' ' + body;
+        
+        if (text.includes('mensaje') || text.includes('carta') || text.includes('regalo') || text.includes('sorpresa')) {
+          this.selectTab('chat');
+        } else if (text.includes('foto') || text.includes('álbum') || text.includes('reaccion') || text.includes('garabato')) {
+          this.selectTab('photo');
+        } else if (text.includes('zumbido') || text.includes('ubicación') || text.includes('llegado') || text.includes('mapa')) {
+          this.selectTab('location');
+        } else if (text.includes('juego') || text.includes('pregunta') || text.includes('verdad') || text.includes('reto') || text.includes('quiz')) {
+          this.selectTab('game');
+        } else if (text.includes('inventario') || text.includes('premium')) {
+          this.selectTab('mas');
+        }
+        this.cdr.detectChanges();
+      })
+    );
     
     this.checkDeliveredNotifications();
 

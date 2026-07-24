@@ -66,10 +66,11 @@
     <uses-permission android:name="com.juanesj2.lovewidget.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:appComponentFactory="androidx.core.app.CoreComponentFactory"
         android:debuggable="true"
         android:extractNativeLibs="false"
+        android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
@@ -159,19 +160,6 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_daily_photo_info" />
-        </receiver>
-        <receiver
-            android:name="com.juanesj2.lovewidget.PokeWidgetProvider"
-            android:exported="true"
-            android:label="@string/widget_poke_label" >
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.juanesj2.lovewidget.ACTION_POKE" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_poke_info" />
         </receiver>
 
         <!-- Background Geolocation Service -->

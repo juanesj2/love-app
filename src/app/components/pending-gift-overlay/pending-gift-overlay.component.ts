@@ -9,7 +9,7 @@ import { GiftViewerComponent } from '../gift-viewer/gift-viewer.component';
 @Component({
   selector: 'app-pending-gift-overlay',
   standalone: true,
-  imports: [CommonModule, GiftViewerComponent],
+  imports: [CommonModule],
   template: `
     <div class="gift-global-overlay" *ngIf="pendingMsg && !isOpened">
       <div class="gift-global-container" (click)="$event.stopPropagation()">
@@ -28,7 +28,7 @@ import { GiftViewerComponent } from '../gift-viewer/gift-viewer.component';
       <div class="gift-content-container" (click)="$event.stopPropagation()">
         <div class="gift-box-opened">
           <h2>¡Has recibido un regalo virtual!</h2>
-          <app-gift-viewer [giftType]="pendingMsg?.meta?.giftType || 'teddy'" [height]="'250px'"></app-gift-viewer>
+          <img [src]="getGiftImageUrl(pendingMsg)" alt="gift" style="width: 200px; height: 200px; object-fit: contain;" />
           <div class="gift-message" *ngIf="pendingMsg?.meta?.message">
             <p class="gift-message-text">"{{ pendingMsg.meta.message }}"</p>
           </div>
@@ -138,6 +138,17 @@ export class PendingGiftOverlayComponent implements OnInit, OnDestroy, AfterView
   isOpened = false;
   isPlaying = false;
   private sub?: Subscription;
+
+  getGiftImageUrl(msg: any): string {
+    if (!msg?.meta?.opened) {
+      return 'assets/gifts/box.png';
+    }
+    const type = msg.meta?.giftType || msg.meta?.gift_type;
+    if (type === 'teddy') return 'assets/gifts/teddy.png';
+    if (type === 'rose') return 'assets/gifts/rose.png';
+    if (type === 'ring') return 'assets/gifts/ring.png';
+    return 'assets/gifts/box.png';
+  }
 
   @ViewChild('lottieCanvas') lottieCanvas?: ElementRef<HTMLCanvasElement>;
   private dotLottieInstance?: DotLottie;

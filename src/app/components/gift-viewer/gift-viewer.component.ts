@@ -14,9 +14,9 @@ import { CommonModule } from '@angular/common';
         [src]="modelSrc"
         auto-rotate
         camera-controls
-        shadow-intensity="1"
+        shadow-intensity="0.5"
         environment-image="neutral"
-        exposure="1"
+        exposure="1.8"
         style="width: 100%; height: 100%; display: block;"
         interaction-prompt="none"
         alt="Regalo 3D">

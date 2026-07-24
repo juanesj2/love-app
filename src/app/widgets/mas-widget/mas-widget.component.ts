@@ -13,7 +13,7 @@ import { LocationService } from '../../services/location.service';
 import { TutorialService } from '../../services/tutorial.service';
 import { OfflineSyncService } from '../../services/offline-sync.service';
 import { addIcons } from 'ionicons';
-import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, bookOutline, imageOutline, checkmarkCircleOutline, informationCircleOutline, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, lockClosed, fingerPrintOutline, chevronForward } from 'ionicons/icons';
+import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, bookOutline, imageOutline, checkmarkCircleOutline, informationCircleOutline, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, lockClosed, fingerPrintOutline, chevronForward, documentTextOutline, documentOutline } from 'ionicons/icons';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.component';
@@ -27,12 +27,13 @@ import { GodModeModalComponent } from './god-mode-modal/god-mode-modal.component
 import { StoreModalComponent } from './store-modal/store-modal.component';
 import { InventoryModalComponent } from './inventory-modal/inventory-modal.component';
 import { PremiumEventModalComponent } from './premium-event-modal/premium-event-modal.component';
+import { LegalModalComponent } from './legal-modal.component';
 
 
 @Component({
   selector: 'app-mas-widget',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent, IonRefresher, IonRefresherContent, IonIcon, IonSelect, IonSelectOption, IonToggle, TimelineWidgetComponent, GodModeModalComponent, PremiumEventModalComponent, StoreModalComponent, InventoryModalComponent],
+  imports: [CommonModule, FormsModule, IonContent, IonRefresher, IonRefresherContent, IonIcon, IonSelect, IonSelectOption, IonToggle, TimelineWidgetComponent, GodModeModalComponent, PremiumEventModalComponent, StoreModalComponent, InventoryModalComponent, LegalModalComponent],
   template: `
     <ion-content class="scroll-content">
       <ng-template #staticStars let-rating="rating">
@@ -336,14 +337,6 @@ import { PremiumEventModalComponent } from './premium-event-modal/premium-event-
                 <ion-toggle [(ngModel)]="isNightOwlEnabled" (ionChange)="toggleNightOwl()"></ion-toggle>
               </div>
 
-              <div class="settings-item interactive" (click)="isCreditsModalOpen = true" style="display: flex; align-items: center; padding: 15px; background: rgba(255,255,255,0.8); border-radius: 14px; margin-bottom: 10px;">
-                <div>
-                  <h4 style="margin: 0; color: #590D22; font-weight: 700;"><ion-icon name="information-circle-outline"></ion-icon> Créditos de Recursos</h4>
-                  <p style="margin: 0; font-size: 0.8rem; color: #6c757d;">Licencias y autores de recursos 3D.</p>
-                </div>
-                <ion-icon name="chevron-forward" style="margin-left: auto; color: #888;"></ion-icon>
-              </div>
-
               <div class="settings-item interactive" (click)="confirmUnpair()" style="display: flex; align-items: center; padding: 15px; background: rgba(255, 77, 109, 0.1); border-radius: 14px; margin-bottom: 10px;">
                 <ion-icon name="heart-dislike-outline" style="color: #FF4D6D; font-size: 1.5rem; margin-right: 15px;"></ion-icon>
                 <div>
@@ -352,17 +345,48 @@ import { PremiumEventModalComponent } from './premium-event-modal/premium-event-
                 </div>
               </div>
 
-              <div class="settings-item interactive" (click)="confirmDeleteAccount()" style="display: flex; align-items: center; padding: 15px; background: rgba(200, 0, 0, 0.1); border-radius: 14px;">
+              <div class="settings-item interactive" (click)="confirmDeleteAccount()" style="display: flex; align-items: center; padding: 15px; background: rgba(200, 0, 0, 0.1); border-radius: 14px; margin-bottom: 10px;">
                 <ion-icon name="trash-outline" style="color: #c80000; font-size: 1.5rem; margin-right: 15px;"></ion-icon>
                 <div>
                   <h4 style="margin: 0; color: #c80000; font-weight: 700;">Eliminar mi Cuenta</h4>
                   <p style="margin: 0; font-size: 0.8rem; color: #a4133c;">Borrar todos mis datos para siempre.</p>
                 </div>
               </div>
+
+              <!-- Extra Info at the bottom -->
+              <div class="settings-item interactive" (click)="isCreditsModalOpen = true" style="display: flex; align-items: center; padding: 15px; background: rgba(255,255,255,0.8); border-radius: 14px; margin-bottom: 10px;">
+                <div>
+                  <h4 style="margin: 0; color: #590D22; font-weight: 700;"><ion-icon name="information-circle-outline"></ion-icon> Créditos de Recursos</h4>
+                  <p style="margin: 0; font-size: 0.8rem; color: #6c757d;">Licencias y autores de recursos 3D.</p>
+                </div>
+                <ion-icon name="chevron-forward" style="margin-left: auto; color: #888;"></ion-icon>
+              </div>
+
+              <div class="settings-item interactive" (click)="openLegalModal('privacy')" style="display: flex; align-items: center; padding: 15px; background: rgba(255,255,255,0.8); border-radius: 14px; margin-bottom: 10px;">
+                <ion-icon name="document-text-outline" style="color: #6c757d; font-size: 1.5rem; margin-right: 15px;"></ion-icon>
+                <div>
+                  <h4 style="margin: 0; color: #590D22; font-weight: 700;">Política de Privacidad</h4>
+                  <p style="margin: 0; font-size: 0.8rem; color: #6c757d;">Cómo tratamos tus datos.</p>
+                </div>
+              </div>
+
+              <div class="settings-item interactive" (click)="openLegalModal('terms')" style="display: flex; align-items: center; padding: 15px; background: rgba(255,255,255,0.8); border-radius: 14px;">
+                <ion-icon name="document-outline" style="color: #6c757d; font-size: 1.5rem; margin-right: 15px;"></ion-icon>
+                <div>
+                  <h4 style="margin: 0; color: #590D22; font-weight: 700;">Términos y Condiciones</h4>
+                  <p style="margin: 0; font-size: 0.8rem; color: #6c757d;">Reglas de uso de la app.</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      <app-legal-modal 
+        *ngIf="isLegalModalOpen" 
+        [documentType]="legalDocumentType" 
+        (close)="closeLegalModal()">
+      </app-legal-modal>
 
         <!-- Credits Modal -->
         <div class="custom-overlay" *ngIf="isCreditsModalOpen" (click)="isCreditsModalOpen = false" style="z-index: 100000;">
@@ -988,7 +1012,7 @@ import { PremiumEventModalComponent } from './premium-event-modal/premium-event-
     .grid-card .sub { font-size: 0.8rem; color: #a4133c; font-weight: 600; margin-top: 4px; }
 
     /* Logout */
-    .logout-btn { width: 100%; background: rgba(208, 0, 0, 0.1); color: #d00000; border: 2px solid rgba(208, 0, 0, 0.2); padding: 16px; border-radius: 20px; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(10px); }
+    .logout-btn { width: 100%; margin-top: 20px; background: rgba(208, 0, 0, 0.1); color: #d00000; border: 2px solid rgba(208, 0, 0, 0.2); padding: 16px; border-radius: 20px; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(10px); }
     .logout-btn:active { background: rgba(208, 0, 0, 0.2); transform: scale(0.98); }
     .logout-btn ion-icon { font-size: 1.4rem; }
 
@@ -1258,6 +1282,10 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   isLogoutModalOpen = false;
   isFeedbackModalOpen = false;
   isMovieListModalOpen = false;
+  isSettingsModalOpen = false;
+  isLegalModalOpen = false;
+  legalDocumentType: 'privacy' | 'terms' = 'privacy';
+  isNightOwlEnabled = false;
   isGodModeModalOpen = false;
   showPremiumEventModal = false;
 
@@ -1334,8 +1362,6 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     this.isConfirmModalOpen = false;
   }
 
-  isSettingsModalOpen = false;
-
   openSettingsModal() {
     this.isSettingsModalOpen = true;
     document.body.classList.add('hide-tabs');
@@ -1366,6 +1392,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   }
 
   openInventoryModal() {
+    this.api.getCoupleInfo(); // Fetch latest info before opening
     this.isInventoryModalOpen = true;
     document.body.classList.add('hide-tabs');
   }
@@ -1375,12 +1402,11 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     document.body.classList.remove('hide-tabs');
   }
 
-  isNightOwlEnabled = false;
   isStoreModalOpen = false;
   isInventoryModalOpen = false;
 
   constructor() {
-    addIcons({ fingerPrintOutline, bookOutline, imageOutline, logOutOutline, addCircleOutline, starOutline, star, closeOutline, checkmarkCircleOutline, restaurantOutline, locationOutline, pencilOutline, filmOutline, gameControllerOutline, personCircleOutline, informationCircleOutline, heartOutline, heart, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, timeOutline, settingsOutline, flagOutline, checkmarkCircle, ellipseOutline, moonOutline, closeCircle, calendar, add, cameraOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, lockClosed, chevronForward });
+    addIcons({ fingerPrintOutline, bookOutline, imageOutline, logOutOutline, addCircleOutline, starOutline, star, closeOutline, checkmarkCircleOutline, restaurantOutline, locationOutline, pencilOutline, filmOutline, gameControllerOutline, personCircleOutline, informationCircleOutline, heartOutline, heart, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, timeOutline, settingsOutline, flagOutline, checkmarkCircle, ellipseOutline, moonOutline, closeCircle, calendar, add, cameraOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, lockClosed, chevronForward, documentTextOutline, documentOutline });
   }
 
   async checkNightOwl() {
@@ -1458,10 +1484,21 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     frame();
   }
 
+  openLegalModal(type: 'privacy' | 'terms') {
+    this.isSettingsModalOpen = false;
+    this.legalDocumentType = type;
+    this.isLegalModalOpen = true;
+  }
+
+  closeLegalModal() {
+    this.isLegalModalOpen = false;
+    document.body.classList.remove('hide-tabs');
+  }
+
   async confirmDeleteAccount() {
     this.showConfirm(
       '¿ELIMINAR CUENTA?',
-      'Esta acción es IRREVERSIBLE. Se borrarán todos tus datos. ¿Estás absolutamente seguro?',
+      'Esta acción es IRREVERSIBLE. Se borrarán todos tus datos y PERDERÁS PARA SIEMPRE tus paquetes premium o compras in-app (no son reembolsables ni transferibles). ¿Estás absolutamente seguro?',
       async () => {
         await this.api.deleteAccount();
         await this.api.logout();

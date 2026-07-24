@@ -13,6 +13,7 @@ export class NotificationService {
   private platform = inject(Platform);
   private api = inject(LoveApiService);
   public newNotification$ = new Subject<any>();
+  public tappedNotification$ = new Subject<any>();
 
   async init() {
     if (!this.platform.is('capacitor')) {
@@ -128,6 +129,7 @@ export class NotificationService {
     PushNotifications.addListener('pushNotificationActionPerformed',
       (notification: ActionPerformed) => {
         console.log('Push action performed: ' + JSON.stringify(notification));
+        this.tappedNotification$.next(notification);
       }
     );
   }

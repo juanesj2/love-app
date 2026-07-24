@@ -38,20 +38,26 @@ import { Location } from '@angular/common';
       </div>
 
       <div class="category-filter-container" *ngIf="categories.length > 1">
-        <div class="category-pill" 
-             *ngFor="let cat of categories" 
-             [class.active]="selectedCategory === cat" 
-             (click)="selectedCategory = cat">
-          {{ cat }}
-        </div>
+        <ng-container *ngIf="api.inventory$ | async as inv">
+          <div class="category-pill" 
+               *ngFor="let cat of categories" 
+               [class.active]="selectedCategory === cat" 
+               [class.spicy-pill]="cat === 'Picante' && inv?.spicy_pack"
+               [class.locked-pill]="cat === 'Picante' && !inv?.spicy_pack"
+               (click)="selectCategory(cat, inv)">
+            <ion-icon name="lock-closed" *ngIf="cat === 'Picante' && !inv?.spicy_pack" style="margin-right:4px;"></ion-icon>
+            <ion-icon name="flame" *ngIf="cat === 'Picante' && inv?.spicy_pack" style="margin-right:4px;"></ion-icon>
+            {{ cat }}
+          </div>
+        </ng-container>
       </div>
 
       <div class="q-list">
         
         <ng-container *ngIf="viewMode === 'pending'">
-          <div class="q-card" *ngFor="let q of pendingQuestions">
+          <div class="q-card" *ngFor="let q of pendingQuestions" [class.spicy-q]="q.category === 'Picante'">
             <div class="q-category">{{ q.category }}</div>
-            <h3 class="q-text">{{ q.question_text }}</h3>
+            <h3 class="q-text">{{ q.question_text }} <span *ngIf="q.category === 'Picante'">🌶️</span></h3>
             <div class="q-body">
               <div class="q-answer-box">
                 <textarea placeholder="Escribe tu respuesta aquí..." [(ngModel)]="draftAnswers[q.id]"></textarea>
@@ -65,9 +71,9 @@ import { Location } from '@angular/common';
         </ng-container>
 
         <ng-container *ngIf="viewMode === 'waiting_you'">
-          <div class="q-card" *ngFor="let q of waitingYouQuestions">
+          <div class="q-card" *ngFor="let q of waitingYouQuestions" [class.spicy-q]="q.category === 'Picante'">
             <div class="q-category attention">¡Tu pareja está esperando!</div>
-            <h3 class="q-text">{{ q.question_text }}</h3>
+            <h3 class="q-text">{{ q.question_text }} <span *ngIf="q.category === 'Picante'">🌶️</span></h3>
             <div class="q-body">
               <div class="q-answer-box">
                 <textarea placeholder="Descubre su respuesta al responder tú..." [(ngModel)]="draftAnswers[q.id]"></textarea>
@@ -81,9 +87,9 @@ import { Location } from '@angular/common';
         </ng-container>
 
         <ng-container *ngIf="viewMode === 'completed'">
-          <div class="q-card" *ngFor="let q of completedQuestions">
+          <div class="q-card" *ngFor="let q of completedQuestions" [class.spicy-q]="q.category === 'Picante'">
             <div class="q-category">{{ q.category }}</div>
-            <h3 class="q-text">{{ q.question_text }}</h3>
+            <h3 class="q-text">{{ q.question_text }} <span *ngIf="q.category === 'Picante'">🌶️</span></h3>
             
             <div class="q-body">
               <div *ngIf="q.status === 'waiting_partner'" class="q-waiting">
@@ -138,6 +144,7 @@ import { Location } from '@angular/common';
     .q-category.attention { background: #FF4D6D; color: white; animation: bounce 1s infinite alternate; }
     @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-3px); } }
     .q-text { color: #590D22; font-size: 1.1rem; margin: 0 0 15px; font-weight: 700; line-height: 1.4; }
+    .q-card.spicy-q { border: 2px solid #ff0055; box-shadow: 0 0 15px rgba(255, 0, 85, 0.3); }
 
     .q-answer-box { display: flex; flex-direction: column; gap: 10px; }
     .q-answer-box textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ffb3c1; background: #fffcfd; color: #590D22; font-family: inherit; font-size: 1.05rem; min-height: 80px; resize: none; outline: none; }
@@ -158,8 +165,11 @@ import { Location } from '@angular/common';
     .toggle-pill.active { background: white; color: #FF4D6D; box-shadow: 0 4px 10px rgba(255,77,109,0.15); transform: scale(1.02); }
     .category-filter-container { display: flex; gap: 8px; overflow-x: auto; padding: 5px; margin-bottom: 15px; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; }
     .category-filter-container::-webkit-scrollbar { display: none; }
-    .category-pill { flex-shrink: 0; padding: 6px 14px; background: rgba(255, 77, 109, 0.1); color: #590D22; border-radius: 20px; font-size: 0.85rem; font-weight: bold; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
+    .category-pill { flex-shrink: 0; padding: 6px 14px; background: rgba(255, 77, 109, 0.1); color: #590D22; border-radius: 20px; font-size: 0.85rem; font-weight: bold; white-space: nowrap; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; }
     .category-pill.active { background: #FF4D6D; color: white; box-shadow: 0 3px 8px rgba(255,77,109,0.3); }
+    .category-pill.spicy-pill { border: 1px solid #ff0055; color: #ff0055; background: rgba(255,0,85,0.05); }
+    .category-pill.spicy-pill.active { background: #ff0055; color: white; }
+    .category-pill.locked-pill { color: #888; background: #e9ecef; border: 1px dashed #ccc; }
     .empty-state { text-align: center; color: #a4133c; padding: 30px; font-weight: bold; opacity: 0.8; }
     
     .scroll-top-btn { position: fixed; bottom: 30px; right: 20px; width: 50px; height: 50px; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4); cursor: pointer; z-index: 1000; opacity: 0; transform: translateY(20px) scale(0.8); pointer-events: none; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
@@ -214,20 +224,40 @@ export class QuestionsWidgetComponent implements OnInit {
   showScrollTop = false;
 
   get categories() {
-    const cats = this.questions.map(q => q.category);
-    return ['Todas', ...new Set(cats)];
+    const cats = Array.from(new Set(this.questions.map(q => q.category)));
+    const spicyIdx = cats.findIndex(c => c === 'Picante' || c === 'Picantes');
+    if (spicyIdx > -1) {
+      const spicy = cats.splice(spicyIdx, 1)[0];
+      cats.unshift(spicy);
+    }
+    return ['Todas', ...cats];
   }
 
   get pendingQuestions() {
-    return this.questions.filter(q => q.status === 'unanswered' && (this.selectedCategory === 'Todas' || q.category === this.selectedCategory));
+    const inv = this.api.inventory$.value;
+    const hasSpicy = inv && (inv.spicy_pack === true || inv.spicy_pack === 1 || inv.spicy_pack === '1');
+    return this.questions.filter(q => 
+      q.status === 'unanswered' && 
+      (this.selectedCategory === 'Todas' ? (hasSpicy || (q.category !== 'Picante' && q.category !== 'Picantes')) : q.category === this.selectedCategory)
+    );
   }
 
   get waitingYouQuestions() {
-    return this.questions.filter(q => q.status === 'waiting_you' && (this.selectedCategory === 'Todas' || q.category === this.selectedCategory));
+    const inv = this.api.inventory$.value;
+    const hasSpicy = inv && (inv.spicy_pack === true || inv.spicy_pack === 1 || inv.spicy_pack === '1');
+    return this.questions.filter(q => 
+      q.status === 'waiting_you' && 
+      (this.selectedCategory === 'Todas' ? (hasSpicy || (q.category !== 'Picante' && q.category !== 'Picantes')) : q.category === this.selectedCategory)
+    );
   }
 
   get completedQuestions() {
-    return this.questions.filter(q => (q.status === 'waiting_partner' || q.status === 'answered') && (this.selectedCategory === 'Todas' || q.category === this.selectedCategory));
+    const inv = this.api.inventory$.value;
+    const hasSpicy = inv && (inv.spicy_pack === true || inv.spicy_pack === 1 || inv.spicy_pack === '1');
+    return this.questions.filter(q => 
+      (q.status === 'waiting_partner' || q.status === 'answered') && 
+      (this.selectedCategory === 'Todas' ? (hasSpicy || (q.category !== 'Picante' && q.category !== 'Picantes')) : q.category === this.selectedCategory)
+    );
   }
 
   get totalCompletedQuestions() {
@@ -239,16 +269,30 @@ export class QuestionsWidgetComponent implements OnInit {
     return Math.round((this.totalCompletedQuestions.length / this.questions.length) * 100);
   }
 
-  private api = inject(LoveApiService);
+  public api = inject(LoveApiService);
   private toastCtrl = inject(ToastController);
   private location = inject(Location);
 
   constructor() {
-    addIcons({ helpCircleOutline, checkmarkCircleOutline, lockClosedOutline, alertCircleOutline, arrowBack, arrowUp });
+    addIcons({ helpCircleOutline, checkmarkCircleOutline, lockClosedOutline, alertCircleOutline, arrowBack, arrowUp, lockClosed: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M336 208v-95a80 80 0 00-160 0v95" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="96" y="208" width="320" height="272" rx="48" ry="48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>', flame: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M112 320c0-93 124-165 96-272 66 0 192 96 192 272a144 144 0 01-288 0z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path d="M320 368c0 57.71-32 80-64 80s-64-22.29-64-80 40-86 32-128c42 0 96 70.29 96 128z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>' });
   }
 
   ngOnInit() {
     this.loadQuestions();
+  }
+
+  async selectCategory(cat: string, inv: any) {
+    if (cat === 'Picante' && (!inv || !inv.spicy_pack)) {
+      const toast = await this.toastCtrl.create({
+        message: 'Debes desbloquear el pack Picante en la Tienda.',
+        duration: 3000,
+        position: 'top',
+        color: 'danger'
+      });
+      toast.present();
+      return;
+    }
+    this.selectedCategory = cat;
   }
 
   goBack() {

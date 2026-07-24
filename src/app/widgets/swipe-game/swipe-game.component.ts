@@ -41,12 +41,12 @@ import { Location } from '@angular/common';
             </div>
             <ng-container *ngIf="api.inventory$ | async as inv">
               <div class="cat-card" *ngFor="let cat of categories" 
-                   [class.premium]="cat.toLowerCase() === 'picantes' && !inv?.spicy_pack"
-                   [class.spicy]="cat.toLowerCase() === 'picantes' && inv?.spicy_pack"
+                   [class.premium]="(cat.toLowerCase() === 'picante' || cat.toLowerCase() === 'picantes') && !inv?.spicy_pack"
+                   [class.spicy]="(cat.toLowerCase() === 'picante' || cat.toLowerCase() === 'picantes') && inv?.spicy_pack"
                    (click)="handleCategoryClick(cat, inv)">
                 <h3>
-                  <ion-icon name="flame" *ngIf="cat.toLowerCase() === 'picantes' && inv?.spicy_pack" style="color: #ffbe0b; vertical-align: middle; margin-right: 5px;"></ion-icon>
-                  <ion-icon name="lock-closed" *ngIf="cat.toLowerCase() === 'picantes' && !inv?.spicy_pack" style="vertical-align: middle; margin-right: 5px;"></ion-icon>
+                  <ion-icon name="flame" *ngIf="(cat.toLowerCase() === 'picante' || cat.toLowerCase() === 'picantes') && inv?.spicy_pack" style="color: #ffbe0b; vertical-align: middle; margin-right: 5px;"></ion-icon>
+                  <ion-icon name="lock-closed" *ngIf="(cat.toLowerCase() === 'picante' || cat.toLowerCase() === 'picantes') && !inv?.spicy_pack" style="vertical-align: middle; margin-right: 5px;"></ion-icon>
                   {{ cat }}
                 </h3>
               </div>
@@ -82,6 +82,7 @@ import { Location } from '@angular/common';
             <div class="card" 
                  *ngFor="let card of cards; let i = index"
                  [class.active]="i === 0"
+                 [class.spicy-q]="card.category === 'Picante'"
                  [style.zIndex]="cards.length - i"
                  [style.transform]="getTransform(i)"
                  (touchstart)="onTouchStart($event, i)"
@@ -94,7 +95,7 @@ import { Location } from '@angular/common';
               
               <div class="card-content">
                 <div class="q-category" style="margin-bottom: 10px;">{{ card.category }}</div>
-                <h3>{{ card.question_text }}</h3>
+                <h3>{{ card.question_text }} <span *ngIf="card.category === 'Picante'">🌶️</span></h3>
               </div>
               
               <div class="stamp nope" [style.opacity]="getNopeOpacity(i)">NO</div>
@@ -111,9 +112,9 @@ import { Location } from '@angular/common';
         <!-- TE TOCA (LISTA) -->
         <ng-container *ngIf="subViewMode === 'waiting_you'">
           <div class="q-list">
-            <div class="q-card touchable" *ngFor="let q of filteredWaitingYou" (click)="playSpecificCard(q)">
+            <div class="q-card touchable" *ngFor="let q of filteredWaitingYou" (click)="playSpecificCard(q)" [class.spicy-q]="q.category === 'Picante'">
               <div class="q-category attention">¡Tu pareja está esperando!</div>
-              <h3 class="q-text">{{ q.question_text }}</h3>
+              <h3 class="q-text">{{ q.question_text }} <span *ngIf="q.category === 'Picante'">🌶️</span></h3>
               <p class="q-hint">Toca para responder</p>
             </div>
             <div *ngIf="filteredWaitingYou.length === 0" class="empty-state-list">
@@ -247,6 +248,8 @@ import { Location } from '@angular/common';
     .q-text { color: #590D22; font-size: 1.05rem; margin: 0 0 5px; font-weight: 700; line-height: 1.3; }
     .q-hint { color: #888; font-size: 0.8rem; margin: 0; font-style: italic; }
     .empty-state-list { text-align: center; color: #a4133c; padding: 30px; font-weight: bold; opacity: 0.8; }
+    .card.spicy-q { border: 3px solid #ff0055; box-shadow: 0 0 20px rgba(255, 0, 85, 0.4); }
+    .q-card.spicy-q { border: 2px solid #ff0055; box-shadow: 0 0 15px rgba(255, 0, 85, 0.3); }
 
     .empty-state { text-align: center; margin-top: 50px; }
     .empty-state h3 { color: #590D22; font-size: 1.5rem; }
@@ -390,6 +393,13 @@ export class SwipeGameComponent implements OnInit {
       } else if (response && typeof response === 'object') {
         cats = Object.values(response).find(val => Array.isArray(val)) as any[] || [];
       }
+      
+      const spicyIdx = cats.findIndex(c => c.toLowerCase() === 'picante' || c.toLowerCase() === 'picantes');
+      if (spicyIdx > -1) {
+        const spicy = cats.splice(spicyIdx, 1)[0];
+        cats.unshift(spicy);
+      }
+      
       this.categories = cats;
     } catch (e) {
       console.error(e);
@@ -398,7 +408,7 @@ export class SwipeGameComponent implements OnInit {
   }
 
   handleCategoryClick(cat: string, inv: any) {
-    if (cat.toLowerCase() === 'picantes' && (!inv || !inv.spicy_pack)) {
+    if ((cat.toLowerCase() === 'picante' || cat.toLowerCase() === 'picantes') && (!inv || !inv.spicy_pack)) {
       this.showToast('Debes desbloquear el pack Picante en la Tienda.');
       return;
     }
@@ -457,7 +467,11 @@ export class SwipeGameComponent implements OnInit {
       }
       all = Array.from(uniqueMap.values());
 
-      this.allCards = this.selectedCategory ? all.filter(c => c.category === this.selectedCategory) : all;
+      const inv = this.api.inventory$.value;
+      const hasSpicy = inv && (inv.spicy_pack === true || inv.spicy_pack === 1 || inv.spicy_pack === '1');
+      this.allCards = this.selectedCategory ? 
+        all.filter(c => c.category === this.selectedCategory) : 
+        all.filter(c => hasSpicy || (c.category !== 'Picante' && c.category !== 'Picantes'));
       this.prepareStack();
     } catch (e) {
       console.error(e);

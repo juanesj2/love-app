@@ -227,30 +227,29 @@ export class FingerprintGameModalComponent implements OnInit, OnDestroy {
   }
 
   private triggerConfetti() {
-    const duration = 3000;
+    const duration = 2000;
     const end = Date.now() + duration;
 
-    const frame = () => {
+    const interval = setInterval(() => {
+      if (Date.now() > end) {
+        return clearInterval(interval);
+      }
+
       confetti({
-        particleCount: 5,
+        particleCount: 15,
         angle: 60,
         spread: 55,
         origin: { x: 0 },
         colors: ['#00ff88', '#ff4d6d', '#ffffff']
       });
       confetti({
-        particleCount: 5,
+        particleCount: 15,
         angle: 120,
         spread: 55,
         origin: { x: 1 },
         colors: ['#00ff88', '#ff4d6d', '#ffffff']
       });
-
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
-      }
-    };
-    frame();
+    }, 250);
   }
 }
 

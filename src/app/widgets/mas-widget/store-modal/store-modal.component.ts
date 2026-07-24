@@ -52,13 +52,13 @@ import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer
               </div>
             </div>
 
-            <div class="offer-card" style="background-image: url('assets/images/offers/spicy.png'); background-size: cover; background-position: center;" (click)="purchaseItem('spicy_pack')">
+            <div class="offer-card" style="background-image: url('assets/images/offers/spicy.png'); background-size: cover; background-position: center;" (click)="openSpicyModal()">
               <div class="offer-overlay"></div>
               <div class="offer-content">
                 <div class="offer-badge" style="background: #240046; color: #ff0054;">18+ HOT</div>
                 <h3 class="offer-title">Pack Picante</h3>
-                <p class="offer-desc">Desbloquea 50 retos y juegos íntimos para subir la temperatura</p>
-                <button class="offer-btn" style="color: #ff0054;">Desbloquear 2.99€</button>
+                <p class="offer-desc">Desbloquea todos los retos y juegos íntimos para subir la temperatura</p>
+                <button class="offer-btn" style="color: #ff0054;">Desbloquear 1.99€</button>
               </div>
             </div>
 
@@ -116,7 +116,7 @@ import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer
             <div class="card-icon">🎁</div>
             <div class="card-info">
               <span class="card-title" style="color: #590D22;">Regalo 3D / Pack</span>
-              <span class="card-desc" style="color: #FF4D6D; font-weight: 800; font-size: 0.75rem;">(Tienes: {{ getTotalGifts(api.couple()?.inventory || {}) }})</span>
+              <span class="card-desc" style="color: #FF4D6D; font-weight: 800; font-size: 0.75rem;">(Tienes: {{ getTotalGifts((api.inventory$ | async) || {}) }})</span>
               <span class="card-desc" style="color: #a4133c;">Elige y envía un modelo 3D sorpresa o un pack con descuento.</span>
             </div>
             <div class="card-action pack-price">
@@ -165,49 +165,65 @@ import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer
 
           <div style="display: flex; gap: 10px; justify-content: center; padding-bottom: 15px;">
             <div (click)="selectedGiftType = 'teddy'" 
-                 style="font-size: 2rem; cursor: pointer; padding: 10px 12px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s; position: relative;" 
+                 style="font-size: 2rem; cursor: pointer; padding: 10px 12px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s;" 
                  [style.background]="selectedGiftType === 'teddy' ? '#ffe4eb' : '#f8f9fa'" 
                  [style.borderColor]="selectedGiftType === 'teddy' ? '#ffb3c6' : 'transparent'">
               🧸
-              <div *ngIf="cart['teddy'] > 0" style="position: absolute; top: -5px; right: -5px; background: #FF4D6D; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; font-weight: bold;">{{ cart['teddy'] }}</div>
             </div>
             <div (click)="selectedGiftType = 'rose'" 
-                 style="font-size: 2rem; cursor: pointer; padding: 10px 12px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s; position: relative;" 
+                 style="font-size: 2rem; cursor: pointer; padding: 10px 12px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s;" 
                  [style.background]="selectedGiftType === 'rose' ? '#ffe4eb' : '#f8f9fa'" 
                  [style.borderColor]="selectedGiftType === 'rose' ? '#ffb3c6' : 'transparent'">
               🌹
-              <div *ngIf="cart['rose'] > 0" style="position: absolute; top: -5px; right: -5px; background: #FF4D6D; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; font-weight: bold;">{{ cart['rose'] }}</div>
             </div>
             <div (click)="selectedGiftType = 'ring'" 
-                 style="font-size: 2rem; cursor: pointer; padding: 10px 12px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s; position: relative;" 
+                 style="font-size: 2rem; cursor: pointer; padding: 10px 12px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s;" 
                  [style.background]="selectedGiftType === 'ring' ? '#ffe4eb' : '#f8f9fa'" 
                  [style.borderColor]="selectedGiftType === 'ring' ? '#ffb3c6' : 'transparent'">
               💍
-              <div *ngIf="cart['ring'] > 0" style="position: absolute; top: -5px; right: -5px; background: #FF4D6D; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; font-weight: bold;">{{ cart['ring'] }}</div>
             </div>
             <div (click)="selectedGiftType = 'bundle'" 
-                 style="font-size: 2rem; cursor: pointer; padding: 10px 12px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s; position: relative;" 
+                 style="font-size: 2rem; cursor: pointer; padding: 10px 12px; border-radius: 18px; border: 2px solid transparent; transition: 0.2s;" 
                  [style.background]="selectedGiftType === 'bundle' ? '#ffe4eb' : '#f8f9fa'" 
                  [style.borderColor]="selectedGiftType === 'bundle' ? '#ffb3c6' : 'transparent'">
               🎁
-              <div *ngIf="cart['bundle'] > 0" style="position: absolute; top: -5px; right: -5px; background: #FF4D6D; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; font-weight: bold;">{{ cart['bundle'] }}</div>
             </div>
           </div>
           
-          <div style="display: flex; align-items: center; justify-content: center; gap: 25px; margin-bottom: 15px;">
-            <button style="background: #f8f9fa; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-radius: 50%; width: 45px; height: 45px; font-size: 1.8rem; color: #590D22; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="decrementCart()">-</button>
-            <span style="font-size: 1.8rem; font-weight: 900; color: #FF4D6D; min-width: 40px; text-align: center;">{{ cart[selectedGiftType] || 0 }}</span>
-            <button style="background: #f8f9fa; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-radius: 50%; width: 45px; height: 45px; font-size: 1.8rem; color: #590D22; display: flex; align-items: center; justify-content: center; cursor: pointer;" (click)="incrementCart()">+</button>
-          </div>
-
-          <button class="confirm-gift-btn" [disabled]="getCartTotal() === 0" (click)="purchaseGift()">
-            {{ getCartTotal() > 0 ? ('Comprar por ' + (getCartTotal() | number:'1.2-2') + ' €') : 'Selecciona cantidad' }}
+          <button class="confirm-gift-btn" (click)="purchaseItem('gift_' + selectedGiftType)">
+            Comprar {{ selectedGiftType === 'bundle' ? 'Pack x3' : 'Regalo' }} por {{ selectedGiftType === 'bundle' ? '2.00' : '0.99' }} €
           </button>
         </div>
       </div>
 
       <!-- Letter Form Modal -->
-      <app-letter-form-modal [isOpen]="showLetterForm" (close)="showLetterForm = false" (letterSent)="processPurchase('letters', $event)"></app-letter-form-modal>
+      <app-letter-form-modal 
+        *ngIf="showLetterForm" 
+        (close)="showLetterForm = false" 
+        (save)="onLetterSave($event)">
+      </app-letter-form-modal>
+
+      <!-- Spicy Modal Overlay -->
+      <div class="gift-selector-overlay" *ngIf="showSpicyModal" (click)="showSpicyModal = false">
+        <div class="gift-selector-sheet" (click)="$event.stopPropagation()">
+          <div class="handle-bar"></div>
+          <h2 class="header-title" style="text-align: center; margin-bottom: 20px; color: #ff0054;">Pack Picante 🌶️</h2>
+          
+          <div style="text-align: center; font-size: 1.1rem; color: #590D22; margin-bottom: 20px; font-weight: 700; line-height: 1.5;">
+            Más de 150 preguntas picantes para ti y para tu pareja, para que os conozcáis más a fondo 😏
+          </div>
+          
+          <div style="background: rgba(255, 0, 85, 0.1); border-radius: 15px; padding: 15px; margin-bottom: 25px; text-align: left; display: flex; flex-direction: column; gap: 8px;">
+            <span style="color: #590D22; font-weight: bold; font-size: 0.95rem;">🔥 60 Preguntas de Tinder</span>
+            <span style="color: #590D22; font-weight: bold; font-size: 0.95rem;">🔥 50 Preguntas Íntimas</span>
+            <span style="color: #590D22; font-weight: bold; font-size: 0.95rem;">🔥 50 Retos de Dibujo</span>
+          </div>
+
+          <button class="confirm-gift-btn" style="background: #ff0054; margin-top: 0;" (click)="purchaseSpicyPack()">
+            Comprar por 1.99€
+          </button>
+        </div>
+      </div>
 
       <!-- Lottie Overlay for Purchases -->
       <div class="lottie-overlay" *ngIf="showLottie">
@@ -335,6 +351,7 @@ export class StoreModalComponent implements OnInit, OnDestroy {
   private dotLottieInstance?: DotLottie;
 
   showLetterForm = false;
+  showSpicyModal = false;
 
   constructor() {
     addIcons({ closeOutline, chevronForward, giftOutline });
@@ -425,6 +442,15 @@ export class StoreModalComponent implements OnInit, OnDestroy {
     if (cartItems.length > 0) {
       this.purchaseItem('cart', { cart: cartItems });
     }
+  }
+
+  openSpicyModal() {
+    this.showSpicyModal = true;
+  }
+
+  purchaseSpicyPack() {
+    this.showSpicyModal = false;
+    this.purchaseItem('spicy_pack');
   }
 
   closeLottieOverlay() {
@@ -533,12 +559,25 @@ export class StoreModalComponent implements OnInit, OnDestroy {
   private async processPurchase(item: string, data?: any) {
     this.purchasingItem = item;
     try {
+      // 1. Cobrar usando RevenueCat
+      const purchaseRes = await this.premiumService.purchaseConsumable(item);
+      
+      if (!purchaseRes.success) {
+        if (!purchaseRes.error?.userCancelled) {
+           await this.playLottieAnimation('assets/lottie/Payment Failed.lottie', 'Error en la compra.', 'Volver');
+        }
+        return;
+      }
+
+      // 2. Registrar en backend y actualizar inventario local
       let body: any = { item };
       if (data) {
         body = { ...body, ...data };
       }
       const res = await this.api.storePurchase(body);
       this.api.inventory$.next(res.inventory);
+      
+      // 3. Celebrar
       this.fireConfetti();
       await this.playLottieAnimation('assets/lottie/Payment Success.lottie', '¡Desbloqueado!', 'Genial');
       this.cdr.detectChanges();

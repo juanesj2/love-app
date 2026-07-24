@@ -112,7 +112,7 @@ import { StoreModalComponent } from '../mas-widget/store-modal/store-modal.compo
                     </p>
                     <div class="gift-reply" *ngIf="msg.mensaje && msg.mensaje.startsWith('[GIFT]')" (click)="openGiftOrLetter(msg)">
                       <div class="gift-box" [class.opened]="msg.meta?.opened">
-                        <span class="gift-icon">{{ msg.meta?.opened ? '🎀' : '🎁' }}</span>
+                        <img class="gift-icon-img" [src]="getGiftImageUrl(msg)" alt="gift" />
                         <span class="gift-text">{{ msg.meta?.opened ? 'Regalo Abierto' : 'Regalo Sorpresa (Toca para abrir)' }}</span>
                       </div>
                     </div>
@@ -672,6 +672,7 @@ import { StoreModalComponent } from '../mas-widget/store-modal/store-modal.compo
     .reactions-container { position: absolute; bottom: -12px; right: 10px; background: white; padding: 2px 6px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; gap: 2px; border: 1px solid rgba(0,0,0,0.05); z-index: 2; }
     .mine .reactions-container { right: auto; left: 10px; }
     
+    .letter-icon-img, .gift-icon-img { width: 40px; height: 40px; object-fit: contain; margin-bottom: 5px; }
     .reply-icon-circle { width: 40px; height: 40px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     .reply-icon-circle ion-icon { font-size: 1.5rem; color: #FF4D6D; }
     .reaction { font-size: 0.9rem; }
@@ -3011,6 +3012,17 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     }
   }
 
+  getGiftImageUrl(msg: any): string {
+    if (!msg.meta?.opened) {
+      return 'assets/gifts/box.png';
+    }
+    const type = msg.meta?.giftType || msg.meta?.gift_type;
+    if (type === 'teddy') return 'assets/gifts/teddy.png';
+    if (type === 'rose') return 'assets/gifts/rose.png';
+    if (type === 'ring') return 'assets/gifts/ring.png';
+    return 'assets/gifts/box.png';
+  }
+
   async openGiftOrLetter(msg: any) {
     if (msg.meta?.type === 'letter' || (msg.mensaje && msg.mensaje.startsWith('[LETTER]'))) {
       if (!msg.meta) msg.meta = { type: 'letter' };
@@ -3032,23 +3044,20 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       return;
     } else if (msg.meta?.type === 'gift' || (msg.mensaje && msg.mensaje.startsWith('[GIFT]'))) {
       if (!msg.meta) msg.meta = { type: 'gift' };
+      
+      if (this.isMine(msg)) {
+        return; // El remitente no puede abrir el regalo para el destinatario
+      }
+      
+      if (msg.meta?.opened) return; // Ya está abierto
+      
       this.pendingLetterService.pendingGift$.next(msg);
-    }
-
-    if (msg.meta?.opened) return; // Ya está abierto
-    
-    // Aquí abriríamos un modal Lottie para regalos, pero como el evento global salta al entrar,
-    // si el usuario está en el chat y le da click, podemos disparar la animación global
-    // manualmente y actualizar el mensaje.
-    
-    // Actualizamos en local primero
-    if (!msg.meta) msg.meta = {};
-    msg.meta.opened = true;
-    
-    try {
-      await this.api.editMessage(msg.id, msg.mensaje, msg.meta);
-    } catch (e) {
-      console.error(e);
+      msg.meta.opened = true;
+      try {
+        await this.api.editMessage(msg.id, msg.mensaje, msg.meta);
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 
@@ -3534,30 +3543,29 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   private triggerConfetti() {
-    const duration = 3000;
+    const duration = 2000;
     const end = Date.now() + duration;
 
-    const frame = () => {
+    const interval = setInterval(() => {
+      if (Date.now() > end) {
+        return clearInterval(interval);
+      }
+
       confetti({
-        particleCount: 5,
+        particleCount: 15,
         angle: 60,
         spread: 55,
         origin: { x: 0 },
         colors: ['#00ff88', '#ff4d6d', '#ffffff']
       });
       confetti({
-        particleCount: 5,
+        particleCount: 15,
         angle: 120,
         spread: 55,
         origin: { x: 1 },
         colors: ['#00ff88', '#ff4d6d', '#ffffff']
       });
-
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
-      }
-    };
-    frame();
+    }, 250);
   }
 
   async promptStore(item: string) {
