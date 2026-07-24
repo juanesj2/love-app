@@ -1,5 +1,12 @@
+:host {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .secure-image-container {
-  display: inline-block;
+  display: block;
   position: relative;
   width: 100%;
   height: 100%;
@@ -25,6 +32,8 @@
     object-fit: inherit;
     border-radius: inherit;
     display: block;
+    opacity: 0;
+    animation: fadeIn 0.3s ease forwards;
   }
 }
 
