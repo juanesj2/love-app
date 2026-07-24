@@ -13,7 +13,7 @@ import { LocationService } from '../../services/location.service';
 import { TutorialService } from '../../services/tutorial.service';
 import { OfflineSyncService } from '../../services/offline-sync.service';
 import { addIcons } from 'ionicons';
-import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, bookOutline, imageOutline, checkmarkCircleOutline, informationCircleOutline, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, lockClosed, fingerPrintOutline, chevronForward, documentTextOutline, documentOutline } from 'ionicons/icons';
+import { logOutOutline, timeOutline, settingsOutline, heart, heartOutline, flagOutline, addCircleOutline, gameControllerOutline, starOutline, checkmarkCircle, ellipseOutline, personCircleOutline, moonOutline, closeCircle, closeOutline, calendar, restaurantOutline, filmOutline, star, cameraOutline, pencilOutline, add, locationOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, bookOutline, imageOutline, checkmarkCircleOutline, informationCircleOutline, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, lockClosed, fingerPrintOutline, chevronForward, documentTextOutline, documentOutline, flashOutline } from 'ionicons/icons';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { TimelineWidgetComponent } from '../timeline-widget/timeline-widget.component';
@@ -1406,7 +1406,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   isInventoryModalOpen = false;
 
   constructor() {
-    addIcons({ fingerPrintOutline, bookOutline, imageOutline, logOutOutline, addCircleOutline, starOutline, star, closeOutline, checkmarkCircleOutline, restaurantOutline, locationOutline, pencilOutline, filmOutline, gameControllerOutline, personCircleOutline, informationCircleOutline, heartOutline, heart, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, timeOutline, settingsOutline, flagOutline, checkmarkCircle, ellipseOutline, moonOutline, closeCircle, calendar, add, cameraOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, lockClosed, chevronForward, documentTextOutline, documentOutline });
+    addIcons({ fingerPrintOutline, bookOutline, imageOutline, logOutOutline, addCircleOutline, starOutline, star, closeOutline, checkmarkCircleOutline, restaurantOutline, locationOutline, pencilOutline, filmOutline, gameControllerOutline, personCircleOutline, informationCircleOutline, heartOutline, heart, chatboxEllipsesOutline, heartDislikeOutline, trashOutline, settingsSharp, timeOutline, settingsOutline, flagOutline, checkmarkCircle, ellipseOutline, moonOutline, closeCircle, calendar, add, cameraOutline, trophyOutline, sparklesOutline, airplaneOutline, wineOutline, musicalNotesOutline, mapOutline, searchOutline, lockClosed, chevronForward, documentTextOutline, documentOutline, flashOutline });
   }
 
   async checkNightOwl() {
