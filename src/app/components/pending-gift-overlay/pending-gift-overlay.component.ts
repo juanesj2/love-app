@@ -71,7 +71,8 @@ import { GiftViewerComponent } from '../gift-viewer/gift-viewer.component';
     .tap-hint {
       color: white; font-size: 1.2rem; font-weight: 700;
       text-shadow: 0 2px 8px rgba(0,0,0,0.5); letter-spacing: 0.5px;
-      transition: opacity 0.4s; margin-top: 8px;
+      transition: opacity 0.4s; margin-top: 8px; text-align: center;
+      line-height: 1.5; padding: 0 20px; max-width: 90%;
     }
     .tap-hint.fade { opacity: 0; pointer-events: none; }
 
@@ -209,8 +210,8 @@ export class PendingGiftOverlayComponent implements OnInit, OnDestroy, AfterView
     this.cleanupLottie();
     if (this.lottieCanvas?.nativeElement) {
       this.dotLottieInstance = new DotLottie({
-        autoplay: this.isAdminGift ? true : false,
-        loop: this.isAdminGift ? true : false,
+        autoplay: true,
+        loop: false,
         canvas: this.lottieCanvas.nativeElement,
         src: this.isAdminGift ? 'assets/lottie/Admin_giftt.lottie' : 'assets/lottie/gift-box.lottie'
       });
