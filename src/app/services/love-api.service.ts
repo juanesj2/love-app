@@ -696,4 +696,8 @@ export class LoveApiService {
   async updateInventoryLetter(id: string, payload: any): Promise<any> {
     return firstValueFrom(this.http.put<any>(`${API_BASE_URL}/love-album/store/letters/${id}`, payload));
   }
+
+  async deleteInventoryLetter(id: string): Promise<any> {
+    return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/love-album/store/letters/${id}`));
+  }
 }

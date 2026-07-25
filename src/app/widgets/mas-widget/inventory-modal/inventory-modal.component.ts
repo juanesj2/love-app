@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Output, inject, HostListener, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, Input, inject, HostListener, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonIcon, IonModal } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { closeOutline, gift, mail, lockClosed, chevronUp, chevronDown } from 'ionicons/icons';
+import { closeOutline, gift, mail, lockClosed, chevronUp, chevronDown, trashOutline } from 'ionicons/icons';
 import { LoveApiService } from '../../../services/love-api.service';
 import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer.component';
 import { InteractiveLetterComponent } from '../../../components/interactive-letter/interactive-letter.component';
@@ -112,10 +112,14 @@ import { InteractiveLetterComponent } from '../../../components/interactive-lett
           </div>
           
           <div class="letters-list" *ngIf="inv.letters && inv.letters.length > 0 && showLetters">
-            <div class="letter-card" *ngFor="let letter of inv.letters" (click)="openLetter(letter)" style="cursor: pointer;">
+            <div class="letter-card" *ngFor="let letter of inv.letters" (click)="openLetter(letter)" style="cursor: pointer; position: relative;">
               <div class="l-title">{{letter.title}}</div>
               <div class="l-subj">{{letter.subject}}</div>
               <div class="l-date">{{letter.created_at | date:'shortDate'}}</div>
+              <button *ngIf="myRole === 'SuperAdmin'" (click)="deleteLetter(letter, $event)" 
+                      style="position: absolute; right: 10px; top: 10px; background: transparent; border: none; color: #d32f2f; font-size: 1.2rem; cursor: pointer; padding: 5px;">
+                <ion-icon name="trash-outline"></ion-icon>
+              </button>
             </div>
           </div>
         </div>
@@ -194,6 +198,7 @@ import { InteractiveLetterComponent } from '../../../components/interactive-lett
   `]
 })
 export class InventoryModalComponent {
+  @Input() myRole: string = '';
   @Output() close = new EventEmitter<void>();
   api = inject(LoveApiService);
   
@@ -228,7 +233,17 @@ export class InventoryModalComponent {
   interactiveLetterData: any = null;
 
   constructor() {
-    addIcons({ closeOutline, gift, mail, lockClosed, chevronUp, chevronDown });
+    addIcons({ closeOutline, gift, mail, lockClosed, chevronUp, chevronDown, trashOutline });
+  }
+
+  async deleteLetter(letter: any, event: Event) {
+    event.stopPropagation();
+    try {
+      await this.api.deleteInventoryLetter(letter.id);
+      this.api.loadInventory(); // reload
+    } catch (error) {
+      console.error('Error deleting letter', error);
+    }
   }
 
   toggleLetters() {

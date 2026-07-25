@@ -790,7 +790,9 @@ import { LegalModalComponent } from './legal-modal.component';
         <app-store-modal *ngIf="isStoreModalOpen" (close)="closeStoreModal()" (openPaywall)="openPaywall()" (openPremiumEvent)="showPremiumEventModal = true"></app-store-modal>
         
         <!-- Inventory Modal -->
-        <app-inventory-modal *ngIf="isInventoryModalOpen" (close)="closeInventoryModal()"></app-inventory-modal>
+        <app-inventory-modal *ngIf="isInventoryModalOpen" 
+          [myRole]="myRole"
+          (close)="closeInventoryModal()"></app-inventory-modal>
 
         <!-- Premium Event Modal (Impulsa tu Relación) -->
         <app-premium-event-modal *ngIf="showPremiumEventModal" (close)="showPremiumEventModal = false"></app-premium-event-modal>
