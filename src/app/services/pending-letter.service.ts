@@ -83,7 +83,7 @@ export class PendingLetterService {
       );
 
       const unreadPartnerSurprises = surprises.filter(msg =>
-        (Number(msg.user_id) !== Number(this.myId) || msg.mensaje?.startsWith('[ADMIN_GIFT]')) &&
+        (Number(msg.user_id) !== Number(this.myId)) &&
         !msg.meta?.opened
       );
 
