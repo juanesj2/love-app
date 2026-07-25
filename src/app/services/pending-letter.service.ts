@@ -82,10 +82,15 @@ export class PendingLetterService {
          msg.mensaje?.startsWith('[LETTER]') || msg.mensaje?.startsWith('[GIFT]') || msg.mensaje?.startsWith('[ADMIN_GIFT]')
       );
 
-      const unreadPartnerSurprises = surprises.filter(msg =>
-        (Number(msg.user_id) !== Number(this.myId)) &&
-        !msg.meta?.opened
-      );
+      const unreadPartnerSurprises = surprises.filter(msg => {
+        if (msg.meta?.opened) return false;
+        
+        if (msg.mensaje?.startsWith('[ADMIN_GIFT]') && msg.meta?.target_user_id) {
+          return Number(msg.meta.target_user_id) === Number(this.myId);
+        }
+        
+        return Number(msg.user_id) !== Number(this.myId);
+      });
 
       if (unreadPartnerSurprises.length === 0) return null;
 

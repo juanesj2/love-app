@@ -175,8 +175,7 @@ export class PendingGiftOverlayComponent implements OnInit, OnDestroy, AfterView
 
   get isAdminGiftLetter(): boolean {
     return this.isAdminGift && 
-           (this.pendingMsg?.meta?.gifts?.type === 'letters' || this.pendingMsg?.meta?.gifts?.type === 'letter') &&
-           !this.amISender;
+           (this.pendingMsg?.meta?.gifts?.type === 'letters' || this.pendingMsg?.meta?.gifts?.type === 'letter');
   }
 
   get adminGiftLetterId(): string {
