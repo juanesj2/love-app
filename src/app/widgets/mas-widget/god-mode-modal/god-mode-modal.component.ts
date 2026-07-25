@@ -685,11 +685,7 @@ export class GodModeModalComponent implements OnInit, OnDestroy {
   }
 
   grantGifts() {
-    if (this.powerGiftType === 'letters') {
-      this.showLetterForm = true;
-    } else {
-      this.processGrantGifts();
-    }
+    this.processGrantGifts();
   }
 
   async onGodLetterSave(data: {title: string, subject: string, content: string}) {
