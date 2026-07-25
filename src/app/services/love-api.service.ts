@@ -685,12 +685,15 @@ export class LoveApiService {
     if (email) body.email = email;
     return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/god-mode/grant-gifts`, body));
   }
-
   async setGodStreak(streak: number): Promise<any> {
     return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/god-mode/set-streak`, { streak }));
   }
 
   async setGodTheme(theme: string): Promise<any> {
     return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/god-mode/set-theme`, { theme }));
+  }
+
+  async updateInventoryLetter(id: string, payload: any): Promise<any> {
+    return firstValueFrom(this.http.put<any>(`${API_BASE_URL}/love-album/store/letters/${id}`, payload));
   }
 }

@@ -5,13 +5,21 @@ import { PendingLetterService } from '../../services/pending-letter.service';
 import { LoveApiService } from '../../services/love-api.service';
 import { Subscription } from 'rxjs';
 import { GiftViewerComponent } from '../gift-viewer/gift-viewer.component';
+import { FillLetterModalComponent } from '../fill-letter-modal/fill-letter-modal.component';
 
 @Component({
   selector: 'app-pending-gift-overlay',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FillLetterModalComponent],
   template: `
-    <div class="gift-global-overlay" *ngIf="pendingMsg && !isOpened">
+    <!-- Fill Letter Modal -->
+    <app-fill-letter-modal 
+      *ngIf="isFillingLetter" 
+      [letterId]="adminGiftLetterId" 
+      (close)="closeFillLetter()">
+    </app-fill-letter-modal>
+
+    <div class="gift-global-overlay" *ngIf="pendingMsg && !isOpened && !isFillingLetter">
       <div class="gift-global-container" (click)="$event.stopPropagation()">
 
         <!-- Lottie gift box -->
@@ -26,7 +34,7 @@ import { GiftViewerComponent } from '../gift-viewer/gift-viewer.component';
     </div>
 
     <!-- Regalo abierto -->
-    <div class="gift-global-overlay" *ngIf="isOpened">
+    <div class="gift-global-overlay" *ngIf="isOpened && !isFillingLetter">
       <div class="gift-content-container" (click)="$event.stopPropagation()">
         <div class="gift-box-opened">
           <h2 *ngIf="!isAdminGift">¡Has recibido un regalo virtual!</h2>
@@ -40,13 +48,15 @@ import { GiftViewerComponent } from '../gift-viewer/gift-viewer.component';
           </ng-container>
 
           <ng-container *ngIf="isAdminGift">
-            <img src="assets/gifts/box.png" alt="admin-gift" style="width: 150px; height: 150px; object-fit: contain;" />
+            <img [src]="isAdminGiftLetter ? 'assets/gifts/box.png' : 'assets/gifts/box.png'" alt="admin-gift" style="width: 150px; height: 150px; object-fit: contain;" />
             <div class="gift-message">
               <p class="gift-message-text" style="font-weight: 700; color: #d00000;">Has recibido:<br/> {{ adminGiftText }}</p>
             </div>
           </ng-container>
         </div>
-        <button class="close-btn" (click)="closeOverlay()">Guardar en el inventario 🎁</button>
+        
+        <button class="close-btn action-fill" *ngIf="isAdminGiftLetter" (click)="openFillLetter()">Escribir carta ahora ✍️</button>
+        <button class="close-btn" *ngIf="!isAdminGiftLetter" (click)="closeOverlay()">Guardar en el inventario 🎁</button>
       </div>
     </div>
   `,
@@ -131,6 +141,8 @@ import { GiftViewerComponent } from '../gift-viewer/gift-viewer.component';
       transition: transform 0.2s, background 0.2s; width: 100%;
     }
     .close-btn:active { transform: scale(0.95); background: #c9184a; }
+    
+    .action-fill { background: linear-gradient(135deg, #FF4D6D, #ff758f); }
 
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes popIn {
@@ -157,6 +169,14 @@ export class PendingGiftOverlayComponent implements OnInit, OnDestroy, AfterView
     return this.pendingMsg?.mensaje === '[ADMIN_GIFT]';
   }
 
+  get isAdminGiftLetter(): boolean {
+    return this.isAdminGift && (this.pendingMsg?.meta?.gifts?.type === 'letters' || this.pendingMsg?.meta?.gifts?.type === 'letter');
+  }
+
+  get adminGiftLetterId(): string {
+    return this.pendingMsg?.meta?.gifts?.letter_id || '';
+  }
+
   get adminGiftText(): string {
     if (!this.isAdminGift || !this.pendingMsg?.meta?.gifts) return '';
     const gifts = this.pendingMsg.meta.gifts;
@@ -164,9 +184,22 @@ export class PendingGiftOverlayComponent implements OnInit, OnDestroy, AfterView
     if (gifts.type === 'all') {
       return `${amount} rosa(s), ${amount} anillo(s) y ${amount} oso(s)`;
     } else {
-      const typeName = gifts.type === 'rose' ? 'rosa(s)' : gifts.type === 'ring' ? 'anillo(s)' : 'oso(s)';
+      const typeName = gifts.type === 'rose' ? 'rosa(s)' : 
+                       gifts.type === 'ring' ? 'anillo(s)' : 
+                       (gifts.type === 'letters' || gifts.type === 'letter') ? 'carta(s) en blanco' : 'oso(s)';
       return `${amount} ${typeName}`;
     }
+  }
+
+  isFillingLetter = false;
+
+  openFillLetter() {
+    this.isFillingLetter = true;
+  }
+
+  closeFillLetter() {
+    this.isFillingLetter = false;
+    this.closeOverlay();
   }
 
   getGiftImageUrl(msg: any): string {
