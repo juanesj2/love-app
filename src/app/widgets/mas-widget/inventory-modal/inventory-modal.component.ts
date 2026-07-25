@@ -240,7 +240,7 @@ export class InventoryModalComponent {
     event.stopPropagation();
     try {
       await this.api.deleteInventoryLetter(letter.id);
-      this.api.loadInventory(); // reload
+      this.api.getCoupleInfo(); // reload
     } catch (error) {
       console.error('Error deleting letter', error);
     }
