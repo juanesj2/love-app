@@ -209,8 +209,8 @@ export class PendingGiftOverlayComponent implements OnInit, OnDestroy, AfterView
     this.cleanupLottie();
     if (this.lottieCanvas?.nativeElement) {
       this.dotLottieInstance = new DotLottie({
-        autoplay: false,
-        loop: false,
+        autoplay: this.isAdminGift ? true : false,
+        loop: this.isAdminGift ? true : false,
         canvas: this.lottieCanvas.nativeElement,
         src: this.isAdminGift ? 'assets/lottie/Admin_giftt.lottie' : 'assets/lottie/gift-box.lottie'
       });
@@ -228,7 +228,7 @@ export class PendingGiftOverlayComponent implements OnInit, OnDestroy, AfterView
     if (this.isPlaying) return;
     this.isPlaying = true;
 
-    if (this.dotLottieInstance) {
+    if (this.dotLottieInstance && !this.isAdminGift) {
        this.dotLottieInstance.play();
     }
 
