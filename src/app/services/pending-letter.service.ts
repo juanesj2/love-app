@@ -13,7 +13,7 @@ export class PendingLetterService {
   public pendingGift$ = new BehaviorSubject<any>(null);
   private shownLetterIds = new Set<number>();
   private pollSub?: Subscription;
-  private myId: number | null = null;
+  public myId: number | null = null;
 
   constructor() {
     this.loadShownLetters();

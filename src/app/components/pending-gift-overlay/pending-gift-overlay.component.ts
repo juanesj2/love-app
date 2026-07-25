@@ -165,12 +165,18 @@ export class PendingGiftOverlayComponent implements OnInit, OnDestroy, AfterView
   isPlaying = false;
   private sub?: Subscription;
 
+  get amISender(): boolean {
+    return Number(this.pendingMsg?.user_id) === Number(this.pendingService.myId);
+  }
+
   get isAdminGift(): boolean {
     return this.pendingMsg?.mensaje === '[ADMIN_GIFT]';
   }
 
   get isAdminGiftLetter(): boolean {
-    return this.isAdminGift && (this.pendingMsg?.meta?.gifts?.type === 'letters' || this.pendingMsg?.meta?.gifts?.type === 'letter');
+    return this.isAdminGift && 
+           (this.pendingMsg?.meta?.gifts?.type === 'letters' || this.pendingMsg?.meta?.gifts?.type === 'letter') &&
+           !this.amISender;
   }
 
   get adminGiftLetterId(): string {
