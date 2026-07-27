@@ -11,7 +11,7 @@ import iro from '@jaames/iro';
 @Component({
   selector: 'app-drawing-game',
   template: `
-    <ion-content>
+    <ion-content [scrollY]="gameState !== 'drawing'">
       <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)" [disabled]="gameState === 'drawing'">
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
@@ -194,8 +194,8 @@ import iro from '@jaames/iro';
       display: block;
       height: 100%;
     }
-    .drawing-container { padding: calc(var(--safe-top) + 40px) 20px calc(var(--safe-bottom) + 80px); background: #fff0f3; min-height: 100vh; display: flex; flex-direction: column; overflow-y: auto; height: 100vh; box-sizing: border-box; overscroll-behavior-y: none; }
-    .header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+    .drawing-container { padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 20px); background: #fff0f3; display: flex; flex-direction: column; overflow-y: auto; height: 100%; box-sizing: border-box; overscroll-behavior-y: none; }
+    .header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; flex-shrink: 0; }
     .back-btn { background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; flex-shrink: 0; }
     .header-titles { flex: 1; text-align: center; display: flex; flex-direction: column; align-items: center; margin-right: 40px; }
     .header-titles h2 { color: #590D22; margin: 0 0 5px; font-weight: 800; font-size: 1.5rem; }
@@ -217,14 +217,14 @@ import iro from '@jaames/iro';
     .all-card h3 { color: white; margin-top: 5px; }
     .all-card ion-icon { font-size: 2rem; }
 
-    .content { flex: 1; display: flex; flex-direction: column; }
-    .prompt-card { background: white; border-radius: 15px; padding: 25px; text-align: center; box-shadow: 0 4px 15px rgba(255,77,109,0.1); margin-bottom: 20px; }
+    .content { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+    .prompt-card { background: white; border-radius: 15px; padding: 15px; text-align: center; box-shadow: 0 4px 15px rgba(255,77,109,0.1); margin-bottom: 15px; flex-shrink: 0; }
     .prompt-card.spicy-q { border: 2px solid #ff0055; box-shadow: 0 0 15px rgba(255,0,85,0.3); }
-    .prompt-card p { color: #a4133c; margin: 0 0 10px; font-weight: bold; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
-    .prompt-card h3 { color: #590D22; margin: 0; font-weight: 800; font-size: 1.3rem; line-height: 1.4; }
-    .cat-badge { display: inline-block; background: #ffb3c1; color: #590D22 !important; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem !important; margin-bottom: 10px !important; text-transform: uppercase; }
-    .prompt-nav { display: flex; justify-content: center; gap: 20px; margin-top: 15px; }
-    .nav-btn { background: rgba(255,77,109,0.1); color: #590D22; border: none; padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; cursor: pointer; transition: all 0.2s; }
+    .prompt-card p { color: #a4133c; margin: 0 0 5px; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+    .prompt-card h3 { color: #590D22; margin: 0; font-weight: 800; font-size: 1.1rem; line-height: 1.3; }
+    .cat-badge { display: inline-block; background: #ffb3c1; color: #590D22 !important; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem !important; margin-bottom: 5px !important; text-transform: uppercase; }
+    .prompt-nav { display: flex; justify-content: center; gap: 15px; margin-top: 10px; }
+    .nav-btn { background: rgba(255,77,109,0.1); color: #590D22; border: none; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; cursor: pointer; transition: all 0.2s; }
     .nav-btn:active { transform: scale(0.95); }
     .nav-btn:disabled { opacity: 0.5; pointer-events: none; }
 
@@ -248,27 +248,27 @@ import iro from '@jaames/iro';
     .d-hidden { background: #f1f3f5; border-radius: 10px; justify-content: center; color: #888; font-size: 0.9rem; aspect-ratio: 1; margin-bottom: 20px; }
     .d-hidden ion-icon { font-size: 2rem; margin-bottom: 5px; }
 
-    .canvas-wrapper { flex: 1; background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; position: relative; min-height: 350px; }
+    .canvas-wrapper { flex: 1; background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; position: relative; min-height: 0; }
     canvas { width: 100%; height: 100%; touch-action: none; display: block; }
     
-    .tools { display: flex; gap: 10px; margin-top: 20px; }
-    .color-picker-container { display: flex; justify-content: center; margin-top: 20px; transition: all 0.3s; }
+    .tools { display: flex; gap: 10px; margin-top: 10px; flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom); }
+    .color-picker-container { display: flex; justify-content: center; margin-top: 10px; transition: all 0.3s; flex-shrink: 0; }
     .color-picker-container.hidden { display: none; }
     .iro-picker-wrapper { background: rgba(255,255,255,0.8); border-radius: 50%; padding: 5px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-    .color-picker-scrollable { display: flex; gap: 12px; overflow-x: auto; padding: 10px 5px; margin-top: 15px; align-items: center; scrollbar-width: none; }
+    .color-picker-scrollable { display: flex; gap: 12px; overflow-x: auto; padding: 5px; margin-top: 10px; align-items: center; scrollbar-width: none; flex-shrink: 0; }
     .color-picker-scrollable::-webkit-scrollbar { display: none; }
     .color-btn { width: 35px; height: 35px; border-radius: 50%; cursor: pointer; border: 2px solid #ddd; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.2s; }
     .color-btn.active-color { transform: scale(1.2); border-color: #FF4D6D; border-width: 3px; }
     .custom-color-btn { background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red); }
 
-    .thickness-slider-container { display: flex; align-items: center; gap: 10px; margin: 10px 0; background: rgba(255,255,255,0.6); padding: 10px 15px; border-radius: 20px; color: #FF4D6D; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+    .thickness-slider-container { display: flex; align-items: center; gap: 10px; margin: 10px 0; background: rgba(255,255,255,0.6); padding: 5px 15px; border-radius: 20px; color: #FF4D6D; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); flex-shrink: 0; }
     .thickness-slider { flex: 1; accent-color: #FF4D6D; }
 
     .unread-item { cursor: pointer; transition: transform 0.2s; background: linear-gradient(145deg, #ffffff, #fff0f3); border: 1px solid #ffb3c1; }
     .unread-item:active { transform: scale(0.98); }
     .new-badge { background: #FF4D6D; color: white; font-size: 0.7rem; padding: 3px 6px; border-radius: 10px; vertical-align: middle; margin-left: 5px; }
     .action-text { margin: 0; color: #a4133c; font-size: 0.9rem; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px; }
-    .tool-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 20px; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; color: white; }
+    .tool-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px; padding: 10px; border-radius: 15px; border: none; font-weight: bold; font-size: 0.9rem; cursor: pointer; color: white; }
     .tool-btn.warning { background: #f4a261; }
     .tool-btn.danger { background: #e63946; }
     .tool-btn.success { background: #2a9d8f; }
