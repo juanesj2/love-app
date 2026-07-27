@@ -433,23 +433,23 @@ import { LegalModalComponent } from './legal-modal.component';
             <div class="bottom-sheet-body">
               <div style="position: relative; margin-bottom: 15px; width: 100%;">
                 <ion-icon name="search-outline" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #a4133c; font-size: 1.4rem; z-index: 1; pointer-events: none;"></ion-icon>
-                <input type="text" id="gastro-search" [(ngModel)]="searchQueryFoodPlaces" placeholder="Buscar restaurante..." class="glass-input" style="padding-left: 45px; background: rgba(255,255,255,0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.05);" />
+                <input type="text" id="gastro-search" [(ngModel)]="searchQueryFoodPlaces" (ngModelChange)="updateFoodPlacesFilter()" placeholder="Buscar restaurante..." class="glass-input" style="padding-left: 45px; background: rgba(255,255,255,0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.05);" />
               </div>
 
               <div id="gastro-filters" style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
-                <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedFoodCategory" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todas las categorías">
+                <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedFoodCategory" (ngModelChange)="updateFoodPlacesFilter()" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todas las categorías">
                   <ion-select-option value="">Todas las categorías</ion-select-option>
                   <ion-select-option *ngFor="let cat of foodCategories" [value]="cat">{{ cat }}</ion-select-option>
                 </ion-select>
                 
-                <button class="glass-btn" style="padding: 8px 15px; font-size: 1.5rem; width: auto; flex: 0 0 auto; box-shadow: none;" [style.color]="showFavoritesOnlyFoodPlaces ? '#FF4D6D' : '#888'" [style.background]="showFavoritesOnlyFoodPlaces ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="showFavoritesOnlyFoodPlaces = !showFavoritesOnlyFoodPlaces">
+                <button class="glass-btn" style="padding: 8px 15px; font-size: 1.5rem; width: auto; flex: 0 0 auto; box-shadow: none;" [style.color]="showFavoritesOnlyFoodPlaces ? '#FF4D6D' : '#888'" [style.background]="showFavoritesOnlyFoodPlaces ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="toggleFoodPlacesFavFilter()">
                   <ion-icon [name]="showFavoritesOnlyFoodPlaces ? 'heart' : 'heart-outline'"></ion-icon>
                 </button>
               </div>
               
               <div id="gastro-list" style="margin-bottom: 0;">
                 <div class="food-places-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-                  <div class="food-place-item" *ngFor="let place of filteredFoodPlaces; trackBy: trackById" (click)="openFoodPlaceModal(place)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; box-sizing: border-box; min-width: 0; overflow: hidden; transform: translateZ(0);">
+                  <div class="food-place-item" *ngFor="let place of filteredFoodPlacesList; trackBy: trackById" (click)="openFoodPlaceModal(place)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; box-sizing: border-box; min-width: 0; overflow: hidden; transform: translateZ(0);">
                     <div *ngIf="place.is_favorite" style="position: absolute; top: 8px; left: 8px; z-index: 5;">
                       <ion-icon name="heart" style="color: #FF4D6D; font-size: 1.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));"></ion-icon>
                     </div>
@@ -489,23 +489,23 @@ import { LegalModalComponent } from './legal-modal.component';
             <div class="bottom-sheet-body">
               <div style="position: relative; margin-bottom: 15px; width: 100%;">
                 <ion-icon name="search-outline" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #a4133c; font-size: 1.4rem; z-index: 1; pointer-events: none;"></ion-icon>
-                <input type="text" id="cine-search" [(ngModel)]="searchQueryMovies" placeholder="Buscar película o serie..." class="glass-input" style="padding-left: 45px; background: rgba(255,255,255,0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.05);" />
+                <input type="text" id="cine-search" [(ngModel)]="searchQueryMovies" (ngModelChange)="updateMoviesFilter()" placeholder="Buscar película o serie..." class="glass-input" style="padding-left: 45px; background: rgba(255,255,255,0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.05);" />
               </div>
 
               <div id="cine-filters" style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
-                <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedMovieGenre" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todos los géneros">
+                <ion-select interface="popover" [interfaceOptions]="{ cssClass: 'love-popover' }" [(ngModel)]="selectedMovieGenre" (ngModelChange)="updateMoviesFilter()" class="glass-input" style="flex: 1; --padding-start: 15px; --padding-end: 15px; --padding-top: 8px; --padding-bottom: 8px;" placeholder="Todos los géneros">
                   <ion-select-option value="">Todos los géneros</ion-select-option>
                   <ion-select-option *ngFor="let g of movieGenres" [value]="g">{{ g }}</ion-select-option>
                 </ion-select>
                 
-                <button class="glass-btn" style="padding: 8px 15px; font-size: 1.5rem; width: auto; flex: 0 0 auto; box-shadow: none;" [style.color]="showFavoritesOnlyMovies ? '#FF4D6D' : '#888'" [style.background]="showFavoritesOnlyMovies ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="showFavoritesOnlyMovies = !showFavoritesOnlyMovies">
+                <button class="glass-btn" style="padding: 8px 15px; font-size: 1.5rem; width: auto; flex: 0 0 auto; box-shadow: none;" [style.color]="showFavoritesOnlyMovies ? '#FF4D6D' : '#888'" [style.background]="showFavoritesOnlyMovies ? 'rgba(255, 77, 109, 0.1)' : 'rgba(255, 255, 255, 0.5)'" (click)="toggleMoviesFavFilter()">
                   <ion-icon [name]="showFavoritesOnlyMovies ? 'heart' : 'heart-outline'"></ion-icon>
                 </button>
               </div>
               
               <div id="cine-list" style="margin-bottom: 0;">
                 <div class="movies-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-                  <div class="movie-item" *ngFor="let movie of filteredMovies; trackBy: trackById" (click)="openMovieModal(movie)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; box-sizing: border-box; min-width: 0; overflow: hidden; transform: translateZ(0);">
+                  <div class="movie-item" *ngFor="let movie of filteredMoviesList; trackBy: trackById" (click)="openMovieModal(movie)" style="position: relative; background: rgba(255,255,255,0.8); border-radius: 14px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; box-sizing: border-box; min-width: 0; overflow: hidden; transform: translateZ(0);">
                     <div *ngIf="movie.is_favorite" style="position: absolute; top: 8px; left: 8px; z-index: 5;">
                       <ion-icon name="heart" style="color: #FF4D6D; font-size: 1.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));"></ion-icon>
                     </div>
@@ -1314,13 +1314,20 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   searchQueryFoodPlaces = '';
   showFavoritesOnlyFoodPlaces = false;
 
-  get filteredFoodPlaces() {
-    return this.foodPlaces.filter(p => {
+  filteredFoodPlacesList: any[] = [];
+  
+  updateFoodPlacesFilter() {
+    this.filteredFoodPlacesList = this.foodPlaces.filter(p => {
       const matchFav = this.showFavoritesOnlyFoodPlaces ? p.is_favorite : true;
       const matchCat = this.selectedFoodCategory ? p.category === this.selectedFoodCategory : true;
       const matchSearch = this.searchQueryFoodPlaces ? p.name.toLowerCase().includes(this.searchQueryFoodPlaces.toLowerCase()) : true;
       return matchFav && matchCat && matchSearch;
     });
+  }
+
+  toggleFoodPlacesFavFilter() {
+    this.showFavoritesOnlyFoodPlaces = !this.showFavoritesOnlyFoodPlaces;
+    this.updateFoodPlacesFilter();
   }
   
   isAddingDish = false;
@@ -1337,13 +1344,20 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   searchQueryMovies = '';
   showFavoritesOnlyMovies = false;
 
-  get filteredMovies() {
-    return this.movies.filter(m => {
+  filteredMoviesList: any[] = [];
+
+  updateMoviesFilter() {
+    this.filteredMoviesList = this.movies.filter(m => {
       const matchFav = this.showFavoritesOnlyMovies ? m.is_favorite : true;
       const matchGenre = this.selectedMovieGenre ? m.genre === this.selectedMovieGenre : true;
       const matchSearch = this.searchQueryMovies ? m.title.toLowerCase().includes(this.searchQueryMovies.toLowerCase()) : true;
       return matchFav && matchGenre && matchSearch;
     });
+  }
+
+  toggleMoviesFavFilter() {
+    this.showFavoritesOnlyMovies = !this.showFavoritesOnlyMovies;
+    this.updateMoviesFilter();
   }
 
   
@@ -1945,7 +1959,9 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   async loadFoodAndMovies() {
     try {
       this.foodPlaces = await this.api.getFoodPlaces();
+      this.updateFoodPlacesFilter();
       this.movies = await this.api.getMovies();
+      this.updateMoviesFilter();
     } catch (e) {
       console.error('Error loading food and movies', e);
     }

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectorRef, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, OnDestroy, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Preferences } from '@capacitor/preferences';
 import { CommonModule } from '@angular/common';
@@ -24,6 +24,7 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
 
 @Component({
   selector: 'app-photo-widget',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="photo-widget-container">
       
@@ -1147,6 +1148,13 @@ export class PhotoWidgetComponent implements OnInit {
     if (this.observer) this.observer.disconnect();
     if (this.midnightTimer) clearInterval(this.midnightTimer);
     if (this.menuHideTimeout) clearTimeout(this.menuHideTimeout);
+    
+    if (this.dateDotLottie) { this.dateDotLottie.destroy(); this.dateDotLottie = undefined; }
+    if (this.dotLottieInstance) { this.dotLottieInstance.destroy(); this.dotLottieInstance = undefined; }
+    if (this.dotLottieEmptyState) { this.dotLottieEmptyState.destroy(); this.dotLottieEmptyState = null; }
+    if (this.dotLottieEmptyStateGrid) { this.dotLottieEmptyStateGrid.destroy(); this.dotLottieEmptyStateGrid = null; }
+    if (this.dotLottieLoadingFeed) { this.dotLottieLoadingFeed.destroy(); this.dotLottieLoadingFeed = null; }
+    if (this.dotLottieLoadingGrid) { this.dotLottieLoadingGrid.destroy(); this.dotLottieLoadingGrid = null; }
   }
 
   startMidnightTimer() {

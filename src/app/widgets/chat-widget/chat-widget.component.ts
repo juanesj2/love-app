@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Preferences } from '@capacitor/preferences';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
@@ -29,6 +29,7 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
 @Component({
   selector: 'app-chat-widget',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule, IonicModule, LetterSelectorModalComponent, InteractiveLetterComponent, GiftViewerComponent, StoreModalComponent, SecureImageComponent],
   template: `
     <div class="chat-wrapper" [style.background]="chatBackground || null" [ngClass]="'font-' + chatFont">
@@ -147,7 +148,7 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
                           <ion-icon [name]="msg.playing ? 'pause' : 'play'"></ion-icon>
                         </button>
                         <div class="waveform" [class.animating]="msg.playing">
-                          <div class="bar" *ngFor="let h of getWaveform(msg)" [style.height]="h + '%'"></div>
+                          <div class="bar" *ngFor="let h of msg._waveform" [style.height]="h + '%'"></div>
                         </div>
                         <span class="duration" *ngIf="audioEl.duration && audioEl.duration !== Infinity">{{ formatDuration(audioEl.duration) }}</span>
                       </div>
@@ -161,7 +162,7 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
                   </ng-container>
                   
                   <div class="reactions-container" *ngIf="hasReactions(msg) && !msg.isDeletedLocally && msg.mensaje !== '[DELETED]'">
-                    <span class="reaction" *ngFor="let r of getReactions(msg)">{{r}}</span>
+                    <span class="reaction" *ngFor="let r of msg._reactions">{{r}}</span>
                   </div>
                   
                   <div class="msg-status" *ngIf="isMine(msg) && !msg.isDeletedLocally && msg.mensaje !== '[DELETED]'">
@@ -2321,6 +2322,9 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         msg.isDeletedLocally = true;
       }
 
+      msg._waveform = this.getWaveform(msg);
+      msg._reactions = this.getReactions(msg);
+
       if (msg.mensaje && msg.mensaje.startsWith('[GRAFFITI:')) {
         const parts = msg.mensaje.split(':');
         if (parts.length >= 6) {
@@ -2345,6 +2349,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         this.regularMessages.push(msg);
       }
     });
+    this.cdr.detectChanges();
   }
 
   onInputFocus() {
