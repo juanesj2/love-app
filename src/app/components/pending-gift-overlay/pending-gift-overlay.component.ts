@@ -10,7 +10,7 @@ import { FillLetterModalComponent } from '../fill-letter-modal/fill-letter-modal
 @Component({
   selector: 'app-pending-gift-overlay',
   standalone: true,
-  imports: [CommonModule, FillLetterModalComponent],
+  imports: [CommonModule, FillLetterModalComponent, GiftViewerComponent],
   template: `
     <!-- Fill Letter Modal -->
     <app-fill-letter-modal 
@@ -41,7 +41,7 @@ import { FillLetterModalComponent } from '../fill-letter-modal/fill-letter-modal
           <h2 *ngIf="isAdminGift">¡Regalo del Administrador!</h2>
           
           <ng-container *ngIf="!isAdminGift">
-            <img [src]="getGiftImageUrl(pendingMsg)" alt="gift" style="width: 200px; height: 200px; object-fit: contain;" />
+            <app-gift-viewer [giftType]="getGiftType(pendingMsg)" height="250px"></app-gift-viewer>
             <div class="gift-message" *ngIf="pendingMsg?.meta?.message">
               <p class="gift-message-text">"{{ pendingMsg.meta.message }}"</p>
             </div>
@@ -216,6 +216,10 @@ export class PendingGiftOverlayComponent implements OnInit, OnDestroy, AfterView
     if (type === 'rose') return 'assets/gifts/rose.png';
     if (type === 'ring') return 'assets/gifts/ring.png';
     return 'assets/gifts/box.png';
+  }
+
+  getGiftType(msg: any): string {
+    return msg?.meta?.giftType || msg?.meta?.gift_type || 'teddy';
   }
 
   @ViewChild('lottieCanvas') lottieCanvas?: ElementRef<HTMLCanvasElement>;

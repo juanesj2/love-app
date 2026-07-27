@@ -104,7 +104,11 @@ public class CounterWidgetWorker extends Worker {
             } else if ("EMPTY".equals(photoUrl)) {
                 isEmpty = true;
             } else if (!photoUrl.isEmpty()) {
-                photoBitmap = fetchBitmap("https://j2api.alwaysdata.net/storage/" + photoUrl);
+                String token = prefs.getString("_cap_auth_token", "");
+                if (token == null || token.isEmpty()) {
+                    token = prefs.getString("auth_token", "");
+                }
+                photoBitmap = fetchBitmap("https://j2api.alwaysdata.net/api/love-album/media/" + photoUrl, token);
                 if (photoBitmap == null) {
                     isNetworkError = true;
                 }
@@ -249,10 +253,13 @@ public class CounterWidgetWorker extends Worker {
         return "ERROR";
     }
     
-    private Bitmap fetchBitmap(String urlString) {
+    private Bitmap fetchBitmap(String urlString, String token) {
         try {
             URL url = new URL(urlString);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            if (token != null && !token.isEmpty()) {
+                conn.setRequestProperty("Authorization", "Bearer " + token);
+            }
             conn.setDoInput(true);
             conn.connect();
             

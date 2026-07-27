@@ -166,7 +166,7 @@ public class LoveWidgetWorker extends Worker {
                         int tx = startTileX + dx;
                         int ty = startTileY + dy;
                         String tUrl = String.format(Locale.US, "https://a.basemaps.cartocdn.com/rastertiles/voyager/%d/%d/%d@2x.png", zoom, tx, ty);
-                        Bitmap tBmp = fetchBitmap(tUrl);
+                        Bitmap tBmp = fetchBitmap(tUrl, token);
                         if (tBmp != null) {
                             hasAnyTile = true;
                             // Where does this tile go?
@@ -187,10 +187,12 @@ public class LoveWidgetWorker extends Worker {
                     Bitmap partnerAvatarBitmap = null;
                     
                     if (myAvatarUrl != null && !myAvatarUrl.isEmpty()) {
-                        myAvatarBitmap = myAvatarUrl.startsWith("data:") ? decodeBase64Bitmap(myAvatarUrl) : fetchAvatarBitmap(myAvatarUrl);
+                        String fullMyUrl = myAvatarUrl.startsWith("data:") ? myAvatarUrl : (myAvatarUrl.startsWith("http") ? myAvatarUrl : "https://j2api.alwaysdata.net/api/love-album/media/" + myAvatarUrl);
+                        myAvatarBitmap = myAvatarUrl.startsWith("data:") ? decodeBase64Bitmap(myAvatarUrl) : fetchAvatarBitmap(fullMyUrl, token);
                     }
                     if (partnerAvatarUrl != null && !partnerAvatarUrl.isEmpty()) {
-                        partnerAvatarBitmap = partnerAvatarUrl.startsWith("data:") ? decodeBase64Bitmap(partnerAvatarUrl) : fetchAvatarBitmap(partnerAvatarUrl);
+                        String fullPartnerUrl = partnerAvatarUrl.startsWith("data:") ? partnerAvatarUrl : (partnerAvatarUrl.startsWith("http") ? partnerAvatarUrl : "https://j2api.alwaysdata.net/api/love-album/media/" + partnerAvatarUrl);
+                        partnerAvatarBitmap = partnerAvatarUrl.startsWith("data:") ? decodeBase64Bitmap(partnerAvatarUrl) : fetchAvatarBitmap(fullPartnerUrl, token);
                     }
                 
                 // The avatars are drawn based on their offset from the center (which is now exactly at 256, 256)
@@ -470,10 +472,13 @@ public class LoveWidgetWorker extends Worker {
 
 
     
-    private Bitmap fetchBitmap(String urlString) {
+    private Bitmap fetchBitmap(String urlString, String token) {
         try {
             URL url = new URL(urlString);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            if (token != null && !token.isEmpty() && urlString.contains("alwaysdata.net")) {
+                conn.setRequestProperty("Authorization", "Bearer " + token);
+            }
             conn.setRequestProperty("User-Agent", "Mozilla/5.0");
             conn.connect();
             return BitmapFactory.decodeStream(conn.getInputStream());
@@ -492,10 +497,13 @@ public class LoveWidgetWorker extends Worker {
         return (int) Math.floor((1 - Math.log(Math.tan(Math.toRadians(lat)) + 1 / Math.cos(Math.toRadians(lat))) / Math.PI) / 2 * (1 << zoom));
     }
 
-    private Bitmap fetchAvatarBitmap(String urlString) {
+    private Bitmap fetchAvatarBitmap(String urlString, String token) {
         try {
             URL url = new URL(urlString);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            if (token != null && !token.isEmpty()) {
+                conn.setRequestProperty("Authorization", "Bearer " + token);
+            }
             conn.setRequestProperty("User-Agent", "Mozilla/5.0");
             conn.connect();
             

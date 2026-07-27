@@ -56,7 +56,7 @@ export class SecureImageComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  private loadImage(url: string) {
+  private async loadImage(url: string) {
     this.loading = true;
     this.error = false;
     this.cleanUp();
@@ -67,17 +67,40 @@ export class SecureImageComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
-    this.imageSubscription = this.http.get(url, { responseType: 'blob' }).subscribe({
-      next: (blob) => {
-        this.objectUrl = URL.createObjectURL(blob);
-        this.secureUrl = this.sanitizer.bypassSecurityTrustUrl(this.objectUrl);
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('Error loading secure image:', err);
-        this.loading = false;
-        this.error = true;
+    try {
+      let cache: Cache | undefined;
+      let response: Response | undefined;
+      
+      try {
+        cache = await caches.open('secure-image-cache');
+        response = await cache.match(url);
+      } catch (e) {
+        console.warn('Cache API no disponible o falló:', e);
       }
-    });
+
+      if (!response) {
+        const { getToken } = await import('../../interceptors/auth.interceptor');
+        const token = await getToken();
+        
+        response = await fetch(url, {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+
+        if (response.ok && cache) {
+          cache.put(url, response.clone());
+        } else if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+      }
+
+      const blob = await response.blob();
+      this.objectUrl = URL.createObjectURL(blob);
+      this.secureUrl = this.sanitizer.bypassSecurityTrustUrl(this.objectUrl);
+      this.loading = false;
+    } catch (err) {
+      console.error('Error loading secure image:', err);
+      this.loading = false;
+      this.error = true;
+    }
   }
 }
