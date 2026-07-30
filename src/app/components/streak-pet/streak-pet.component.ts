@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges, ElementRef, ViewChild, OnDestroy, CUSTOM_ELEMENTS_SCHEMA, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonModal } from '@ionic/angular/standalone';
+import { IonModal, AlertController } from '@ionic/angular/standalone';
 import { Rive, Layout, Fit, Alignment } from '@rive-app/canvas';
 import '@dotlottie/player-component';
 import confetti from 'canvas-confetti';
@@ -138,7 +138,10 @@ import { LoveApiService } from '../../services/love-api.service';
             <!-- NORMAL INTERACT VIEW -->
             <div [hidden]="showShop">
               <div class="interact-header">
-                <h3>Tu {{ petType === 'Dog' ? 'Perrito' : 'Gatito' }} {{ petData?.rarity === 'legendario' ? '⭐' : (petData?.rarity === 'raro' ? '✨' : '') }}</h3>
+                <h3 (click)="editPetName()" style="cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                  {{ petName || 'Tu ' + (petType === 'Dog' ? 'Perrito' : 'Gatito') }} {{ petData?.rarity === 'legendario' ? '⭐' : (petData?.rarity === 'raro' ? '✨' : '') }}
+                  <span style="font-size: 0.9rem; opacity: 0.6;">✏️</span>
+                </h3>
                 <p class="streak-badge">Racha: {{ streakDays }} días 🔥</p>
               </div>
               
@@ -407,6 +410,7 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
   @Input() streakDays: number = 0;
   @Input() coupleId: number = 0;
   @Input() petData: any = null;
+  @Input() petName: string | null = null;
   @Input() set decorations(val: any) {
     if (typeof val === 'string') {
       try { this.activeDeco = JSON.parse(val); } catch(e) { this.activeDeco = {}; }
@@ -430,6 +434,9 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     }
   }
 
+  private api = inject(LoveApiService);
+  private alertCtrl = inject(AlertController);
+
   private riveInstance: Rive | null = null;
   public currentLottieSrc: string = '';
   public petType: 'Dog' | 'Cat' = 'Dog';
@@ -451,8 +458,6 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
   public lottieSrc = '';
 
   private interactionTimeout: any;
-
-  private api = inject(LoveApiService);
 
   public showShop = false;
   public activeDeco: any = {};
@@ -504,6 +509,38 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     } catch (e) {
       console.error('Error saving decoration', e);
     }
+  }
+
+  async editPetName() {
+    const alert = await this.alertCtrl.create({
+      header: 'Nombre de tu Mascota',
+      message: '¿Cómo quieres llamar a vuestra mascota?',
+      inputs: [
+        {
+          name: 'name',
+          type: 'text',
+          placeholder: 'Ej: Firulais',
+          value: this.petName || ''
+        }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        { 
+          text: 'Guardar', 
+          handler: async (data) => {
+            if (data.name && data.name.trim() !== '') {
+              this.petName = data.name.trim();
+              try {
+                await this.api.updateCoupleInfo({ pet_name: this.petName });
+              } catch (e) {
+                console.error('Error saving pet name', e);
+              }
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 
   ngOnChanges(changes: SimpleChanges) {

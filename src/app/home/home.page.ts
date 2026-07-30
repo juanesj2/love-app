@@ -63,6 +63,7 @@ import { PushNotifications } from '@capacitor/push-notifications';
               [coupleId]="couple?.id"
               [petData]="couple?.inventory?.pet"
               [decorations]="couple?.pet_decorations"
+              [petName]="couple?.pet_name"
               (petHatched)="onPetHatched($event)">
             </app-streak-pet>
 
