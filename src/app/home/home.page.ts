@@ -60,8 +60,9 @@ import { PushNotifications } from '@capacitor/push-notifications';
             <!-- Streak Pet -->
             <app-streak-pet 
               [streakDays]="couple?.current_streak || 0" 
-              [coupleId]="couple?.id || 0"
+              [coupleId]="couple?.id"
               [petData]="couple?.inventory?.pet"
+              [decorations]="couple?.pet_decorations"
               (petHatched)="onPetHatched($event)">
             </app-streak-pet>
 

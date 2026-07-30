@@ -1,11 +1,10 @@
 import { Component, Input, OnChanges, SimpleChanges, ElementRef, ViewChild, OnDestroy, CUSTOM_ELEMENTS_SCHEMA, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonModal } from '@ionic/angular/standalone';
-import { Rive } from '@rive-app/canvas';
+import { Rive, Layout, Fit, Alignment } from '@rive-app/canvas';
 import '@dotlottie/player-component';
 import confetti from 'canvas-confetti';
 import { LoveApiService } from '../../services/love-api.service';
-import { AlertController } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-streak-pet',
@@ -14,7 +13,12 @@ import { AlertController } from '@ionic/angular/standalone';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   template: `
     <!-- We show egg emoji if streak == 0 OR if not hatched yet -->
-    <div class="pet-container" (click)="onPetTap()" [class.is-egg]="isEgg" [ngClass]="rarityClass">
+    <div class="pet-container" 
+         (pointerdown)="onPointerDown($event)" 
+         (pointerup)="onPointerUp($event)" 
+         (pointercancel)="onPointerCancel($event)"
+         (pointerleave)="onPointerCancel($event)"
+         [class.is-egg]="isEgg" [ngClass]="rarityClass">
       
       <div class="egg-emoji" *ngIf="isEgg">🥚</div>
       
@@ -40,16 +44,153 @@ import { AlertController } from '@ionic/angular/standalone';
     <ion-modal [isOpen]="showHatchModal" (didDismiss)="closeModal()" class="hatch-modal">
       <ng-template>
         <div class="hatch-modal-content">
-          <h2 *ngIf="!hatchingInProgress">¡Tu mascota quiere nacer!</h2>
-          <h2 *ngIf="hatchingInProgress">¡Naciendo!</h2>
-          
-          <div class="big-egg-container" (click)="hatchEgg()">
+          <div class="big-egg-container">
             <!-- Rive Canvas for Egg -->
             <canvas #riveCanvas class="egg-canvas"></canvas>
-            <div class="tap-hint" *ngIf="!hatchingInProgress">👆 Toca para romper el cascarón</div>
+            
+            <!-- Mascota (Lottie) sobre el cascarón roto -->
+            <div class="pet-overlay" *ngIf="hatchedPet">
+               <dotlottie-player
+                  [src]="lottieSrc"
+                  autoplay
+                  [loop]="false"
+                  style="width: 350px; height: 350px;">
+               </dotlottie-player>
+            </div>
+
+            <!-- Capa transparente para interceptar los clicks -->
+            <div class="click-overlay" (click)="onCanvasClick()"></div>
+            
+            <div class="tap-hint" *ngIf="!hatchingInProgress || hatchedPet" [innerHTML]="tapHintText"></div>
           </div>
-          
-          <button class="close-btn" (click)="closeModal()" *ngIf="!hatchingInProgress">Quizás más tarde</button>
+          <!-- Botón de cierre sutil en la esquina superior -->
+          <div class="close-icon" *ngIf="!hatchingInProgress && !hatchedPet" (click)="closeModal()">✕</div>
+        </div>
+      </ng-template>
+    </ion-modal>
+
+    <!-- Modal de Interacción con la Mascota -->
+    <ion-modal [isOpen]="showInteractModal" (didDismiss)="closeInteractModal()" class="pet-interact-modal" style="--background: transparent; --box-shadow: none; --backdrop-opacity: 0;">
+      <ng-template>
+        <div class="overlay" (click)="closeInteractModal()">
+          <div class="modal-sheet" (click)="$event.stopPropagation()">
+            <button class="close-btn" (click)="closeInteractModal()">
+              ✕
+            </button>
+            <!-- DECORATION SHOP VIEW -->
+            <div [hidden]="!showShop">
+              <div class="interact-header" style="position: relative; margin-bottom: 30px;">
+                <button class="close-btn" style="position: absolute; top: -10px; left: -10px;" (click)="showShop = false">
+                  <span style="font-size: 1.2rem;">←</span>
+                </button>
+                <h3 style="margin-top: 5px;">Tienda 🎨</h3>
+              </div>
+              
+              <div class="pet-stage" [ngStyle]="getStageStyles()">
+                <div class="floating-prop" *ngIf="getPropEmoji()">{{ getPropEmoji() }}</div>
+                <dotlottie-player 
+                  [src]="currentLottieSrc" 
+                  background="transparent" 
+                  speed="1" 
+                  style="width: 150px; height: 150px;" 
+                  loop 
+                  autoplay>
+                </dotlottie-player>
+              </div>
+
+              <div class="shop-section">
+                <h4>Fondos</h4>
+                <div class="shop-grid">
+                  <div class="shop-item" *ngFor="let opt of bgOptions" 
+                       [class.active]="activeDeco.bg === opt.id"
+                       (click)="selectDeco('bg', opt.id)">
+                    <div class="preview-circle" [style.background]="opt.style || '#f4f5f8'"></div>
+                    <span>{{ opt.name }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="shop-section">
+                <h4>Bordes</h4>
+                <div class="shop-grid">
+                  <div class="shop-item" *ngFor="let opt of borderOptions" 
+                       [class.active]="activeDeco.border === opt.id"
+                       (click)="selectDeco('border', opt.id)">
+                    <div class="preview-circle" [style.border]="opt.style" [style.box-shadow]="opt.shadow"></div>
+                    <span>{{ opt.name }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="shop-section">
+                <h4>Accesorios</h4>
+                <div class="shop-grid">
+                  <div class="shop-item" *ngFor="let opt of propOptions" 
+                       [class.active]="activeDeco.prop === opt.id"
+                       (click)="selectDeco('prop', opt.id)">
+                    <div class="preview-circle" style="font-size: 1.5rem; display:flex; justify-content:center; align-items:center;">{{ opt.emoji || '❌' }}</div>
+                    <span>{{ opt.name }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- NORMAL INTERACT VIEW -->
+            <div [hidden]="showShop">
+              <div class="interact-header">
+                <h3>Tu {{ petType === 'Dog' ? 'Perrito' : 'Gatito' }} {{ petData?.rarity === 'legendario' ? '⭐' : (petData?.rarity === 'raro' ? '✨' : '') }}</h3>
+                <p class="streak-badge">Racha: {{ streakDays }} días 🔥</p>
+              </div>
+              
+              <div class="pet-stage" [ngStyle]="getStageStyles()">
+                <div class="floating-prop" *ngIf="getPropEmoji()">{{ getPropEmoji() }}</div>
+                <dotlottie-player 
+                  #modalLottiePlayer
+                  [src]="currentLottieSrc" 
+                  background="transparent" 
+                  speed="1" 
+                  style="width: 200px; height: 200px;" 
+                  loop 
+                  autoplay>
+                </dotlottie-player>
+              </div>
+
+              <div class="action-grid">
+                <button class="action-btn feed" (click)="doAction('feed')">
+                  <span class="emoji">🍖</span>
+                  <span>Alimentar</span>
+                </button>
+                <button class="action-btn play" (click)="doAction('play')">
+                  <span class="emoji">🎾</span>
+                  <span>Jugar</span>
+                </button>
+                <button class="action-btn pet" (click)="doAction('pet')">
+                  <span class="emoji">✋</span>
+                  <span>Acariciar</span>
+                </button>
+                <button class="action-btn sleep" (click)="doAction('sleep')">
+                  <span class="emoji">💤</span>
+                  <span>Dormir</span>
+                </button>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <button class="shop-btn-large" (click)="showShop = true">
+                  🎨 Decorar Mascota
+                </button>
+              </div>
+              </div>
+            <div class="stats-panel">
+              <div class="stat-row">
+                <span>Estado:</span>
+                <strong>{{ currentEmotion }}</strong>
+              </div>
+              <div class="stat-row">
+                <span>Nivel de amor:</span>
+                <strong>{{ streakDays * 10 }} XP</strong>
+              </div>
+            </div>
+          </div>
         </div>
       </ng-template>
     </ion-modal>
@@ -102,62 +243,163 @@ import { AlertController } from '@ionic/angular/standalone';
     }
 
     /* Modal Styles */
-    .hatch-modal-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      background: linear-gradient(135deg, #1a1a2e, #16213e);
-      color: white;
-      text-align: center;
-      padding: 20px;
+    .hatch-modal {
+      --background: transparent;
     }
-    .hatch-modal-content h2 {
-      font-size: 1.8rem;
-      font-weight: 800;
-      margin-bottom: 30px;
-      background: -webkit-linear-gradient(45deg, #FFCA3A, #FF9F1C);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .hatch-modal-content {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      background: black; /* Just in case there's letterboxing */
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     .big-egg-container {
-      width: 100vw;
-      height: 60vh;
+      width: 100%;
+      height: 100%;
       position: relative;
       cursor: pointer;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     .egg-canvas {
       width: 100%;
       height: 100%;
     }
+    .click-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      /* CRÍTICO: iOS Safari ignora clicks en divs transparentes sin fondo */
+      background: rgba(0, 0, 0, 0.01);
+      cursor: pointer;
+    }
+    .pet-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 5;
+      animation: spawnPet 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    @keyframes spawnPet {
+      0% { opacity: 0; transform: scale(0.2) translateY(50px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* Interact Modal Styles */
+    ::ng-deep .pet-interact-modal { --background: transparent; --box-shadow: none; --backdrop-opacity: 0; }
+    .overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); z-index: 10000; display: flex; flex-direction: column; padding: calc(env(safe-area-inset-top, 20px) + 20px) 20px 20px; align-items: center; overflow-y: auto; animation: fadeIn 0.3s; }
+    .modal-sheet { margin: auto 0; background: #fdf2f4; width: 100%; max-width: 400px; border-radius: 30px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); animation: slideUp 0.35s cubic-bezier(0.175, 0.885, 0.32, 1); position: relative; max-height: 85vh; overflow-y: auto; }
+    :host-context(.night-owl-mode) .modal-sheet { background: #1a1a2e; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+    
+    .close-btn { position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; border-radius: 50%; background: white; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #590D22; box-shadow: 0 4px 15px rgba(0,0,0,0.08); cursor: pointer; z-index: 100; }
+    :host-context(.night-owl-mode) .close-btn { background: #2b2b36; color: white; border: 1px solid rgba(255,255,255,0.1); }
+
+    .interact-header { text-align: center; margin-bottom: 20px; margin-top: 10px; }
+    .interact-header h3 { font-weight: 800; font-size: 1.6rem; margin: 0 0 10px 0; color: #590D22; font-family: 'Outfit', sans-serif; }
+    :host-context(.night-owl-mode) .interact-header h3 { color: #fdfdfd; }
+    
+    .streak-badge { display: inline-block; background: rgba(255, 77, 109, 0.15); color: #ff4d6d; padding: 6px 16px; border-radius: 20px; font-weight: bold; margin: 0; border: 1px solid rgba(255, 77, 109, 0.3); }
+    
+    .pet-stage { position: relative; display: flex; justify-content: center; align-items: center; background: white; border-radius: 50%; margin: 20px auto; width: 220px; height: 220px; box-shadow: inset 0 0 40px rgba(0,0,0,0.03); transition: all 0.3s ease; }
+    :host-context(.night-owl-mode) .pet-stage { background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); box-shadow: inset 0 0 40px rgba(0,0,0,0.5); }
+    
+    .floating-prop { position: absolute; top: -15px; right: 20px; font-size: 3.5rem; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.2)); animation: float 3s ease-in-out infinite; z-index: 10; }
+    @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-10px) rotate(5deg); } }
+
+    .shop-btn-large { width: 100%; background: linear-gradient(135deg, #ff4d6d, #ff758f); color: white; border: none; border-radius: 20px; padding: 15px; font-family: 'Outfit', sans-serif; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(255,77,109,0.3); transition: all 0.2s; cursor: pointer; }
+    .shop-btn-large:active { transform: scale(0.98); }
+    :host-context(.night-owl-mode) .shop-btn-large { background: linear-gradient(135deg, #a78bfa, #8b5cf6); box-shadow: 0 4px 15px rgba(167, 139, 250, 0.3); }
+
+    .shop-section { margin-bottom: 20px; }
+    .shop-section h4 { color: #A4133C; font-family: 'Outfit', sans-serif; margin: 0 0 10px 0; font-size: 1.1rem; }
+    :host-context(.night-owl-mode) .shop-section h4 { color: #fdfdfd; }
+    
+    .shop-grid { display: flex; overflow-x: auto; gap: 10px; padding-bottom: 10px; }
+    .shop-item { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; min-width: 60px; opacity: 0.6; transition: all 0.2s; }
+    .shop-item.active { opacity: 1; transform: scale(1.05); }
+    .shop-item.active span { font-weight: bold; color: #590D22; }
+    :host-context(.night-owl-mode) .shop-item.active span { color: #a78bfa; }
+    
+    .preview-circle { width: 50px; height: 50px; border-radius: 50%; background: white; border: 2px solid transparent; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .shop-item.active .preview-circle { border-color: #ff4d6d; }
+    :host-context(.night-owl-mode) .shop-item.active .preview-circle { border-color: #a78bfa; }
+    .shop-item span { font-size: 0.75rem; color: #888; text-align: center; font-family: 'Outfit', sans-serif; }
+    
+    .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px; }
+    .action-btn { background: white; border: 1px solid rgba(0,0,0,0.05); border-radius: 20px; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #590D22; font-weight: 600; transition: all 0.2s; font-family: 'Outfit', sans-serif; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    :host-context(.night-owl-mode) .action-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: white; }
+    .action-btn:active { transform: scale(0.95); opacity: 0.8; }
+    .action-btn .emoji { font-size: 2rem; margin-bottom: 8px; }
+    .action-btn.feed { border-color: rgba(255, 159, 28, 0.3); }
+    .action-btn.play { border-color: rgba(46, 204, 113, 0.3); }
+    .action-btn.pet { border-color: rgba(167, 139, 250, 0.3); }
+    .action-btn.sleep { border-color: rgba(52, 152, 219, 0.3); }
+
+    .stats-panel { margin-top: 30px; background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    :host-context(.night-owl-mode) .stats-panel { background: rgba(0, 0, 0, 0.3); }
+    
+    .stat-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 1.1rem; }
+    .stat-row:last-child { margin-bottom: 0; }
+    .stat-row span { color: #A4133C; font-weight: 500; font-family: 'Outfit', sans-serif; }
+    :host-context(.night-owl-mode) .stat-row span { color: #aaa; }
+    .stat-row strong { color: #590D22; font-weight: bold; }
+    :host-context(.night-owl-mode) .stat-row strong { color: #fdfdfd; }
+    
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
     .tap-hint {
       position: absolute;
-      bottom: 20px;
+      bottom: 12%;
       left: 50%;
       transform: translateX(-50%);
       font-size: 1.2rem;
       font-weight: bold;
       color: white;
-      background: rgba(255, 77, 109, 0.8);
-      padding: 10px 20px;
-      border-radius: 20px;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+      padding: 15px 25px;
+      border-radius: 25px;
       pointer-events: none;
       animation: pulseHint 1.5s infinite;
+      text-align: center;
+      line-height: 1.5;
+      width: max-content;
+      max-width: 90%;
     }
     @keyframes pulseHint {
       0% { transform: translateX(-50%) scale(1); }
-      50% { transform: translateX(-50%) scale(1.1); }
+      50% { transform: translateX(-50%) scale(1.05); }
       100% { transform: translateX(-50%) scale(1); }
     }
-    .close-btn {
-      margin-top: 30px;
-      padding: 12px 25px;
-      border-radius: 25px;
-      background: rgba(255, 255, 255, 0.1);
+    .close-icon {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      background: rgba(0,0,0,0.3);
       color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      font-size: 1.2rem;
       font-weight: bold;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      z-index: 100;
+      cursor: pointer;
     }
   `]
 })
@@ -165,10 +407,21 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
   @Input() streakDays: number = 0;
   @Input() coupleId: number = 0;
   @Input() petData: any = null;
+  @Input() set decorations(val: any) {
+    if (typeof val === 'string') {
+      try { this.activeDeco = JSON.parse(val); } catch(e) { this.activeDeco = {}; }
+    } else if (val) {
+      this.activeDeco = val;
+    } else {
+      this.activeDeco = {};
+    }
+  }
 
   @Output() petHatched = new EventEmitter<any>();
 
-  @ViewChild('lottiePlayer') lottiePlayer!: ElementRef<any>;
+  @ViewChild('lottiePlayer') lottiePlayer!: ElementRef;
+  @ViewChild('modalLottiePlayer') modalLottiePlayer!: ElementRef;
+  @ViewChild(IonModal) modal!: IonModal;
 
   // Use setter to detect when canvas becomes available in modal
   @ViewChild('riveCanvas') set riveCanvas(element: ElementRef<HTMLCanvasElement>) {
@@ -185,11 +438,73 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
   public showHatchModal = false;
   public hatchingInProgress = false;
 
+  public showInteractModal = false;
+  public currentEmotion: string = 'Tranquilo';
+  private isLongPress = false;
+  private pressTimeout: any;
+
   public rarityClass = '';
+  public tapHintText = '👆 Toca para romper el cascarón';
+  private clickCount = 0;
+
+  public hatchedPet: any = null;
+  public lottieSrc = '';
+
   private interactionTimeout: any;
 
   private api = inject(LoveApiService);
-  private alertCtrl = inject(AlertController);
+
+  public showShop = false;
+  public activeDeco: any = {};
+
+  public bgOptions = [
+    { id: 'default', name: 'Original', style: '' },
+    { id: 'forest', name: 'Bosque', style: 'radial-gradient(circle, #d4f0d0 0%, #a4d4a0 70%)' },
+    { id: 'night', name: 'Noche', style: 'radial-gradient(circle, #2a2a3e 0%, #16213e 70%)' },
+    { id: 'royal', name: 'Real', style: 'radial-gradient(circle, #ffecd2 0%, #fcb69f 70%)' }
+  ];
+
+  public borderOptions = [
+    { id: 'none', name: 'Ninguno', style: 'none' },
+    { id: 'gold', name: 'Oro', style: '4px solid #ffd700', shadow: '0 0 15px rgba(255,215,0,0.6)' },
+    { id: 'neon', name: 'Neón', style: '3px solid #00f3ff', shadow: '0 0 15px #00f3ff, inset 0 0 10px #00f3ff' },
+    { id: 'love', name: 'Amor', style: '4px dashed #ff4d6d' }
+  ];
+
+  public propOptions = [
+    { id: 'none', name: 'Nada', emoji: '' },
+    { id: 'crown', name: 'Corona', emoji: '👑' },
+    { id: 'star', name: 'Estrellas', emoji: '✨' },
+    { id: 'bow', name: 'Lazo', emoji: '🎀' },
+    { id: 'heart', name: 'Corazón', emoji: '💖' }
+  ];
+
+  getStageStyles() {
+    let styles: any = {};
+    const bg = this.bgOptions.find(b => b.id === this.activeDeco.bg);
+    if (bg && bg.style) styles['background'] = bg.style;
+
+    const border = this.borderOptions.find(b => b.id === this.activeDeco.border);
+    if (border && border.style !== 'none') {
+      styles['border'] = border.style;
+      if (border.shadow) styles['box-shadow'] = border.shadow;
+    }
+    return styles;
+  }
+
+  getPropEmoji() {
+    const prop = this.propOptions.find(p => p.id === this.activeDeco.prop);
+    return prop ? prop.emoji : '';
+  }
+
+  async selectDeco(type: 'bg' | 'border' | 'prop', id: string) {
+    this.activeDeco[type] = id;
+    try {
+      await this.api.updateCoupleInfo({ pet_decorations: JSON.stringify(this.activeDeco) });
+    } catch (e) {
+      console.error('Error saving decoration', e);
+    }
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     this.evaluateState();
@@ -213,6 +528,8 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     }
   }
 
+  private clickInput: any = null;
+
   private initRive(canvasEl: HTMLCanvasElement) {
     if (this.riveInstance) {
       this.riveInstance.cleanup();
@@ -222,8 +539,24 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
       src: '/assets/pets/egg.riv',
       canvas: canvasEl,
       autoplay: true,
+      stateMachines: 'State Machine 1',
+      layout: new Layout({
+        fit: Fit.Cover,
+        alignment: Alignment.Center
+      }),
       onLoad: () => {
         this.riveInstance?.resizeDrawingSurfaceToCanvas();
+        
+        const stateMachineNames = this.riveInstance?.stateMachineNames;
+        if (stateMachineNames && stateMachineNames.length > 0) {
+          this.riveInstance?.play(stateMachineNames);
+          
+          const smName = stateMachineNames[0];
+          const inputs = this.riveInstance?.stateMachineInputs(smName);
+          if (inputs) {
+            this.clickInput = inputs.find(i => i.name === 'Butten click');
+          }
+        }
       }
     });
   }
@@ -264,6 +597,31 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     if (this.lottiePlayer && this.lottiePlayer.nativeElement && this.lottiePlayer.nativeElement.load) {
        this.lottiePlayer.nativeElement.load(this.currentLottieSrc);
     }
+    if (this.modalLottiePlayer && this.modalLottiePlayer.nativeElement && this.modalLottiePlayer.nativeElement.load) {
+       this.modalLottiePlayer.nativeElement.load(this.currentLottieSrc);
+    }
+  }
+
+  onPointerDown(event: Event) {
+    if (this.isEgg && this.streakDays === 0) return; // Nada si falta racha
+    this.isLongPress = false;
+    this.pressTimeout = setTimeout(() => {
+      this.isLongPress = true;
+      if (!this.isEgg) {
+        this.openInteractModal();
+      }
+    }, 500); // 500ms para mantener pulsado
+  }
+
+  onPointerUp(event: Event) {
+    clearTimeout(this.pressTimeout);
+    if (!this.isLongPress) {
+      this.onPetTap();
+    }
+  }
+
+  onPointerCancel(event: Event) {
+    clearTimeout(this.pressTimeout);
   }
 
   onPetTap() {
@@ -278,10 +636,11 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
       return;
     }
 
-    // Ya eclosionado: Interacción con la mascota
+    // Ya eclosionado: Interacción rápida
     if (!this.isEgg) {
       const happyState = Math.random() > 0.5 ? 'happy' : 'heart';
       this.setLottieState(happyState);
+      this.currentEmotion = happyState === 'happy' ? 'Feliz' : 'Amoroso';
 
       if (this.interactionTimeout) {
         clearTimeout(this.interactionTimeout);
@@ -289,53 +648,129 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
 
       this.interactionTimeout = setTimeout(() => {
         this.setLottieState('neutral');
+        this.currentEmotion = 'Tranquilo';
       }, 2500);
     }
   }
 
-  async hatchEgg() {
-    if (this.hatchingInProgress) return;
-    this.hatchingInProgress = true;
+  openInteractModal() {
+    this.showInteractModal = true;
+  }
 
-    // Rive se está rompiendo al hacer click, esperamos 1.5s
-    setTimeout(async () => {
-      try {
-        const res = await this.api.hatchPet();
-        const newPet = res.pet;
+  closeInteractModal() {
+    this.showInteractModal = false;
+  }
 
-        this.showHatchModal = false;
-        
-        // Confeti full
-        confetti({
-          particleCount: 150,
-          spread: 100,
-          origin: { y: 0.6 },
-          colors: ['#ff4d6d', '#ffca3a', '#8b5cf6', '#ffffff']
-        });
+  doAction(action: string) {
+    if (this.interactionTimeout) {
+      clearTimeout(this.interactionTimeout);
+    }
 
-        const rarityText = newPet.rarity === 'legendario' ? '⭐ LEGENDARIO ⭐' : (newPet.rarity === 'raro' ? '✨ RARO ✨' : 'Común');
-        const alert = await this.alertCtrl.create({
-          header: '¡Ha nacido tu mascota!',
-          subHeader: `¡Es un ${newPet.type === 'Dog' ? 'Perrito' : 'Gatito'} ${rarityText}!`,
-          message: 'Mantenla feliz cuidando vuestra racha de amor. Si perdéis la racha, volverá a su cascarón.',
-          buttons: ['¡Me encanta!']
-        });
-        await alert.present();
+    if (action === 'feed') {
+      this.setLottieState('happy');
+      this.currentEmotion = '¡Lleno y Feliz! 🍖';
+      confetti({ particleCount: 50, spread: 60, origin: { y: 0.8 }, colors: ['#ff9f1c', '#ffffff'] });
+    } else if (action === 'play') {
+      this.setLottieState('happy');
+      this.currentEmotion = '¡Divertido! 🎾';
+      confetti({ particleCount: 50, spread: 60, origin: { y: 0.8 }, colors: ['#2ecc71', '#ffffff'] });
+    } else if (action === 'pet') {
+      this.setLottieState('heart');
+      this.currentEmotion = 'Mimoso ❤️';
+      confetti({ particleCount: 50, spread: 60, origin: { y: 0.8 }, colors: ['#ff4d6d', '#ffffff'] });
+    } else if (action === 'sleep') {
+      this.setLottieState('sleeping');
+      this.currentEmotion = 'Zzz... 💤';
+    }
 
-        this.hatchingInProgress = false;
-        this.petHatched.emit(newPet);
-        
-      } catch (e) {
-        console.error("Error al eclosionar mascota", e);
-        this.hatchingInProgress = false;
-        this.showHatchModal = false;
-      }
-    }, 1500);
+    this.interactionTimeout = setTimeout(() => {
+      this.setLottieState('neutral');
+      this.currentEmotion = 'Tranquilo';
+    }, 4000);
+  }
+
+  onCanvasClick() {
+    // Si la mascota ya nació, cualquier tap en la pantalla cierra el modal y emite el evento
+    if (this.hatchedPet) {
+      this.closeModal();
+      this.petHatched.emit(this.hatchedPet);
+      return;
+    }
+
+    // NUNCA bloqueamos los clicks hacia Rive, para que el usuario pueda hacer click rápido
+    // y Rive reciba todos los eventos necesarios para explotar.
+    if (this.clickInput) {
+      this.clickInput.fire();
+    }
+
+    this.clickCount++;
+    
+    // Mensajes para guiar al usuario
+    if (this.clickCount === 1) this.tapHintText = '¡Sigue tocando!';
+    if (this.clickCount === 2) this.tapHintText = '¡Un poco más!';
+    if (this.clickCount === 3) this.tapHintText = '¡Va a explotar!';
+
+    // Asumimos que al 4º o 5º toque explota. 
+    // Disparamos la aparición de la mascota SOLO la primera vez que pasamos por 4
+    if (this.clickCount === 4) {
+      this.hatchingInProgress = true;
+      this.tapHintText = ''; // Ocultamos el texto para que se vea bien la explosión
+      
+      // Le damos 2 segundos enteros para que termine la explosión de Rive antes de soltar al gato
+      setTimeout(() => {
+        this.executeHatch();
+      }, 2000);
+    }
+  }
+
+  async executeHatch() {
+    try {
+      const res = await this.api.hatchPet();
+      const newPet = res.pet;
+
+      this.hatchedPet = newPet;
+      this.lottieSrc = `/assets/pets/${newPet.type}_hello.lottie`;
+      
+      // Confeti full
+      confetti({
+        particleCount: 150,
+        spread: 100,
+        origin: { y: 0.6 },
+        colors: ['#ff4d6d', '#ffca3a', '#8b5cf6', '#ffffff']
+      });
+
+      const rarityText = newPet.rarity === 'legendario' ? '⭐ LEGENDARIO ⭐' : (newPet.rarity === 'raro' ? '✨ RARO ✨' : 'Común');
+      const petName = newPet.type === 'Dog' ? 'Perrito' : 'Gatito';
+      this.tapHintText = `¡Es un ${petName} ${rarityText}!<br><span style="font-size: 0.95rem; font-weight: normal; opacity: 0.85;">👆 Toca para continuar</span>`;
+      
+      // Ya no mostramos un Alert, la mascota está ahí en la pantalla :)
+      
+    } catch (e) {
+      console.error("Error al eclosionar mascota", e);
+      this.hatchingInProgress = false;
+      this.clickCount = 0;
+      this.tapHintText = '👆 Toca para romper el cascarón';
+      this.showHatchModal = false;
+    }
   }
 
   closeModal() {
     this.showHatchModal = false;
-    this.cleanupRive();
+    
+    // Forzar el cierre nativo del modal por si el binding de Angular falla
+    if (this.modal) {
+      this.modal.dismiss();
+    }
+    
+    // Retrasar la limpieza para que el modal tenga tiempo de hacer la animación de salida
+    // sin que desaparezca la mascota bruscamente
+    setTimeout(() => {
+      this.clickCount = 0;
+      this.hatchedPet = null;
+      this.hatchingInProgress = false;
+      this.tapHintText = '👆 Toca para romper el cascarón';
+      this.cleanupRive();
+    }, 400);
   }
 
   ngOnDestroy() {
