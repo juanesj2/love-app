@@ -208,7 +208,8 @@ import { LoveApiService } from '../../services/love-api.service';
                   <div class="clothing-layer draggable" 
                        [class.dragging]="isDraggingClothes"
                        [ngStyle]="getClothesStyle('modal')" 
-                       (pointerdown)="startDragClothes($event)">
+                       (mousedown)="startDragClothes($event)"
+                       (touchstart)="startDragClothes($event)">
                     {{ getClothesEmoji() }}
                   </div>
                 </div>
@@ -382,7 +383,7 @@ import { LoveApiService } from '../../services/love-api.service';
     @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-10px) rotate(5deg); } }
 
     .clothing-layer { position: absolute; pointer-events: none; z-index: 15; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); transition: all 0.3s ease; transform: translate(-50%, -50%); }
-    .clothing-layer.draggable { pointer-events: auto; cursor: grab; }
+    .clothing-layer.draggable { pointer-events: auto; cursor: grab; touch-action: none; }
     .clothing-layer.dragging { transition: none !important; cursor: grabbing !important; transform: scale(1.1) translate(-50%, -50%); }
 
 
@@ -646,12 +647,23 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
   currentDragLeft: number | null = null;
   currentDragTop: number | null = null;
 
-  startDragClothes(event: PointerEvent) {
+  startDragClothes(event: MouseEvent | TouchEvent) {
     if (!this.activeDeco.clothes || this.activeDeco.clothes === 'none') return;
-    event.preventDefault();
+    
+    // Prevent default to avoid scrolling while dragging
+    if (event.cancelable) {
+      event.preventDefault();
+    }
+    
     this.isDraggingClothes = true;
-    this.dragStartX = event.clientX;
-    this.dragStartY = event.clientY;
+    
+    if (window.TouchEvent && event instanceof TouchEvent) {
+      this.dragStartX = event.touches[0].clientX;
+      this.dragStartY = event.touches[0].clientY;
+    } else {
+      this.dragStartX = (event as MouseEvent).clientX;
+      this.dragStartY = (event as MouseEvent).clientY;
+    }
 
     const item = this.clothesOptions.find(c => c.id === this.activeDeco.clothes);
     const savedLeft = this.activeDeco.clothes_left || item?.style?.left || '50%';
@@ -664,14 +676,23 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     this.currentDragTop = this.startTopPercent;
   }
 
-  @HostListener('document:pointermove', ['$event'])
-  onPointerMove(event: PointerEvent) {
+  @HostListener('document:mousemove', ['$event'])
+  @HostListener('document:touchmove', ['$event'])
+  onPointerMove(event: MouseEvent | TouchEvent) {
     if (!this.isDraggingClothes) return;
     
-    const deltaX = event.clientX - this.dragStartX;
-    const deltaY = event.clientY - this.dragStartY;
+    let clientX, clientY;
+    if (window.TouchEvent && event instanceof TouchEvent) {
+      clientX = event.touches[0].clientX;
+      clientY = event.touches[0].clientY;
+    } else {
+      clientX = (event as MouseEvent).clientX;
+      clientY = (event as MouseEvent).clientY;
+    }
     
-    // modal pet-stage is 220px (wait! let's check css: .pet-stage is 220px width/height!)
+    const deltaX = clientX - this.dragStartX;
+    const deltaY = clientY - this.dragStartY;
+    
     const deltaPercentX = (deltaX / 220) * 100;
     const deltaPercentY = (deltaY / 220) * 100;
     
@@ -679,8 +700,9 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     this.currentDragTop = this.startTopPercent + deltaPercentY;
   }
 
-  @HostListener('document:pointerup', ['$event'])
-  async onPointerUpGlobal(event: PointerEvent) {
+  @HostListener('document:mouseup', ['$event'])
+  @HostListener('document:touchend', ['$event'])
+  async onPointerUpGlobal(event: MouseEvent | TouchEvent) {
     if (!this.isDraggingClothes) return;
     this.isDraggingClothes = false;
     
