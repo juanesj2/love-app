@@ -28,7 +28,7 @@ import { LoveApiService } from '../../services/love-api.service';
 
       <!-- DotLottie Player for Pets -->
       <dotlottie-player 
-        *ngIf="!isEgg"
+        [hidden]="isEgg"
         #lottiePlayer
         src="{{currentLottieSrc}}" 
         background="transparent" 
@@ -50,7 +50,7 @@ import { LoveApiService } from '../../services/love-api.service';
             <canvas #riveCanvas class="egg-canvas"></canvas>
             
             <!-- Mascota (Lottie) sobre el cascarón roto -->
-            <div class="pet-overlay" *ngIf="hatchedPet">
+            <div class="pet-overlay" [hidden]="!hatchedPet">
                <dotlottie-player
                   [src]="lottieSrc"
                   autoplay
