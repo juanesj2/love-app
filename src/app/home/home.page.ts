@@ -27,6 +27,7 @@ import { PremiumService } from '../services/premium.service';
 import { PaywallComponent } from '../components/paywall/paywall.component';
 import { ModalController, Platform } from '@ionic/angular';
 import { SecretStatsModalComponent } from '../widgets/mas-widget/secret-stats-modal.component';
+import { StreakPetComponent } from '../components/streak-pet/streak-pet.component';
 
 import { NotificationService } from '../services/notification.service';
 import { PushNotifications } from '@capacitor/push-notifications';
@@ -56,6 +57,13 @@ import { PushNotifications } from '@capacitor/push-notifications';
           </div>
 
           <div class="header-center-actions">
+            <!-- Streak Pet -->
+            <app-streak-pet 
+              [streakDays]="couple?.current_streak || 0" 
+              [coupleId]="couple?.id || 0"
+              [petData]="couple?.inventory?.pet"
+              (petHatched)="onPetHatched($event)">
+            </app-streak-pet>
 
             <!-- Moon icon for Night Mode if unlocked -->
             <div class="moon-btn" [class.dark-active]="isDarkMode" *ngIf="hasNightOwlSecret" (click)="toggleDarkMode()">
@@ -123,20 +131,20 @@ import { PushNotifications } from '@capacitor/push-notifications';
 
       <div class="custom-tab-bar">
         <!-- Album -->
-        <div id="tab-photo" class="tab-btn" (click)="selectTab('photo')" [class.active]="selectedWidget === 'photo'">
+        <div id="tab-photo" class="tab-btn" (click)="selectTab('photo')" [class.active]="activeTab === 'photo'">
           <div style="position: relative; display: flex;">
-            <ion-icon name="images-outline" *ngIf="selectedWidget !== 'photo'"></ion-icon>
-            <ion-icon name="images" *ngIf="selectedWidget === 'photo'"></ion-icon>
+            <ion-icon name="images-outline" *ngIf="activeTab !== 'photo'"></ion-icon>
+            <ion-icon name="images" *ngIf="activeTab === 'photo'"></ion-icon>
             <div class="notification-badge" *ngIf="unreadPhoto"></div>
           </div>
           <span>Álbum</span>
         </div>
         
         <!-- Chat -->
-        <div id="tab-chat" class="tab-btn" (click)="selectTab('chat')" [class.active]="selectedWidget === 'chat'">
+        <div id="tab-chat" class="tab-btn" (click)="selectTab('chat')" [class.active]="activeTab === 'chat'">
           <div style="position: relative; display: flex;">
-            <ion-icon name="chatbubbles-outline" *ngIf="selectedWidget !== 'chat'"></ion-icon>
-            <ion-icon name="chatbubbles" *ngIf="selectedWidget === 'chat'"></ion-icon>
+            <ion-icon name="chatbubbles-outline" *ngIf="activeTab !== 'chat'"></ion-icon>
+            <ion-icon name="chatbubbles" *ngIf="activeTab === 'chat'"></ion-icon>
             <div class="notification-badge" *ngIf="unreadChat"></div>
           </div>
           <span>Chat</span>
@@ -146,19 +154,19 @@ import { PushNotifications } from '@capacitor/push-notifications';
         <div class="tab-btn center-btn" style="pointer-events: none;"></div>
         
         <!-- Map -->
-        <div id="tab-map" class="tab-btn" (click)="selectTab('location')" [class.active]="selectedWidget === 'location'">
+        <div id="tab-map" class="tab-btn" (click)="selectTab('location')" [class.active]="activeTab === 'location'">
           <div style="position: relative; display: flex;">
-            <ion-icon name="map-outline" *ngIf="selectedWidget !== 'location'"></ion-icon>
-            <ion-icon name="map" *ngIf="selectedWidget === 'location'"></ion-icon>
+            <ion-icon name="map-outline" *ngIf="activeTab !== 'location'"></ion-icon>
+            <ion-icon name="map" *ngIf="activeTab === 'location'"></ion-icon>
             <div class="notification-badge" *ngIf="unreadMap"></div>
           </div>
           <span>Mapa</span>
         </div>
         
         <!-- Más -->
-        <div id="tab-mas" class="tab-btn" (click)="selectTab('mas')" [class.active]="selectedWidget === 'mas'">
-          <ion-icon name="ellipsis-horizontal-outline" *ngIf="selectedWidget !== 'mas'"></ion-icon>
-          <ion-icon name="ellipsis-horizontal" *ngIf="selectedWidget === 'mas'"></ion-icon>
+        <div id="tab-mas" class="tab-btn" (click)="selectTab('mas')" [class.active]="activeTab === 'mas'">
+          <ion-icon name="ellipsis-horizontal-outline" *ngIf="activeTab !== 'mas'"></ion-icon>
+          <ion-icon name="ellipsis-horizontal" *ngIf="activeTab === 'mas'"></ion-icon>
           <span>Más</span>
         </div>
       </div>
@@ -296,7 +304,7 @@ import { PushNotifications } from '@capacitor/push-notifications';
 
       .custom-footer { background: transparent; border: none; padding: 0 15px calc(var(--safe-bottom) + 15px) 15px; position: absolute; bottom: 0; width: 100%; pointer-events: none; z-index: 1000; }
       .custom-tab-bar { pointer-events: auto; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; padding: 5px 15px; height: 70px; border-radius: 35px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.5); position: relative; margin-bottom: 5px; }
-      .tab-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #a08c92; width: 55px; font-size: 0.75rem; gap: 4px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; }
+      .tab-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #a08c92; width: 55px; font-size: 0.75rem; gap: 4px; transition: color 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; }
       .tab-btn.active { color: #FF4D6D; font-weight: 800; transform: translateY(-3px); }
       
       .tab-btn ion-icon { font-size: 1.6rem; transition: transform 0.3s; }
@@ -361,11 +369,13 @@ import { PushNotifications } from '@capacitor/push-notifications';
     :host-context(.night-owl-mode) .prompt-preview-container { background: rgba(0,0,0,0.3); }
   `],
   standalone: true,
-  imports: [IonHeader, IonContent, IonFooter, IonIcon, IonSpinner, CommonModule, FormsModule, LocationWidgetComponent, PhotoWidgetComponent, ChatWidgetComponent, MasWidgetComponent, QuestionsWidgetComponent],
+  imports: [IonHeader, IonContent, IonFooter, IonIcon, IonSpinner, CommonModule, FormsModule, LocationWidgetComponent, PhotoWidgetComponent, ChatWidgetComponent, MasWidgetComponent, QuestionsWidgetComponent, StreakPetComponent],
 })
 export class HomePage implements OnInit, OnDestroy {
+  activeTab: string = 'photo';
   selectedWidget: 'location' | 'photo' | 'chat' | 'mas' | 'game' = 'photo';
   uploading = false;
+  couple: any = null;
   pokeAnimation = false;
   superPokeAnimation = false;
 
@@ -444,6 +454,7 @@ export class HomePage implements OnInit, OnDestroy {
       const tab = res.value as 'location' | 'photo' | 'chat' | 'mas' | 'game';
       if (['location', 'photo', 'chat', 'mas', 'game'].includes(tab)) {
         this.selectedWidget = tab;
+        this.activeTab = tab;
       }
       await Preferences.remove({ key: 'widget_open_tab' });
     }
@@ -565,21 +576,28 @@ export class HomePage implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.notificationService.tappedNotification$.subscribe((action: any) => {
         const notif = action.notification;
-        const title = notif.title ? notif.title.toLowerCase() : '';
-        const body = notif.body ? notif.body.toLowerCase() : '';
-        const text = title + ' ' + body;
-        
+        const payload = {
+          title: notif.title || '',
+          body: notif.body || '',
+          data: notif.data
+        };
+        const text = (payload.title + ' ' + payload.body).toLowerCase();
+        let targetWidget = 'photo';
+
         if (text.includes('mensaje') || text.includes('carta') || text.includes('regalo') || text.includes('sorpresa')) {
-          this.selectTab('chat');
+          targetWidget = 'chat';
         } else if (text.includes('foto') || text.includes('álbum') || text.includes('reaccion') || text.includes('garabato')) {
-          this.selectTab('photo');
+          targetWidget = 'photo';
         } else if (text.includes('zumbido') || text.includes('ubicación') || text.includes('llegado') || text.includes('mapa')) {
-          this.selectTab('location');
+          targetWidget = 'location';
         } else if (text.includes('juego') || text.includes('pregunta') || text.includes('verdad') || text.includes('reto') || text.includes('quiz')) {
-          this.selectTab('game');
+          targetWidget = 'game';
         } else if (text.includes('inventario') || text.includes('premium')) {
-          this.selectTab('mas');
+          targetWidget = 'mas';
         }
+
+        this.activeTab = targetWidget;
+        this.selectedWidget = targetWidget as 'location' | 'photo' | 'chat' | 'mas' | 'game';
         this.cdr.detectChanges();
       })
     );
@@ -664,44 +682,56 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   public async selectTab(tab: string) {
-    this.selectedWidget = tab as 'location' | 'photo' | 'chat' | 'mas' | 'game';
+    if (this.activeTab === tab) return;
     
-    if (tab === 'chat') this.unreadChat = false;
-    if (tab === 'photo') this.unreadPhoto = false;
-    if (tab === 'location') this.unreadMap = false;
+    // Update visual tab instantly for ultra-fast INP (< 16ms response)
+    this.activeTab = tab;
+    this.cdr.detectChanges();
 
-    // Remove OS notifications associated with the selected tab
-    if (this.platform.is('capacitor')) {
-      try {
-        const delivered = await PushNotifications.getDeliveredNotifications();
-        const toRemove = delivered.notifications.filter(notif => {
-          const text = ((notif.title || '') + ' ' + (notif.body || '')).toLowerCase();
-          if (tab === 'chat' && text.includes('mensaje')) return true;
-          if (tab === 'photo' && (text.includes('foto') || text.includes('álbum') || text.includes('reaccion') || text.includes('garabato'))) return true;
-          if (tab === 'location' && text.includes('zumbido')) return true;
-          return false;
-        });
-        if (toRemove.length > 0) {
-          await PushNotifications.removeDeliveredNotifications({ notifications: toRemove });
-        }
-      } catch (e) {
-        console.log('Error removing notifications', e);
-      }
-    }
+    // Defer the heavy DOM manipulation (destroying and creating widget components)
+    // to the next frame so the browser can paint the UI update first.
+    setTimeout(async () => {
+      this.selectedWidget = tab as 'location' | 'photo' | 'chat' | 'mas' | 'game';
+      
+      if (tab === 'chat') this.unreadChat = false;
+      if (tab === 'photo') this.unreadPhoto = false;
+      if (tab === 'location') this.unreadMap = false;
 
-    // Damos un pequeño respiro de 300ms para que el DOM renderice el componente antes de mostrar el tutorial
-    setTimeout(() => {
-      switch (tab) {
-        case 'photo': this.tutorialService.showPhotosTour(); break;
-        case 'chat': this.tutorialService.showChatTour(); break;
-        case 'location': 
-          if (!this.premiumService.isFree$.value) {
-            this.tutorialService.showMapTour(); 
+      // Remove OS notifications associated with the selected tab
+      if (this.platform.is('capacitor')) {
+        try {
+          const delivered = await PushNotifications.getDeliveredNotifications();
+          const toRemove = delivered.notifications.filter(notif => {
+            const text = ((notif.title || '') + ' ' + (notif.body || '')).toLowerCase();
+            if (tab === 'chat' && text.includes('mensaje')) return true;
+            if (tab === 'photo' && (text.includes('foto') || text.includes('álbum') || text.includes('reaccion') || text.includes('garabato'))) return true;
+            if (tab === 'location' && text.includes('zumbido')) return true;
+            return false;
+          });
+          if (toRemove.length > 0) {
+            await PushNotifications.removeDeliveredNotifications({ notifications: toRemove });
           }
-          break;
-        case 'mas': this.tutorialService.showMasTour(); break;
+        } catch (e) {
+          console.log('Error removing notifications', e);
+        }
       }
-    }, 300);
+
+      this.cdr.detectChanges();
+
+      // Damos un pequeño respiro de 300ms para que el DOM renderice el componente antes de mostrar el tutorial
+      setTimeout(() => {
+        switch (tab) {
+          case 'photo': this.tutorialService.showPhotosTour(); break;
+          case 'chat': this.tutorialService.showChatTour(); break;
+          case 'location': 
+            if (!this.premiumService.isFree$.value) {
+              this.tutorialService.showMapTour(); 
+            }
+            break;
+          case 'mas': this.tutorialService.showMasTour(); break;
+        }
+      }, 300);
+    }, 10);
   }
 
   async openPaywall() {
@@ -815,8 +845,29 @@ export class HomePage implements OnInit, OnDestroy {
     try {
       this.api.markMessagesDelivered().catch(e => console.log('Error marking messages delivered', e));
       
+      const cached = await Preferences.get({ key: 'chat_couple_info_cache' });
+      if (cached.value) {
+        const data = JSON.parse(cached.value);
+        if (data.global_theme && data.global_theme !== 'default') {
+          document.body.setAttribute('data-global-theme', data.global_theme);
+        }
+        if (data.my_mood) this.myMood = data.my_mood;
+        if (data.partner_mood) this.partnerMood = data.partner_mood;
+        if (data.my_avatar_frame || data.avatar_frame) this.myAvatarFrame = data.my_avatar_frame || data.avatar_frame || 'default';
+        if (data.partner_avatar_frame) this.partnerAvatarFrame = data.partner_avatar_frame || 'default';
+        if (data.partner_name) this.partnerInitial = data.partner_name.charAt(0).toUpperCase();
+        if (data.my_avatar) this.myAvatarUrl = data.my_avatar;
+        if (data.partner_avatar) this.partnerAvatarUrl = data.partner_avatar;
+        if (data.couple) this.couple = data.couple;
+        this.cdr.detectChanges();
+      }
+      
       const data = await this.api.getCoupleInfo();
       
+      if (data) {
+        await Preferences.set({ key: 'chat_couple_info_cache', value: JSON.stringify(data) });
+      }
+
       if (data.global_theme && data.global_theme !== 'default') {
         document.body.setAttribute('data-global-theme', data.global_theme);
       } else {
@@ -831,6 +882,13 @@ export class HomePage implements OnInit, OnDestroy {
       if (data.partner_name) this.partnerInitial = data.partner_name.charAt(0).toUpperCase();
       if (data.my_avatar) this.myAvatarUrl = data.my_avatar;
       if (data.partner_avatar) this.partnerAvatarUrl = data.partner_avatar;
+      
+      if (data.couple) {
+        this.couple = data.couple;
+      } else if (data.current_streak !== undefined) {
+        // Fallback in case couple is not in the top level object
+        this.couple = { current_streak: data.current_streak, id: data.my_id || 0 };
+      }
 
       const myIdStr = data.my_id?.toString();
       const partnerIdStr = data.partner_id?.toString();
@@ -928,6 +986,26 @@ export class HomePage implements OnInit, OnDestroy {
       toast.present();
     } catch(e) {
       console.error(e);
+    }
+  }
+
+  onPetHatched(petData: any) {
+    if (this.couple) {
+      if (!this.couple.inventory) {
+        this.couple.inventory = {};
+      }
+      this.couple.inventory.pet = petData;
+      // Update cache
+      Preferences.get({ key: 'chat_couple_info_cache' }).then(cached => {
+        if (cached.value) {
+          const data = JSON.parse(cached.value);
+          if (data.couple) {
+            data.couple = this.couple;
+            Preferences.set({ key: 'chat_couple_info_cache', value: JSON.stringify(data) });
+          }
+        }
+      });
+      this.cdr.detectChanges();
     }
   }
 
@@ -1087,6 +1165,10 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   async takePicture() {
+    if (this.activeTab === 'mas') {
+      this.masWidgetComp?.openAddFoodPlaceModal();
+      return;
+    }
     this.presentPhotoOptions(async (source) => {
       try {
         const image = await Camera.getPhoto({
@@ -1134,6 +1216,7 @@ export class HomePage implements OnInit, OnDestroy {
       await this.api.uploadPhoto(this.pendingPhotoFile, this.pendingPhotoText);
       this.cancelUpload();
 
+      this.activeTab = 'photo';
       this.selectedWidget = 'photo';
       
       setTimeout(async () => {

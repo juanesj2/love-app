@@ -24,6 +24,9 @@
 				"sound",
 				"alert"
 			]
+		},
+		"Keyboard": {
+			"resize": "none"
 		}
 	}
 }

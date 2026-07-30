@@ -190,8 +190,9 @@ import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer
             </div>
           </div>
           
-          <button class="confirm-gift-btn" (click)="purchaseItem('gift_' + selectedGiftType)">
-            Comprar {{ selectedGiftType === 'bundle' ? 'Pack x3' : 'Regalo' }} por {{ selectedGiftType === 'bundle' ? '2.00' : '0.99' }} €
+          <button class="confirm-gift-btn" (click)="purchaseItem('gift_' + selectedGiftType)" [disabled]="purchasingItem === 'gift_' + selectedGiftType">
+            <span *ngIf="purchasingItem !== 'gift_' + selectedGiftType">Comprar {{ selectedGiftType === 'bundle' ? 'Pack x3' : 'Regalo' }} por {{ selectedGiftType === 'bundle' ? '2.00' : '0.99' }} €</span>
+            <ion-spinner name="crescent" *ngIf="purchasingItem === 'gift_' + selectedGiftType"></ion-spinner>
           </button>
         </div>
       </div>
@@ -219,8 +220,9 @@ import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer
             <span style="color: #590D22; font-weight: bold; font-size: 0.95rem;">🔥 50 Retos de Dibujo</span>
           </div>
 
-          <button class="confirm-gift-btn" style="background: #ff0054; margin-top: 0;" (click)="purchaseSpicyPack()">
-            Comprar por 1.99€
+          <button class="confirm-gift-btn" style="background: #ff0054; margin-top: 0;" (click)="purchaseSpicyPack()" [disabled]="purchasingItem === 'spicy_pack'">
+            <span *ngIf="purchasingItem !== 'spicy_pack'">Comprar por 1.99€</span>
+            <ion-spinner name="crescent" *ngIf="purchasingItem === 'spicy_pack'"></ion-spinner>
           </button>
         </div>
       </div>

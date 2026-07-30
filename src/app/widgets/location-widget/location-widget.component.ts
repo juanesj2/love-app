@@ -59,8 +59,9 @@ import { ModalController } from '@ionic/angular';
             <ion-icon *ngIf="partnerIsGhost" name="eye-off-outline" class="avatar-mini-ghost"></ion-icon>
             <div class="mood-badge-mini" *ngIf="partnerMood && !partnerIsGhost">{{ partnerMood }}</div>
           </div>
-          <div class="partner-info-mini" *ngIf="partnerIsGhost">
-            <strong>Ubicación Oculta</strong>
+          <div class="partner-info-mini" *ngIf="partnerIsGhost" style="line-height: 1.2;">
+            <strong style="font-size: 14px;">{{ partnerName || 'Tu pareja' }}</strong><br>
+            <span style="font-size: 12px; color: #888;">Ubicación oculta</span>
           </div>
         </div>
       
@@ -294,16 +295,29 @@ export class LocationWidgetComponent implements OnInit, OnDestroy, AfterViewInit
   async ngOnInit() {
     this.isGhostMode = await this.locationService.getPrivacyMode();
 
+    // 1. Carga ultra rápida desde caché
+    try {
+      const cachedInfo = await Preferences.get({ key: 'location_couple_info' });
+      if (cachedInfo.value) {
+        this.applyCoupleInfo(JSON.parse(cachedInfo.value));
+      }
+      
+      const cachedMilestone = await Preferences.get({ key: 'location_next_milestone' });
+      if (cachedMilestone.value) {
+        const m = JSON.parse(cachedMilestone.value);
+        this.nextMilestone = m.milestone;
+        this.daysRemaining = m.daysRemaining;
+      }
+    } catch (e) {
+      console.error('Error reading location cache', e);
+    }
+
+    // 2. Fetch de datos reales en segundo plano
     try {
       const info = await this.api.getCoupleInfo();
-      this.myUserId = info.my_id as any;
-      this.partnerId = info.partner_id as any;
-      this.myMood = info.my_mood || '';
-      this.partnerMood = info.partner_mood || '';
-      this.myAvatarUrl = info.my_avatar || '';
-      this.partnerAvatarUrl = info.partner_avatar || '';
-      this.partnerName = info.partner_name || 'Tu pareja';
-
+      await Preferences.set({ key: 'location_couple_info', value: JSON.stringify(info) });
+      this.applyCoupleInfo(info);
+      
       const myName = info.my_name || 'Yo';
       this.locationService.updateMyLocation(this.myUserId, myName).catch(err => {
         console.error('Error GPS', err);
@@ -326,19 +340,32 @@ export class LocationWidgetComponent implements OnInit, OnDestroy, AfterViewInit
     });
   }
 
+  private applyCoupleInfo(info: any) {
+    this.myUserId = info.my_id as any;
+    this.partnerId = info.partner_id as any;
+    this.myMood = info.my_mood || '';
+    this.partnerMood = info.partner_mood || '';
+    this.myAvatarUrl = info.my_avatar || '';
+    this.partnerAvatarUrl = info.partner_avatar || '';
+    this.partnerName = info.partner_name || 'Tu pareja';
+    this.refreshMarkers();
+  }
+
   ngAfterViewInit() {
-    this.initMap();
-    
-    const mapElement = document.getElementById('map');
-    if (mapElement) {
-      this.resizeObserver = new ResizeObserver(() => {
-        if (this.map) {
-          this.map.invalidateSize();
-          this.centerMap();
-        }
-      });
-      this.resizeObserver.observe(mapElement);
-    }
+    setTimeout(() => {
+      this.initMap();
+      
+      const mapElement = document.getElementById('map');
+      if (mapElement) {
+        this.resizeObserver = new ResizeObserver(() => {
+          if (this.map) {
+            this.map.invalidateSize();
+            this.centerMap();
+          }
+        });
+        this.resizeObserver.observe(mapElement);
+      }
+    }, 50);
   }
 
   private startMoodInterval() {
@@ -393,6 +420,7 @@ export class LocationWidgetComponent implements OnInit, OnDestroy, AfterViewInit
       if (closest) {
         this.nextMilestone = closest;
         this.daysRemaining = minDiff;
+        await Preferences.set({ key: 'location_next_milestone', value: JSON.stringify({ milestone: closest, daysRemaining: minDiff }) });
       }
     } catch (e) {
       console.error('Error fetching milestones', e);

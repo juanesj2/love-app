@@ -161,7 +161,7 @@ import confetti from 'canvas-confetti';
 
     .notes-container {
       padding: 20px;
-      padding-bottom: 120px;
+      padding-bottom: calc(120px + var(--safe-bottom));
     }
 
     .empty-state {
@@ -388,7 +388,7 @@ import confetti from 'canvas-confetti';
       width: 100%;
       background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(10px);
-      padding: 15px;
+      padding: 15px 15px calc(15px + var(--safe-bottom)) 15px;
       border-top: 1px solid rgba(255, 143, 163, 0.3);
       display: flex;
       gap: 10px;

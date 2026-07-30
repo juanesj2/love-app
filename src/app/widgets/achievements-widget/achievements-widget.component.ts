@@ -89,7 +89,7 @@ import { LoveApiService } from '../../services/love-api.service';
   `,
   styles: [`
     .scroll-content { --background: #fff0f3; }
-    .achievements-container { padding: 20px; padding-bottom: 80px; min-height: 100vh; position: relative; }
+    .achievements-container { padding: 20px; padding-bottom: calc(80px + var(--safe-bottom)); min-height: 100vh; position: relative; }
     
     .winner-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.3s; }
     .winner-content { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }

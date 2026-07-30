@@ -9,6 +9,12 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class PremiumService {
+  // ==========================================
+  // MODO DE PRUEBAS PARA PAGOS (SIMULADOR)
+  // Cambiar a false cuando vayas a lanzar a Google Play con RevenueCat configurado
+  // ==========================================
+  public SIMULATE_PAYMENTS = false; 
+
   private api = inject(LoveApiService);
   private platform = inject(Platform);
 
@@ -38,14 +44,16 @@ export class PremiumService {
     try {
       await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
       
+      if (this.SIMULATE_PAYMENTS || !this.platform.is('hybrid')) {
+        // En web o modo simulado, asumiremos premium temporalmente para pruebas
+        this.verifyPremiumFromBackend();
+        return;
+      }
+
       if (this.platform.is('ios')) {
         await Purchases.configure({ apiKey: environment.revenuecatAppleKey });
       } else if (this.platform.is('android')) {
         await Purchases.configure({ apiKey: environment.revenuecatGoogleKey });
-      } else {
-        // En web, asumiremos premium temporalmente para pruebas o requeriremos el backend
-        this.verifyPremiumFromBackend();
-        return;
       }
 
       const me = await this.api.getMe().catch(() => null);
@@ -87,7 +95,7 @@ export class PremiumService {
   }
 
   async checkSubscriptionStatus() {
-    if (!this.platform.is('hybrid')) return;
+    if (!this.platform.is('hybrid') || this.SIMULATE_PAYMENTS) return;
 
     try {
       const customerInfo = await Purchases.getCustomerInfo();
@@ -116,8 +124,8 @@ export class PremiumService {
   }
 
   async fetchOfferings() {
-    if (!this.platform.is('hybrid')) {
-      // Fallback simulado para web
+    if (!this.platform.is('hybrid') || this.SIMULATE_PAYMENTS) {
+      // Fallback simulado para web o modo de pruebas
       this.packages$.next([
         { identifier: 'monthly', packageType: 'MONTHLY', product: { priceString: '1,99 €', title: 'Mensual' } },
         { identifier: 'annual', packageType: 'ANNUAL', product: { priceString: '20,00 €', title: 'Anual' } }
@@ -136,8 +144,8 @@ export class PremiumService {
   }
 
   async purchasePremium(pkg?: any): Promise<{success: boolean, error?: any}> {
-    if (!this.platform.is('hybrid')) {
-      const confirmPurchase = confirm('Estás en la web (modo simulado). ¿Seguro que quieres "comprar" el plan Premium? No se te cobrará nada real.');
+    if (!this.platform.is('hybrid') || this.SIMULATE_PAYMENTS) {
+      const confirmPurchase = confirm('Estás en el modo simulado de pagos.\n¿Seguro que quieres "comprar" el plan Premium? No se te cobrará nada real.');
       if (!confirmPurchase) return { success: false, error: { userCancelled: true } };
 
       // Simulamos éxito en Web con 7 días de prueba
@@ -177,8 +185,8 @@ export class PremiumService {
   }
 
   async purchaseConsumable(productId: string): Promise<{success: boolean, error?: any}> {
-    if (!this.platform.is('hybrid')) {
-      const confirmPurchase = confirm(`Estás en la web (modo simulado). ¿Seguro que quieres "comprar" el producto ${productId}?`);
+    if (!this.platform.is('hybrid') || this.SIMULATE_PAYMENTS) {
+      const confirmPurchase = confirm(`Estás en el modo simulado de pagos.\n¿Seguro que quieres simular la compra del producto "${productId}" sin pagar nada?`);
       if (!confirmPurchase) return { success: false, error: { userCancelled: true } };
       return { success: true };
     }
@@ -202,7 +210,7 @@ export class PremiumService {
   }
 
   async restorePurchases(): Promise<boolean> {
-    if (!this.platform.is('hybrid')) return false;
+    if (!this.platform.is('hybrid') || this.SIMULATE_PAYMENTS) return false;
 
     try {
       const customerInfo = await Purchases.restorePurchases();

@@ -342,7 +342,10 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
           </div>
         </div>
 
-        <button class="doodle-btn send" (click)="sendDoodle()"><ion-icon name="paper-plane"></ion-icon></button>
+        <button class="doodle-btn send" (click)="sendDoodle()" [disabled]="sending">
+          <ion-icon name="paper-plane" *ngIf="!sending"></ion-icon>
+          <ion-spinner name="crescent" *ngIf="sending" style="width: 20px; height: 20px;"></ion-spinner>
+        </button>
       </div>
       <canvas #doodleCanvas class="doodle-canvas" (touchstart)="onDoodleStart($event)" (touchmove)="onDoodleMove($event)" (touchend)="onDoodleEnd()"></canvas>
     </div>
@@ -369,27 +372,7 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
       </div>
     </div>
 
-    <!-- Custom Color Picker Overlay -->
-    <div class="color-picker-overlay" *ngIf="showColorPicker">
-      <div class="color-picker-modal">
-        <h3>Elige un Color</h3>
-        <div class="color-grid">
-          <div class="color-swatch" *ngFor="let color of extendedColors" 
-               [style.background]="color" 
-               [class.selected]="tempColor === color"
-               (click)="tempColor = color">
-          </div>
-        </div>
-        <div class="color-preview-row">
-          <div class="preview-circle" [style.background]="tempColor"></div>
-          <input type="text" class="hex-input" [(ngModel)]="tempColor" />
-        </div>
-        <div class="color-picker-actions">
-          <button class="cp-btn cancel" (click)="showColorPicker = false">Cancelar</button>
-          <button class="cp-btn accept" (click)="acceptCustomColor()">Aceptar</button>
-        </div>
-      </div>
-    </div>
+
 
     <!-- Graffiti Context Menu Overlay -->
     <div class="graffiti-context-overlay" *ngIf="selectedGraffiti" (click)="closeGraffitiOptions()">
@@ -544,6 +527,8 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
     audio { display: none; }
     
     .messages-content { flex: 1; --background: transparent; }
+    /* Prevent browser scroll-anchoring from jumping when images above the viewport finish loading */
+    .messages-content::part(scroll) { overflow-anchor: none; }
     .messages-inner { padding: calc(var(--safe-top) + 85px) 15px 20px; display: flex; flex-direction: column; min-height: 100%; background: transparent !important; }
     
     .message-row { position: relative; width: 100%; display: flex; align-items: center; margin-bottom: 12px; }
@@ -634,7 +619,7 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
     .graffiti-overlay { position: absolute; pointer-events: auto; z-index: 5; filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.2)); }
 
     .gif-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10000; background: rgba(0,0,0,0.4); display: flex; align-items: flex-end; }
-    .gif-modal { width: 100%; height: 50vh; background: white; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; padding: 15px; animation: slideUpGif 0.3s ease-out; }
+    .gif-modal { width: 100%; height: 50vh; background: white; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; padding: 15px 15px calc(15px + var(--safe-bottom)) 15px; animation: slideUpGif 0.3s ease-out; }
     @keyframes slideUpGif { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .gif-header { display: flex; gap: 10px; margin-bottom: 15px; }
     .gif-search { flex: 1; padding: 10px 15px; border-radius: 20px; border: 1px solid #ddd; background: #f5f5f5; color: #333; outline: none; }
@@ -1987,8 +1972,21 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
 
   async loadCoupleInfoSettings() {
     try {
+      const cached = await Preferences.get({ key: 'chat_couple_info_cache' });
+      if (cached.value) {
+        const info = JSON.parse(cached.value);
+        this.myBubbleStyle = info.my_bubble_shape || info.bubble_shape || 'default';
+        this.partnerBubbleStyle = info.partner_bubble_shape || 'default';
+        this.myAvatarMood = info.my_mood || info.current_mood || '';
+        this.partnerAvatarMood = info.partner_mood || '';
+        this.myAvatarFrame = info.my_avatar_frame || info.avatar_frame || 'default';
+        this.partnerAvatarFrame = info.partner_avatar_frame || 'default';
+        this.cdr.detectChanges();
+      }
+      
       const info = await this.api.getCoupleInfo();
       if (info) {
+        await Preferences.set({ key: 'chat_couple_info_cache', value: JSON.stringify(info) });
         this.myBubbleStyle = info.my_bubble_shape || info.bubble_shape || 'default';
         this.partnerBubbleStyle = info.partner_bubble_shape || 'default';
         this.myAvatarMood = info.my_mood || info.current_mood || '';
@@ -2105,7 +2103,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     this.loadChatBackground();
     
     this.pollingInterval = setInterval(() => {
-      this.loadMessages(true);
+      this.pollNewMessages();
     }, 5000);
     
     const deletedPref = await Preferences.get({ key: 'deleted_chat_messages' });
@@ -2147,6 +2145,16 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   async loadAvatars() {
+    const cacheTs = localStorage.getItem('chat_avatars_ts');
+    const now = Date.now();
+    const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+    const cacheIsFresh = cacheTs && (now - parseInt(cacheTs, 10)) < CACHE_TTL;
+
+    if (Object.keys(this.avatars).length > 0 && cacheIsFresh) {
+      // Cache is warm and fresh - skip network call entirely
+      this.cdr.detectChanges();
+      return;
+    }
 
     try {
       const info = await this.api.getCoupleInfo();
@@ -2160,6 +2168,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
           this.avatars[info.partner_name] = info.partner_avatar;
         }
         localStorage.setItem('chat_avatars_cache', JSON.stringify(this.avatars));
+        localStorage.setItem('chat_avatars_ts', now.toString());
+        this.cdr.detectChanges();
       }
     } catch (e) {
       console.error('Error loading avatars', e);
@@ -2174,24 +2184,26 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   enforceScrollToBottom() {
-    if (this.forceScrollInterval) clearInterval(this.forceScrollInterval);
-    let attempts = 0;
     this.isEnforcingScroll = true;
-    this.forceScrollInterval = setInterval(() => {
-      this.scrollToBottom(false);
-      attempts++;
-      if (attempts >= 15) { // 3 seconds total
-        clearInterval(this.forceScrollInterval);
-        this.isEnforcingScroll = false;
-        // Check real position after enforcing
-        if (this.msgContainer) {
-          this.msgContainer.getScrollElement().then((el: any) => {
-             const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
-             this.isUserScrolledUp = distanceFromBottom > 100;
+    this.scrollToBottom(false);
+    // Multiple passes to handle: cache render, API response, and slow image loads.
+    // Each pass overwrites the previous displacement caused by new content.
+    const passes = [100, 300, 600, 1000, 1800];
+    passes.forEach((delay, i) => {
+      this.safeTimeout(() => {
+        this.scrollToBottom(false);
+        if (i === passes.length - 1) {
+          // Last pass: release enforcement and compute real scroll state
+          this.isEnforcingScroll = false;
+          this.getScrollEl().then(el => {
+            if (el) {
+              const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+              this.isUserScrolledUp = distanceFromBottom > 100;
+            }
           });
         }
-      }
-    }, 200);
+      }, delay);
+    });
   }
 
   scrollToBottom(animated: boolean = true): void {
@@ -2202,15 +2214,139 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   async handleRefresh(event: any) {
-    await this.loadMessages();
-    event.target.complete();
+    await this.loadOlderMessages(event);
   }
 
   lastKnownMessageId: number = 0;
+  allMessagesLoaded: boolean = false;
+  isPolling: boolean = false;
+
+  async loadOlderMessages(event?: any) {
+    if (this.messages.length === 0) {
+      this.allMessagesLoaded = true;
+      if (event) event.target.complete();
+      return;
+    }
+
+    const firstId = this.messages[0].id;
+    try {
+      const older = await this.api.getChatMessages(firstId, undefined);
+      if (older && older.length > 0) {
+        // Only accept messages that are genuinely older than our first message
+        const filteredOlder = older.filter((msg: any) => msg.id < firstId);
+        
+        if (filteredOlder.length > 0) {
+          const el = this.cachedScrollElement || await this.getScrollEl();
+          if (!el) {
+            if (event) event.target.complete();
+            return;
+          }
+          const scrollHeightBefore = el.scrollHeight;
+          const scrollTopBefore = el.scrollTop;
+
+          this.messages = [...filteredOlder, ...this.messages];
+          this.cachedScrollElement = null;
+          this.processMessages();
+          this.cdr.detectChanges();
+
+          requestAnimationFrame(() => {
+            const scrollHeightAfter = el.scrollHeight;
+            const diff = scrollHeightAfter - scrollHeightBefore;
+            if (diff > 0) {
+              el.scrollTop = scrollTopBefore + diff;
+            }
+            if (event) event.target.complete();
+          });
+        } else {
+          if (event) event.target.complete();
+        }
+
+        if (older.length < 30) this.allMessagesLoaded = true;
+      } else {
+        this.allMessagesLoaded = true;
+        if (event) event.target.complete();
+      }
+    } catch (e) {
+      if (event) event.target.complete();
+    }
+  }
+
+  async pollNewMessages() {
+    if (this.isPolling) return;
+    this.isPolling = true;
+    try {
+      if (this.messages.length > 0) {
+         const lastId = this.messages[this.messages.length - 1].id;
+         const newMsgs = await this.api.getChatMessages(undefined, lastId);
+         if (newMsgs && newMsgs.length > 0) {
+            // Only accept messages that are genuinely newer than our last message
+            const filteredNew = newMsgs.filter((msg: any) => msg.id > lastId);
+            if (filteredNew.length > 0) {
+              this.messages = [...this.messages, ...filteredNew];
+              this.processNewIncomingMessages(filteredNew);
+            }
+         }
+      } else {
+         await this.loadMessages(true);
+      }
+    } catch(e) {} finally {
+      this.isPolling = false;
+    }
+  }
+
+  processNewIncomingMessages(newMsgs: any[]) {
+      this.processMessages();
+      let shouldScroll = !this.isUserScrolledUp;
+      let newCount = 0;
+      
+      const latestMsg = newMsgs[newMsgs.length - 1];
+      
+      for (const msg of newMsgs) {
+        if (!this.isMine(msg)) {
+           newCount++;
+        }
+      }
+
+      if (!shouldScroll) {
+         this.unreadCount += newCount;
+      } else {
+         this.unreadCount = 0;
+      }
+
+      if (latestMsg && !this.isMine(latestMsg)) {
+          if (this.isEmojiOnly(latestMsg.mensaje)) {
+            this.triggerEmojiReaction(latestMsg.mensaje.trim());
+          }
+          if (latestMsg.mensaje && latestMsg.mensaje.includes('✨')) {
+            this.triggerConfetti();
+          }
+          if (this.chatSound && this.chatSound !== 'default' && this.chatSound !== 'none') {
+            const audio = new Audio(`assets/sounds/${this.chatSound}.wav`);
+            audio.play().catch((e:any) => console.log('Audio play error:', e));
+          }
+      }
+      this.lastKnownMessageId = latestMsg.id;
+
+      if (shouldScroll) {
+         this.safeTimeout(() => this.scrollToBottom(false), 50);
+         this.safeTimeout(() => this.scrollToBottom(true), 300);
+      }
+      
+      this.cdr.detectChanges();
+      
+      const limitMessages = this.messages.slice(-30);
+      Preferences.set({ key: 'chat_cache', value: JSON.stringify(limitMessages) }).catch(()=>{});
+  }
+
+  async fetchNewMessagesAndScroll() {
+    await this.pollNewMessages();
+    this.isUserScrolledUp = false;
+    this.safeTimeout(() => this.scrollToBottom(false), 50);
+    this.safeTimeout(() => this.scrollToBottom(true), 300);
+  }
 
   async loadMessages(isBackground = false) {
     try {
-      // 1. Mostrar caché primero para experiencia instantánea
       if (!isBackground) {
         const cache = await Preferences.get({ key: 'chat_cache' });
         if (cache.value) {
@@ -2222,64 +2358,52 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
           this.isLoading = false;
           this.cdr.detectChanges();
           this.safeTimeout(() => this.scrollToBottom(false), 50);
-          this.safeTimeout(() => this.scrollToBottom(false), 300);
+
+          // Cache hit: only fetch messages newer than what we already have.
+          // No need to download everything again — that's the whole point of caching.
+          const newMsgs = await this.api.getChatMessages(undefined, this.lastKnownMessageId).catch(() => [] as any[]);
+          if (newMsgs && newMsgs.length > 0) {
+            // Only accept messages that are genuinely newer than our last known message
+            const filteredNew = newMsgs.filter((msg: any) => msg.id > this.lastKnownMessageId);
+            if (filteredNew.length > 0) {
+              this.messages = [...this.messages, ...filteredNew];
+              this.lastKnownMessageId = filteredNew[filteredNew.length - 1].id;
+              this.processNewIncomingMessages(filteredNew);
+              const limitMessages = this.messages.slice(-30);
+              await Preferences.set({ key: 'chat_cache', value: JSON.stringify(limitMessages) });
+            }
+          }
+          return;
         }
       }
 
-      // 2. Fetch de la red en segundo plano
+      // No cache (first launch or background refresh): full download
       const newMessages = await this.api.getChatMessages();
       
-      // 3. Actualizar la vista solo si hay cambios (evita parpadeos)
       if (JSON.stringify(this.messages) !== JSON.stringify(newMessages)) {
         this.messages = newMessages;
+        if (this.messages.length < 30) this.allMessagesLoaded = true;
         
-        let shouldScrollToBottom = !isBackground;
+        let shouldScrollToBottom = !isBackground || !this.isUserScrolledUp;
 
         if (this.messages.length > 0) {
           const latestMsg = this.messages[this.messages.length - 1];
-          if (this.lastKnownMessageId > 0 && latestMsg.id > this.lastKnownMessageId && !this.isMine(latestMsg)) {
-            let newMessagesCount = 0;
-            for (let i = this.messages.length - 1; i >= 0; i--) {
-              if (this.messages[i].id > this.lastKnownMessageId && !this.isMine(this.messages[i])) {
-                newMessagesCount++;
-              } else if (this.messages[i].id <= this.lastKnownMessageId) {
-                break;
-              }
-            }
-            
-            if (this.isUserScrolledUp) {
-              shouldScrollToBottom = false;
-              this.unreadCount += newMessagesCount;
-            } else {
-              shouldScrollToBottom = true;
-              this.unreadCount = 0;
-            }
-            
-            if (this.isEmojiOnly(latestMsg.mensaje)) {
-              this.triggerEmojiReaction(latestMsg.mensaje.trim());
-            }
-            if (latestMsg.mensaje && latestMsg.mensaje.includes('✨')) {
-              this.triggerConfetti();
-            }
-            if (this.chatSound && this.chatSound !== 'default' && this.chatSound !== 'none') {
-              const audio = new Audio(`assets/sounds/${this.chatSound}.wav`);
-              audio.play().catch(e => console.log('Audio play error:', e));
-            }
-          }
           this.lastKnownMessageId = latestMsg.id;
         }
         
         this.processMessages();
         if (shouldScrollToBottom) {
-          this.safeTimeout(() => this.scrollToBottom(false), 100);
-          this.safeTimeout(() => this.scrollToBottom(true), 500);
+          this.unreadCount = 0;
+          // Fire multiple scroll attempts to catch images that load after API data arrives
+          [50, 200, 600, 1200].forEach(delay => {
+            this.safeTimeout(() => this.scrollToBottom(false), delay);
+          });
         }
         const limitMessages = this.messages.slice(-30);
         await Preferences.set({ key: 'chat_cache', value: JSON.stringify(limitMessages) });
       }
     } catch (e) {
       if (!isBackground) {
-        console.error(e);
         this.showError('No pudimos cargar los mensajes. ¿Hay conexión?');
       }
     } finally {
@@ -2288,25 +2412,45 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     }
   }
 
-  async onScroll(event: any) {
+  private cachedScrollElement: HTMLElement | null = null;
+
+  private async getScrollEl(): Promise<HTMLElement | null> {
+    if (this.cachedScrollElement) return this.cachedScrollElement;
+    if (!this.msgContainer) return null;
+    this.cachedScrollElement = await this.msgContainer.getScrollElement();
+    return this.cachedScrollElement;
+  }
+
+  onScroll(event: any) {
     if (this.isEnforcingScroll) return;
-    
-    if (!this.msgContainer) return;
-    const scrollElement = await this.msgContainer.getScrollElement();
-    if (!scrollElement) return;
-    
-    const distanceFromBottom = scrollElement.scrollHeight - scrollElement.scrollTop - scrollElement.clientHeight;
-    // Consider scrolled up if distance is > 100px from bottom
+    if (!this.cachedScrollElement) {
+      // Prime the cache on first scroll event
+      this.getScrollEl();
+      return;
+    }
+    const el = this.cachedScrollElement;
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
     this.isUserScrolledUp = distanceFromBottom > 100;
-    
     if (!this.isUserScrolledUp) {
-      this.unreadCount = 0; // Clear badge if user scrolls to bottom
+      this.unreadCount = 0;
     }
   }
 
   scrollToBottomAndClear() {
     this.unreadCount = 0;
-    this.scrollToBottom(true);
+    this.isUserScrolledUp = false;
+    this.isEnforcingScroll = true;
+
+    if (this.msgContainer) {
+      this.msgContainer.scrollToBottom(300).then(() => {
+        setTimeout(() => {
+          this.isEnforcingScroll = false;
+          this.isUserScrolledUp = false;
+        }, 50);
+      });
+    } else {
+      this.isEnforcingScroll = false;
+    }
   }
 
   private messageById = new Map<number, any>();
@@ -2316,16 +2460,22 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     this.graffitisByAnchorId = {};
     this.messageById.clear();
 
-    this.messages.forEach(msg => {
+    // Use a Set for O(1) lookup instead of O(n) array.includes on every message
+    const deletedSet = new Set(this.deletedLocalMessages);
+
+    for (const msg of this.messages) {
       this.messageById.set(msg.id, msg);
-      if (this.deletedLocalMessages.includes(msg.id)) {
+
+      if (deletedSet.has(msg.id)) {
         msg.isDeletedLocally = true;
       }
 
-      msg._waveform = this.getWaveform(msg);
-      msg._reactions = this.getReactions(msg);
+      // Cache waveform and reactions on the message object to avoid re-computing every render
+      if (msg._waveform === undefined) msg._waveform = this.getWaveform(msg);
+      if (msg._reactions === undefined) msg._reactions = this.getReactions(msg);
 
       if (msg.mensaje && msg.mensaje.startsWith('[GRAFFITI:')) {
+        if (msg.isDeletedLocally) continue;
         const parts = msg.mensaje.split(':');
         if (parts.length >= 6) {
           msg.isGraffiti = true;
@@ -2339,7 +2489,6 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
           } else {
             msg.height = parseInt(parts[5].replace(']', ''), 10);
           }
-          
           if (!this.graffitisByAnchorId[msg.anchorMsgId]) {
             this.graffitisByAnchorId[msg.anchorMsgId] = [];
           }
@@ -2348,7 +2497,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       } else {
         this.regularMessages.push(msg);
       }
-    });
+    }
     this.cdr.detectChanges();
   }
 
@@ -2387,6 +2536,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         await this.api.editMessage(this.editingMsgId, payloadMessage);
         this.isEditing = false;
         this.editingMsgId = null;
+        // Lightweight poll to refresh the edited message
+        await this.pollNewMessages();
       } else {
         const replyPayload = isReplyingTo ? {
           id: isReplyingTo.id,
@@ -2394,7 +2545,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
           text: this.getReplyPreviewText(isReplyingTo)
         } : undefined;
         
-        // Push a fake pending message immediately
+        // Push a fake pending message immediately for instant UX feedback
         const fakeMsg = {
           id: Date.now() + Math.floor(Math.random() * 1000),
           user_id: this.myUserId,
@@ -2407,11 +2558,13 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         this.safeTimeout(() => this.scrollToBottom(true), 50);
 
         await this.api.sendMessage(payloadMessage, undefined, replyPayload);
+        // Replace fake msg with the real server message via lightweight poll
+        await this.pollNewMessages();
       }
       
-      await this.loadMessages();
-      
-      this.safeTimeout(() => this.scrollToBottom(true), 100);
+      // Always scroll to bottom after sending
+      this.isUserScrolledUp = false;
+      this.safeTimeout(() => this.scrollToBottom(true), 80);
     } catch (e) {
       console.error(e);
       this.showError('Ocurrió un error al enviar tu mensaje. Inténtalo de nuevo.');
@@ -2659,12 +2812,15 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
   }
 
   async sendDoodle() {
+    if (this.sending) return;
     if (!this.doodleCanvas || !this.doodleCanvas.nativeElement) return;
+    this.sending = true;
     const canvas = this.doodleCanvas.nativeElement;
     
     const cropResult = await this.cropCanvas(canvas);
     if (!cropResult || !cropResult.blob) {
         this.isDoodling = false;
+        this.sending = false;
         return;
     }
     
@@ -2696,7 +2852,6 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
     }
     
     this.isDoodling = false;
-    this.sending = true;
     try {
       // Use Blob directly to avoid 'Illegal constructor' error on some Capacitor webviews
       const description = `[GRAFFITI:${anchorMsgId}:${Math.round(offsetX)}:${Math.round(offsetY)}:${cropResult.w}:${cropResult.h}]`;
@@ -2706,8 +2861,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         const replyPayload = this.replyingTo ? { id: this.replyingTo.id, user: this.replyingTo.user?.name, text: this.getReplyPreviewText(this.replyingTo) } : undefined;
         await this.api.sendMessage(messageContent, undefined, replyPayload);
         this.replyingTo = null;
-        await this.loadMessages();
-        this.safeTimeout(() => this.scrollToBottom(), 100);
+        await this.fetchNewMessagesAndScroll();
       }
     } catch (e: any) {
       console.error('Error sending doodle', e);
@@ -2840,11 +2994,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
           role: 'destructive',
           handler: async () => {
             try {
-              await this.api.deleteMessage(graf.id);
-              if (graf.photo?.id) {
-                await this.api.deletePhoto(graf.photo.id);
-              }
-              this.loadMessages();
+              await this.deleteMessageForMe(graf.id);
             } catch (e) {
               this.showError('Error al borrar garabato');
             }
@@ -2898,8 +3048,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       const meta = { type: 'letter', opened: false, title: letter.title, subject: letter.subject, content: letter.content };
       await this.api.sendMessage('[LETTER]', undefined, undefined, meta);
       // Recargar mensajes para mostrar la carta enviada
-      await this.loadMessages();
-      this.safeTimeout(() => this.scrollToBottom(), 100);
+      await this.fetchNewMessagesAndScroll();
     } catch (e: any) {
       console.error('Error al enviar carta:', e);
       this.showError('Error al enviar la carta: ' + (e?.error?.message || e?.message || 'Error desconocido'));
@@ -2995,8 +3144,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
         const replyPayload = this.replyingTo ? { id: this.replyingTo.id, user: this.replyingTo.user?.name, text: this.getReplyPreviewText(this.replyingTo) } : undefined;
         await this.api.sendMessage('[AUDIO]' + base64Audio, undefined, replyPayload);
         this.replyingTo = null;
-        await this.loadMessages();
-        this.safeTimeout(() => this.scrollToBottom(), 100);
+        await this.fetchNewMessagesAndScroll();
       } else {
         this.sending = false;
       }
@@ -3050,8 +3198,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewInit {
       await this.api.sendMessage('[GIFT]', undefined, undefined, meta);
       
       this.api.getCoupleInfo();
-      this.loadMessages();
-      this.safeTimeout(() => this.scrollToBottom(), 100);
+      await this.fetchNewMessagesAndScroll();
     } catch (e) {
       console.error('Error al consumir/enviar regalo:', e);
       this.promptStore('gifts');

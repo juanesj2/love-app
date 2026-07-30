@@ -239,6 +239,10 @@ export class LoveApiService {
     return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/poke`, { is_super: isSuper }));
   }
 
+  async hatchPet(): Promise<any> {
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/pet/hatch`, {}));
+  }
+
   async getAllUsers(): Promise<any[]> {
     return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/global-events/users`));
   }
@@ -356,8 +360,14 @@ export class LoveApiService {
   }
 
   // --- CHAT ---
-  async getChatMessages(): Promise<any[]> {
-    return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/chat`));
+  async getChatMessages(beforeId?: number, afterId?: number): Promise<any[]> {
+    let url = `${API_BASE_URL}/love-album/chat`;
+    const params = [];
+    if (beforeId) params.push(`before_id=${beforeId}`);
+    if (afterId) params.push(`after_id=${afterId}`);
+    if (params.length > 0) url += `?${params.join('&')}`;
+    
+    return firstValueFrom(this.http.get<any[]>(url));
   }
 
   async markMessagesDelivered(): Promise<any> {

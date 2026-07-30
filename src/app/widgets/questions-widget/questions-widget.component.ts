@@ -127,7 +127,7 @@ import { Location } from '@angular/common';
       height: 100%;
     }
     .scroll-content { --background: transparent; }
-    .questions-container { padding: calc(var(--safe-top) + 40px) 20px 20px; background: #fff0f3; min-height: 100%; padding-bottom: 100px; box-sizing: border-box; }
+    .questions-container { padding: calc(var(--safe-top) + 40px) 20px 20px; background: #fff0f3; min-height: 100%; padding-bottom: calc(100px + var(--safe-bottom)); box-sizing: border-box; }
     .q-header { text-align: center; margin-bottom: 20px; position: relative; }
     .back-btn { position: absolute; left: 0; top: 0; background: rgba(255, 77, 109, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #590D22; font-size: 1.5rem; cursor: pointer; }
     .q-header h2 { color: #590D22; margin: 0 0 5px; font-weight: 800; font-size: 1.8rem; padding-top: 5px; }
@@ -172,7 +172,7 @@ import { Location } from '@angular/common';
     .category-pill.locked-pill { color: #888; background: #e9ecef; border: 1px dashed #ccc; }
     .empty-state { text-align: center; color: #a4133c; padding: 30px; font-weight: bold; opacity: 0.8; }
     
-    .scroll-top-btn { position: fixed; bottom: 30px; right: 20px; width: 50px; height: 50px; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4); cursor: pointer; z-index: 1000; opacity: 0; transform: translateY(20px) scale(0.8); pointer-events: none; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+    .scroll-top-btn { position: fixed; bottom: calc(30px + var(--safe-bottom)); right: 20px; width: 50px; height: 50px; background: linear-gradient(135deg, #FF4D6D, #c9184a); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4); cursor: pointer; z-index: 1000; opacity: 0; transform: translateY(20px) scale(0.8); pointer-events: none; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
     .scroll-top-btn.visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
     .scroll-top-btn:active { transform: scale(0.9); }
 

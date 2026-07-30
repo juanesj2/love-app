@@ -25,6 +25,9 @@ export class SecureImageComponent implements OnInit, OnChanges, OnDestroy {
   private imageSubscription?: Subscription;
   private objectUrl?: string;
 
+  // Static memory cache for instant loads across components (e.g. from grid to lightbox)
+  private static memoryCache: Map<string, SafeUrl> = new Map();
+
   constructor(
     private http: HttpClient,
     private sanitizer: DomSanitizer
@@ -50,10 +53,8 @@ export class SecureImageComponent implements OnInit, OnChanges, OnDestroy {
     if (this.imageSubscription) {
       this.imageSubscription.unsubscribe();
     }
-    if (this.objectUrl) {
-      URL.revokeObjectURL(this.objectUrl);
-      this.objectUrl = undefined;
-    }
+    // Note: We no longer revoke the object URL here because it might be cached globally in memoryCache
+    // and used by other instances of this component (like the lightbox).
   }
 
   private async loadImage(url: string) {
@@ -64,6 +65,13 @@ export class SecureImageComponent implements OnInit, OnChanges, OnDestroy {
     if (!url) {
       this.loading = false;
       this.error = true;
+      return;
+    }
+
+    // 1. Check instant memory cache first
+    if (SecureImageComponent.memoryCache.has(url)) {
+      this.secureUrl = SecureImageComponent.memoryCache.get(url)!;
+      this.loading = false;
       return;
     }
 
@@ -96,6 +104,10 @@ export class SecureImageComponent implements OnInit, OnChanges, OnDestroy {
       const blob = await response.blob();
       this.objectUrl = URL.createObjectURL(blob);
       this.secureUrl = this.sanitizer.bypassSecurityTrustUrl(this.objectUrl);
+      
+      // Save to instant memory cache
+      SecureImageComponent.memoryCache.set(url, this.secureUrl);
+      
       this.loading = false;
     } catch (err) {
       console.error('Error loading secure image:', err);

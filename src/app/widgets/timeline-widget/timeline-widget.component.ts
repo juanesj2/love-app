@@ -192,7 +192,7 @@ import { OfflineSyncService } from '../../services/offline-sync.service';
     }
     .tab.active { background: #FF4D6D; color: white; box-shadow: 0 4px 10px rgba(255,77,109,0.3); }
 
-    .timeline-body { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 80px; }
+    .timeline-body { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: calc(80px + var(--safe-bottom)); }
     .empty-state { text-align: center; color: #a4133c; margin-top: 50px; font-weight: 500; }
 
     .plan-card {

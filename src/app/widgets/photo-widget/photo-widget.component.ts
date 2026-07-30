@@ -132,7 +132,7 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
         </div>
         </div>
 
-        <ion-infinite-scroll (ionInfinite)="loadMore($event)">
+        <ion-infinite-scroll (ionInfinite)="loadMore($event)" [disabled]="currentPage >= lastPage">
           <ion-infinite-scroll-content loadingSpinner="null" loadingText="">
              <div style="display: flex; justify-content: center; align-items: center; padding: 10px;">
                 <canvas #loadingLottieFeed width="80" height="80"></canvas>
@@ -219,7 +219,7 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
             </button>
           </div>
 
-        <ion-infinite-scroll (ionInfinite)="loadMore($event)">
+        <ion-infinite-scroll (ionInfinite)="loadMore($event)" [disabled]="currentPage >= lastPage">
           <ion-infinite-scroll-content loadingSpinner="null" loadingText="">
              <div style="display: flex; justify-content: center; align-items: center; padding: 10px;">
                 <canvas #loadingLottieGrid width="80" height="80"></canvas>
@@ -267,8 +267,8 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
                  [ngStyle]="{'transform': 'scale(' + lightboxScale + ') translateY(' + lightboxTranslateY + 'px)'}"
                  style="margin: auto; width: 100%; max-height: 90vh;">
               
-              <div class="image-wrapper">
-                <app-secure-image [url]="environment.secureStorageUrl + photo.image_path" class="main-photo"></app-secure-image>
+              <div class="image-wrapper" style="background: transparent;">
+                <app-secure-image [url]="environment.secureStorageUrl + photo.image_path" class="lightbox-image" [objectFit]="'contain'"></app-secure-image>
                 
                 <div class="photo-overlay-bottom">
                   <div class="card-user-info">
@@ -683,7 +683,7 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
     
     .photo-card:hover { transform: translateY(-3px); }
     
-    .photo-overlay-bottom { position: absolute; bottom: 0; left: 0; width: 100%; padding: 40px 15px 12px 15px; display: flex; justify-content: space-between; align-items: flex-end; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%); pointer-events: none; }
+    .photo-overlay-bottom { position: absolute; bottom: 0; left: 0; width: 100%; padding: 40px 15px calc(12px + var(--safe-bottom)) 15px; display: flex; justify-content: space-between; align-items: flex-end; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%); pointer-events: none; }
     .photo-overlay-bottom > * { pointer-events: auto; }
     .card-user-info { display: flex; align-items: center; gap: 10px; }
     .card-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
@@ -776,7 +776,7 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
     .lightbox-close { background: rgba(255,255,255,0.2); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(5px); transition: background 0.2s; }
     .lightbox-close:active { background: rgba(255,255,255,0.4); }
     .lightbox-image { flex: 1; width: 100%; height: 100%; object-fit: contain; }
-    .lightbox-footer { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px 20px 40px 20px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); color: white; font-size: 1rem; line-height: 1.4; text-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 2002; }
+    .lightbox-footer { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px 20px calc(40px + var(--safe-bottom)) 20px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); color: white; font-size: 1rem; line-height: 1.4; text-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 2002; }
 
     /* Lightbox Animations */
     .lightbox-card { transition: transform 0.1s ease-out, opacity 0.25s; opacity: 1; transform-origin: center; }
@@ -879,7 +879,7 @@ import { SecureImageComponent } from '../../components/secure-image/secure-image
     .timeline-track.visible { opacity: 1; pointer-events: auto; }
     .timeline-track:active { background: rgba(0,0,0,0.05); border-radius: 15px; }
     
-    .timeline-years { position: absolute; top: 0; bottom: 0; right: 0; width: 100%; display: flex; flex-direction: column; justify-content: space-between; align-items: center; pointer-events: none; padding: 20px 0; }
+    .timeline-years { position: absolute; top: 0; bottom: 0; right: 0; width: 100%; display: flex; flex-direction: column; justify-content: space-between; align-items: center; pointer-events: none; padding: 20px 0 calc(20px + var(--safe-bottom)) 0; }
     .timeline-years span { font-size: 0.7rem; font-weight: bold; color: #a08c92; writing-mode: vertical-rl; text-orientation: mixed; user-select: none; }
 
     .timeline-thumb { position: absolute; left: -10px; width: 36px; height: 36px; background: white; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; transform: translateY(-50%); z-index: 2; transition: background 0.2s; }
@@ -1355,9 +1355,6 @@ export class PhotoWidgetComponent implements OnInit {
     try {
       this.currentPage = 1;
       
-      const infiniteScrolls = document.querySelectorAll('ion-infinite-scroll');
-      infiniteScrolls.forEach((is: any) => is.disabled = false);
-      
       // 1. Mostrar caché primero si no estamos en un álbum específico
       if (!this.currentAlbum) {
         const cachePhotos = await Preferences.get({ key: 'feed_photos_cache' });
@@ -1371,6 +1368,8 @@ export class PhotoWidgetComponent implements OnInit {
         }
         if (cacheCouple.value) this.coupleInfo = JSON.parse(cacheCouple.value);
         if (cacheAlbums.value) this.albums = JSON.parse(cacheAlbums.value);
+        
+        this.cdr.detectChanges(); // <-- ACTUALIZAR UI INMEDIATAMENTE
       }
 
       // 2. Cargar en segundo plano
@@ -1412,7 +1411,6 @@ export class PhotoWidgetComponent implements OnInit {
   async loadMore(event: any) {
     if (this.currentPage >= this.lastPage) {
       event.target.complete();
-      event.target.disabled = true;
       return;
     }
     this.currentPage++;
@@ -1431,8 +1429,6 @@ export class PhotoWidgetComponent implements OnInit {
   }
 
   async handleRefresh(event: any) {
-    const infiniteScroll = document.querySelector('ion-infinite-scroll');
-    if (infiniteScroll) infiniteScroll.disabled = false;
     await this.loadData();
     event.target.complete();
   }
@@ -2071,6 +2067,8 @@ export class PhotoWidgetComponent implements OnInit {
   openAlbum(album: any) {
     this.currentAlbum = album;
     this.viewMode = 'grid';
+    this.isTopBarHidden = false;
+    if (this.menuHideTimeout) clearTimeout(this.menuHideTimeout);
     this.closeAlbumsModal();
     this.loadData();
   }
@@ -2094,6 +2092,9 @@ export class PhotoWidgetComponent implements OnInit {
     this.menuHideTimeout = setTimeout(() => {
       if (this.tutorialService.isTourActive) {
         this.resetMenuTimeout();
+        return;
+      }
+      if (this.viewMode === 'grid' || this.currentAlbum) {
         return;
       }
       this.isTopBarHidden = true;
@@ -2551,10 +2552,23 @@ export class PhotoWidgetComponent implements OnInit {
     }
   }
 
+  private async getPhotoBlobDirectly(photo: any): Promise<Blob> {
+    const url = this.environment.secureStorageUrl + photo.image_path;
+    const { getToken } = await import('../../interceptors/auth.interceptor');
+    const token = await getToken();
+    const response = await fetch(url, {
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return await response.blob();
+  }
+
   async setPhotoAsCover(albumId: number, photo: any) {
     try {
       this.showSuccess('Descargando imagen para la portada...');
-      const blob = await this.api.downloadPhotoBlob(photo.id);
+      const blob = await this.getPhotoBlobDirectly(photo);
       
       const reader = new FileReader();
       reader.onloadend = async () => {
@@ -2653,7 +2667,7 @@ export class PhotoWidgetComponent implements OnInit {
     this.saveText = action === 'share' ? 'Preparando imagen...' : 'Descargando imagen...';
 
     try {
-      const blob = await this.api.downloadPhotoBlob(photo.id);
+      const blob = await this.getPhotoBlobDirectly(photo);
       
       if (Capacitor.isNativePlatform()) {
         try {

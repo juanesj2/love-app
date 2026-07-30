@@ -433,7 +433,7 @@ import { LegalModalComponent } from './legal-modal.component';
             <div class="bottom-sheet-body">
               <div style="position: relative; margin-bottom: 15px; width: 100%;">
                 <ion-icon name="search-outline" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #a4133c; font-size: 1.4rem; z-index: 1; pointer-events: none;"></ion-icon>
-                <input type="text" id="gastro-search" [(ngModel)]="searchQueryFoodPlaces" (ngModelChange)="updateFoodPlacesFilter()" placeholder="Buscar restaurante..." class="glass-input" style="padding-left: 45px; background: rgba(255,255,255,0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.05);" />
+                <input type="text" id="gastro-search" [(ngModel)]="searchQueryFoodPlaces" (ngModelChange)="onFoodSearchChange($event)" placeholder="Buscar restaurante..." class="glass-input" style="padding-left: 45px; background: rgba(255,255,255,0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.05);" />
               </div>
 
               <div id="gastro-filters" style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
@@ -489,7 +489,7 @@ import { LegalModalComponent } from './legal-modal.component';
             <div class="bottom-sheet-body">
               <div style="position: relative; margin-bottom: 15px; width: 100%;">
                 <ion-icon name="search-outline" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #a4133c; font-size: 1.4rem; z-index: 1; pointer-events: none;"></ion-icon>
-                <input type="text" id="cine-search" [(ngModel)]="searchQueryMovies" (ngModelChange)="updateMoviesFilter()" placeholder="Buscar película o serie..." class="glass-input" style="padding-left: 45px; background: rgba(255,255,255,0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.05);" />
+                <input type="text" id="cine-search" [(ngModel)]="searchQueryMovies" (ngModelChange)="onMovieSearchChange($event)" placeholder="Buscar película o serie..." class="glass-input" style="padding-left: 45px; background: rgba(255,255,255,0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.05);" />
               </div>
 
               <div id="cine-filters" style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
@@ -899,7 +899,7 @@ import { LegalModalComponent } from './legal-modal.component';
     .bottom-sheet-header h2 { margin: 0; font-size: 1.8rem; font-weight: 900; color: #590D22; display: flex; align-items: center; gap: 10px; }
     .bottom-sheet-header p { margin: 5px 0 20px; color: #a4133c; font-size: 0.95rem; }
     .bottom-sheet-body { flex: 1; overflow-y: auto; padding: 0 20px; transform: translateZ(0); }
-    .bottom-sheet-footer { padding: 15px 20px 25px; background: linear-gradient(to top, #fff0f3 80%, rgba(255,240,243,0)); position: relative; z-index: 2; transform: translateZ(0); }
+    .bottom-sheet-footer { padding: 15px 20px calc(25px + var(--safe-bottom)); background: linear-gradient(to top, #fff0f3 80%, rgba(255,240,243,0)); position: relative; z-index: 2; transform: translateZ(0); }
     
     .sheet-close-btn {
       position: absolute; top: 20px; right: 20px; width: 36px; height: 36px;
@@ -1157,6 +1157,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   private notificationService = inject(NotificationService);
 
   private locationSub?: Subscription;
+  private premiumSub?: Subscription;
 
   @Output() viewChange = new EventEmitter<string>();
 
@@ -1166,6 +1167,8 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   
   previewMapUrl: SafeResourceUrl | null = null;
   locationSubject = new Subject<string>();
+  private foodSearchSubject = new Subject<string>();
+  private movieSearchSubject = new Subject<string>();
 
   startDate: string = '';
   selectedAlbumId: any = 'feed';
@@ -1317,12 +1320,18 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   filteredFoodPlacesList: any[] = [];
   
   updateFoodPlacesFilter() {
+    const q = this.searchQueryFoodPlaces?.toLowerCase() ?? '';
     this.filteredFoodPlacesList = this.foodPlaces.filter(p => {
       const matchFav = this.showFavoritesOnlyFoodPlaces ? p.is_favorite : true;
       const matchCat = this.selectedFoodCategory ? p.category === this.selectedFoodCategory : true;
-      const matchSearch = this.searchQueryFoodPlaces ? p.name.toLowerCase().includes(this.searchQueryFoodPlaces.toLowerCase()) : true;
+      const matchSearch = q ? p.name.toLowerCase().includes(q) : true;
       return matchFav && matchCat && matchSearch;
     });
+  }
+
+  onFoodSearchChange(value: string) {
+    this.searchQueryFoodPlaces = value;
+    this.foodSearchSubject.next(value);
   }
 
   toggleFoodPlacesFavFilter() {
@@ -1347,12 +1356,18 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   filteredMoviesList: any[] = [];
 
   updateMoviesFilter() {
+    const q = this.searchQueryMovies?.toLowerCase() ?? '';
     this.filteredMoviesList = this.movies.filter(m => {
       const matchFav = this.showFavoritesOnlyMovies ? m.is_favorite : true;
       const matchGenre = this.selectedMovieGenre ? m.genre === this.selectedMovieGenre : true;
-      const matchSearch = this.searchQueryMovies ? m.title.toLowerCase().includes(this.searchQueryMovies.toLowerCase()) : true;
+      const matchSearch = q ? m.title.toLowerCase().includes(q) : true;
       return matchFav && matchGenre && matchSearch;
     });
+  }
+
+  onMovieSearchChange(value: string) {
+    this.searchQueryMovies = value;
+    this.movieSearchSubject.next(value);
   }
 
   toggleMoviesFavFilter() {
@@ -1408,7 +1423,6 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   }
 
   openInventoryModal() {
-    this.api.getCoupleInfo(); // Fetch latest info before opening
     this.isInventoryModalOpen = true;
     document.body.classList.add('hide-tabs');
   }
@@ -1537,8 +1551,26 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
       }
     });
 
+    // Debounced search for food and movies (200ms delay per keypress)
+    this.foodSearchSubject.pipe(debounceTime(200), distinctUntilChanged())
+      .subscribe(() => this.updateFoodPlacesFilter());
+    this.movieSearchSubject.pipe(debounceTime(200), distinctUntilChanged())
+      .subscribe(() => this.updateMoviesFilter());
+
     // 1. Sync Date from API
     try {
+      const dateRes = await Preferences.get({ key: 'relationshipStartDate' });
+      if (dateRes.value) {
+        this.startDate = dateRes.value;
+      }
+      const myB = await Preferences.get({ key: 'myBirthday' });
+      if (myB.value) this.myBirthday = myB.value;
+      
+      const pB = await Preferences.get({ key: 'partnerBirthday' });
+      if (pB.value) this.partnerBirthday = pB.value;
+      
+      this.calculateTime(); // Calcular y mostrar en UI instantaneamente
+      
       const info = await this.api.getCoupleInfo();
       
       this.myRole = info.my_role || '';
@@ -1567,20 +1599,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
         }
       }
     } catch (e) {
-      const dateRes = await Preferences.get({ key: 'relationshipStartDate' });
-      if (dateRes.value) {
-        this.startDate = dateRes.value;
-      }
-    }
-    
-    // Load birthdays as fallback if API fails or empty
-    if (!this.myBirthday) {
-      const myB = await Preferences.get({ key: 'myBirthday' });
-      if (myB.value) this.myBirthday = myB.value;
-    }
-    if (!this.partnerBirthday) {
-      const pB = await Preferences.get({ key: 'partnerBirthday' });
-      if (pB.value) this.partnerBirthday = pB.value;
+      console.log('Error al cargar info de pareja en panel', e);
     }
 
     this.updateAnnualEvents();
@@ -1605,15 +1624,24 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
       this.selectedAlbumId = albumRes.value === 'feed' ? 'feed' : Number(albumRes.value);
     }
 
-    // Load API data
-    try {
-      this.albums = await this.api.getAlbums().catch(() => []);
-      const progress = await this.api.getGamesProgress().catch(() => null);
-      if (progress && progress.total_pending !== undefined) {
-        this.totalPendingGames = progress.total_pending;
+    // Load remaining API data in parallel — much faster than sequential awaits
+    const [albums, progress] = await Promise.all([
+      this.api.getAlbums().catch(() => [] as any[]),
+      this.api.getGamesProgress().catch(() => null)
+    ]);
+
+    this.albums = albums ?? [];
+    if (progress?.total_pending !== undefined) {
+      this.totalPendingGames = progress.total_pending;
+    }
+
+    // Fire food/movies and upcoming plan in parallel — neither depends on the other
+    this.premiumSub = this.premiumService.isPremium$.pipe(distinctUntilChanged()).subscribe(isPremium => {
+      if (isPremium) {
+        this.loadFoodAndMovies();
       }
-    } catch (e) {}
-    
+    });
+    // Call immediately if free (loadFoodAndMovies handles the skip inside) or let the subscription handle it if premium
     this.loadFoodAndMovies();
     this.loadUpcomingPlan();
 
@@ -1646,6 +1674,11 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     if (this.locationSub) {
       this.locationSub.unsubscribe();
     }
+    if (this.premiumSub) {
+      this.premiumSub.unsubscribe();
+    }
+    this.foodSearchSubject.complete();
+    this.movieSearchSubject.complete();
   }
 
   async saveStartDate() {
@@ -1719,16 +1752,16 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
   }
 
   async handleRefresh(event: any) {
-    try {
-      const progress = await this.api.getGamesProgress().catch(() => null);
-      if (progress && progress.total_pending !== undefined) {
-        this.totalPendingGames = progress.total_pending;
-      }
-    } catch (e) {}
-    
-    setTimeout(() => {
-      event.target.complete();
-    }, 500);
+    await Promise.all([
+      this.api.getGamesProgress().catch(() => null).then(progress => {
+        if (progress?.total_pending !== undefined) {
+          this.totalPendingGames = progress.total_pending;
+        }
+      }),
+      this.loadFoodAndMovies().catch(() => {}),
+      this.loadUpcomingPlan().catch(() => {})
+    ]);
+    event.target.complete();
   }
   
   openGame() {
@@ -1957,14 +1990,53 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
 
   // --- FOOD PLACES & MOVIES API LOGIC ---
   async loadFoodAndMovies() {
+    // Users on free plan can't access these features — skip the network calls
+    if (!this.premiumService.isPremium$.value) return;
+
+    // Load from cache first
+    const cachedFood = await Preferences.get({ key: 'food_places_cache' });
+    const cachedMovies = await Preferences.get({ key: 'movies_cache' });
+
+    if (cachedFood.value) {
+      this.foodPlaces = JSON.parse(cachedFood.value);
+      this.updateFoodPlacesFilter();
+    }
+    if (cachedMovies.value) {
+      this.movies = JSON.parse(cachedMovies.value);
+      this.updateMoviesFilter();
+    }
+
+    const [food, movies] = await Promise.all([
+      this.api.getFoodPlaces().catch(() => null),
+      this.api.getMovies().catch(() => null)
+    ]);
+
+    if (food) {
+      this.foodPlaces = food;
+      this.updateFoodPlacesFilter();
+      await Preferences.set({ key: 'food_places_cache', value: JSON.stringify(food) });
+    }
+    if (movies) {
+      this.movies = movies;
+      this.updateMoviesFilter();
+      await Preferences.set({ key: 'movies_cache', value: JSON.stringify(movies) });
+    }
+  }
+
+  async reloadFoodPlaces() {
+    if (this.premiumService.isFree$.value) return;
     try {
       this.foodPlaces = await this.api.getFoodPlaces();
       this.updateFoodPlacesFilter();
+    } catch (e) { console.error('Error reloading food places', e); }
+  }
+
+  async reloadMovies() {
+    if (this.premiumService.isFree$.value) return;
+    try {
       this.movies = await this.api.getMovies();
       this.updateMoviesFilter();
-    } catch (e) {
-      console.error('Error loading food and movies', e);
-    }
+    } catch (e) { console.error('Error reloading movies', e); }
   }
 
   // Food Places
@@ -2016,7 +2088,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
       }
       this.isAddingFoodPlace = false;
       this.newFoodPlace = { name: '', location: '', description: '', rating: 5, category: '', is_favorite: false, imageBase64: null };
-      this.loadFoodAndMovies();
+      this.reloadFoodPlaces();
     } catch (e) {
       this.showToast('Error al guardar restaurante', 'danger');
     }
@@ -2051,7 +2123,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
         await this.api.deleteFoodPlace(id);
         this.isFoodPlaceModalOpen = false;
         this.isAddingFoodPlace = false;
-        this.loadFoodAndMovies();
+        this.reloadFoodPlaces();
         this.showToast('Eliminado', 'success');
       } catch (e) {}
     });
@@ -2087,7 +2159,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
       }
       this.isAddingDish = false;
       this.newDish = { id: null, name: '', description: '', rating: 5, imageBase64: null };
-      this.loadFoodAndMovies();
+      this.reloadFoodPlaces();
     } catch (e) {
       this.showToast('Error al guardar plato', 'danger');
     }
@@ -2128,12 +2200,9 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
         const image = await Camera.getPhoto({ quality: 80, allowEditing: true, resultType: CameraResultType.DataUrl, source });
         if (image.dataUrl) {
           this.newMovie.imageBase64 = image.dataUrl;
-          console.log('[PHOTO] Movie photo set, dataUrl length:', image.dataUrl.length);
-        } else {
-          console.warn('[PHOTO] Camera returned no dataUrl');
         }
       } catch (e) {
-        console.error('[PHOTO] Error getting movie photo:', e);
+        console.error('Error getting movie photo:', e);
       }
     });
   }
@@ -2162,7 +2231,6 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
     }
 
     try {
-      console.log('[SAVE] imageBase64 presente:', !!this.newMovie.imageBase64, 'length:', this.newMovie.imageBase64?.length);
       if (this.newMovie.id) {
         await this.api.updateMovie(this.newMovie.id, this.newMovie.title, this.newMovie.rating, this.newMovie.who_fell_asleep, this.newMovie.favorite_quote, this.newMovie.imageBase64, this.newMovie.description, this.newMovie.genre, this.newMovie.is_favorite);
         this.showToast('Peli actualizada', 'success');
@@ -2173,7 +2241,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
       this.isAddingMovie = false;
       this.newMovie = { title: '', description: '', who_fell_asleep: '', favorite_quote: '', rating: 5, genre: '', is_favorite: false, imageBase64: null };
       this.showWhoFellAsleep = false;
-      this.loadFoodAndMovies();
+      this.reloadMovies();
     } catch (e) {
       this.showToast('Error al guardar', 'danger');
     }
@@ -2191,7 +2259,7 @@ export class MasWidgetComponent implements OnInit, OnDestroy {
         await this.api.deleteMovie(id);
         this.isMovieModalOpen = false;
         this.isAddingMovie = false;
-        this.loadFoodAndMovies();
+        this.reloadMovies();
         this.showToast('Eliminada', 'success');
       } catch (e) {}
     });
