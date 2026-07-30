@@ -4,12 +4,14 @@ import { LoveApiService } from './love-api.service';
 import { ToastController } from '@ionic/angular/standalone';
 
 export interface OfflineAction {
-  id: string;
+  id?: string;
   type: 'food_place' | 'movie' | 'food_dish' | 'plan';
   method: 'POST' | 'PUT' | 'DELETE';
   endpointId?: number; // For PUT/DELETE
   parentId?: number; // For food_dish
   payload?: any;
+  timestamp?: string;
+  retryCount?: number;
 }
 
 @Injectable({
@@ -25,6 +27,10 @@ export class OfflineSyncService {
   }
 
   async enqueueAction(action: OfflineAction) {
+    if (!action.id) action.id = 'off_' + new Date().getTime() + '_' + Math.random().toString(36).substring(2, 9);
+    if (!action.timestamp) action.timestamp = new Date().toISOString();
+    action.retryCount = 0;
+
     const queue = await this.getQueue();
     queue.push(action);
     await Preferences.set({ key: this.QUEUE_KEY, value: JSON.stringify(queue) });
@@ -47,6 +53,7 @@ export class OfflineSyncService {
     this.showToast('Sincronizando datos guardados sin conexión...', 'primary');
     
     const failedActions: OfflineAction[] = [];
+    let syncedCount = 0;
 
     for (const action of queue) {
       try {
@@ -65,20 +72,27 @@ export class OfflineSyncService {
           else if (action.method === 'PUT') await this.api.updatePlan(action.endpointId!, action.payload);
           else if (action.method === 'DELETE') await this.api.deletePlan(action.endpointId!);
         }
+        syncedCount++;
       } catch (error) {
         console.error('Error syncing action:', action, error);
-        failedActions.push(action);
+        action.retryCount = (action.retryCount || 0) + 1;
+        // Keep in queue if failed less than 5 times
+        if (action.retryCount < 5) {
+          failedActions.push(action);
+        } else {
+          console.warn('Action discarded after 5 failed retries:', action);
+        }
       }
     }
 
     if (failedActions.length === 0) {
       await this.clearQueue();
-      this.showToast('¡Todo sincronizado!', 'success');
-      // Trigger a reload of data if possible, maybe reload page or notify
+      if (syncedCount > 0) this.showToast('¡Todo sincronizado!', 'success');
       window.dispatchEvent(new CustomEvent('offline-sync-complete'));
     } else {
       await Preferences.set({ key: this.QUEUE_KEY, value: JSON.stringify(failedActions) });
-      this.showToast('Algunos elementos no pudieron sincronizarse.', 'danger');
+      this.showToast(`Sincronizados ${syncedCount}, ${failedActions.length} fallaron y se reintentarán.`, 'danger');
+      window.dispatchEvent(new CustomEvent('offline-sync-complete'));
     }
   }
 
