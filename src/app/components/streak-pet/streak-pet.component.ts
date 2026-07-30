@@ -654,8 +654,8 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     this.dragStartY = event.clientY;
 
     const item = this.clothesOptions.find(c => c.id === this.activeDeco.clothes);
-    const savedLeft = this.activeDeco.clothes_left || item?.style.left || '50%';
-    const savedTop = this.activeDeco.clothes_top || item?.style.top || '50%';
+    const savedLeft = this.activeDeco.clothes_left || item?.style?.left || '50%';
+    const savedTop = this.activeDeco.clothes_top || item?.style?.top || '50%';
 
     this.startLeftPercent = parseFloat(savedLeft);
     this.startTopPercent = parseFloat(savedTop);
