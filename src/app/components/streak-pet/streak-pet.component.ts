@@ -490,10 +490,11 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
   public activeDeco: any = {};
 
   public bgOptions = [
-    { id: 'default', name: 'Original', style: '' },
-    { id: 'forest', name: 'Bosque', style: 'radial-gradient(circle, #d4f0d0 0%, #a4d4a0 70%)' },
-    { id: 'night', name: 'Noche', style: 'radial-gradient(circle, #2a2a3e 0%, #16213e 70%)' },
-    { id: 'royal', name: 'Real', style: 'radial-gradient(circle, #ffecd2 0%, #fcb69f 70%)' }
+    { id: 'none', name: 'Original', style: 'none' },
+    { id: 'forest', name: 'Bosque', style: 'url("/assets/pets/bg/forest.jpg") center/cover' },
+    { id: 'night', name: 'Noche', style: 'url("/assets/pets/bg/night.jpg") center/cover' },
+    { id: 'royal', name: 'Real', style: 'url("/assets/pets/bg/room.jpg") center/cover' },
+    { id: 'car', name: 'Coche', style: 'url("/assets/pets/bg/car.jpg") center/cover' }
   ];
 
   public borderOptions = [
