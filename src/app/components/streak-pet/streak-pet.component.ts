@@ -174,18 +174,23 @@ import { LoveApiService } from '../../services/love-api.service';
                 <p class="streak-badge">Racha: {{ streakDays }} días 🔥</p>
               </div>
               
-              <div class="pet-stage" [ngStyle]="getStageStyles()">
+              <div class="pet-border-wrapper" [ngStyle]="getBorderWrapperStyles()">
+                <div class="pet-stage" [ngStyle]="getStageStyles()">
 
-                <div class="floating-prop" *ngIf="getPropEmoji()">{{ getPropEmoji() }}</div>
-                <dotlottie-player 
-                  #modalLottiePlayer
-                  [src]="currentLottieSrc" 
-                  background="transparent" 
-                  speed="1" 
-                  style="width: 200px; height: 200px;" 
-                  loop 
-                  autoplay>
-                </dotlottie-player>
+                  <div class="floating-prop" *ngIf="getActiveProp() as prop">
+                    <div *ngIf="prop.emoji" class="prop-emoji">{{ prop.emoji }}</div>
+                    <div *ngIf="prop.image" class="prop-image" [style.background]="prop.image"></div>
+                  </div>
+                  <dotlottie-player 
+                    #modalLottiePlayer
+                    [src]="currentLottieSrc" 
+                    background="transparent" 
+                    speed="1" 
+                    style="width: 200px; height: 200px;" 
+                    loop 
+                    autoplay>
+                  </dotlottie-player>
+                </div>
               </div>
 
               <div class="action-grid">
@@ -527,8 +532,8 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     { id: 'none', name: 'Nada', emoji: '' },
     { id: 'crown', name: 'Corona', image: 'url("/assets/pets/prop/crown.jpg") center/cover' },
     { id: 'star', name: 'Estrellas', image: 'url("/assets/pets/prop/star.jpg") center/cover' },
-    { id: 'bow', name: 'Lazo', emoji: '🎀' },
-    { id: 'heart', name: 'Corazón', emoji: '💖' }
+    { id: 'bow', name: 'Lazo', image: 'url("/assets/pets/prop/bow.jpg") center/cover' },
+    { id: 'heart', name: 'Corazón', image: 'url("/assets/pets/prop/heart.jpg") center/cover' }
   ];
 
   getStageStyles() {
