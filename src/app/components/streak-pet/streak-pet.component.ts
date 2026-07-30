@@ -1,5 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges, ElementRef, ViewChild, OnDestroy, CUSTOM_ELEMENTS_SCHEMA, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { IonModal, AlertController } from '@ionic/angular/standalone';
 import { Rive, Layout, Fit, Alignment } from '@rive-app/canvas';
 import '@dotlottie/player-component';
@@ -9,7 +10,7 @@ import { LoveApiService } from '../../services/love-api.service';
 @Component({
   selector: 'app-streak-pet',
   standalone: true,
-  imports: [CommonModule, IonModal],
+  imports: [CommonModule, FormsModule, IonModal],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   template: `
     <!-- We show egg emoji if streak == 0 OR if not hatched yet -->
@@ -135,10 +136,28 @@ import { LoveApiService } from '../../services/love-api.service';
               </div>
             </div>
 
+            <!-- EDIT NAME VIEW -->
+            <div [hidden]="!showNameEdit">
+              <div class="interact-header" style="position: relative; margin-bottom: 20px;">
+                <button class="close-btn" style="position: absolute; top: -10px; left: -10px;" (click)="showNameEdit = false">
+                  <span style="font-size: 1.2rem;">←</span>
+                </button>
+                <h3 style="margin-top: 5px;">Nombre ✏️</h3>
+              </div>
+              
+              <div style="padding: 10px; display: flex; flex-direction: column; gap: 15px;">
+                <p style="text-align: center; color: #590D22; opacity: 0.8; font-family: 'Outfit', sans-serif;">¿Cómo quieres llamar a vuestra mascota?</p>
+                <input type="text" [(ngModel)]="tempPetName" placeholder="Ej: Firulais" class="name-input" />
+                <button class="shop-btn-large" (click)="savePetName()">
+                  Guardar
+                </button>
+              </div>
+            </div>
+
             <!-- NORMAL INTERACT VIEW -->
-            <div [hidden]="showShop">
+            <div [hidden]="showShop || showNameEdit">
               <div class="interact-header">
-                <h3 (click)="editPetName()" style="cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <h3 (click)="openNameEdit()" style="cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
                   {{ petName || 'Tu ' + (petType === 'Dog' ? 'Perrito' : 'Gatito') }} {{ petData?.rarity === 'legendario' ? '⭐' : (petData?.rarity === 'raro' ? '✨' : '') }}
                   <span style="font-size: 0.9rem; opacity: 0.6;">✏️</span>
                 </h3>
@@ -146,6 +165,7 @@ import { LoveApiService } from '../../services/love-api.service';
               </div>
               
               <div class="pet-stage" [ngStyle]="getStageStyles()">
+
                 <div class="floating-prop" *ngIf="getPropEmoji()">{{ getPropEmoji() }}</div>
                 <dotlottie-player 
                   #modalLottiePlayer
@@ -363,6 +383,11 @@ import { LoveApiService } from '../../services/love-api.service';
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
+    .name-input { width: 100%; padding: 15px; border-radius: 20px; border: 2px solid rgba(255, 77, 109, 0.3); font-size: 1.1rem; font-family: 'Outfit', sans-serif; outline: none; transition: border-color 0.2s; background: white; color: #590D22; text-align: center; }
+    .name-input:focus { border-color: #ff4d6d; }
+    :host-context(.night-owl-mode) .name-input { background: rgba(0,0,0,0.2); border-color: rgba(167, 139, 250, 0.3); color: white; }
+    :host-context(.night-owl-mode) .name-input:focus { border-color: #a78bfa; }
+
     .tap-hint {
       position: absolute;
       bottom: 12%;
@@ -460,6 +485,8 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
   private interactionTimeout: any;
 
   public showShop = false;
+  public showNameEdit = false;
+  public tempPetName = '';
   public activeDeco: any = {};
 
   public bgOptions = [
@@ -511,36 +538,21 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     }
   }
 
-  async editPetName() {
-    const alert = await this.alertCtrl.create({
-      header: 'Nombre de tu Mascota',
-      message: '¿Cómo quieres llamar a vuestra mascota?',
-      inputs: [
-        {
-          name: 'name',
-          type: 'text',
-          placeholder: 'Ej: Firulais',
-          value: this.petName || ''
-        }
-      ],
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        { 
-          text: 'Guardar', 
-          handler: async (data) => {
-            if (data.name && data.name.trim() !== '') {
-              this.petName = data.name.trim();
-              try {
-                await this.api.updateCoupleInfo({ pet_name: this.petName });
-              } catch (e) {
-                console.error('Error saving pet name', e);
-              }
-            }
-          }
-        }
-      ]
-    });
-    await alert.present();
+  openNameEdit() {
+    this.tempPetName = this.petName || '';
+    this.showNameEdit = true;
+  }
+
+  async savePetName() {
+    if (this.tempPetName && this.tempPetName.trim() !== '') {
+      this.petName = this.tempPetName.trim();
+      this.showNameEdit = false;
+      try {
+        await this.api.updateCoupleInfo({ pet_name: this.petName });
+      } catch (e) {
+        console.error('Error saving pet name', e);
+      }
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
