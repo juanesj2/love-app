@@ -612,9 +612,8 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
 
   getClothesStyle(context: 'shop' | 'modal') {
     const item = this.clothesOptions.find(c => c.id === this.activeDeco.clothes);
-    if (!item || !item.emoji) return { display: 'none' };
+    if (!item || !item.emoji || !item.style) return { display: 'none' };
     
-    // Scale down if in shop since the stage is smaller (150px vs 200px)
     const scale = context === 'shop' ? 0.8 : 1;
     
     return {
