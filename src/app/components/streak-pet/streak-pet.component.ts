@@ -89,7 +89,10 @@ import { LoveApiService } from '../../services/love-api.service';
               
               <div class="pet-border-wrapper" [ngStyle]="getBorderWrapperStyles()">
                 <div class="pet-stage" [ngStyle]="getStageStyles()">
-                  <div class="floating-prop" *ngIf="getPropEmoji()">{{ getPropEmoji() }}</div>
+                  <div class="floating-prop" *ngIf="getActiveProp() as prop">
+                    <div *ngIf="prop.emoji" class="prop-emoji">{{ prop.emoji }}</div>
+                    <div *ngIf="prop.image" class="prop-image" [style.background]="prop.image"></div>
+                  </div>
                   <dotlottie-player 
                     [src]="currentLottieSrc" 
                     background="transparent" 
@@ -133,7 +136,10 @@ import { LoveApiService } from '../../services/love-api.service';
                   <div class="shop-item" *ngFor="let opt of propOptions" 
                        [class.active]="activeDeco.prop === opt.id"
                        (click)="selectDeco('prop', opt.id)">
-                    <div class="preview-circle" style="font-size: 1.5rem; display:flex; justify-content:center; align-items:center;">{{ opt.emoji || '❌' }}</div>
+                    <div class="preview-circle" style="display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background-size: cover; background-position: center;"
+                         [style.background]="opt.image || 'white'">
+                      <span *ngIf="!opt.image">{{ opt.emoji || '❌' }}</span>
+                    </div>
                     <span>{{ opt.name }}</span>
                   </div>
                 </div>
@@ -343,7 +349,10 @@ import { LoveApiService } from '../../services/love-api.service';
     .pet-stage { position: relative; display: flex; justify-content: center; align-items: center; background: white; border-radius: 50%; width: 220px; height: 220px; box-shadow: inset 0 0 40px rgba(0,0,0,0.03); transition: all 0.3s ease; }
     :host-context(.night-owl-mode) .pet-stage { background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); box-shadow: inset 0 0 40px rgba(0,0,0,0.5); }
     
-    .floating-prop { position: absolute; top: -15px; right: 20px; font-size: 3.5rem; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.2)); animation: float 3s ease-in-out infinite; z-index: 10; }
+    .floating-prop { position: absolute; top: -15px; right: 20px; z-index: 10; animation: float 3s ease-in-out infinite; }
+    .prop-emoji { font-size: 3.5rem; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.2)); }
+    .prop-image { width: 60px; height: 60px; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border: 3px solid white; }
+    :host-context(.night-owl-mode) .prop-image { border-color: rgba(255,255,255,0.1); }
     @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-10px) rotate(5deg); } }
 
     .shop-btn-large { width: 100%; background: linear-gradient(135deg, #ff4d6d, #ff758f); color: white; border: none; border-radius: 20px; padding: 15px; font-family: 'Outfit', sans-serif; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(255,77,109,0.3); transition: all 0.2s; cursor: pointer; }
@@ -516,8 +525,8 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
 
   public propOptions = [
     { id: 'none', name: 'Nada', emoji: '' },
-    { id: 'crown', name: 'Corona', emoji: '👑' },
-    { id: 'star', name: 'Estrellas', emoji: '✨' },
+    { id: 'crown', name: 'Corona', image: 'url("/assets/pets/prop/crown.jpg") center/cover' },
+    { id: 'star', name: 'Estrellas', image: 'url("/assets/pets/prop/star.jpg") center/cover' },
     { id: 'bow', name: 'Lazo', emoji: '🎀' },
     { id: 'heart', name: 'Corazón', emoji: '💖' }
   ];
@@ -559,9 +568,8 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     return styles;
   }
 
-  getPropEmoji() {
-    const prop = this.propOptions.find(p => p.id === this.activeDeco.prop);
-    return prop ? prop.emoji : '';
+  getActiveProp() {
+    return this.propOptions.find(p => p.id === this.activeDeco.prop);
   }
 
   async selectDeco(type: 'bg' | 'border' | 'prop', id: string) {
