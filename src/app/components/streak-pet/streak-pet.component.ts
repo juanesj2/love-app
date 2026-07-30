@@ -87,16 +87,18 @@ import { LoveApiService } from '../../services/love-api.service';
                 <h3 style="margin-top: 5px;">Tienda 🎨</h3>
               </div>
               
-              <div class="pet-stage" [ngStyle]="getStageStyles()">
-                <div class="floating-prop" *ngIf="getPropEmoji()">{{ getPropEmoji() }}</div>
-                <dotlottie-player 
-                  [src]="currentLottieSrc" 
-                  background="transparent" 
-                  speed="1" 
-                  style="width: 150px; height: 150px;" 
-                  loop 
-                  autoplay>
-                </dotlottie-player>
+              <div class="pet-border-wrapper" [ngStyle]="getBorderWrapperStyles()">
+                <div class="pet-stage" [ngStyle]="getStageStyles()">
+                  <div class="floating-prop" *ngIf="getPropEmoji()">{{ getPropEmoji() }}</div>
+                  <dotlottie-player 
+                    [src]="currentLottieSrc" 
+                    background="transparent" 
+                    speed="1" 
+                    style="width: 150px; height: 150px;" 
+                    loop 
+                    autoplay>
+                  </dotlottie-player>
+                </div>
               </div>
 
               <div class="shop-section">
@@ -117,7 +119,9 @@ import { LoveApiService } from '../../services/love-api.service';
                   <div class="shop-item" *ngFor="let opt of borderOptions" 
                        [class.active]="activeDeco.border === opt.id"
                        (click)="selectDeco('border', opt.id)">
-                    <div class="preview-circle" [style.border]="opt.style" [style.box-shadow]="opt.shadow"></div>
+                    <div class="preview-border-wrapper" [ngStyle]="getPreviewBorderWrapperStyles(opt)">
+                      <div class="preview-circle" [style.border]="opt.style" [style.box-shadow]="opt.shadow"></div>
+                    </div>
                     <span>{{ opt.name }}</span>
                   </div>
                 </div>
@@ -335,7 +339,8 @@ import { LoveApiService } from '../../services/love-api.service';
     
     .streak-badge { display: inline-block; background: rgba(255, 77, 109, 0.15); color: #ff4d6d; padding: 6px 16px; border-radius: 20px; font-weight: bold; margin: 0; border: 1px solid rgba(255, 77, 109, 0.3); }
     
-    .pet-stage { position: relative; display: flex; justify-content: center; align-items: center; background: white; border-radius: 50%; margin: 20px auto; width: 220px; height: 220px; box-shadow: inset 0 0 40px rgba(0,0,0,0.03); transition: all 0.3s ease; }
+    .pet-border-wrapper { margin: 20px auto; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: fit-content; transition: all 0.3s ease; }
+    .pet-stage { position: relative; display: flex; justify-content: center; align-items: center; background: white; border-radius: 50%; width: 220px; height: 220px; box-shadow: inset 0 0 40px rgba(0,0,0,0.03); transition: all 0.3s ease; }
     :host-context(.night-owl-mode) .pet-stage { background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); box-shadow: inset 0 0 40px rgba(0,0,0,0.5); }
     
     .floating-prop { position: absolute; top: -15px; right: 20px; font-size: 3.5rem; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.2)); animation: float 3s ease-in-out infinite; z-index: 10; }
@@ -355,9 +360,10 @@ import { LoveApiService } from '../../services/love-api.service';
     .shop-item.active span { font-weight: bold; color: #590D22; }
     :host-context(.night-owl-mode) .shop-item.active span { color: #a78bfa; }
     
+    .preview-border-wrapper { border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
     .preview-circle { width: 50px; height: 50px; border-radius: 50%; background: white; border: 2px solid transparent; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .shop-item.active .preview-circle { border-color: #ff4d6d; }
-    :host-context(.night-owl-mode) .shop-item.active .preview-circle { border-color: #a78bfa; }
+    .shop-item.active .preview-border-wrapper .preview-circle, .shop-item.active .preview-circle { border-color: #ff4d6d; }
+    :host-context(.night-owl-mode) .shop-item.active .preview-border-wrapper .preview-circle, :host-context(.night-owl-mode) .shop-item.active .preview-circle { border-color: #a78bfa; }
     .shop-item span { font-size: 0.75rem; color: #888; text-align: center; font-family: 'Outfit', sans-serif; }
     
     .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px; }
@@ -501,7 +507,11 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     { id: 'none', name: 'Ninguno', style: 'none' },
     { id: 'gold', name: 'Oro', style: '4px solid #ffd700', shadow: '0 0 15px rgba(255,215,0,0.6)' },
     { id: 'neon', name: 'Neón', style: '3px solid #00f3ff', shadow: '0 0 15px #00f3ff, inset 0 0 10px #00f3ff' },
-    { id: 'love', name: 'Amor', style: '4px dashed #ff4d6d' }
+    { id: 'love', name: 'Amor', style: '4px dashed #ff4d6d' },
+    { id: 'wood', name: 'Madera', bgImage: 'url("/assets/pets/border/wood.jpg") center/cover', padding: '12px', shadow: '0 4px 15px rgba(0,0,0,0.3)' },
+    { id: 'galaxy', name: 'Galaxia', bgImage: 'url("/assets/pets/border/galaxy.jpg") center/cover', padding: '10px', shadow: '0 0 20px #8b5cf6' },
+    { id: 'rainbow', name: 'Arcoíris', bgImage: 'url("/assets/pets/border/rainbow.jpg") center/cover', padding: '10px' },
+    { id: 'water', name: 'Agua', bgImage: 'url("/assets/pets/border/water.jpg") center/cover', padding: '10px' }
   ];
 
   public propOptions = [
@@ -518,9 +528,33 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     if (bg && bg.style) styles['background'] = bg.style;
 
     const border = this.borderOptions.find(b => b.id === this.activeDeco.border);
-    if (border && border.style !== 'none') {
+    if (border && !border.bgImage && border.style !== 'none') {
       styles['border'] = border.style;
       if (border.shadow) styles['box-shadow'] = border.shadow;
+    }
+    return styles;
+  }
+
+  getBorderWrapperStyles() {
+    let styles: any = {};
+    const border = this.borderOptions.find(b => b.id === this.activeDeco.border);
+    if (border && border.bgImage) {
+      styles['background'] = border.bgImage;
+      styles['padding'] = border.padding || '10px';
+      if (border.shadow) styles['box-shadow'] = border.shadow;
+    } else {
+      styles['padding'] = '0px';
+    }
+    return styles;
+  }
+
+  getPreviewBorderWrapperStyles(opt: any) {
+    let styles: any = {};
+    if (opt.bgImage) {
+      styles['background'] = opt.bgImage;
+      styles['padding'] = '5px';
+    } else {
+      styles['padding'] = '0px';
     }
     return styles;
   }
