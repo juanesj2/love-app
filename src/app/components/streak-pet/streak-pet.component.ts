@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges, ElementRef, ViewChild, OnDestroy, CUSTOM_ELEMENTS_SCHEMA, Output, EventEmitter, inject } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ElementRef, ViewChild, OnDestroy, CUSTOM_ELEMENTS_SCHEMA, Output, EventEmitter, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonModal, AlertController } from '@ionic/angular/standalone';
@@ -205,7 +205,12 @@ import { LoveApiService } from '../../services/love-api.service';
                     loop 
                     autoplay>
                   </dotlottie-player>
-                  <div class="clothing-layer" [ngStyle]="getClothesStyle('modal')">{{ getClothesEmoji() }}</div>
+                  <div class="clothing-layer draggable" 
+                       [class.dragging]="isDraggingClothes"
+                       [ngStyle]="getClothesStyle('modal')" 
+                       (pointerdown)="startDragClothes($event)">
+                    {{ getClothesEmoji() }}
+                  </div>
                 </div>
               </div>
 
@@ -376,7 +381,9 @@ import { LoveApiService } from '../../services/love-api.service';
     :host-context(.night-owl-mode) .prop-image { border-color: rgba(255,255,255,0.1); }
     @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-10px) rotate(5deg); } }
 
-    .clothing-layer { position: absolute; pointer-events: none; z-index: 15; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); transition: all 0.3s ease; }
+    .clothing-layer { position: absolute; pointer-events: none; z-index: 15; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); transition: all 0.3s ease; transform: translate(-50%, -50%); }
+    .clothing-layer.draggable { pointer-events: auto; cursor: grab; }
+    .clothing-layer.dragging { transition: none !important; cursor: grabbing !important; transform: scale(1.1) translate(-50%, -50%); }
 
 
     .shop-btn-large { width: 100%; background: linear-gradient(135deg, #ff4d6d, #ff758f); color: white; border: none; border-radius: 20px; padding: 15px; font-family: 'Outfit', sans-serif; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(255,77,109,0.3); transition: all 0.2s; cursor: pointer; }
@@ -616,15 +623,90 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     
     const scale = context === 'shop' ? 0.8 : 1;
     
+    let top = this.activeDeco.clothes_top || item.style.top;
+    let left = this.activeDeco.clothes_left || item.style.left;
+
+    if (context === 'modal' && this.isDraggingClothes && this.currentDragTop !== null && this.currentDragLeft !== null) {
+      top = `${this.currentDragTop}%`;
+      left = `${this.currentDragLeft}%`;
+    }
+    
     return {
-      top: item.style.top,
-      left: item.style.left,
+      top: top,
+      left: left,
       fontSize: `calc(${item.style.fontSize} * ${scale})`
     };
   }
 
+  isDraggingClothes = false;
+  dragStartX = 0;
+  dragStartY = 0;
+  startLeftPercent = 0;
+  startTopPercent = 0;
+  currentDragLeft: number | null = null;
+  currentDragTop: number | null = null;
+
+  startDragClothes(event: PointerEvent) {
+    if (!this.activeDeco.clothes || this.activeDeco.clothes === 'none') return;
+    event.preventDefault();
+    this.isDraggingClothes = true;
+    this.dragStartX = event.clientX;
+    this.dragStartY = event.clientY;
+
+    const item = this.clothesOptions.find(c => c.id === this.activeDeco.clothes);
+    const savedLeft = this.activeDeco.clothes_left || item?.style.left || '50%';
+    const savedTop = this.activeDeco.clothes_top || item?.style.top || '50%';
+
+    this.startLeftPercent = parseFloat(savedLeft);
+    this.startTopPercent = parseFloat(savedTop);
+    
+    this.currentDragLeft = this.startLeftPercent;
+    this.currentDragTop = this.startTopPercent;
+  }
+
+  @HostListener('document:pointermove', ['$event'])
+  onPointerMove(event: PointerEvent) {
+    if (!this.isDraggingClothes) return;
+    
+    const deltaX = event.clientX - this.dragStartX;
+    const deltaY = event.clientY - this.dragStartY;
+    
+    // modal pet-stage is 220px (wait! let's check css: .pet-stage is 220px width/height!)
+    const deltaPercentX = (deltaX / 220) * 100;
+    const deltaPercentY = (deltaY / 220) * 100;
+    
+    this.currentDragLeft = this.startLeftPercent + deltaPercentX;
+    this.currentDragTop = this.startTopPercent + deltaPercentY;
+  }
+
+  @HostListener('document:pointerup', ['$event'])
+  async onPointerUpGlobal(event: PointerEvent) {
+    if (!this.isDraggingClothes) return;
+    this.isDraggingClothes = false;
+    
+    if (this.currentDragLeft !== null && this.currentDragTop !== null) {
+      this.activeDeco.clothes_left = `${this.currentDragLeft}%`;
+      this.activeDeco.clothes_top = `${this.currentDragTop}%`;
+      
+      this.currentDragLeft = null;
+      this.currentDragTop = null;
+      
+      try {
+        await this.api.updateCoupleInfo({ pet_decorations: JSON.stringify(this.activeDeco) });
+      } catch (e) {
+        console.error('Error saving clothes position', e);
+      }
+    }
+  }
+
   async selectDeco(type: 'bg' | 'border' | 'prop' | 'clothes', id: string) {
     this.activeDeco[type] = id;
+    
+    if (type === 'clothes') {
+      delete this.activeDeco.clothes_left;
+      delete this.activeDeco.clothes_top;
+    }
+
     try {
       await this.api.updateCoupleInfo({ pet_decorations: JSON.stringify(this.activeDeco) });
     } catch (e) {
