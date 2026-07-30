@@ -101,6 +101,7 @@ import { LoveApiService } from '../../services/love-api.service';
                     loop 
                     autoplay>
                   </dotlottie-player>
+                  <div class="clothing-layer" [ngStyle]="getClothesStyle('shop')">{{ getClothesEmoji() }}</div>
                 </div>
               </div>
 
@@ -139,6 +140,20 @@ import { LoveApiService } from '../../services/love-api.service';
                     <div class="preview-circle" style="display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background-size: cover; background-position: center;"
                          [style.background]="opt.image || 'white'">
                       <span *ngIf="!opt.image">{{ opt.emoji || '❌' }}</span>
+                    </div>
+                    <span>{{ opt.name }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="shop-section">
+                <h4>Ropa / Pegatinas</h4>
+                <div class="shop-grid">
+                  <div class="shop-item" *ngFor="let opt of clothesOptions" 
+                       [class.active]="activeDeco.clothes === opt.id"
+                       (click)="selectDeco('clothes', opt.id)">
+                    <div class="preview-circle" style="display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                      {{ opt.emoji || '❌' }}
                     </div>
                     <span>{{ opt.name }}</span>
                   </div>
@@ -190,6 +205,7 @@ import { LoveApiService } from '../../services/love-api.service';
                     loop 
                     autoplay>
                   </dotlottie-player>
+                  <div class="clothing-layer" [ngStyle]="getClothesStyle('modal')">{{ getClothesEmoji() }}</div>
                 </div>
               </div>
 
@@ -359,6 +375,9 @@ import { LoveApiService } from '../../services/love-api.service';
     .prop-image { width: 60px; height: 60px; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border: 3px solid white; }
     :host-context(.night-owl-mode) .prop-image { border-color: rgba(255,255,255,0.1); }
     @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-10px) rotate(5deg); } }
+
+    .clothing-layer { position: absolute; pointer-events: none; z-index: 15; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); transition: all 0.3s ease; }
+
 
     .shop-btn-large { width: 100%; background: linear-gradient(135deg, #ff4d6d, #ff758f); color: white; border: none; border-radius: 20px; padding: 15px; font-family: 'Outfit', sans-serif; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(255,77,109,0.3); transition: all 0.2s; cursor: pointer; }
     .shop-btn-large:active { transform: scale(0.98); }
@@ -536,6 +555,15 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     { id: 'heart', name: 'Corazón', image: 'url("/assets/pets/prop/heart.jpg") center/cover' }
   ];
 
+  public clothesOptions = [
+    { id: 'none', name: 'Nada', emoji: '' },
+    { id: 'glasses', name: 'Gafas', emoji: '🕶️', style: { top: '35%', left: '33%', fontSize: '3rem' } },
+    { id: 'hat', name: 'Sombrero', emoji: '🎩', style: { top: '5%', left: '42%', fontSize: '3.5rem' } },
+    { id: 'scarf', name: 'Bufanda', emoji: '🧣', style: { top: '55%', left: '33%', fontSize: '3.5rem' } },
+    { id: 'bowtie', name: 'Pajarita', emoji: '🎀', style: { top: '65%', left: '38%', fontSize: '2.5rem' } },
+    { id: 'flower', name: 'Flor', emoji: '🌻', style: { top: '25%', left: '60%', fontSize: '2.5rem' } }
+  ];
+
   getStageStyles() {
     let styles: any = {};
     const bg = this.bgOptions.find(b => b.id === this.activeDeco.bg);
@@ -577,7 +605,26 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     return this.propOptions.find(p => p.id === this.activeDeco.prop);
   }
 
-  async selectDeco(type: 'bg' | 'border' | 'prop', id: string) {
+  getClothesEmoji() {
+    const item = this.clothesOptions.find(c => c.id === this.activeDeco.clothes);
+    return item ? item.emoji : '';
+  }
+
+  getClothesStyle(context: 'shop' | 'modal') {
+    const item = this.clothesOptions.find(c => c.id === this.activeDeco.clothes);
+    if (!item || !item.emoji) return { display: 'none' };
+    
+    // Scale down if in shop since the stage is smaller (150px vs 200px)
+    const scale = context === 'shop' ? 0.8 : 1;
+    
+    return {
+      top: item.style.top,
+      left: item.style.left,
+      fontSize: `calc(${item.style.fontSize} * ${scale})`
+    };
+  }
+
+  async selectDeco(type: 'bg' | 'border' | 'prop' | 'clothes', id: string) {
     this.activeDeco[type] = id;
     try {
       await this.api.updateCoupleInfo({ pet_decorations: JSON.stringify(this.activeDeco) });
