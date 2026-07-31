@@ -874,6 +874,9 @@ img.frame-fire, .avatar.frame-fire {
     text-transform: none !important;
     font-size: 1.1rem !important;
     box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3) !important;
+    display: flex !important;
+    justify-content: center !important;
+    text-align: center !important;
   }
 }
 
