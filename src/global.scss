@@ -824,3 +824,80 @@ img.frame-fire, .avatar.frame-fire {
 }
 
 
+
+// Custom alert styling for love-app
+.custom-alert {
+  --background: #fff0f3 !important;
+  --backdrop-opacity: 0.6;
+  --max-width: 320px;
+  
+  .alert-wrapper {
+    border-radius: 20px !important;
+    box-shadow: 0 10px 30px rgba(89, 13, 34, 0.15) !important;
+    font-family: 'Outfit', sans-serif !important;
+  }
+
+  .alert-head {
+    padding-top: 25px;
+    padding-bottom: 10px;
+  }
+
+  .alert-title {
+    color: #590D22 !important;
+    font-weight: 700 !important;
+    font-size: 1.3rem !important;
+    text-align: center;
+  }
+
+  .alert-message {
+    color: #800f2f !important;
+    font-weight: 500 !important;
+    font-size: 1rem !important;
+    text-align: center;
+    padding: 0 20px 20px 20px;
+  }
+
+  .alert-button-group {
+    padding: 10px 20px 20px 20px;
+    justify-content: center;
+  }
+
+  .alert-button {
+    background: #ff4d6d !important;
+    color: white !important;
+    border-radius: 25px !important;
+    font-weight: 600 !important;
+    font-family: 'Outfit', sans-serif !important;
+    margin: 0 !important;
+    width: 100%;
+    padding: 15px 0 !important;
+    text-transform: none !important;
+    font-size: 1.1rem !important;
+    box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3) !important;
+  }
+}
+
+// Night mode overrides for custom alert
+body.night-owl-mode .custom-alert {
+  --background: #1a1a2e !important;
+  
+  .alert-wrapper {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    border: 1px solid rgba(167, 139, 250, 0.2);
+  }
+
+  .alert-title {
+    color: #fdfdfd !important;
+  }
+
+  .alert-message {
+    color: #a78bfa !important;
+  }
+
+  .alert-button {
+    background: #a78bfa !important;
+    color: white !important;
+    box-shadow: 0 4px 10px rgba(167, 139, 250, 0.3) !important;
+  }
+}
+
