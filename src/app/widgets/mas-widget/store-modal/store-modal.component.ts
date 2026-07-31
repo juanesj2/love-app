@@ -99,6 +99,46 @@ import { GiftViewerComponent } from '../../../components/gift-viewer/gift-viewer
             </div>
           </div>
 
+          <!-- Monedas (Balance) -->
+          <div class="store-card premium-card" style="background: linear-gradient(135deg, #FFCA3A 0%, #FFB703 100%);">
+            <div class="card-icon">🪙</div>
+            <div class="card-info">
+              <span class="card-title" style="color: #590D22;">Mis Monedas</span>
+              <span class="card-desc" style="color: rgba(89, 13, 34, 0.8);">{{ ((api.inventory$ | async)?.coins || 0) }} monedas disponibles</span>
+            </div>
+          </div>
+
+          <!-- Packs de monedas -->
+          <div class="store-card pack-card" style="background: white; border: 1px solid #ffe4eb;" (click)="buyCoins('small')" [class.purchasing]="purchasingItem === 'coins_small'">
+            <ion-spinner name="crescent" *ngIf="purchasingItem === 'coins_small'" class="pack-spinner" style="color: #FF4D6D; left: auto; right: 20px;"></ion-spinner>
+            <div class="card-icon" *ngIf="purchasingItem !== 'coins_small'">💰</div>
+            <div class="card-info">
+              <span class="card-title" style="color: #590D22;">10 Monedas</span>
+              <span class="card-desc" style="color: #a4133c;">Pack pequeño</span>
+            </div>
+            <div class="card-action pack-price">1.00 €</div>
+          </div>
+
+          <div class="store-card pack-card" style="background: white; border: 1px solid #ffe4eb;" (click)="buyCoins('medium')" [class.purchasing]="purchasingItem === 'coins_medium'">
+            <ion-spinner name="crescent" *ngIf="purchasingItem === 'coins_medium'" class="pack-spinner" style="color: #FF4D6D; left: auto; right: 20px;"></ion-spinner>
+            <div class="card-icon" *ngIf="purchasingItem !== 'coins_medium'">💰</div>
+            <div class="card-info">
+              <span class="card-title" style="color: #590D22;">50 Monedas</span>
+              <span class="card-desc" style="color: #a4133c;">Pack mediano</span>
+            </div>
+            <div class="card-action pack-price">5.00 €</div>
+          </div>
+
+          <div class="store-card pack-card" style="background: white; border: 1px solid #ffe4eb;" (click)="buyCoins('large')" [class.purchasing]="purchasingItem === 'coins_large'">
+            <ion-spinner name="crescent" *ngIf="purchasingItem === 'coins_large'" class="pack-spinner" style="color: #FF4D6D; left: auto; right: 20px;"></ion-spinner>
+            <div class="card-icon" *ngIf="purchasingItem !== 'coins_large'">💎</div>
+            <div class="card-info">
+              <span class="card-title" style="color: #590D22;">100 Monedas</span>
+              <span class="card-desc" style="color: #a4133c;">Mejor valor</span>
+            </div>
+            <div class="card-action pack-price">10.00 €</div>
+          </div>
+
           <!-- Impulso a tu relación -->
           <div class="store-card event-card" (click)="openPremiumEvent.emit(); close.emit()">
             <div class="card-icon">🚀</div>
@@ -539,6 +579,33 @@ export class StoreModalComponent implements OnInit, OnDestroy {
       await this.playLottieAnimation('assets/lottie/Payment Failed.lottie', 'Error en la compra.', 'Volver');
     } finally {
       this.purchasingRevival = false;
+    }
+  }
+
+  async buyCoins(packId: 'small' | 'medium' | 'large') {
+    if (this.purchasingItem) return;
+    this.purchasingItem = `coins_${packId}`;
+    try {
+      const purchaseRes = await this.premiumService.purchaseConsumable(`coins_${packId}`);
+      
+      if (!purchaseRes.success) {
+        if (!purchaseRes.error?.userCancelled) {
+           await this.playLottieAnimation('assets/lottie/Payment Failed.lottie', 'Error en la compra.', 'Volver');
+        }
+        return;
+      }
+
+      const res = await this.api.buyCoins(packId);
+      const currentInv = this.api.inventory$.value;
+      this.api.inventory$.next({ ...currentInv, coins: res.coins });
+      
+      this.fireConfetti();
+      await this.playLottieAnimation('assets/lottie/Payment Success.lottie', '¡Monedas Compradas!', 'Genial');
+      this.cdr.detectChanges();
+    } catch (e: any) {
+      await this.playLottieAnimation('assets/lottie/Payment Failed.lottie', 'Error en la compra.', 'Volver');
+    } finally {
+      this.purchasingItem = null;
     }
   }
 
