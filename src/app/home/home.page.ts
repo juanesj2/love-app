@@ -99,13 +99,6 @@ import { PushNotifications } from '@capacitor/push-notifications';
               👻
             </div>
 
-            <!-- Tienda Button (Monedas) -->
-            <div class="menu-toggle-btn show" 
-                 (click)="openStoreModal()"
-                 style="font-size: 1.5rem; color: #ff9f1c; box-shadow: 0 0 15px rgba(255, 159, 28, 0.4);">
-              <ion-icon name="storefront"></ion-icon>
-            </div>
-
           </div>
 
           
