@@ -866,7 +866,7 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     this.currentDragTop = this.startTopPercent + deltaPercentY;
   }
 
-  @HostListener('wheel', ['$event'])
+  @HostListener('document:wheel', ['$event'])
   onWheel(event: WheelEvent) {
     if (!this.isDraggingClothes) return;
     event.preventDefault();
