@@ -172,6 +172,19 @@ import { LoveApiService } from '../../services/love-api.service';
                 </div>
               </div>
 
+              <div class="shop-section" *ngIf="activeDeco.clothes?.[myUserId] && activeDeco.clothes?.[myUserId].id !== 'none'">
+                <h4>Tamaño de la Pegatina</h4>
+                <div style="display: flex; align-items: center; gap: 15px; padding: 10px 20px; background: rgba(0,0,0,0.03); border-radius: 15px; margin-top: 10px;">
+                  <span style="font-size: 1.2rem;">➖</span>
+                  <input type="range" min="0.3" max="4" step="0.1" style="flex: 1; accent-color: #ff4d6d;"
+                         [value]="activeDeco.clothes[myUserId].scale || 1"
+                         (input)="updateLocalScale($event)"
+                         (change)="saveScale()">
+                  <span style="font-size: 1.5rem;">➕</span>
+                </div>
+              </div>
+
+
               <div class="shop-section">
                 <h4>Huevos Sorpresa</h4>
                 <div class="shop-grid">
@@ -904,6 +917,20 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
       } catch (e) {
         console.error('Error saving clothes position/scale', e);
       }
+    }
+  }
+
+  updateLocalScale(event: any) {
+    if (this.activeDeco.clothes && this.activeDeco.clothes[this.myUserId]) {
+      this.activeDeco.clothes[this.myUserId].scale = parseFloat(event.target.value);
+    }
+  }
+
+  async saveScale() {
+    try {
+      await this.api.updateCoupleInfo({ pet_decorations: JSON.stringify(this.activeDeco) });
+    } catch (e) {
+      console.error('Error saving scale', e);
     }
   }
 
