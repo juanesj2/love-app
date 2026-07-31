@@ -276,9 +276,12 @@ import { LoveApiService } from '../../services/love-api.service';
                 <span>Nivel de amor:</span>
                 <strong>{{ streakDays * 10 }} XP</strong>
               </div>
-              <div class="stat-row">
+              <div class="stat-row" style="cursor: pointer;" (click)="openStore.emit()">
                 <span>Monedas:</span>
-                <strong>🪙 {{ coins }}</strong>
+                <strong style="display: flex; align-items: center; gap: 4px; color: #FFCA3A;">
+                  💰 {{ coins }}
+                  <ion-icon name="add-circle" style="font-size: 1.2rem;"></ion-icon>
+                </strong>
               </div>
             </div>
 
@@ -575,12 +578,13 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
   @Input() petName: string | null = null;
   @Input() coins: number = 0;
   @Input() unlockedPets: string[] = [];
+  @Output() openStore = new EventEmitter<void>();
   @Input() set decorations(val: any) {
     let parsed: any = {};
     if (typeof val === 'string') {
       try { parsed = JSON.parse(val); } catch(e) {}
-    } else if (val) {
-      parsed = val;
+    } else {
+      parsed = val || {};
     }
     
     // Migration: if clothes is a string, migrate it to the current user

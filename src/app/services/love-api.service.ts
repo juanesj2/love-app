@@ -247,6 +247,14 @@ export class LoveApiService {
     return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/pet/buy-egg`, {}));
   }
 
+  async buyCoins(packId: string): Promise<any> {
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/store/buy-coins`, { pack_id: packId }));
+  }
+
+  async subscribePremium(): Promise<any> {
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/store/subscribe-premium`, {}));
+  }
+
   async getAllUsers(): Promise<any[]> {
     return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/global-events/users`));
   }

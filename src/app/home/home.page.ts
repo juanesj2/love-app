@@ -62,6 +62,7 @@ import { PushNotifications } from '@capacitor/push-notifications';
               [streakDays]="couple?.current_streak || 0" 
               [coupleId]="couple?.id"
               [petData]="couple?.inventory?.pet"
+              (openStore)="openStoreModal()"
               [decorations]="couple?.pet_decorations"
               [petName]="couple?.pet_name"
               [coins]="couple?.inventory?.coins || 0"
@@ -248,6 +249,60 @@ import { PushNotifications } from '@capacitor/push-notifications';
           </button>
         </div>
       </div>
+    <!-- Modal de Tienda de Monedas y Premium -->
+    <div class="modal-backdrop" *ngIf="showStoreModal" (click)="closeStoreModal()"></div>
+    <div class="prompt-sheet store-sheet" [class.show]="showStoreModal">
+      <div class="modal-header">
+        <h2>Tienda y VIP 💎</h2>
+      </div>
+      
+      <div class="prompt-body store-body">
+        <div class="store-premium-banner" *ngIf="!isPremium">
+          <div class="premium-icon-glow">
+            <ion-icon name="star"></ion-icon>
+          </div>
+          <h3>Love App VIP</h3>
+          <p>Desbloquea el Modo Noche, el Marco Dorado y consigue +10 Monedas mensuales.</p>
+          <button class="store-btn premium-btn" (click)="subscribeToPremium()" [disabled]="buyingStore">
+            Suscribirse - 2,99€/mes
+          </button>
+        </div>
+
+        <div class="store-premium-banner active" *ngIf="isPremium">
+          <div class="premium-icon-glow">
+            <ion-icon name="star"></ion-icon>
+          </div>
+          <h3>Eres VIP ✨</h3>
+          <p>Disfrutas del Modo Noche y Marco Dorado.</p>
+        </div>
+        
+        <h3 class="store-section-title">Comprar Monedas</h3>
+        
+        <div class="coin-packs">
+          <div class="coin-pack" (click)="buyCoinPack('small')">
+            <div class="pack-icon">🪙</div>
+            <div class="pack-amount">100</div>
+            <div class="pack-price">1,99€</div>
+          </div>
+          
+          <div class="coin-pack popular" (click)="buyCoinPack('medium')">
+            <div class="popular-badge">Popular</div>
+            <div class="pack-icon">💰</div>
+            <div class="pack-amount">500</div>
+            <div class="pack-price">4,99€</div>
+          </div>
+          
+          <div class="coin-pack" (click)="buyCoinPack('large')">
+            <div class="pack-icon">💎</div>
+            <div class="pack-amount">1200</div>
+            <div class="pack-price">9,99€</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="prompt-actions">
+        <button class="prompt-btn cancel" (click)="closeStoreModal()">Cerrar</button>
+      </div>
     </div>
   `,
   styles: [`
@@ -392,6 +447,9 @@ export class HomePage implements OnInit, OnDestroy {
   private pokeHoldFired = false;
   
   myUserId: number = 0;
+  isPremium: boolean = false;
+  showStoreModal: boolean = false;
+  buyingStore: boolean = false;
   hasNightOwlSecret = false;
   isDarkMode = false;
   hasGoldenFrame = false;
@@ -660,11 +718,9 @@ export class HomePage implements OnInit, OnDestroy {
 
     await this.loadHeaderData();
 
-    // Suscribirse a los logros para el búho nocturno y marco dorado
-    // Usar una suscripción separada que NO se cancela en loadHeaderData
+    // Suscribirse a los logros (ya no se usan para Night Owl / Golden)
     this.subscriptions.push(this.api.unlockedAchievements$.subscribe(achievements => {
-      this.hasNightOwlSecret = achievements.includes('secret_owl');
-      this.hasGoldenFrame = achievements.includes('secret_golden_frame');
+      // Other achievements logic could go here
       this.cdr.detectChanges();
     }));
 
@@ -907,10 +963,14 @@ export class HomePage implements OnInit, OnDestroy {
         this.subscriptions = [];
       }
 
-      // Leer logros siempre despues de getCoupleInfo (por si la suscripcion fue antes)
-      const achievements = this.api.unlockedAchievements$.getValue();
-      this.hasNightOwlSecret = achievements.includes('secret_owl');
-      this.hasGoldenFrame = achievements.includes('secret_golden_frame');
+      if (data.is_premium !== undefined) {
+        this.isPremium = data.is_premium;
+      }
+
+      // Desbloquear Night Owl y Golden Frame si es Premium
+      this.hasNightOwlSecret = this.isPremium;
+      this.hasGoldenFrame = this.isPremium;
+
       this.cdr.detectChanges();
     } catch (e: any) {
       console.log('No se pudo cargar la info de la cabecera', e);
@@ -1273,6 +1333,79 @@ export class HomePage implements OnInit, OnDestroy {
     await modal.present();
     await modal.onDidDismiss();
     document.body.classList.remove('hide-tabs');
+  }
+  async openStoreModal() {
+    this.showStoreModal = true;
+  }
+
+  closeStoreModal() {
+    this.showStoreModal = false;
+  }
+
+  async buyCoinPack(packId: string) {
+    if (this.buyingStore) return;
+    this.buyingStore = true;
+    try {
+      const res = await this.api.buyCoins(packId);
+      if (this.couple && this.couple.inventory) {
+        this.couple.inventory.coins = res.coins;
+      }
+      const toast = await this.toastCtrl.create({
+        message: res.message,
+        duration: 3000,
+        color: 'success',
+        position: 'top',
+        icon: 'cash-outline'
+      });
+      await toast.present();
+    } catch (e) {
+      console.error(e);
+      const toast = await this.toastCtrl.create({
+        message: 'No se pudo completar la compra.',
+        duration: 2000,
+        color: 'danger'
+      });
+      await toast.present();
+    } finally {
+      this.buyingStore = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  async subscribeToPremium() {
+    if (this.buyingStore) return;
+    this.buyingStore = true;
+    try {
+      const res = await this.api.subscribePremium();
+      if (this.couple && this.couple.inventory) {
+        this.couple.inventory.coins = res.coins;
+      }
+      this.isPremium = true;
+      this.hasNightOwlSecret = true;
+      this.hasGoldenFrame = true;
+
+      const toast = await this.toastCtrl.create({
+        message: res.message,
+        duration: 4000,
+        color: 'success',
+        position: 'top',
+        icon: 'star'
+      });
+      await toast.present();
+      
+      this.closeStoreModal();
+    } catch (e) {
+      console.error(e);
+      const toast = await this.toastCtrl.create({
+        message: 'No se pudo completar la suscripción.',
+        duration: 2000,
+        color: 'danger'
+      });
+      await toast.present();
+    } finally {
+      this.buyingStore = false;
+      this.cdr.detectChanges();
+    }
   }
 }
 
