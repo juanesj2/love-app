@@ -69,11 +69,6 @@ import { PushNotifications } from '@capacitor/push-notifications';
               [unlockedPets]="couple?.inventory?.unlocked_pets || []"
               (petHatched)="onPetHatched($event)">
             </app-streak-pet>
-
-            <!-- Moon icon for Night Mode if unlocked -->
-            <div class="moon-btn" [class.dark-active]="isDarkMode" *ngIf="hasNightOwlSecret" (click)="toggleDarkMode()">
-              <span style="font-size: 1.3rem; line-height: 1;">{{ isDarkMode ? '🌕' : '🌙' }}</span>
-            </div>
             
             <div class="poke-btn"
               (click)="onPokeClick()"
@@ -338,10 +333,6 @@ import { PushNotifications } from '@capacitor/push-notifications';
       .mood-badge { position: absolute; bottom: -5px; right: -5px; background: white; border-radius: 50%; padding: 2px; font-size: 1.2rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.3s; pointer-events: none; }
       
       .header-center-actions { display: flex; align-items: center; gap: 15px; position: absolute; left: 50%; transform: translateX(-50%); }
-      .moon-btn { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, rgba(108,99,255,0.15), rgba(162,155,254,0.2)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 2px solid rgba(108,99,255,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(108,99,255,0.2); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-      .moon-btn:active { transform: scale(0.88); }
-      .moon-btn.dark-active { background: linear-gradient(135deg, rgba(108,99,255,0.4), rgba(76,70,201,0.5)); border-color: rgba(108,99,255,0.6); box-shadow: 0 4px 20px rgba(108,99,255,0.4); }
-      .moon-btn.dark-active ion-icon { color: #fff !important; }
       
       .premium-btn { padding: 8px 12px; border-radius: 20px; background: linear-gradient(135deg, #FFCA3A, #FF9F1C); display: flex; align-items: center; gap: 5px; color: white; font-weight: 800; font-size: 0.85rem; box-shadow: 0 4px 15px rgba(255,159,28,0.4); cursor: pointer; border: 2px solid white; transition: transform 0.3s; }
       .premium-btn:active { transform: scale(0.95); }
