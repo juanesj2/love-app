@@ -243,6 +243,10 @@ export class LoveApiService {
     return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/pet/hatch`, {}));
   }
 
+  async buyEgg(): Promise<any> {
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/pet/buy-egg`, {}));
+  }
+
   async getAllUsers(): Promise<any[]> {
     return firstValueFrom(this.http.get<any[]>(`${API_BASE_URL}/love-album/global-events/users`));
   }
