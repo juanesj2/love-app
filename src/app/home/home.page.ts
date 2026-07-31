@@ -1350,7 +1350,7 @@ export class HomePage implements OnInit, OnDestroy {
       if (this.couple && this.couple.inventory) {
         this.couple.inventory.coins = res.coins;
       }
-      const toast = await this.toastCtrl.create({
+      const toast = await this.toastController.create({
         message: res.message,
         duration: 3000,
         color: 'success',
@@ -1360,7 +1360,7 @@ export class HomePage implements OnInit, OnDestroy {
       await toast.present();
     } catch (e) {
       console.error(e);
-      const toast = await this.toastCtrl.create({
+      const toast = await this.toastController.create({
         message: 'No se pudo completar la compra.',
         duration: 2000,
         color: 'danger'
@@ -1384,7 +1384,7 @@ export class HomePage implements OnInit, OnDestroy {
       this.hasNightOwlSecret = true;
       this.hasGoldenFrame = true;
 
-      const toast = await this.toastCtrl.create({
+      const toast = await this.toastController.create({
         message: res.message,
         duration: 4000,
         color: 'success',
@@ -1396,7 +1396,7 @@ export class HomePage implements OnInit, OnDestroy {
       this.closeStoreModal();
     } catch (e) {
       console.error(e);
-      const toast = await this.toastCtrl.create({
+      const toast = await this.toastController.create({
         message: 'No se pudo completar la suscripción.',
         duration: 2000,
         color: 'danger'
