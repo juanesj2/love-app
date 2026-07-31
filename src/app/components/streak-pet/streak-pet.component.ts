@@ -750,30 +750,40 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     const item = this.clothesOptions.find(c => c.id === userClothes.id);
     if (!item || !item.emoji || !item.style) return { display: 'none' };
     
-    const scale = context === 'shop' ? 0.8 : 1;
+    let baseScale = context === 'shop' ? 0.8 : 1;
+    let stickerScale = userClothes.scale || 1;
     
     let top = userClothes.top || item.style.top;
     let left = userClothes.left || item.style.left;
 
-    if (context === 'modal' && this.isDraggingClothes && userId === this.myUserId && this.currentDragTop !== null && this.currentDragLeft !== null) {
-      top = `${this.currentDragTop}%`;
-      left = `${this.currentDragLeft}%`;
+    if (context === 'modal' && this.isDraggingClothes && userId === this.myUserId) {
+      if (this.currentDragTop !== null && this.currentDragLeft !== null) {
+        top = `${this.currentDragTop}%`;
+        left = `${this.currentDragLeft}%`;
+      }
+      if (this.currentScale !== null) {
+        stickerScale = this.currentScale;
+      }
     }
     
     return {
       top: top,
       left: left,
-      fontSize: `calc(${item.style.fontSize} * ${scale})`
+      fontSize: `calc(${item.style.fontSize} * ${baseScale * stickerScale})`
     };
   }
 
   isDraggingClothes = false;
+  isPinching = false;
+  initialPinchDistance = 0;
+  startScale = 1;
   dragStartX = 0;
   dragStartY = 0;
   startLeftPercent = 0;
   startTopPercent = 0;
   currentDragLeft: number | null = null;
   currentDragTop: number | null = null;
+  currentScale: number | null = null;
   
   showDoomMode: boolean = false;
 
@@ -784,23 +794,32 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     if (event.cancelable) event.preventDefault();
     this.isDraggingClothes = true;
     
-    if (window.TouchEvent && event instanceof TouchEvent) {
-      this.dragStartX = event.touches[0].clientX;
-      this.dragStartY = event.touches[0].clientY;
-    } else {
-      this.dragStartX = (event as MouseEvent).clientX;
-      this.dragStartY = (event as MouseEvent).clientY;
-    }
-
     const item = this.clothesOptions.find(c => c.id === myClothes.id);
     const savedLeft = myClothes.left || item?.style?.left || '50%';
     const savedTop = myClothes.top || item?.style?.top || '50%';
-
     this.startLeftPercent = parseFloat(savedLeft);
     this.startTopPercent = parseFloat(savedTop);
     
-    this.currentDragLeft = this.startLeftPercent;
-    this.currentDragTop = this.startTopPercent;
+    this.startScale = myClothes.scale || 1;
+    this.currentScale = this.startScale;
+
+    if (window.TouchEvent && event instanceof TouchEvent && event.touches.length === 2) {
+      this.isPinching = true;
+      const t1 = event.touches[0];
+      const t2 = event.touches[1];
+      this.initialPinchDistance = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+    } else {
+      this.isPinching = false;
+      if (window.TouchEvent && event instanceof TouchEvent) {
+        this.dragStartX = event.touches[0].clientX;
+        this.dragStartY = event.touches[0].clientY;
+      } else {
+        this.dragStartX = (event as MouseEvent).clientX;
+        this.dragStartY = (event as MouseEvent).clientY;
+      }
+      this.currentDragLeft = this.startLeftPercent;
+      this.currentDragTop = this.startTopPercent;
+    }
   }
 
   @HostListener('document:mousemove', ['$event'])
@@ -808,6 +827,26 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
   onPointerMove(event: MouseEvent | TouchEvent) {
     if (!this.isDraggingClothes) return;
     
+    if (window.TouchEvent && event instanceof TouchEvent && event.touches.length === 2) {
+      if (!this.isPinching) {
+        this.isPinching = true;
+        const t1 = event.touches[0];
+        const t2 = event.touches[1];
+        this.initialPinchDistance = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        const myClothes = this.activeDeco.clothes?.[this.myUserId];
+        this.startScale = myClothes?.scale || 1;
+        this.currentScale = this.startScale;
+      } else {
+        const t1 = event.touches[0];
+        const t2 = event.touches[1];
+        const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        const delta = dist / this.initialPinchDistance;
+        this.currentScale = Math.max(0.3, Math.min(4, this.startScale * delta));
+      }
+      return;
+    }
+    
+    this.isPinching = false;
     let clientX, clientY;
     if (window.TouchEvent && event instanceof TouchEvent) {
       clientX = event.touches[0].clientX;
@@ -827,27 +866,43 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     this.currentDragTop = this.startTopPercent + deltaPercentY;
   }
 
+  @HostListener('wheel', ['$event'])
+  onWheel(event: WheelEvent) {
+    if (!this.isDraggingClothes) return;
+    event.preventDefault();
+    const myClothes = this.activeDeco.clothes?.[this.myUserId];
+    if (!myClothes) return;
+    
+    const current = this.currentScale !== null ? this.currentScale : (myClothes.scale || 1);
+    const delta = event.deltaY > 0 ? -0.1 : 0.1;
+    this.currentScale = Math.max(0.3, Math.min(4, current + delta));
+  }
+
   @HostListener('document:mouseup', ['$event'])
   @HostListener('document:touchend', ['$event'])
   async onPointerUpGlobal(event: MouseEvent | TouchEvent) {
     if (!this.isDraggingClothes) return;
     this.isDraggingClothes = false;
+    this.isPinching = false;
     
-    if (this.currentDragLeft !== null && this.currentDragTop !== null) {
+    if (this.currentDragLeft !== null || this.currentDragTop !== null || this.currentScale !== null) {
       if (!this.activeDeco.clothes) this.activeDeco.clothes = {};
       if (!this.activeDeco.clothes[this.myUserId]) {
          this.activeDeco.clothes[this.myUserId] = { id: 'none' };
       }
-      this.activeDeco.clothes[this.myUserId].left = `${this.currentDragLeft}%`;
-      this.activeDeco.clothes[this.myUserId].top = `${this.currentDragTop}%`;
+      
+      if (this.currentDragLeft !== null) this.activeDeco.clothes[this.myUserId].left = `${this.currentDragLeft}%`;
+      if (this.currentDragTop !== null) this.activeDeco.clothes[this.myUserId].top = `${this.currentDragTop}%`;
+      if (this.currentScale !== null) this.activeDeco.clothes[this.myUserId].scale = this.currentScale;
       
       this.currentDragLeft = null;
       this.currentDragTop = null;
+      this.currentScale = null;
       
       try {
         await this.api.updateCoupleInfo({ pet_decorations: JSON.stringify(this.activeDeco) });
       } catch (e) {
-        console.error('Error saving clothes position', e);
+        console.error('Error saving clothes position/scale', e);
       }
     }
   }
