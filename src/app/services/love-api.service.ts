@@ -239,13 +239,7 @@ export class LoveApiService {
     return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/poke`, { is_super: isSuper }));
   }
 
-  async hatchPet(): Promise<any> {
-    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/pet/hatch`, {}));
-  }
 
-  async buyEgg(): Promise<any> {
-    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/pet/buy-egg`, {}));
-  }
 
   async buyPetDecoration(id: string, price: number): Promise<any> {
     return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/pet/buy-decoration`, { id, price }));
@@ -725,6 +719,22 @@ export class LoveApiService {
 
   async deleteInventoryLetter(id: string): Promise<any> {
     return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/love-album/store/letters/${id}`));
+  }
+
+  async buyEgg(): Promise<any> {
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/store/buy-egg`, {}));
+  }
+
+  async openEgg(): Promise<any> {
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/store/open-egg`, {}));
+  }
+
+  async resolveDuplicatePet(petType: string, action: 'evolve' | 'sell'): Promise<any> {
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/store/resolve-duplicate`, { pet_type: petType, action }));
+  }
+
+  async setActivePet(petId: number): Promise<any> {
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/store/set-active-pet`, { pet_id: petId }));
   }
 }
 

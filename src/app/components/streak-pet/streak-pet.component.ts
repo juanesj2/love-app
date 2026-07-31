@@ -1246,7 +1246,7 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
 
   async executeHatch() {
     try {
-      const res = await this.api.hatchPet();
+      const res = await this.api.openEgg();
       const newPet = res.pet;
 
       this.hatchedPet = newPet;
