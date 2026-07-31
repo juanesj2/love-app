@@ -878,6 +878,12 @@ img.frame-fire, .avatar.frame-fire {
     justify-content: center !important;
     text-align: center !important;
   }
+
+  .alert-button .alert-button-inner {
+    justify-content: center !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
 }
 
 // Night mode overrides for custom alert
