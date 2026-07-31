@@ -101,7 +101,9 @@ import { LoveApiService } from '../../services/love-api.service';
                     loop 
                     autoplay>
                   </dotlottie-player>
-                  <div class="clothing-layer" [ngStyle]="getClothesStyle('shop')">{{ getClothesEmoji() }}</div>
+                  <ng-container *ngFor="let userId of getClothesUserIds()">
+                    <div class="clothing-layer" [ngStyle]="getClothesStyle('shop', userId)">{{ getClothesEmoji(userId) }}</div>
+                  </ng-container>
                 </div>
               </div>
 
@@ -150,7 +152,7 @@ import { LoveApiService } from '../../services/love-api.service';
                 <h4>Ropa / Pegatinas</h4>
                 <div class="shop-grid">
                   <div class="shop-item" *ngFor="let opt of clothesOptions" 
-                       [class.active]="activeDeco.clothes === opt.id"
+                       [class.active]="activeDeco.clothes?.[myUserId]?.id === opt.id || (opt.id === 'none' && !activeDeco.clothes?.[myUserId])"
                        (click)="selectDeco('clothes', opt.id)">
                     <div class="preview-circle" style="display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
                       {{ opt.emoji || '❌' }}
@@ -205,13 +207,16 @@ import { LoveApiService } from '../../services/love-api.service';
                     loop 
                     autoplay>
                   </dotlottie-player>
-                  <div class="clothing-layer draggable" 
-                       [class.dragging]="isDraggingClothes"
-                       [ngStyle]="getClothesStyle('modal')" 
-                       (mousedown)="startDragClothes($event)"
-                       (touchstart)="startDragClothes($event)">
-                    {{ getClothesEmoji() }}
-                  </div>
+                  <ng-container *ngFor="let userId of getClothesUserIds()">
+                    <div class="clothing-layer" 
+                         [class.draggable]="userId === myUserId"
+                         [class.dragging]="isDraggingClothes && userId === myUserId"
+                         [ngStyle]="getClothesStyle('modal', userId)" 
+                         (mousedown)="userId === myUserId ? startDragClothes($event) : null"
+                         (touchstart)="userId === myUserId ? startDragClothes($event) : null">
+                      {{ getClothesEmoji(userId) }}
+                    </div>
+                  </ng-container>
                 </div>
               </div>
 
@@ -250,6 +255,24 @@ import { LoveApiService } from '../../services/love-api.service';
                 <strong>{{ streakDays * 10 }} XP</strong>
               </div>
             </div>
+
+          </div>
+        </div>
+      </ng-template>
+    </ion-modal>
+
+    <!-- DOOM MODAL -->
+    <ion-modal [isOpen]="showDoomMode" (didDismiss)="showDoomMode = false" class="doom-modal">
+      <ng-template>
+        <div class="doom-easter-egg-full">
+          <div class="doom-rotator">
+            <div class="doom-header">
+              <button class="doom-close-btn" (click)="showDoomMode = false">
+                ← SALIR
+              </button>
+              <h3>DOOM</h3>
+            </div>
+            <iframe src="https://silentspacemarine.com/" allowfullscreen scrolling="no"></iframe>
           </div>
         </div>
       </ng-template>
@@ -476,6 +499,43 @@ import { LoveApiService } from '../../services/love-api.service';
       z-index: 100;
       cursor: pointer;
     }
+
+    .doom-easter-egg-full {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; overflow: hidden; z-index: 9999;
+    }
+    .doom-rotator {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; background: black;
+    }
+    .doom-header {
+      position: relative; margin-bottom: 0; padding: 15px; background: #222; border-bottom: 2px solid #8b0000; border-radius: 0; display: flex; align-items: center; justify-content: center;
+    }
+    .doom-close-btn {
+      position: absolute; left: 15px; background: #8b0000; color: white; border: none; padding: 8px 15px; border-radius: 5px; font-family: monospace; font-weight: bold; font-size: 1rem; cursor: pointer; z-index: 2000;
+    }
+    .doom-header h3 {
+      margin: 0; color: #ff0000; font-family: monospace; font-size: 1.5rem; letter-spacing: 2px; text-shadow: 2px 2px 0px #550000;
+    }
+    .doom-rotator iframe {
+      flex: 1; width: 100%; height: 100%; border: none; overflow: hidden;
+    }
+    ion-modal.doom-modal {
+      --background: black;
+      --width: 100%;
+      --height: 100%;
+      --border-radius: 0;
+      --overflow: hidden;
+    }
+
+    @media screen and (orientation: portrait) {
+      .doom-rotator {
+        top: 50%;
+        left: 50%;
+        width: 800px;
+        height: 600px;
+        transform: translate(-50%, -50%) rotate(90deg) scale(0.55);
+        transform-origin: center center;
+      }
+    }
   `]
 })
 export class StreakPetComponent implements OnChanges, OnDestroy {
@@ -484,13 +544,31 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
   @Input() petData: any = null;
   @Input() petName: string | null = null;
   @Input() set decorations(val: any) {
+    let parsed: any = {};
     if (typeof val === 'string') {
-      try { this.activeDeco = JSON.parse(val); } catch(e) { this.activeDeco = {}; }
+      try { parsed = JSON.parse(val); } catch(e) {}
     } else if (val) {
-      this.activeDeco = val;
-    } else {
-      this.activeDeco = {};
+      parsed = val;
     }
+    
+    // Migration: if clothes is a string, migrate it to the current user
+    if (parsed && typeof parsed.clothes === 'string') {
+       if (parsed.clothes !== 'none') {
+         const oldClothes = parsed.clothes;
+         const oldTop = parsed.clothes_top;
+         const oldLeft = parsed.clothes_left;
+         parsed.clothes = {
+           [this.myUserId]: { id: oldClothes, top: oldTop, left: oldLeft }
+         };
+       } else {
+         parsed.clothes = {};
+       }
+       delete parsed.clothes_top;
+       delete parsed.clothes_left;
+    }
+    if (parsed && !parsed.clothes) parsed.clothes = {};
+    
+    this.activeDeco = parsed;
   }
 
   @Output() petHatched = new EventEmitter<any>();
@@ -613,21 +691,35 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     return this.propOptions.find(p => p.id === this.activeDeco.prop);
   }
 
-  getClothesEmoji() {
-    const item = this.clothesOptions.find(c => c.id === this.activeDeco.clothes);
+  get myUserId(): string {
+    return localStorage.getItem('my_user_id') || 'unknown';
+  }
+
+  getClothesUserIds(): string[] {
+    if (!this.activeDeco.clothes || typeof this.activeDeco.clothes !== 'object') return [];
+    return Object.keys(this.activeDeco.clothes);
+  }
+
+  getClothesEmoji(userId: string = this.myUserId) {
+    const userClothes = this.activeDeco.clothes?.[userId];
+    if (!userClothes) return '';
+    const item = this.clothesOptions.find(c => c.id === userClothes.id);
     return item ? item.emoji : '';
   }
 
-  getClothesStyle(context: 'shop' | 'modal') {
-    const item = this.clothesOptions.find(c => c.id === this.activeDeco.clothes);
+  getClothesStyle(context: 'shop' | 'modal', userId: string = this.myUserId) {
+    const userClothes = this.activeDeco.clothes?.[userId];
+    if (!userClothes) return { display: 'none' };
+
+    const item = this.clothesOptions.find(c => c.id === userClothes.id);
     if (!item || !item.emoji || !item.style) return { display: 'none' };
     
     const scale = context === 'shop' ? 0.8 : 1;
     
-    let top = this.activeDeco.clothes_top || item.style.top;
-    let left = this.activeDeco.clothes_left || item.style.left;
+    let top = userClothes.top || item.style.top;
+    let left = userClothes.left || item.style.left;
 
-    if (context === 'modal' && this.isDraggingClothes && this.currentDragTop !== null && this.currentDragLeft !== null) {
+    if (context === 'modal' && this.isDraggingClothes && userId === this.myUserId && this.currentDragTop !== null && this.currentDragLeft !== null) {
       top = `${this.currentDragTop}%`;
       left = `${this.currentDragLeft}%`;
     }
@@ -646,15 +738,14 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
   startTopPercent = 0;
   currentDragLeft: number | null = null;
   currentDragTop: number | null = null;
+  
+  showDoomMode: boolean = false;
 
   startDragClothes(event: MouseEvent | TouchEvent) {
-    if (!this.activeDeco.clothes || this.activeDeco.clothes === 'none') return;
+    const myClothes = this.activeDeco.clothes?.[this.myUserId];
+    if (!myClothes || myClothes.id === 'none') return;
     
-    // Prevent default to avoid scrolling while dragging
-    if (event.cancelable) {
-      event.preventDefault();
-    }
-    
+    if (event.cancelable) event.preventDefault();
     this.isDraggingClothes = true;
     
     if (window.TouchEvent && event instanceof TouchEvent) {
@@ -665,9 +756,9 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
       this.dragStartY = (event as MouseEvent).clientY;
     }
 
-    const item = this.clothesOptions.find(c => c.id === this.activeDeco.clothes);
-    const savedLeft = this.activeDeco.clothes_left || item?.style?.left || '50%';
-    const savedTop = this.activeDeco.clothes_top || item?.style?.top || '50%';
+    const item = this.clothesOptions.find(c => c.id === myClothes.id);
+    const savedLeft = myClothes.left || item?.style?.left || '50%';
+    const savedTop = myClothes.top || item?.style?.top || '50%';
 
     this.startLeftPercent = parseFloat(savedLeft);
     this.startTopPercent = parseFloat(savedTop);
@@ -707,8 +798,12 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     this.isDraggingClothes = false;
     
     if (this.currentDragLeft !== null && this.currentDragTop !== null) {
-      this.activeDeco.clothes_left = `${this.currentDragLeft}%`;
-      this.activeDeco.clothes_top = `${this.currentDragTop}%`;
+      if (!this.activeDeco.clothes) this.activeDeco.clothes = {};
+      if (!this.activeDeco.clothes[this.myUserId]) {
+         this.activeDeco.clothes[this.myUserId] = { id: 'none' };
+      }
+      this.activeDeco.clothes[this.myUserId].left = `${this.currentDragLeft}%`;
+      this.activeDeco.clothes[this.myUserId].top = `${this.currentDragTop}%`;
       
       this.currentDragLeft = null;
       this.currentDragTop = null;
@@ -722,11 +817,20 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
   }
 
   async selectDeco(type: 'bg' | 'border' | 'prop' | 'clothes', id: string) {
-    this.activeDeco[type] = id;
-    
     if (type === 'clothes') {
-      delete this.activeDeco.clothes_left;
-      delete this.activeDeco.clothes_top;
+      if (!this.activeDeco.clothes) this.activeDeco.clothes = {};
+      if (id === 'none') {
+        delete this.activeDeco.clothes[this.myUserId];
+      } else {
+        const item = this.clothesOptions.find(c => c.id === id);
+        this.activeDeco.clothes[this.myUserId] = {
+          id: id,
+          top: item?.style?.top || '50%',
+          left: item?.style?.left || '50%'
+        };
+      }
+    } else {
+      this.activeDeco[type] = id;
     }
 
     try {
@@ -743,7 +847,18 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
 
   async savePetName() {
     if (this.tempPetName && this.tempPetName.trim() !== '') {
-      this.petName = this.tempPetName.trim();
+      const newName = this.tempPetName.trim();
+      
+      // EASTER EGG CHECK
+      if (newName.toUpperCase() === 'DOOM') {
+        this.showDoomMode = true;
+        this.showNameEdit = false;
+        this.tempPetName = '';
+        this.api.unlockAchievement('secret_doom').catch(e => console.error(e));
+        return;
+      }
+      
+      this.petName = newName;
       this.showNameEdit = false;
       try {
         await this.api.updateCoupleInfo({ pet_name: this.petName });
