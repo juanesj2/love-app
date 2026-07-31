@@ -67,6 +67,7 @@ import { PushNotifications } from '@capacitor/push-notifications';
               [petName]="couple?.pet_name"
               [coins]="couple?.inventory?.coins || 0"
               [unlockedPets]="couple?.inventory?.unlocked_pets || []"
+              [ownedDecorations]="couple?.inventory?.owned_decorations || []"
               (petHatched)="onPetHatched($event)">
             </app-streak-pet>
             
@@ -96,6 +97,13 @@ import { PushNotifications } from '@capacitor/push-notifications';
                  (click)="openSpyStats()"
                  style="font-size: 1.5rem;">
               👻
+            </div>
+
+            <!-- Tienda Button (Monedas) -->
+            <div class="menu-toggle-btn show" 
+                 (click)="openStoreModal()"
+                 style="font-size: 1.5rem; color: #ff9f1c; box-shadow: 0 0 15px rgba(255, 159, 28, 0.4);">
+              <ion-icon name="storefront"></ion-icon>
             </div>
 
           </div>
@@ -276,21 +284,21 @@ import { PushNotifications } from '@capacitor/push-notifications';
         <div class="coin-packs">
           <div class="coin-pack" (click)="buyCoinPack('small')">
             <div class="pack-icon">🪙</div>
-            <div class="pack-amount">100</div>
-            <div class="pack-price">1,99€</div>
+            <div class="pack-amount">10</div>
+            <div class="pack-price">1,00€</div>
           </div>
           
           <div class="coin-pack popular" (click)="buyCoinPack('medium')">
             <div class="popular-badge">Popular</div>
             <div class="pack-icon">💰</div>
-            <div class="pack-amount">500</div>
-            <div class="pack-price">4,99€</div>
+            <div class="pack-amount">50</div>
+            <div class="pack-price">5,00€</div>
           </div>
           
           <div class="coin-pack" (click)="buyCoinPack('large')">
             <div class="pack-icon">💎</div>
-            <div class="pack-amount">1200</div>
-            <div class="pack-price">9,99€</div>
+            <div class="pack-amount">100</div>
+            <div class="pack-price">10,00€</div>
           </div>
         </div>
       </div>

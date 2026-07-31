@@ -112,12 +112,12 @@ import { LoveApiService } from '../../services/love-api.service';
                 <div class="shop-grid">
                   <div class="shop-item" *ngFor="let opt of bgOptions" 
                        [class.active]="activeDeco.bg === opt.id"
-                       [class.locked]="(streakDays * 10) < (opt.xpRequired || 0)"
-                       (click)="selectDeco('bg', opt.id, opt.xpRequired)">
+                       [class.locked]="!ownedDecorations.includes(opt.id) && opt.coinPrice > 0"
+                       (click)="selectDeco('bg', opt.id, opt.coinPrice)">
                     <div class="preview-circle" [style.background]="opt.style || '#f4f5f8'">
-                      <span *ngIf="(streakDays * 10) < (opt.xpRequired || 0)" class="lock-icon">🔒</span>
+                      <span *ngIf="!ownedDecorations.includes(opt.id) && opt.coinPrice > 0" class="lock-icon">🔒</span>
                     </div>
-                    <span>{{ opt.name }}<br><small *ngIf="opt.xpRequired">{{opt.xpRequired}} XP</small></span>
+                    <span>{{ opt.name }}<br><small *ngIf="opt.coinPrice">{{opt.coinPrice}} 🪙</small></span>
                   </div>
                 </div>
               </div>
@@ -127,14 +127,14 @@ import { LoveApiService } from '../../services/love-api.service';
                 <div class="shop-grid">
                   <div class="shop-item" *ngFor="let opt of borderOptions" 
                        [class.active]="activeDeco.border === opt.id"
-                       [class.locked]="(streakDays * 10) < (opt.xpRequired || 0)"
-                       (click)="selectDeco('border', opt.id, opt.xpRequired)">
+                       [class.locked]="!ownedDecorations.includes(opt.id) && opt.coinPrice > 0"
+                       (click)="selectDeco('border', opt.id, opt.coinPrice)">
                     <div class="preview-border-wrapper" [ngStyle]="getPreviewBorderWrapperStyles(opt)">
                       <div class="preview-circle" [style.border]="opt.style" [style.box-shadow]="opt.shadow">
-                        <span *ngIf="(streakDays * 10) < (opt.xpRequired || 0)" class="lock-icon">🔒</span>
+                        <span *ngIf="!ownedDecorations.includes(opt.id) && opt.coinPrice > 0" class="lock-icon">🔒</span>
                       </div>
                     </div>
-                    <span>{{ opt.name }}<br><small *ngIf="opt.xpRequired">{{opt.xpRequired}} XP</small></span>
+                    <span>{{ opt.name }}<br><small *ngIf="opt.coinPrice">{{opt.coinPrice}} 🪙</small></span>
                   </div>
                 </div>
               </div>
@@ -144,14 +144,14 @@ import { LoveApiService } from '../../services/love-api.service';
                 <div class="shop-grid">
                   <div class="shop-item" *ngFor="let opt of propOptions" 
                        [class.active]="activeDeco.prop === opt.id"
-                       [class.locked]="(streakDays * 10) < (opt.xpRequired || 0)"
-                       (click)="selectDeco('prop', opt.id, opt.xpRequired)">
+                       [class.locked]="!ownedDecorations.includes(opt.id) && opt.coinPrice > 0"
+                       (click)="selectDeco('prop', opt.id, opt.coinPrice)">
                     <div class="preview-circle" style="display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background-size: cover; background-position: center; position: relative;"
                          [style.background]="opt.image || 'white'">
                       <span *ngIf="!opt.image">{{ opt.emoji || '?' }}</span>
-                      <span *ngIf="(streakDays * 10) < (opt.xpRequired || 0)" class="lock-icon" style="position: absolute; font-size: 1.2rem;">🔒</span>
+                      <span *ngIf="!ownedDecorations.includes(opt.id) && opt.coinPrice > 0" class="lock-icon" style="position: absolute; font-size: 1.2rem;">🔒</span>
                     </div>
-                    <span>{{ opt.name }}<br><small *ngIf="opt.xpRequired">{{opt.xpRequired}} XP</small></span>
+                    <span>{{ opt.name }}<br><small *ngIf="opt.coinPrice">{{opt.coinPrice}} 🪙</small></span>
                   </div>
                 </div>
               </div>
@@ -161,13 +161,13 @@ import { LoveApiService } from '../../services/love-api.service';
                 <div class="shop-grid">
                   <div class="shop-item" *ngFor="let opt of clothesOptions" 
                        [class.active]="activeDeco.clothes?.[myUserId]?.id === opt.id || (opt.id === 'none' && !activeDeco.clothes?.[myUserId])"
-                       [class.locked]="(streakDays * 10) < (opt.xpRequired || 0)"
-                       (click)="selectDeco('clothes', opt.id, opt.xpRequired)">
+                       [class.locked]="!ownedDecorations.includes(opt.id) && opt.coinPrice > 0"
+                       (click)="selectDeco('clothes', opt.id, opt.coinPrice)">
                     <div class="preview-circle" style="display: flex; align-items: center; justify-content: center; font-size: 1.5rem; position: relative;">
                       {{ opt.emoji || '?' }}
-                      <span *ngIf="(streakDays * 10) < (opt.xpRequired || 0)" class="lock-icon" style="position: absolute; font-size: 1.2rem;">🔒</span>
+                      <span *ngIf="!ownedDecorations.includes(opt.id) && opt.coinPrice > 0" class="lock-icon" style="position: absolute; font-size: 1.2rem;">🔒</span>
                     </div>
-                    <span>{{ opt.name }}<br><small *ngIf="opt.xpRequired">{{opt.xpRequired}} XP</small></span>
+                    <span>{{ opt.name }}<br><small *ngIf="opt.coinPrice">{{opt.coinPrice}} 🪙</small></span>
                   </div>
                 </div>
               </div>
@@ -591,6 +591,7 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
   @Input() petName: string | null = null;
   @Input() coins: number = 0;
   @Input() unlockedPets: string[] = [];
+  @Input() ownedDecorations: string[] = [];
   @Output() openStore = new EventEmitter<void>();
   @Input() set decorations(val: any) {
     let parsed: any = {};
@@ -664,39 +665,39 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
   public activeDeco: any = {};
 
   public bgOptions = [
-    { id: 'none', name: 'Original', style: 'none', xpRequired: 0 },
-    { id: 'forest', name: 'Bosque', style: 'url("/assets/pets/bg/forest.jpg") center/cover', xpRequired: 50 },
-    { id: 'night', name: 'Noche', style: 'url("/assets/pets/bg/night.jpg") center/cover', xpRequired: 150 },
-    { id: 'royal', name: 'Real', style: 'url("/assets/pets/bg/room.jpg") center/cover', xpRequired: 300 },
-    { id: 'car', name: 'Coche', style: 'url("/assets/pets/bg/car.jpg") center/cover', xpRequired: 500 }
+    { id: 'none', name: 'Original', style: 'none', coinPrice: 0 },
+    { id: 'forest', name: 'Bosque', style: 'url("/assets/pets/bg/forest.jpg") center/cover', coinPrice: 50 },
+    { id: 'night', name: 'Noche', style: 'url("/assets/pets/bg/night.jpg") center/cover', coinPrice: 50 },
+    { id: 'royal', name: 'Real', style: 'url("/assets/pets/bg/room.jpg") center/cover', coinPrice: 50 },
+    { id: 'car', name: 'Coche', style: 'url("/assets/pets/bg/car.jpg") center/cover', coinPrice: 50 }
   ];
 
   public borderOptions = [
-    { id: 'none', name: 'Ninguno', style: 'none', xpRequired: 0 },
-    { id: 'gold', name: 'Oro', style: '4px solid #ffd700', shadow: '0 0 15px rgba(255,215,0,0.6)', xpRequired: 100 },
-    { id: 'neon', name: 'Neón', style: '3px solid #00f3ff', shadow: '0 0 15px #00f3ff, inset 0 0 10px #00f3ff', xpRequired: 200 },
-    { id: 'love', name: 'Amor', style: '4px dashed #ff4d6d', xpRequired: 0 },
-    { id: 'wood', name: 'Madera', bgImage: 'url("/assets/pets/border/wood.jpg") center/cover', padding: '12px', shadow: '0 4px 15px rgba(0,0,0,0.3)', xpRequired: 150 },
-    { id: 'galaxy', name: 'Galaxia', bgImage: 'url("/assets/pets/border/galaxy.jpg") center/cover', padding: '10px', shadow: '0 0 20px #8b5cf6', xpRequired: 400 },
-    { id: 'rainbow', name: 'Arcoíris', bgImage: 'url("/assets/pets/border/rainbow.jpg") center/cover', padding: '10px', xpRequired: 250 },
-    { id: 'water', name: 'Agua', bgImage: 'url("/assets/pets/border/water.jpg") center/cover', padding: '10px', xpRequired: 300 }
+    { id: 'none', name: 'Ninguno', style: 'none', coinPrice: 0 },
+    { id: 'gold', name: 'Oro', style: '4px solid #ffd700', shadow: '0 0 15px rgba(255,215,0,0.6)', coinPrice: 50 },
+    { id: 'neon', name: 'Neón', style: '3px solid #00f3ff', shadow: '0 0 15px #00f3ff, inset 0 0 10px #00f3ff', coinPrice: 50 },
+    { id: 'love', name: 'Amor', style: '4px dashed #ff4d6d', coinPrice: 0 },
+    { id: 'wood', name: 'Madera', bgImage: 'url("/assets/pets/border/wood.jpg") center/cover', padding: '12px', shadow: '0 4px 15px rgba(0,0,0,0.3)', coinPrice: 50 },
+    { id: 'galaxy', name: 'Galaxia', bgImage: 'url("/assets/pets/border/galaxy.jpg") center/cover', padding: '10px', shadow: '0 0 20px #8b5cf6', coinPrice: 50 },
+    { id: 'rainbow', name: 'Arcoíris', bgImage: 'url("/assets/pets/border/rainbow.jpg") center/cover', padding: '10px', coinPrice: 50 },
+    { id: 'water', name: 'Agua', bgImage: 'url("/assets/pets/border/water.jpg") center/cover', padding: '10px', coinPrice: 50 }
   ];
 
   public propOptions = [
-    { id: 'none', name: 'Nada', emoji: '', xpRequired: 0 },
-    { id: 'crown', name: 'Corona', image: 'url("/assets/pets/prop/crown.jpg") center/cover', xpRequired: 500 },
-    { id: 'star', name: 'Estrellas', image: 'url("/assets/pets/prop/star.jpg") center/cover', xpRequired: 200 },
-    { id: 'bow', name: 'Lazo', image: 'url("/assets/pets/prop/bow.jpg") center/cover', xpRequired: 50 },
-    { id: 'heart', name: 'Corazón', image: 'url("/assets/pets/prop/heart.jpg") center/cover', xpRequired: 100 }
+    { id: 'none', name: 'Nada', emoji: '', coinPrice: 0 },
+    { id: 'crown', name: 'Corona', image: 'url("/assets/pets/prop/crown.jpg") center/cover', coinPrice: 50 },
+    { id: 'star', name: 'Estrellas', image: 'url("/assets/pets/prop/star.jpg") center/cover', coinPrice: 50 },
+    { id: 'bow', name: 'Lazo', image: 'url("/assets/pets/prop/bow.jpg") center/cover', coinPrice: 50 },
+    { id: 'heart', name: 'Corazón', image: 'url("/assets/pets/prop/heart.jpg") center/cover', coinPrice: 50 }
   ];
 
   public clothesOptions = [
-    { id: 'none', name: 'Nada', emoji: '', xpRequired: 0 },
-    { id: 'glasses', name: 'Gafas', emoji: '🕶️', style: { top: '35%', left: '33%', fontSize: '3rem' }, xpRequired: 100 },
-    { id: 'hat', name: 'Sombrero', emoji: '🎩', style: { top: '5%', left: '42%', fontSize: '3.5rem' }, xpRequired: 250 },
-    { id: 'scarf', name: 'Bufanda', emoji: '🧣', style: { top: '55%', left: '33%', fontSize: '3.5rem' }, xpRequired: 50 },
-    { id: 'bowtie', name: 'Pajarita', emoji: '🎀', style: { top: '65%', left: '38%', fontSize: '2.5rem' }, xpRequired: 150 },
-    { id: 'flower', name: 'Flor', emoji: '🌻', style: { top: '25%', left: '60%', fontSize: '2.5rem' }, xpRequired: 50 }
+    { id: 'none', name: 'Nada', emoji: '', coinPrice: 0 },
+    { id: 'glasses', name: 'Gafas', emoji: '🕶️', style: { top: '35%', left: '33%', fontSize: '3rem' }, coinPrice: 50 },
+    { id: 'hat', name: 'Sombrero', emoji: '🎩', style: { top: '5%', left: '42%', fontSize: '3.5rem' }, coinPrice: 50 },
+    { id: 'scarf', name: 'Bufanda', emoji: '🧣', style: { top: '55%', left: '33%', fontSize: '3.5rem' }, coinPrice: 50 },
+    { id: 'bowtie', name: 'Pajarita', emoji: '🎀', style: { top: '65%', left: '38%', fontSize: '2.5rem' }, coinPrice: 50 },
+    { id: 'flower', name: 'Flor', emoji: '🌻', style: { top: '25%', left: '60%', fontSize: '2.5rem' }, coinPrice: 50 }
   ];
 
   getStageStyles() {
@@ -934,18 +935,46 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     }
   }
 
-  async selectDeco(type: 'bg' | 'border' | 'prop' | 'clothes', id: string, xpRequired?: number) {
-    if (xpRequired && (this.streakDays * 10) < xpRequired) {
-      const alert = await this.alertCtrl.create({
-        header: '¡Nivel Insuficiente!',
-        message: `Necesitas ${xpRequired} XP para usar esto. ¡Sigue interactuando con tu mascota cada día!`,
-        buttons: ['Vale'],
+  async selectDeco(type: 'bg' | 'border' | 'prop' | 'clothes', id: string, coinPrice?: number) {
+    if (coinPrice && coinPrice > 0 && !this.ownedDecorations.includes(id)) {
+      if (this.coins < coinPrice) {
+        const alert = await this.alertCtrl.create({
+          header: '¡Monedas Insuficientes!',
+          message: `Necesitas ${coinPrice} monedas para comprar esto.`,
+          buttons: ['Vale'],
+          cssClass: 'custom-alert'
+        });
+        await alert.present();
+        return;
+      }
+      
+      const confirm = await this.alertCtrl.create({
+        header: 'Comprar Accesorio',
+        message: `¿Quieres comprar esto por ${coinPrice} monedas?`,
+        buttons: [
+          { text: 'Cancelar', role: 'cancel' },
+          { text: 'Comprar', handler: async () => {
+              try {
+                const res = await this.api.buyPetDecoration(id, coinPrice);
+                if (res.coins !== undefined) this.coins = res.coins;
+                if (res.owned_decorations) this.ownedDecorations = res.owned_decorations;
+                this.applyDeco(type, id);
+              } catch (e) {
+                console.error(e);
+              }
+            } 
+          }
+        ],
         cssClass: 'custom-alert'
       });
-      await alert.present();
+      await confirm.present();
       return;
     }
 
+    this.applyDeco(type, id);
+  }
+
+  async applyDeco(type: 'bg' | 'border' | 'prop' | 'clothes', id: string) {
     if (type === 'clothes') {
       if (!this.activeDeco.clothes) this.activeDeco.clothes = {};
       
@@ -1314,3 +1343,5 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     }
   }
 }
+
+

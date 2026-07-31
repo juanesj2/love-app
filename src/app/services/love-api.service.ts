@@ -247,6 +247,10 @@ export class LoveApiService {
     return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/pet/buy-egg`, {}));
   }
 
+  async buyPetDecoration(id: string, price: number): Promise<any> {
+    return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/pet/buy-decoration`, { id, price }));
+  }
+
   async buyCoins(packId: string): Promise<any> {
     return firstValueFrom(this.http.post<any>(`${API_BASE_URL}/love-album/store/buy-coins`, { pack_id: packId }));
   }
@@ -723,3 +727,5 @@ export class LoveApiService {
     return firstValueFrom(this.http.delete<any>(`${API_BASE_URL}/love-album/store/letters/${id}`));
   }
 }
+
+
