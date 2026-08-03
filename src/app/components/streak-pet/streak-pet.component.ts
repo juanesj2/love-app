@@ -1102,7 +1102,7 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
       autoplay: true,
       stateMachines: 'State Machine 1',
       layout: new Layout({
-        fit: Fit.Contain,
+        fit: Fit.Cover,
         alignment: Alignment.Center
       }),
       onLoad: () => {
