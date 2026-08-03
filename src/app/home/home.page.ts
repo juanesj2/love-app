@@ -66,6 +66,8 @@ import { PushNotifications } from '@capacitor/push-notifications';
               [decorations]="couple?.pet_decorations"
               [petName]="couple?.pet_name"
               [coins]="couple?.inventory?.coins || 0"
+              [eggs]="couple?.inventory?.eggs || 0"
+              [pets]="couple?.pets || []"
               [unlockedPets]="couple?.inventory?.unlocked_pets || []"
               [ownedDecorations]="couple?.inventory?.owned_decorations || []"
               (petHatched)="onPetHatched($event)"
