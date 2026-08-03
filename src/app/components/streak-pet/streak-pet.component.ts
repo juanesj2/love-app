@@ -64,7 +64,7 @@ import { LoveApiService } from '../../services/love-api.service';
             <div class="click-overlay" (click)="onCanvasClick()"></div>
           </div>
           
-          <div class="tap-hint" *ngIf="!hatchingInProgress || hatchedPet" [innerHTML]="tapHintText"></div>
+          <div class="tap-hint" *ngIf="!hatchingInProgress || hatchedPet" [innerHTML]="tapHintText" [ngStyle]="isDuplicatePet ? {'bottom': 'auto', 'top': '12%'} : {}"></div>
           
           <div class="duplicate-actions" *ngIf="isDuplicatePet" style="position: absolute; bottom: 15%; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 12px; z-index: 20;">
             <button style="padding: 15px 30px; border-radius: 25px; background: white; color: #590D22; font-weight: bold; font-size: 1.1rem; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2);" (click)="resolveDuplicate('sell')">
