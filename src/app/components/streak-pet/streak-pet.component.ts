@@ -47,7 +47,7 @@ import { LoveApiService } from '../../services/love-api.service';
         <div class="hatch-modal-content">
           <div class="big-egg-container">
             <!-- Rive Canvas for Egg -->
-            <canvas #riveCanvas class="egg-canvas"></canvas>
+            <canvas #riveCanvas class="egg-canvas" [style.opacity]="hatchedPet ? 0 : 1" style="transition: opacity 0.5s ease;"></canvas>
             
             <!-- Mascota (Lottie) sobre el cascarón roto -->
             <div class="pet-overlay" *ngIf="hatchedPet">
