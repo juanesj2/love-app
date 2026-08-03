@@ -1212,7 +1212,7 @@ export class StreakPetComponent implements OnChanges, OnDestroy, OnInit {
         this.animFrame = 1;
         this.animDirection = 1;
       }
-    }, 250); // 4 FPS animation
+    }, 500); // 2 FPS animation
   }
 
   getPngSrc(base: string): string {
