@@ -1204,7 +1204,14 @@ export class StreakPetComponent implements OnChanges, OnDestroy, OnInit {
 
   startPngAnimation() {
     this.animInterval = setInterval(() => {
-      this.animFrame = this.animFrame >= 4 ? 1 : this.animFrame + 1;
+      this.animFrame += this.animDirection;
+      if (this.animFrame >= 4) {
+        this.animFrame = 4;
+        this.animDirection = -1;
+      } else if (this.animFrame <= 1) {
+        this.animFrame = 1;
+        this.animDirection = 1;
+      }
     }, 250); // 4 FPS animation
   }
 
