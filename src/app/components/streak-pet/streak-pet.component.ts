@@ -1363,9 +1363,12 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
 
       const res: any = await this.api.resolveDuplicatePet(this.duplicatePetType, action);
       await alert.dismiss();
-      
-      this.coins = res.coins;
-      this.pets = res.pets;
+      if (res.inventory) {
+        this.coins = res.inventory.coins;
+      }
+      if (res.pets) {
+        this.pets = res.pets;
+      }
       
       const success = await this.alertCtrl.create({
         header: action === 'sell' ? 'Vendido' : 'Evolucionado',
