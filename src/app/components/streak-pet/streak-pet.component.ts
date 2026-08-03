@@ -1165,12 +1165,16 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     if (this.isEgg) return;
 
     const filename = this.getLottieFileName(state);
-    this.currentLottieSrc = `/assets/pets/${filename}.lottie`;
-    if (this.lottiePlayer && this.lottiePlayer.nativeElement && this.lottiePlayer.nativeElement.load) {
-       this.lottiePlayer.nativeElement.load(this.currentLottieSrc);
-    }
-    if (this.modalLottiePlayer && this.modalLottiePlayer.nativeElement && this.modalLottiePlayer.nativeElement.load) {
-       this.modalLottiePlayer.nativeElement.load(this.currentLottieSrc);
+    const newLottieSrc = `/assets/pets/${filename}.lottie`;
+    
+    if (this.currentLottieSrc !== newLottieSrc) {
+      this.currentLottieSrc = newLottieSrc;
+      if (this.lottiePlayer && this.lottiePlayer.nativeElement && this.lottiePlayer.nativeElement.load) {
+        this.lottiePlayer.nativeElement.load(this.currentLottieSrc);
+      }
+      if (this.modalLottiePlayer && this.modalLottiePlayer.nativeElement && this.modalLottiePlayer.nativeElement.load) {
+        this.modalLottiePlayer.nativeElement.load(this.currentLottieSrc);
+      }
     }
   }
 

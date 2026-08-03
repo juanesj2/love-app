@@ -433,10 +433,7 @@ export class HomePage implements OnInit, OnDestroy {
     if (this.couple?.pets && Array.isArray(this.couple.pets) && this.couple.pets.length > 0) {
       const active = this.couple.pets.find((p: any) => p.is_active);
       if (active) {
-        return {
-          type: active.pet_type,
-          rarity: 'common' // You might need to map rarity based on evolution_phase later
-        };
+        return active;
       }
     }
     return this.couple?.inventory?.pet;
