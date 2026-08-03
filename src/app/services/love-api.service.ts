@@ -722,20 +722,25 @@ export class LoveApiService {
   }
 
   async buyEgg(): Promise<any> {
-    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/store/buy-egg`, {}));
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/pet/buy-egg`, {}));
   }
 
   async openEgg(): Promise<any> {
-    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/store/open-egg`, {}));
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/pet/open-egg`, {}));
+  }
+  
+  async hatchPet(): Promise<any> {
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/pet/hatch`, {}));
   }
 
   async resolveDuplicatePet(petType: string, action: 'evolve' | 'sell'): Promise<any> {
-    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/store/resolve-duplicate`, { pet_type: petType, action }));
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/pet/resolve-duplicate`, { pet_type: petType, action }));
   }
 
   async setActivePet(petId: number): Promise<any> {
-    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/store/set-active-pet`, { pet_id: petId }));
+    return firstValueFrom(this.http.post(`${API_BASE_URL}/love-album/pet/set-active-pet`, { pet_id: petId }));
   }
 }
+
 
 

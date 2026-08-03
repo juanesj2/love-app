@@ -68,7 +68,8 @@ import { PushNotifications } from '@capacitor/push-notifications';
               [coins]="couple?.inventory?.coins || 0"
               [unlockedPets]="couple?.inventory?.unlocked_pets || []"
               [ownedDecorations]="couple?.inventory?.owned_decorations || []"
-              (petHatched)="onPetHatched($event)">
+              (petHatched)="onPetHatched($event)"
+              (activePetChanged)="onActivePetChanged($event)">
             </app-streak-pet>
             
             <div class="poke-btn"
@@ -1061,6 +1062,16 @@ export class HomePage implements OnInit, OnDestroy {
           }
         }
       });
+      this.cdr.detectChanges();
+    }
+  }
+
+  onActivePetChanged(event: any) {
+    if (this.couple) {
+      if (!this.couple.inventory) {
+        this.couple.inventory = {};
+      }
+      this.couple.inventory.pet = event.petData;
       this.cdr.detectChanges();
     }
   }

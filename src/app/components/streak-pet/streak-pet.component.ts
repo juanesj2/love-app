@@ -50,8 +50,9 @@ import { LoveApiService } from '../../services/love-api.service';
             <canvas #riveCanvas class="egg-canvas"></canvas>
             
             <!-- Mascota (Lottie) sobre el cascarón roto -->
-            <div class="pet-overlay" [hidden]="!hatchedPet">
+            <div class="pet-overlay" *ngIf="hatchedPet">
                <dotlottie-player
+                  *ngIf="lottieSrc"
                   [src]="lottieSrc"
                   autoplay
                   [loop]="false"
@@ -61,11 +62,20 @@ import { LoveApiService } from '../../services/love-api.service';
 
             <!-- Capa transparente para interceptar los clicks -->
             <div class="click-overlay" (click)="onCanvasClick()"></div>
-            
-            <div class="tap-hint" *ngIf="!hatchingInProgress || hatchedPet" [innerHTML]="tapHintText"></div>
+          </div>
+          
+          <div class="tap-hint" *ngIf="!hatchingInProgress || hatchedPet" [innerHTML]="tapHintText"></div>
+          
+          <div class="duplicate-actions" *ngIf="isDuplicatePet" style="position: absolute; bottom: 15%; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 12px; z-index: 20;">
+            <button style="padding: 15px 30px; border-radius: 25px; background: white; color: #590D22; font-weight: bold; font-size: 1.1rem; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2);" (click)="resolveDuplicate('sell')">
+              💰 Vender por 7 Monedas
+            </button>
+            <button *ngIf="canEvolvePet" style="padding: 15px 30px; border-radius: 25px; background: linear-gradient(135deg, #ffca3a, #ff9e00); color: white; font-weight: bold; font-size: 1.1rem; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2);" (click)="resolveDuplicate('evolve')">
+              ✨ Evolucionar Mascota
+            </button>
           </div>
           <!-- Botón de cierre sutil en la esquina superior -->
-          <div class="close-icon" *ngIf="!hatchingInProgress && !hatchedPet" (click)="closeModal()">✕</div>
+          <div class="close-icon" *ngIf="(!hatchingInProgress && !hatchedPet) || (hatchedPet && !isDuplicatePet)" (click)="closeModal()">✕</div>
         </div>
       </ng-template>
     </ion-modal>
@@ -186,13 +196,31 @@ import { LoveApiService } from '../../services/love-api.service';
 
 
               <div class="shop-section">
-                <h4>Huevos Sorpresa</h4>
+                <h4>Huevos Sorpresa (Tienes: {{ eggs }})</h4>
                 <div class="shop-grid">
                   <div class="shop-item" (click)="buyEgg()">
                     <div class="preview-circle" style="display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff;">
                       🥚
                     </div>
-                    <span>Huevo<br><small>50 Monedas</small></span>
+                    <span>Comprar<br><small>10 Monedas</small></span>
+                  </div>
+                  <div class="shop-item" (click)="openEggFromShop()" *ngIf="eggs > 0">
+                    <div class="preview-circle" style="display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff; border-color: #ffca3a;">
+                      ✨
+                    </div>
+                    <span>Abrir<br><small>Huevo</small></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="shop-section" *ngIf="pets.length > 0">
+                <h4>Mis Mascotas</h4>
+                <div class="shop-grid">
+                  <div class="shop-item" *ngFor="let p of pets" (click)="changeActivePet(p.id)" [class.active]="p.is_active">
+                    <div class="preview-circle" style="display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff;">
+                      {{ p.pet_type === 'dragon' ? '🐉' : (p.pet_type === 'cat' ? '🐱' : '🐶') }}
+                    </div>
+                    <span style="text-transform: capitalize;">{{ p.pet_type }}<br><small>Fase {{ p.evolution_phase }}</small></span>
                   </div>
                 </div>
               </div>
@@ -375,17 +403,17 @@ import { LoveApiService } from '../../services/love-api.service';
       width: 100vw;
       height: 100vh;
       position: relative;
-      background: black; /* Just in case there's letterboxing */
+      background: rgba(0, 0, 0, 0.7); /* Oscurecer el fondo para enfocar en el huevo */
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
     }
     .big-egg-container {
-      width: 100%;
-      height: 100%;
+      width: 350px;
+      height: 350px;
       position: relative;
       cursor: pointer;
-      overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -590,7 +618,9 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
   @Input() petData: any = null;
   @Input() petName: string | null = null;
   @Input() coins: number = 0;
+  @Input() eggs: number = 0;
   @Input() unlockedPets: string[] = [];
+  @Input() pets: any[] = [];
   @Input() ownedDecorations: string[] = [];
   @Output() openStore = new EventEmitter<void>();
   @Input() set decorations(val: any) {
@@ -623,6 +653,8 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
 
   @Output() petHatched = new EventEmitter<any>();
 
+  @Output() activePetChanged = new EventEmitter<any>();
+
   @ViewChild('lottiePlayer') lottiePlayer!: ElementRef;
   @ViewChild('modalLottiePlayer') modalLottiePlayer!: ElementRef;
   @ViewChild(IonModal) modal!: IonModal;
@@ -639,7 +671,7 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
 
   private riveInstance: Rive | null = null;
   public currentLottieSrc: string = '';
-  public petType: 'Dog' | 'Cat' = 'Dog';
+  public petType: 'Dog' | 'Cat' | 'Dragon' = 'Dog';
   public isEgg: boolean = true;
   
   public showHatchModal = false;
@@ -656,6 +688,9 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
 
   public hatchedPet: any = null;
   public lottieSrc = '';
+  public isDuplicatePet = false;
+  public canEvolvePet = false;
+  public duplicatePetType = '';
 
   private interactionTimeout: any;
 
@@ -1032,18 +1067,22 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
   }
 
   private evaluateState() {
-    if (this.streakDays === 0 || !this.petData || !this.petData.hatched) {
+    if (this.streakDays === 0 || !this.petData) {
       this.isEgg = true;
       this.rarityClass = '';
     } else {
       this.isEgg = false;
       this.cleanupRive();
-      this.petType = this.petData.type === 'Cat' ? 'Cat' : 'Dog';
       
-      // Set Rarity Class
-      if (this.petData.rarity === 'raro') this.rarityClass = 'rarity-raro';
-      else if (this.petData.rarity === 'legendario') this.rarityClass = 'rarity-legendario';
-      else this.rarityClass = '';
+      let pType = this.petData.pet_type || this.petData.type;
+      if (pType) {
+        pType = pType.toLowerCase();
+        this.petType = pType === 'cat' ? 'Cat' : (pType === 'dog' ? 'Dog' : 'Dragon');
+      } else {
+        this.petType = 'Dog';
+      }
+      
+      this.rarityClass = ''; 
 
       this.setLottieState('neutral');
     }
@@ -1062,7 +1101,7 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
       autoplay: true,
       stateMachines: 'State Machine 1',
       layout: new Layout({
-        fit: Fit.Cover,
+        fit: Fit.Contain,
         alignment: Alignment.Center
       }),
       onLoad: () => {
@@ -1090,7 +1129,23 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
   }
 
   private getLottieFileName(state: string): string {
-    if (this.petType === 'Dog') {
+    let typeStr = this.petType.toLowerCase();
+    
+    // Si es un dragón, dependemos de la fase de evolución
+    if (typeStr === 'dragon' && this.petData && this.petData.evolution_phase > 1) {
+      return `dragon_fase${this.petData.evolution_phase}_${state}`;
+    }
+    
+    // Convertir el estado genérico (neutral, happy, etc.) a los archivos que tenemos
+    if (typeStr === 'cat') {
+      switch(state) {
+        case 'neutral': return 'Cat_sleeping';
+        case 'happy': return 'Cat_riendo';
+        case 'heart': return 'Cat_heart';
+        case 'sleeping': return 'Cat_sleeping';
+        default: return 'Cat_sleeping';
+      }
+    } else if (typeStr === 'dog') {
       switch(state) {
         case 'neutral': return 'Dog_neutral';
         case 'happy': return 'Dog_happy';
@@ -1099,15 +1154,10 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
         case 'sleeping': return 'Dog_neutral';
         default: return 'Dog_neutral';
       }
-    } else {
-      switch(state) {
-        case 'neutral': return 'Cat_sleeping';
-        case 'happy': return 'Cat_riendo';
-        case 'heart': return 'Cat_heart';
-        case 'sleeping': return 'Cat_sleeping';
-        default: return 'Cat_sleeping';
-      }
     }
+    
+    // Default fallback (dragon_neutral, dragon_happy, etc.)
+    return `${typeStr}_${state}`;
   }
 
   private setLottieState(state: 'neutral' | 'happy' | 'heart' | 'sleeping') {
@@ -1247,24 +1297,43 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
   async executeHatch() {
     try {
       const res = await this.api.openEgg();
-      const newPet = res.pet;
-
-      this.hatchedPet = newPet;
-      this.lottieSrc = `/assets/pets/${newPet.type}_hello.lottie`;
       
-      // Confeti full
-      confetti({
-        particleCount: 150,
-        spread: 100,
-        origin: { y: 0.6 },
-        colors: ['#ff4d6d', '#ffca3a', '#8b5cf6', '#ffffff']
-      });
-
-      const rarityText = newPet.rarity === 'legendario' ? '⭐ LEGENDARIO ⭐' : (newPet.rarity === 'raro' ? '✨ RARO ✨' : 'Común');
-      const petName = newPet.type === 'Dog' ? 'Perrito' : 'Gatito';
-      this.tapHintText = `¡Es un ${petName} ${rarityText}!<br><span style="font-size: 0.95rem; font-weight: normal; opacity: 0.85;">👆 Toca para continuar</span>`;
+      this.eggs = (res as any).eggs_remaining ?? (this.eggs - 1);
       
-      // Ya no mostramos un Alert, la mascota está ahí en la pantalla :)
+      if (res.status === 'new') {
+        const newPet = res.pet;
+        this.hatchedPet = newPet;
+        this.isDuplicatePet = false;
+        
+        const capitalizedType = newPet.pet_type.charAt(0).toUpperCase() + newPet.pet_type.slice(1).toLowerCase();
+        let lottieFile = `${capitalizedType}_hello.lottie`;
+        if (newPet.pet_type === 'dragon' && newPet.evolution_phase > 1) {
+           lottieFile = `Dragon_fase${newPet.evolution_phase}_hello.lottie`;
+        }
+        this.lottieSrc = `/assets/pets/${lottieFile}`;
+        
+        // Confeti full
+        confetti({
+          particleCount: 150,
+          spread: 100,
+          origin: { y: 0.6 },
+          colors: ['#ff4d6d', '#ffca3a', '#8b5cf6', '#ffffff']
+        });
+
+        const petName = newPet.pet_type === 'dog' ? 'Perrito' : (newPet.pet_type === 'cat' ? 'Gatito' : 'Dragón');
+        this.tapHintText = `¡Es un ${petName}!<br><span style="font-size: 0.95rem; font-weight: normal; opacity: 0.85;">👆 Toca para continuar</span>`;
+      } else if (res.status === 'duplicate') {
+        this.hatchedPet = { pet_type: res.pet_type };
+        this.isDuplicatePet = true;
+        this.canEvolvePet = res.can_evolve;
+        this.duplicatePetType = res.pet_type;
+        
+        const duplicateCapitalized = res.pet_type.charAt(0).toUpperCase() + res.pet_type.slice(1).toLowerCase();
+        this.lottieSrc = `/assets/pets/${duplicateCapitalized}_hello.lottie`;
+        
+        const petName = res.pet_type === 'dog' ? 'Perrito' : (res.pet_type === 'cat' ? 'Gatito' : 'Dragón');
+        this.tapHintText = `¡Vaya! Ya tienes este ${petName}. ¿Qué quieres hacer?`;
+      }
       
     } catch (e) {
       console.error("Error al eclosionar mascota", e);
@@ -1272,6 +1341,41 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
       this.clickCount = 0;
       this.tapHintText = '👆 Toca para romper el cascarón';
       this.showHatchModal = false;
+    }
+  }
+
+  async resolveDuplicate(action: 'evolve' | 'sell') {
+    try {
+      const alert = await this.alertCtrl.create({
+        header: 'Procesando...',
+        backdropDismiss: false
+      });
+      await alert.present();
+
+      const res: any = await this.api.resolveDuplicatePet(this.duplicatePetType, action);
+      await alert.dismiss();
+      
+      this.coins = res.coins;
+      this.pets = res.pets;
+      
+      const success = await this.alertCtrl.create({
+        header: action === 'sell' ? 'Vendido' : 'Evolucionado',
+        message: action === 'sell' ? 'Has recibido 7 monedas.' : '¡Tu mascota ha evolucionado a la siguiente fase!',
+        buttons: ['Genial'],
+        cssClass: 'custom-alert'
+      });
+      await success.present();
+      
+      this.closeModal();
+    } catch (e: any) {
+      this.alertCtrl.dismiss().catch(() => {});
+      const errorAlert = await this.alertCtrl.create({
+        header: 'Error',
+        message: e.error?.error || 'Hubo un error al procesar la mascota.',
+        buttons: ['Vale'],
+        cssClass: 'custom-alert'
+      });
+      await errorAlert.present();
     }
   }
 
@@ -1288,17 +1392,44 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     setTimeout(() => {
       this.clickCount = 0;
       this.hatchedPet = null;
+      this.isDuplicatePet = false;
       this.hatchingInProgress = false;
       this.tapHintText = '👆 Toca para romper el cascarón';
       this.cleanupRive();
     }, 400);
   }
 
+  openEggFromShop() {
+    this.showHatchModal = true;
+    this.showInteractModal = false;
+  }
+  
+  async changeActivePet(petId: number) {
+    try {
+      const alert = await this.alertCtrl.create({
+        header: 'Cambiando...',
+        backdropDismiss: false
+      });
+      await alert.present();
+
+      const res: any = await this.api.setActivePet(petId);
+      await alert.dismiss();
+      
+      this.pets = res.pets;
+      this.petData = res.pets.find((p: any) => p.is_active);
+      this.activePetChanged.emit({ pets: this.pets, petData: this.petData });
+      this.evaluateState();
+      
+    } catch (e: any) {
+      this.alertCtrl.dismiss().catch(() => {});
+    }
+  }
+
   async buyEgg() {
     try {
       const alert = await this.alertCtrl.create({
         header: 'Comprando Huevo...',
-        message: 'A punto de abrir un huevo misterioso...',
+        message: 'Añadiendo un huevo sorpresa a tu inventario...',
         backdropDismiss: false
       });
       await alert.present();
@@ -1306,29 +1437,22 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
       const res: any = await this.api.buyEgg();
       await alert.dismiss();
 
-      this.coins = res.coins;
-      this.unlockedPets = res.unlocked_pets;
+      this.coins = res.inventory.coins;
+      this.eggs = res.inventory.eggs;
       
-      let message = '';
-      if (res.is_duplicate) {
-        message = `¡Vaya! Te ha tocado un ${res.pet.type} ${res.pet.rarity} que ya tenías. Como recompensa, obtienes ${res.coins_reward} monedas de app.`;
-      } else {
-        message = `¡Felicidades! Has desbloqueado una nueva mascota: ${res.pet.type} ${res.pet.rarity}!`;
-      }
-
-      const resultAlert = await this.alertCtrl.create({
-        header: res.is_duplicate ? '¡Mascota Repetida!' : '¡Nueva Mascota!',
-        message: message,
+      const successAlert = await this.alertCtrl.create({
+        header: '¡Huevo Comprado!',
+        message: `Has comprado un huevo sorpresa. ¡Abrelo desde la tienda! (Huevos: ${this.eggs})`,
         buttons: ['Genial'],
         cssClass: 'custom-alert'
       });
-      await resultAlert.present();
+      await successAlert.present();
 
     } catch (e: any) {
       this.alertCtrl.dismiss().catch(() => {});
       const errorAlert = await this.alertCtrl.create({
         header: 'Error',
-        message: e.error?.message || 'Hubo un error comprando el huevo.',
+        message: e.error?.error || 'Hubo un error comprando el huevo.',
         buttons: ['Vale'],
         cssClass: 'custom-alert'
       });
