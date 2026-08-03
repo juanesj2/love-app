@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges, ElementRef, ViewChild, OnDestroy, CUSTOM_ELEMENTS_SCHEMA, Output, EventEmitter, inject, HostListener } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ElementRef, ViewChild, OnDestroy, OnInit, CUSTOM_ELEMENTS_SCHEMA, Output, EventEmitter, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonModal, AlertController } from '@ionic/angular/standalone';
@@ -42,7 +42,7 @@ import { LoveApiService } from '../../services/love-api.service';
       </dotlottie-player>
       <img *ngIf="currentLottieSrc.endsWith('.png')"
            [hidden]="isEgg"
-           [src]="currentLottieSrc"
+           [src]="getPngSrc(currentLottieSrc)"
            style="width: 100%; height: 100%; object-fit: contain; transform: scale(1.4); image-rendering: pixelated;" />
     </div>
 
@@ -64,7 +64,7 @@ import { LoveApiService } from '../../services/love-api.service';
                   style="width: 350px; height: 350px;">
                </dotlottie-player>
                <img *ngIf="lottieSrc && lottieSrc.endsWith('.png')"
-                    [src]="lottieSrc"
+                    [src]="getPngSrc(lottieSrc)"
                     style="width: 350px; height: 350px; object-fit: contain; image-rendering: pixelated;" />
             </div>
 
@@ -117,7 +117,7 @@ import { LoveApiService } from '../../services/love-api.service';
                     autoplay>
                   </dotlottie-player>
                   <img *ngIf="currentLottieSrc.endsWith('.png')"
-                       [src]="currentLottieSrc"
+                       [src]="getPngSrc(currentLottieSrc)"
                        style="width: 150px; height: 150px; object-fit: contain; image-rendering: pixelated; position: relative; z-index: 1;" />
                   <ng-container *ngFor="let userId of getClothesUserIds()">
                     <div class="clothing-layer" [ngStyle]="getClothesStyle('shop', userId)">{{ getClothesEmoji(userId) }}</div>
@@ -251,7 +251,7 @@ import { LoveApiService } from '../../services/love-api.service';
                     autoplay>
                   </dotlottie-player>
                   <img *ngIf="currentLottieSrc.endsWith('.png')"
-                       [src]="currentLottieSrc"
+                       [src]="getPngSrc(currentLottieSrc)"
                        style="width: 200px; height: 200px; object-fit: contain; image-rendering: pixelated; position: relative; z-index: 1;" />
                   <ng-container *ngFor="let userId of getClothesUserIds()">
                     <div class="clothing-layer" 
@@ -626,7 +626,7 @@ import { LoveApiService } from '../../services/love-api.service';
     }
   `]
 })
-export class StreakPetComponent implements OnChanges, OnDestroy {
+export class StreakPetComponent implements OnChanges, OnDestroy, OnInit {
   @Input() streakDays: number = 0;
   @Input() coupleId: number = 0;
   @Input() petData: any = null;
@@ -712,6 +712,9 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
   public showNameEdit = false;
   public tempPetName = '';
   public activeDeco: any = {};
+
+  public animFrame = 1;
+  private animInterval: any;
 
   public bgOptions = [
     { id: 'none', name: 'Original', style: 'none', coinPrice: 0 },
@@ -1149,13 +1152,7 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     if (typeStr === 'dragon') {
       const phase = this.petData?.evolution_phase || 1;
       if (phase === 1) {
-        switch(state) {
-          case 'neutral': return 'dragon/dragon_pixel_1.1.png';
-          case 'happy': return 'dragon/dragon_pixel_1.4.png';
-          case 'heart': return 'dragon/dragon_pixel_1.2.png';
-          case 'sleeping': return 'dragon/dragon_pixel_1.3.png';
-          default: return 'dragon/dragon_pixel_1.1.png';
-        }
+        return 'dragon/dragon_fase1.png';
       }
       return `Dragon_fase${phase}_${state}`;
     }
@@ -1202,6 +1199,17 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
         }
       }
     }
+  }
+
+  startPngAnimation() {
+    this.animInterval = setInterval(() => {
+      this.animFrame = this.animFrame >= 4 ? 1 : this.animFrame + 1;
+    }, 250); // 4 FPS animation
+  }
+
+  getPngSrc(base: string): string {
+    if (!base || !base.endsWith('.png')) return base;
+    return base.replace('.png', `_${this.animFrame}.png`);
   }
 
   onPointerDown(event: Event) {
@@ -1346,7 +1354,7 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
            if (newPet.evolution_phase > 1) {
               lottieFile = `Dragon_fase${newPet.evolution_phase}_hello.lottie`;
            } else {
-              lottieFile = `dragon/dragon_pixel_1.2.png`;
+              lottieFile = `dragon/dragon_fase1.png`;
            }
         }
         this.lottieSrc = lottieFile.includes('.png') ? `/assets/pets/${lottieFile}` : `/assets/pets/${lottieFile}`;
@@ -1373,7 +1381,7 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
            if (res.evolution_phase && res.evolution_phase > 1) {
               lottieFile = `Dragon_fase${res.evolution_phase}_hello.lottie`;
            } else {
-              lottieFile = `dragon/dragon_pixel_1.2.png`;
+              lottieFile = `dragon/dragon_fase1.png`;
            }
         }
         this.lottieSrc = lottieFile.includes('.png') ? `/assets/pets/${lottieFile}` : `/assets/pets/${lottieFile}`;
@@ -1510,10 +1518,17 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
     }
   }
 
+  ngOnInit() {
+    this.startPngAnimation();
+  }
+
   ngOnDestroy() {
     this.cleanupRive();
     if (this.interactionTimeout) {
       clearTimeout(this.interactionTimeout);
+    }
+    if (this.animInterval) {
+      clearInterval(this.animInterval);
     }
   }
 }
