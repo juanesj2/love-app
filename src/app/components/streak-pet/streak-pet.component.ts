@@ -191,6 +191,8 @@ import { LoveApiService } from '../../services/love-api.service';
               </div>
 
 
+            </div>
+
             <!-- EDIT NAME VIEW -->
             <div [hidden]="!showNameEdit">
               <div class="interact-header" style="position: relative; margin-bottom: 20px;">
