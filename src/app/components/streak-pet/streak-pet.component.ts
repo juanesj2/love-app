@@ -1301,6 +1301,10 @@ export class StreakPetComponent implements OnChanges, OnDestroy {
 
   async executeHatch() {
     try {
+      if (this.riveInstance) {
+        this.riveInstance.pause();
+      }
+
       const res = await this.api.openEgg();
       
       this.eggs = (res as any).eggs_remaining ?? (this.eggs - 1);
