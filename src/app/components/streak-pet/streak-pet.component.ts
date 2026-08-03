@@ -410,10 +410,11 @@ import { LoveApiService } from '../../services/love-api.service';
       align-items: center;
     }
     .big-egg-container {
-      width: 350px;
-      height: 350px;
+      width: 100%;
+      height: 100%;
       position: relative;
       cursor: pointer;
+      overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;

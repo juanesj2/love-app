@@ -61,7 +61,7 @@ import { PushNotifications } from '@capacitor/push-notifications';
             <app-streak-pet 
               [streakDays]="couple?.current_streak || 0" 
               [coupleId]="couple?.id"
-              [petData]="couple?.inventory?.pet"
+              [petData]="activePetData"
               (openStore)="openStoreModal()"
               [decorations]="couple?.pet_decorations"
               [petName]="couple?.pet_name"
@@ -428,6 +428,19 @@ export class HomePage implements OnInit, OnDestroy {
   selectedWidget: 'location' | 'photo' | 'chat' | 'mas' | 'game' = 'photo';
   uploading = false;
   couple: any = null;
+
+  get activePetData(): any {
+    if (this.couple?.pets && Array.isArray(this.couple.pets) && this.couple.pets.length > 0) {
+      const active = this.couple.pets.find((p: any) => p.is_active);
+      if (active) {
+        return {
+          type: active.pet_type,
+          rarity: 'common' // You might need to map rarity based on evolution_phase later
+        };
+      }
+    }
+    return this.couple?.inventory?.pet;
+  }
   pokeAnimation = false;
   superPokeAnimation = false;
 
