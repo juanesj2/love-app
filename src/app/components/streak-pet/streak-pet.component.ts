@@ -90,14 +90,10 @@ import { LoveApiService } from '../../services/love-api.service';
             </button>
             <!-- DECORATION SHOP VIEW -->
             <div [hidden]="!showShop">
-              <div class="interact-header" style="position: relative; margin-bottom: 30px;">
+              <div class="interact-header" style="position: relative; margin-bottom: 30px; display: flex; justify-content: center; align-items: center;">
                 <button class="close-btn" style="position: absolute; top: -10px; left: -10px;" (click)="showShop = false">
                   <span style="font-size: 1.2rem;">←</span>
                 </button>
-                <h3 style="margin-top: 5px;">Tienda 🎨</h3>
-              </div>
-              
-              <div class="pet-border-wrapper" [ngStyle]="getBorderWrapperStyles()">
                 <div class="pet-stage" [ngStyle]="getStageStyles()">
                   <div class="floating-prop" *ngIf="getActiveProp() as prop">
                     <div *ngIf="prop.emoji" class="prop-emoji">{{ prop.emoji }}</div>
@@ -195,37 +191,6 @@ import { LoveApiService } from '../../services/love-api.service';
               </div>
 
 
-              <div class="shop-section">
-                <h4>Huevos Sorpresa (Tienes: {{ eggs }})</h4>
-                <div class="shop-grid">
-                  <div class="shop-item" (click)="buyEgg()">
-                    <div class="preview-circle" style="display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff;">
-                      🥚
-                    </div>
-                    <span>Comprar<br><small>10 Monedas</small></span>
-                  </div>
-                  <div class="shop-item" (click)="openEggFromShop()" *ngIf="eggs > 0">
-                    <div class="preview-circle" style="display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff; border-color: #ffca3a;">
-                      ✨
-                    </div>
-                    <span>Abrir<br><small>Huevo</small></span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="shop-section" *ngIf="pets.length > 0">
-                <h4>Mis Mascotas</h4>
-                <div class="shop-grid">
-                  <div class="shop-item" *ngFor="let p of pets" (click)="changeActivePet(p.id)" [class.active]="p.is_active">
-                    <div class="preview-circle" style="display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff;">
-                      {{ p.pet_type === 'dragon' ? '🐉' : (p.pet_type === 'cat' ? '🐱' : '🐶') }}
-                    </div>
-                    <span style="text-transform: capitalize;">{{ p.pet_type }}<br><small>Fase {{ p.evolution_phase }}</small></span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             <!-- EDIT NAME VIEW -->
             <div [hidden]="!showNameEdit">
               <div class="interact-header" style="position: relative; margin-bottom: 20px;">
@@ -301,28 +266,58 @@ import { LoveApiService } from '../../services/love-api.service';
                   <span>Dormir</span>
                 </button>
               </div>
-              
+              <div class="stats-panel">
+                <div class="stat-row">
+                  <span>Estado:</span>
+                  <strong>{{ currentEmotion }}</strong>
+                </div>
+                <div class="stat-row">
+                  <span>Nivel de amor:</span>
+                  <strong>{{ streakDays * 10 }} XP</strong>
+                </div>
+                <div class="stat-row" style="cursor: pointer;" (click)="openStore.emit()">
+                  <span>Monedas:</span>
+                  <strong style="display: flex; align-items: center; gap: 4px; color: #FFCA3A;">
+                    💰 {{ coins }}
+                    <ion-icon name="add-circle" style="font-size: 1.2rem;"></ion-icon>
+                  </strong>
+                </div>
+              </div>
+
               <div style="margin-top: 15px;">
                 <button class="shop-btn-large" (click)="showShop = true">
                   🎨 Decorar Mascota
                 </button>
               </div>
+
+              <div class="shop-section" style="margin-top: 20px;">
+                <h4>Huevos Sorpresa (Tienes: {{ eggs }})</h4>
+                <div class="shop-grid">
+                  <div class="shop-item" (click)="buyEgg()">
+                    <div class="preview-circle" style="display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff;">
+                      🥚
+                    </div>
+                    <span>Comprar<br><small>10 Monedas</small></span>
+                  </div>
+                  <div class="shop-item" (click)="openEggFromShop()" *ngIf="eggs > 0">
+                    <div class="preview-circle" style="display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff; border-color: #ffca3a;">
+                      ✨
+                    </div>
+                    <span>Abrir<br><small>Huevo</small></span>
+                  </div>
+                </div>
               </div>
-            <div class="stats-panel">
-              <div class="stat-row">
-                <span>Estado:</span>
-                <strong>{{ currentEmotion }}</strong>
-              </div>
-              <div class="stat-row">
-                <span>Nivel de amor:</span>
-                <strong>{{ streakDays * 10 }} XP</strong>
-              </div>
-              <div class="stat-row" style="cursor: pointer;" (click)="openStore.emit()">
-                <span>Monedas:</span>
-                <strong style="display: flex; align-items: center; gap: 4px; color: #FFCA3A;">
-                  💰 {{ coins }}
-                  <ion-icon name="add-circle" style="font-size: 1.2rem;"></ion-icon>
-                </strong>
+
+              <div class="shop-section" *ngIf="pets.length > 0">
+                <h4>Mis Mascotas</h4>
+                <div class="shop-grid">
+                  <div class="shop-item" *ngFor="let p of pets" (click)="changeActivePet(p.id)" [class.active]="p.is_active">
+                    <div class="preview-circle" style="display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff;">
+                      {{ p.pet_type === 'dragon' ? '🐉' : (p.pet_type === 'cat' ? '🐱' : '🐶') }}
+                    </div>
+                    <span style="text-transform: capitalize;">{{ p.pet_type }}<br><small>Fase {{ p.evolution_phase }}</small></span>
+                  </div>
+                </div>
               </div>
             </div>
 
