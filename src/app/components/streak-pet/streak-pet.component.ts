@@ -716,6 +716,7 @@ export class StreakPetComponent implements OnChanges, OnDestroy, OnInit {
   public animFrame = 1;
   private animDirection = 1;
   private animInterval: any;
+  private animMode: 'idle' | 'greeting' = 'idle';
 
   public bgOptions = [
     { id: 'none', name: 'Original', style: 'none', coinPrice: 0 },
@@ -1153,7 +1154,7 @@ export class StreakPetComponent implements OnChanges, OnDestroy, OnInit {
     if (typeStr === 'dragon') {
       const phase = this.petData?.evolution_phase || 1;
       if (phase === 1) {
-        return 'dragon/dragon_fase1.png';
+        return 'dragon/dragon_idle.png';
       }
       return `Dragon_fase${phase}_${state}`;
     }
@@ -1203,16 +1204,28 @@ export class StreakPetComponent implements OnChanges, OnDestroy, OnInit {
   }
 
   startPngAnimation() {
-    this.animInterval = setInterval(() => {
-      this.animFrame += this.animDirection;
-      if (this.animFrame >= 5) {
-        this.animFrame = 5;
-        this.animDirection = -1;
-      } else if (this.animFrame <= 1) {
-        this.animFrame = 1;
-        this.animDirection = 1;
-      }
-    }, 150); // Faster animation
+    if (this.animInterval) { clearInterval(this.animInterval); }
+    this.animFrame = 1;
+    this.animDirection = 1;
+    
+    if (this.animMode === 'idle') {
+      // Bucle continuo: 1->2->3->4->1->...
+      this.animInterval = setInterval(() => {
+        this.animFrame = this.animFrame >= 4 ? 1 : this.animFrame + 1;
+      }, 150);
+    } else {
+      // Ping-pong: 1->2->3->4->5->4->3->2->1->...
+      this.animInterval = setInterval(() => {
+        this.animFrame += this.animDirection;
+        if (this.animFrame >= 5) {
+          this.animFrame = 5;
+          this.animDirection = -1;
+        } else if (this.animFrame <= 1) {
+          this.animFrame = 1;
+          this.animDirection = 1;
+        }
+      }, 150);
+    }
   }
 
   getPngSrc(base: string): string {
