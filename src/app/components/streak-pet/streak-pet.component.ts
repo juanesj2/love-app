@@ -15,10 +15,7 @@ import { LoveApiService } from '../../services/love-api.service';
   template: `
     <!-- We show egg emoji if streak == 0 OR if not hatched yet -->
     <div class="pet-container" 
-         (pointerdown)="onPointerDown($event)" 
-         (pointerup)="onPointerUp($event)" 
-         (pointercancel)="onPointerCancel($event)"
-         (pointerleave)="onPointerCancel($event)"
+         (click)="onPetClick($event)"
          [class.is-egg]="isEgg" [ngClass]="rarityClass">
       
       <div class="egg-emoji" *ngIf="isEgg">🥚</div>
@@ -1233,31 +1230,10 @@ export class StreakPetComponent implements OnChanges, OnDestroy, OnInit {
     return base.replace('.png', `_${this.animFrame}.png`);
   }
 
-  onPointerDown(event: Event) {
-    if (this.isEgg && this.streakDays === 0) return; // Nada si falta racha
-    this.isLongPress = false;
-    this.pressTimeout = setTimeout(() => {
-      this.isLongPress = true;
-      if (!this.isEgg) {
-        this.openInteractModal();
-      }
-    }, 500); // 500ms para mantener pulsado
-  }
-
-  onPointerUp(event: Event) {
-    clearTimeout(this.pressTimeout);
-    if (!this.isLongPress) {
-      this.onPetTap();
-    }
-  }
-
-  onPointerCancel(event: Event) {
-    clearTimeout(this.pressTimeout);
-  }
-
-  onPetTap() {
+  onPetClick(event: Event) {
     if (this.isEgg && this.streakDays === 0) {
-      // Falta racha
+      // Si es un huevo y no hay racha, igual abrimos el modal de interacción para que vean información
+      this.openInteractModal();
       return;
     }
 
@@ -1267,7 +1243,7 @@ export class StreakPetComponent implements OnChanges, OnDestroy, OnInit {
       return;
     }
 
-    // Ya eclosionado: Interacción rápida
+    // Ya eclosionado: Abrir el modal de interacción siempre
     if (!this.isEgg) {
       const happyState = Math.random() > 0.5 ? 'happy' : 'heart';
       this.setLottieState(happyState);
@@ -1281,6 +1257,8 @@ export class StreakPetComponent implements OnChanges, OnDestroy, OnInit {
         this.setLottieState('neutral');
         this.currentEmotion = 'Tranquilo';
       }, 2500);
+
+      this.openInteractModal();
     }
   }
 
