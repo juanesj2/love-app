@@ -1204,8 +1204,12 @@ export class StreakPetComponent implements OnChanges, OnDestroy, OnInit {
     }
   }
 
-  startPngAnimation() {
+  startPngAnimation(state: string) {
     if (this.animInterval) { clearInterval(this.animInterval); }
+    
+    let isGreeting = this.currentLottieSrc.includes('/saludar/');
+    let maxFrames = isGreeting ? 5 : 4;
+    
     this.animFrame = 1;
     this.animDirection = 1;
 
