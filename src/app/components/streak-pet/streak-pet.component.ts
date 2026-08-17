@@ -1083,7 +1083,7 @@ export class StreakPetComponent implements OnChanges, OnDestroy, OnInit {
   }
 
   private evaluateState() {
-    if (this.streakDays === 0 || !this.petData) {
+    if (!this.petData) {
       this.isEgg = true;
       this.rarityClass = '';
     } else {
@@ -1232,8 +1232,7 @@ export class StreakPetComponent implements OnChanges, OnDestroy, OnInit {
 
   onPetClick(event: Event) {
     if (this.isEgg && this.streakDays === 0) {
-      // Si es un huevo y no hay racha, igual abrimos el modal de interacción para que vean información
-      this.openInteractModal();
+      // Falta racha para el huevo (y no tienen mascota activa)
       return;
     }
 
