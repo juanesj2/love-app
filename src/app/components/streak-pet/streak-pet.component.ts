@@ -1213,7 +1213,16 @@ export class StreakPetComponent implements OnChanges, OnDestroy, OnInit {
     if (this.animInterval) { clearInterval(this.animInterval); }
     
     let isGreeting = this.currentLottieSrc.includes('/saludar/');
+    let isHearts = this.currentLottieSrc.includes('/corazones/');
+    
     let maxFrames = isGreeting ? 5 : 4;
+    
+    // Ajustar velocidad (ms por frame). 
+    // Corazones va más lento para que sea más natural.
+    let animSpeed = 150;
+    if (isHearts) {
+      animSpeed = 250;
+    }
     
     this.animFrame = 1;
     this.animDirection = 1;
@@ -1231,12 +1240,12 @@ export class StreakPetComponent implements OnChanges, OnDestroy, OnInit {
           this.animDirection = 1;
         }
       } else {
-        // Loop for neutral
+        // Loop for neutral y corazones
         if (this.animFrame > maxFrames) {
           this.animFrame = 1;
         }
       }
-    }, 150);
+    }, animSpeed);
   }
 
   getPngSrc(base: string): string {
