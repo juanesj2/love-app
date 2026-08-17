@@ -1192,6 +1192,11 @@ export class StreakPetComponent implements OnChanges, OnDestroy, OnInit {
     if (this.currentLottieSrc !== newLottieSrc) {
       this.currentLottieSrc = newLottieSrc;
       
+      // Manejar la animación PNG del dragón
+      if (this.currentLottieSrc.includes('dragon')) {
+        this.startPngAnimation();
+      }
+      
       // Solo recargamos si no es una imagen PNG
       if (!this.currentLottieSrc.endsWith('.png')) {
         if (this.lottiePlayer && this.lottiePlayer.nativeElement && this.lottiePlayer.nativeElement.load) {
@@ -1204,7 +1209,7 @@ export class StreakPetComponent implements OnChanges, OnDestroy, OnInit {
     }
   }
 
-  startPngAnimation(state: string) {
+  startPngAnimation() {
     if (this.animInterval) { clearInterval(this.animInterval); }
     
     let isGreeting = this.currentLottieSrc.includes('/saludar/');
