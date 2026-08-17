@@ -1147,13 +1147,17 @@ export class StreakPetComponent implements OnChanges, OnDestroy, OnInit {
   private getLottieFileName(state: string): string {
     let typeStr = this.petType.toLowerCase();
     
-    // Si es un dragón, dependemos de la fase de evolución
+    // Si es un dragón, dependemos de la fase de evolución y su estado
     if (typeStr === 'dragon') {
       const phase = this.petData?.evolution_phase || 1;
-      if (phase === 1) {
-        return 'dragon/dragon_idle.png';
-      }
-      return `Dragon_fase${phase}_${state}`;
+      
+      let folderState = 'neutral';
+      if (state === 'neutral' || state === 'idle') folderState = 'neutral';
+      else if (state === 'heart' || state === 'greeting' || state === 'pet') folderState = 'saludar';
+      else if (state === 'happy' || state === 'feed' || state === 'play') folderState = 'corazones';
+      else if (state === 'sleeping') folderState = 'durmiendo';
+      
+      return `dragon/fase${phase}/${folderState}/frame.png`;
     }
     
     // Convertir el estado genérico (neutral, happy, etc.) a los archivos que tenemos
@@ -1204,25 +1208,26 @@ export class StreakPetComponent implements OnChanges, OnDestroy, OnInit {
     if (this.animInterval) { clearInterval(this.animInterval); }
     this.animFrame = 1;
     this.animDirection = 1;
-    
-    if (this.animMode === 'idle') {
-      // Bucle continuo: 1->2->3->4->1->...
-      this.animInterval = setInterval(() => {
-        this.animFrame = this.animFrame >= 4 ? 1 : this.animFrame + 1;
-      }, 150);
-    } else {
-      // Ping-pong: 1->2->3->4->5->4->3->2->1->...
-      this.animInterval = setInterval(() => {
-        this.animFrame += this.animDirection;
-        if (this.animFrame >= 5) {
-          this.animFrame = 5;
+
+    this.animInterval = setInterval(() => {
+      this.animFrame += this.animDirection;
+      
+      if (isGreeting) {
+        // Ping-pong for saludar
+        if (this.animFrame >= maxFrames) {
+          this.animFrame = maxFrames;
           this.animDirection = -1;
         } else if (this.animFrame <= 1) {
           this.animFrame = 1;
           this.animDirection = 1;
         }
-      }, 150);
-    }
+      } else {
+        // Loop for neutral
+        if (this.animFrame > maxFrames) {
+          this.animFrame = 1;
+        }
+      }
+    }, 150);
   }
 
   getPngSrc(base: string): string {
